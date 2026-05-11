@@ -20,10 +20,16 @@ function TransportRegistration() {
     const loadData = async () => {
       try {
         const [semRes, stopsRes, regRes] = await Promise.all([getSemesters(), getStops(), getRegistration()]);
-        setSemesters(semRes.data);
-        setStops(stopsRes.data);
-        if (regRes.data?.length > 0) {
-          const reg = regRes.data[0];
+        const semData = semRes.data?.results ?? semRes.data;
+        const stopData = stopsRes.data?.results ?? stopsRes.data;
+        const regData = regRes.data?.results ?? regRes.data;
+
+        setSemesters(Array.isArray(semData) ? semData : []);
+        setStops(Array.isArray(stopData) ? stopData : []);
+        const regList = regRes.data?.results ?? regRes.data;
+
+        if (Array.isArray(regList) && regList.length > 0) {
+          const reg = regList[0];
           setRegistration(reg);
           try { const cr = await getChallan(reg.id); setChallan(cr.data); } catch { setChallan(null); }
         }
@@ -82,13 +88,17 @@ function TransportRegistration() {
               <Field label="Semester" required>
                 <select value={selectedSemester} onChange={(e) => setSelectedSemester(e.target.value)} style={selectStyle}>
                   <option value="">Select Semester</option>
-                  {semesters.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  {Array.isArray(semesters) && semesters.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
                 </select>
               </Field>
               <Field label="Pickup Stop" required>
                 <select value={selectedStop} onChange={(e) => setSelectedStop(e.target.value)} style={selectStyle}>
                   <option value="">Select Stop</option>
-                  {stops.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  {Array.isArray(stops) && stops.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
                 </select>
               </Field>
               <button type="submit" disabled={loading} style={{ ...btn.primary, alignSelf: "flex-start", minWidth: "180px", opacity: loading ? 0.6 : 1 }}>

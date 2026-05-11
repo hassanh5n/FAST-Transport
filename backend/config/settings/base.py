@@ -1,7 +1,10 @@
 from pathlib import Path
 import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+load_dotenv(BASE_DIR.parent / ".env")
 
 # ── Security ──────────────────────────────────────────────────────────────────
 # No fallback — if this env var is missing, the app must not start.
