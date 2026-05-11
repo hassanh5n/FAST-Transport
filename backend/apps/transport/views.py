@@ -13,6 +13,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from datetime import timedelta
 import random
+import string as _string
 from rest_framework.response import Response
 from rest_framework import viewsets,permissions
 from rest_framework.decorators import action
@@ -945,52 +946,136 @@ def verify_otp(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def resend_otp(request):
-    """
-    POST /api/resend-otp/
-    Body: { "email": "..." }
-    """
-    email = request.data.get("email", "").strip()
-
+    email = request.data.get("email", "").lower().strip()
     if not email:
         return Response({"detail": "Email is required."}, status=400)
-
+ 
     try:
-        users = User.objects.filter(email=email, is_active=False)
-
-        if not users.exists():
-            return Response({"detail": "No pending account found with this email."}, status=404)
-
-        if users.count() > 1:
-            return Response({"detail": "Multiple accounts found. Contact support."}, status=400)
-
-        user = users.first()
+        user = User.objects.get(email__iexact=email)
     except User.DoesNotExist:
-        return Response({"detail": "No pending account found with this email."}, status=404)
-
-    otp_code = generate_otp()
-    OTPVerification.objects.update_or_create(
+        # Don't reveal whether the email exists
+        return Response({"detail": "If that email is registered, a new OTP has been sent."})
+ 
+    # ── Rate limit: one OTP per 60 seconds ───────────────────────────────────
+    existing = OTPVerification.objects.filter(user=user).first()
+    if existing:
+        seconds_since = (timezone.now() - existing.created_at).total_seconds()
+        if seconds_since < 60:
+            wait = int(60 - seconds_since)
+            return Response(
+                {"detail": f"Please wait {wait} seconds before requesting another OTP."},
+                status=429,
+            )
+        existing.delete()
+ 
+    otp_code = ''.join(random.choices(_string.digits, k=6))
+    OTPVerification.objects.create(
         user=user,
-        defaults={
-            "otp": otp_code,
-            "expires_at": timezone.now() + timedelta(minutes=10),
-            "is_used": False,
-        }
+        otp=otp_code,
+        expires_at=timezone.now() + timedelta(minutes=10),
     )
-
+ 
     send_mail(
-        subject="Your New FAST Transport OTP Code",
-        message=(
-            f"Hello {user.username},\n\n"
-            f"Your new OTP verification code is: {otp_code}\n\n"
-            f"This code expires in 10 minutes."
-        ),
+        subject="Your FAST Transport OTP",
+        message=f"Your OTP is: {otp_code}\nIt expires in 10 minutes.",
         from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[user.email],
+        recipient_list=[email],
         fail_silently=False,
     )
-
-    return Response({"detail": "A new OTP has been sent to your email."})
+ 
+    return Response({"detail": "If that email is registered, a new OTP has been sent."})
     
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def forgot_password(request):
+    """
+    POST /api/forgot-password/
+    Body: { "email": "k220001@nu.edu.pk" }
+ 
+    Sends a password-reset OTP to the email. Always returns 200 to avoid
+    leaking whether the email exists.
+    """
+    email = request.data.get("email", "").lower().strip()
+    if not email:
+        return Response({"detail": "Email is required."}, status=400)
+ 
+    try:
+        user = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        return Response({"detail": "If that email is registered, a reset OTP has been sent."})
+ 
+    # Rate limit: same 60-second window as resend_otp
+    existing = OTPVerification.objects.filter(user=user).first()
+    if existing:
+        seconds_since = (timezone.now() - existing.created_at).total_seconds()
+        if seconds_since < 60:
+            wait = int(60 - seconds_since)
+            return Response(
+                {"detail": f"Please wait {wait} seconds before requesting another reset OTP."},
+                status=429,
+            )
+        existing.delete()
+ 
+    otp_code = ''.join(random.choices(_string.digits, k=6))
+    OTPVerification.objects.create(
+        user=user,
+        otp=otp_code,
+        expires_at=timezone.now() + timedelta(minutes=10),
+    )
+ 
+    send_mail(
+        subject="Reset your FAST Transport password",
+        message=(
+            f"Your password reset OTP is: {otp_code}\n"
+            "It expires in 10 minutes.\n\n"
+            "If you did not request this, ignore this email."
+        ),
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+ 
+    return Response({"detail": "If that email is registered, a reset OTP has been sent."})
+ 
+ 
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def reset_password(request):
+    """
+    POST /api/reset-password/
+    Body: { "email": "k220001@nu.edu.pk", "otp": "123456", "new_password": "..." }
+    """
+    email        = request.data.get("email", "").lower().strip()
+    otp_code     = request.data.get("otp", "").strip()
+    new_password = request.data.get("new_password", "").strip()
+ 
+    if not all([email, otp_code, new_password]):
+        return Response({"detail": "email, otp, and new_password are all required."}, status=400)
+ 
+    if len(new_password) < 8:
+        return Response({"detail": "Password must be at least 8 characters."}, status=400)
+ 
+    try:
+        user = User.objects.get(email__iexact=email)
+    except User.DoesNotExist:
+        return Response({"detail": "Invalid credentials."}, status=400)
+ 
+    try:
+        otp_obj = OTPVerification.objects.get(user=user, otp=otp_code)
+    except OTPVerification.DoesNotExist:
+        return Response({"detail": "Invalid or expired OTP."}, status=400)
+ 
+    if not otp_obj.is_valid():
+        otp_obj.delete()
+        return Response({"detail": "OTP has expired. Please request a new one."}, status=400)
+ 
+    user.set_password(new_password)
+    user.save()
+    otp_obj.delete()
+ 
+    return Response({"detail": "Password reset successfully. You can now log in."})
+
 
 
 class DashboardView(APIView):
@@ -1390,7 +1475,7 @@ def student_bus_tracking(request):
 
 # ── Stripe Payment + OTP Verification ────────────────────────────────────────
 
-import string as _string
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])

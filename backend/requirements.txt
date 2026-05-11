@@ -2,11 +2,12 @@ asgiref==3.11.1
 Django==6.0.2
 django-cors-headers==4.9.0
 djangorestframework==3.16.1
-reportlab
 sqlparse==0.5.5
 tzdata==2025.3
 djangorestframework-simplejwt==5.5.1
 psycopg2-binary
-python-dotenv==1.1.1
 stripe
 requests==2.32.3
+gunicorn==23.0.0
+
+

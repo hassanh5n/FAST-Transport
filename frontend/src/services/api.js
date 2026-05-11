@@ -22,8 +22,12 @@ function endRequest() {
   emitLoadingState();
 }
 
+// In development: VITE_API_BASE_URL is not set, so it falls back to localhost.
+// In production: docker-compose.prod.yml injects the real URL at build time.
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
 const api = axios.create({
-  baseURL: "http://localhost:8000",
+  baseURL: BASE_URL,
 });
 
 api.interceptors.request.use(
@@ -54,7 +58,7 @@ api.interceptors.response.use(
       const refresh = localStorage.getItem("refresh");
       if (refresh) {
         try {
-          const res = await axios.post("http://localhost:8000/api/token/refresh/", { refresh });
+          const res = await axios.post(`${BASE_URL}/api/token/refresh/`, { refresh });
           const newAccess = res.data.access;
           localStorage.setItem("access", newAccess);
           originalRequest.headers = originalRequest.headers || {};

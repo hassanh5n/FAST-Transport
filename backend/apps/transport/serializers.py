@@ -455,3 +455,16 @@ class StudentProfileCreateSerializer(serializers.ModelSerializer):
 
         profile = StudentProfile.objects.create(user=user, **validated_data)
         return profile
+    
+    def validate_email(self, value):
+        value = value.lower().strip()
+
+        if not value.endswith("@nu.edu.pk"):
+            raise serializers.ValidationError(
+            "Only FAST NUCES email addresses (@nu.edu.pk) are allowed."
+            )
+
+        if User.objects.filter(email__iexact=value).exists():
+            raise serializers.ValidationError("An account with this email already exists.")
+
+        return value
