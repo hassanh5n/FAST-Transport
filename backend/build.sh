@@ -7,3 +7,4 @@ pip install -r requirements.txt
 
 python manage.py collectstatic --noinput --settings=config.settings.prod
 python manage.py migrate --settings=config.settings.prod
+python manage.py create_superuser_env --settings=config.settings.prod
