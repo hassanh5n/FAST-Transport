@@ -16,7 +16,7 @@
 Built with **Django REST Framework** and **React (Vite)**, it follows a clean three-tier architecture with JWT authentication, role-based access control, and responsive design across all devices.
 
 ### 🌐 Live Access
-[https://fast-transport.vercel.app](https://fast-transport.vercel.app)
+[https://fast-transport-one.vercel.app](https://fast-transport-one.vercel.app)
 
 
 ---
