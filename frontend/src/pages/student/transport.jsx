@@ -56,7 +56,7 @@ function StudentTransport() {
                 <div style={{ borderTop: `1px solid ${colors.borderLight}`, margin: "14px 0" }} />
                 <h4 style={{ ...sectionH, fontSize: "13px", marginBottom: "8px" }}>Student Details</h4>
                 <DetailRow label="Full Name" value={(() => {
-                  const name = `${profile.user?.first_name || ""} ${profile.user?.last_name || ""}`.trim();
+                  const name = `${profile.first_name || ""} ${profile.last_name || ""}`.trim();
                   return name || "—";
                 })()} />
                 <DetailRow label="Roll No"    value={profile.roll_number} />

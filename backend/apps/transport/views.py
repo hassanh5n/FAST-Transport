@@ -378,7 +378,7 @@ class SeatAllocationViewSet(viewsets.ModelViewSet):
                 {
                     "registration_id": registration.id,
                     "roll_number": registration.student.roll_number,
-                    "student_name": registration.student.user.username,
+                    "student_name": f"{registration.student.user.first_name} {registration.student.user.last_name}".strip() or registration.student.user.username,
                     "semester": registration.semester.name,
                     "route": registration.route.name,
                     "stop": registration.stop.name,
@@ -436,7 +436,7 @@ class SeatAllocationViewSet(viewsets.ModelViewSet):
                 {
                     "registration_id": registration.id,
                     "roll_number": registration.student.roll_number,
-                    "student_name": registration.student.user.username,
+                    "student_name": f"{registration.student.user.first_name} {registration.student.user.last_name}".strip() or registration.student.user.username,
                     "semester": registration.semester.name,
                     "route": registration.route.name,
                     "stop": registration.stop.name,
