@@ -12,6 +12,6 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
 ]
 
-# In dev, use the console email backend so you don't need SMTP running
-# Comment this out when you want to test real email delivery locally.
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+#EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' (for console only)
+
+EMAIL_BACKEND = 'config.email_backends.DualEmailBackend' # (for both console and real email)

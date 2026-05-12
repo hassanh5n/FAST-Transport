@@ -19,14 +19,19 @@ function downloadCSV(filename, rows) {
 }
 
 // ── Export card ───────────────────────────────────────────────────────────────
+
 function ExportCard({ title, description, icon, onExport, loading }) {
   return (
     <div style={{
-      background: "#fff", border: `1px solid ${colors.borderLight}`,
-      borderRadius: radius.lg, padding: "24px",
+      background: "#fff",
+      border: `1px solid ${colors.borderLight}`,
+      borderRadius: radius.lg,
+      padding: "24px",
       boxShadow: "0 1px 3px rgba(11,45,66,0.06)",
+      display: "flex",
+      flexDirection: "column",
     }}>
-      <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", marginBottom: "16px" }}>
+      <div style={{ display: "flex", gap: "16px", alignItems: "flex-start", marginBottom: "12px" }}>
         <div style={{
           width: "44px", height: "44px", borderRadius: "10px",
           background: colors.infoBg, border: `1px solid rgba(40,141,196,0.2)`,
@@ -35,15 +40,17 @@ function ExportCard({ title, description, icon, onExport, loading }) {
         }}>
           {icon}
         </div>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <h3 style={{ margin: "0 0 4px", fontSize: "15px", fontWeight: "700", color: colors.textPrimary, fontFamily: fonts.heading }}>{title}</h3>
           <p style={{ margin: 0, fontSize: "13px", color: colors.textSecondary, lineHeight: 1.5 }}>{description}</p>
         </div>
       </div>
+      {/* Spacer pushes button to bottom */}
+      <div style={{ flex: 1 }} />
       <button
         onClick={onExport}
         disabled={loading}
-        style={{ ...btn.primary, display: "flex", alignItems: "center", gap: "8px", opacity: loading ? 0.6 : 1 }}
+        style={{ ...btn.primary, display: "flex", alignItems: "center", gap: "8px", opacity: loading ? 0.6 : 1, alignSelf: "flex-start", marginTop: "16px" }}
       >
         {loading ? "Preparing…" : (
           <>
@@ -62,10 +69,10 @@ function ExportCard({ title, description, icon, onExport, loading }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 function AdminExportPage() {
-  const [semesters, setSemesters]           = useState([]);
+  const [semesters, setSemesters]               = useState([]);
   const [selectedSemester, setSelectedSemester] = useState("");
-  const [loadingKey, setLoadingKey]         = useState(null);
-  const [error, setError]                   = useState("");
+  const [loadingKey, setLoadingKey]             = useState(null);
+  const [error, setError]                       = useState("");
 
   useEffect(() => {
     getSemesters()
@@ -80,17 +87,28 @@ function AdminExportPage() {
   const withLoading = async (key, fn) => {
     setLoadingKey(key); setError("");
     try { await fn(); }
-    catch { setError("Export failed. Please try again."); }
+    catch (err) {
+      const msg = err.response?.data?.detail || err.message || "Export failed. Please try again.";
+      setError(msg);
+    }
     finally { setLoadingKey(null); }
   };
+
+
+  const selectedSemName = () =>
+    semesters.find(s => String(s.id) === selectedSemester)?.name || selectedSemester;
 
   // ── Export: all students ──────────────────────────────────────────────────
   const exportAllStudents = () => withLoading("students", async () => {
     const res  = await api.get("/api/students/");
-    const rows = res.data.map(s => ({
+    const data = res.data;
+    if (!data.length) { setError("No student records found."); return; }
+    const rows = data.map(s => ({
       "Roll Number":  s.roll_number,
       "Username":     s.user?.username,
       "Email":        s.user?.email,
+      "First Name":   s.user?.first_name,
+      "Last Name":    s.user?.last_name,
       "Department":   s.department,
       "Batch":        s.batch,
       "Phone":        s.phone,
@@ -104,18 +122,20 @@ function AdminExportPage() {
   const exportRegistrations = () => withLoading("registrations", async () => {
     if (!selectedSemester) { setError("Please select a semester first."); return; }
     const res  = await api.get(`/api/semester-registrations/?semester=${selectedSemester}`);
-    const rows = (res.data.results ?? res.data).map(r => ({
-      "Roll Number":  r.student?.roll_number,
-      "Student":      r.student?.user?.username,
-      "Email":        r.student?.user?.email,
-      "Department":   r.student?.department,
-      "Semester":     r.semester?.name,
-      "Route":        r.route?.name,
-      "Stop":         r.stop?.name,
-      "Status":       r.status,
+    const data = res.data;
+    if (!data.length) { setError("No registrations found for this semester."); return; }
+    const rows = data.map(r => ({
+      "Roll Number":   r.student?.roll_number,
+      "Username":      r.student?.user?.username,
+      "Email":         r.student?.user?.email,
+      "Department":    r.student?.department,
+      "Semester":      r.semester?.name,
+      "Route":         r.route?.name,
+      "Stop":          r.stop?.name,
+      "Status":        r.status,
       "Registered At": r.registered_at?.slice(0, 10),
     }));
-    const semName = semesters.find(s => String(s.id) === selectedSemester)?.name || selectedSemester;
+    const semName = selectedSemName();
     downloadCSV(`registrations_${semName.replace(/\s+/g, "_")}.csv`, rows);
   });
 
@@ -123,17 +143,21 @@ function AdminExportPage() {
   const exportFees = () => withLoading("fees", async () => {
     if (!selectedSemester) { setError("Please select a semester first."); return; }
     const res  = await api.get("/api/fee-verifications/list/");
-    const rows = res.data
-      .filter(f => !selectedSemester || String(f.semester_id) === selectedSemester)
-      .map(f => ({
-        "Roll Number":    f.roll_number,
-        "Student":        f.student_name,
-        "Semester":       f.semester,
-        "Challan Number": f.challan_number,
-        "Amount (PKR)":   f.amount,
-        "Verified":       f.is_verified ? "Yes" : "No",
-      }));
-    const semName = semesters.find(s => String(s.id) === selectedSemester)?.name || selectedSemester;
+    const semName = selectedSemName();
+
+    const filtered = res.data.filter(f =>
+      !selectedSemester || f.semester === semName
+    );
+    if (!filtered.length) { setError(`No fee records found for "${semName}".`); return; }
+
+    const rows = filtered.map(f => ({
+      "Roll Number":    f.roll_number,
+      "Student":        f.student_name,
+      "Semester":       f.semester,
+      "Challan Number": f.challan_number,
+      "Amount (PKR)":   f.amount,
+      "Verified":       f.is_verified ? "Yes" : "No",
+    }));
     downloadCSV(`fees_${semName.replace(/\s+/g, "_")}.csv`, rows);
   });
 
@@ -141,42 +165,48 @@ function AdminExportPage() {
   const exportSeats = () => withLoading("seats", async () => {
     if (!selectedSemester) { setError("Please select a semester first."); return; }
     const res  = await api.get("/api/seat-allocations/current-allocations/");
-    const rows = (res.data ?? [])
-      .filter(r => !selectedSemester || String(r.semester_id) === selectedSemester)
-      .map(r => ({
-        "Roll Number":  r.roll_number,
-        "Student":      r.student_name,
-        "Semester":     r.semester,
-        "Route":        r.route,
-        "Stop":         r.stop,
-        "Bus":          r.current_bus,
-        "Seat Number":  r.current_seat_number,
-      }));
-    const semName = semesters.find(s => String(s.id) === selectedSemester)?.name || selectedSemester;
+    const semName = selectedSemName();
+
+    const filtered = (res.data ?? []).filter(r =>
+      !selectedSemester || r.semester === semName
+    );
+    if (!filtered.length) { setError(`No seat allocations found for "${semName}".`); return; }
+
+    const rows = filtered.map(r => ({
+      "Roll Number":  r.roll_number,
+      "Student":      r.student_name,
+      "Semester":     r.semester,
+      "Route":        r.route,
+      "Stop":         r.stop,
+      "Bus":          r.current_bus,
+      "Seat Number":  r.current_seat_number,
+    }));
     downloadCSV(`seat_allocations_${semName.replace(/\s+/g, "_")}.csv`, rows);
   });
 
   // ── Export: complaints ────────────────────────────────────────────────────
   const exportComplaints = () => withLoading("complaints", async () => {
     const res  = await api.get("/api/complaints/");
-    const rows = res.data.map(c => ({
-      "Student":      c.submitted_by?.username,
-      "Subject":      c.subject,
-      "Category":     c.category,
-      "Priority":     c.priority,
-      "Status":       c.status,
-      "Description":  c.description,
+    const data = res.data;
+    if (!data.length) { setError("No complaint records found."); return; }
+    const rows = data.map(c => ({
+      "Student":        c.submitted_by?.username,
+      "Subject":        c.subject,
+      "Category":       c.category,
+      "Priority":       c.priority,
+      "Status":         c.status,
+      "Description":    c.description,
       "Admin Response": c.admin_response !== "N/A" ? c.admin_response : "",
-      "Submitted":    c.created_at?.slice(0, 10),
-      "Resolved":     c.resolved_at?.slice(0, 10) || "",
+      "Submitted":      c.created_at?.slice(0, 10),
+      "Resolved":       c.resolved_at?.slice(0, 10) || "",
     }));
     downloadCSV("complaints_all.csv", rows);
   });
 
   const semesterExports = [
-    { key: "registrations", title: "Semester Registrations",   description: "All student transport registrations for the selected semester with route, stop, and status.",          icon: "📋", fn: exportRegistrations },
-    { key: "fees",          title: "Fee Verifications",         description: "Fee payment and challan records for the selected semester.",                                            icon: "💳", fn: exportFees          },
-    { key: "seats",         title: "Seat Allocations",          description: "Final seat assignments per bus for the selected semester.",                                             icon: "🎫", fn: exportSeats         },
+    { key: "registrations", title: "Semester Registrations",   description: "All student transport registrations for the selected semester with route, stop, and status.",   icon: "📋", fn: exportRegistrations },
+    { key: "fees",          title: "Fee Verifications",         description: "Fee payment and challan records for the selected semester.",                                      icon: "💳", fn: exportFees          },
+    { key: "seats",         title: "Seat Allocations",          description: "Final seat assignments per bus for the selected semester.",                                       icon: "🎫", fn: exportSeats         },
   ];
 
   const globalExports = [
@@ -192,7 +222,12 @@ function AdminExportPage() {
 
       {error && <Banner variant="danger" style={{ marginBottom: "20px" }}>{error}</Banner>}
 
-      <div style={{ background: "#fff", border: `1px solid ${colors.borderLight}`, borderRadius: radius.lg, padding: "20px 24px", marginBottom: "28px", boxShadow: "0 1px 3px rgba(11,45,66,0.06)" }}>
+      {/* Semester picker */}
+      <div style={{
+        background: "#fff", border: `1px solid ${colors.borderLight}`,
+        borderRadius: radius.lg, padding: "20px 24px", marginBottom: "28px",
+        boxShadow: "0 1px 3px rgba(11,45,66,0.06)",
+      }}>
         <p style={{ margin: "0 0 10px", fontSize: "13px", fontWeight: "600", color: colors.textSecondary, textTransform: "uppercase", letterSpacing: "0.05em" }}>
           Semester for filtered exports
         </p>
@@ -208,6 +243,7 @@ function AdminExportPage() {
         </select>
       </div>
 
+      {/* Semester-scoped exports */}
       <h3 style={{ margin: "0 0 14px", fontSize: "14px", fontWeight: "700", color: colors.textPrimary, fontFamily: fonts.heading }}>
         Semester Reports
       </h3>
@@ -218,6 +254,7 @@ function AdminExportPage() {
         ))}
       </div>
 
+      {/* Global exports */}
       <h3 style={{ margin: "0 0 14px", fontSize: "14px", fontWeight: "700", color: colors.textPrimary, fontFamily: fonts.heading }}>
         Full Records
       </h3>

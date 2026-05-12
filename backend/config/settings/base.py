@@ -94,7 +94,7 @@ EMAIL_PORT         = 587
 EMAIL_USE_TLS      = True
 EMAIL_HOST_USER    = 'a8d609001@smtp-brevo.com'
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
-DEFAULT_FROM_EMAIL = 'FAST Transport <thundermarks.agency@gmail.com>'
+DEFAULT_FROM_EMAIL = 'FAST-Transport <hassannafees.4017@gmail.com>'
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
 # Set in dev.py / prod.py — never allow all in base.
