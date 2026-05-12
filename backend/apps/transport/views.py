@@ -868,19 +868,25 @@ class StudentSignupView(generics.CreateAPIView):
             }
         )
 
-        # Send OTP email
-        send_mail(
-            subject="Your FAST Transport OTP Code",
-            message=(
-                f"Hello {user.username},\n\n"
-                f"Your OTP verification code is: {otp_code}\n\n"
-                f"This code expires in 10 minutes.\n\n"
-                f"If you did not request this, please ignore this email."
-            ),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[user.email],
-            fail_silently=False,
-        )
+        # Send OTP email — if this fails we still want the user created
+        try:
+            send_mail(
+                subject="Your FAST Transport OTP Code",
+                message=(
+                    f"Hello {user.username},\n\n"
+                    f"Your OTP verification code is: {otp_code}\n\n"
+                    f"This code expires in 10 minutes.\n\n"
+                    f"If you did not request this, please ignore this email."
+                ),
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.error(f"Failed to send OTP email to {user.email}: {e}")
+            # Don't raise — user is created, they can request a resend
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

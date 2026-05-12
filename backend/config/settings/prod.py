@@ -38,3 +38,7 @@ SECURE_HSTS_SECONDS           = 31536000
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_CONTENT_TYPE_NOSNIFF   = True
 X_FRAME_OPTIONS               = 'DENY'
+
+# ── Email (Brevo HTTP API — SMTP port 587 is blocked on Render free tier) ────
+EMAIL_BACKEND = 'config.brevo_backend.BrevoAPIEmailBackend'
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY', '')
