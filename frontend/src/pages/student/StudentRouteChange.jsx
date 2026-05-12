@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
-import { Pill, Banner } from "../../components/ui";
+import { Banner } from "../../components/ui";
 import { colors, fonts, radius, btn } from "../../theme";
 import {
   getMyRouteChangeRequests,
@@ -9,11 +9,11 @@ import {
 } from "../../services/transportService";
 import api from "../../services/api";
 
-const STATUS_VARIANT = {
-  Pending:   "warning",
-  Approved:  "success",
-  Rejected:  "danger",
-  Cancelled: "neutral",
+const STATUS_COLORS = {
+  Pending:   { bg: "#fff3cd", color: "#856404" },
+  Approved:  { bg: "#EAF3DE", color: "#3B6D11" },
+  Rejected:  { bg: "#fde8e8", color: "#9b1c1c" },
+  Cancelled: { bg: "#f3f4f6", color: "#6b7280" },
 };
 
 export default function StudentRouteChange() {
@@ -163,7 +163,7 @@ export default function StudentRouteChange() {
                       )}
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "8px", flexShrink: 0 }}>
-                      <Pill label={req.status} variant={STATUS_VARIANT[req.status] || "neutral"} />
+                      <span style={{ fontSize: "11px", fontWeight: "600", padding: "3px 10px", borderRadius: "20px", ...(STATUS_COLORS[req.status] || STATUS_COLORS.Cancelled) }}>{req.status}</span>
                       {req.status === "Pending" && (
                         <button
                           style={{ ...btn.danger, padding: "5px 12px", fontSize: "12px" }}

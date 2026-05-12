@@ -9,5 +9,6 @@ psycopg2-binary
 stripe
 requests==2.32.3
 gunicorn==23.0.0
-
-
+python-dotenv
+dj-database-url==2.3.0
+whitenoise[brotli]==6.9.0

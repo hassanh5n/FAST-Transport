@@ -15,7 +15,6 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 backend/staticfiles/
-backend/config/settings/base.py
 
 # =====================
 # Frontend - Vite/React
