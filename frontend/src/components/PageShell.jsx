@@ -1,17 +1,34 @@
+// frontend/src/components/PageShell.jsx
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar  from "./Navbar";
+import { useBreakpoint } from "../utils/useBreakpoint";
 import { colors, fonts } from "../theme";
 
 function PageShell({ role = "student", title, children, maxWidth }) {
+  const isMobile = useBreakpoint(768);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div style={styles.root}>
-      <Sidebar role={role} />
+      <Sidebar
+        role={role}
+        isMobile={isMobile}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
       <div style={styles.main}>
-        <Navbar title={title} />
+        <Navbar
+          title={title}
+          isMobile={isMobile}
+          onMenuToggle={() => setSidebarOpen(true)}
+        />
         <div
           className="page-content"
           style={{
             ...styles.content,
+            padding: isMobile ? "16px" : "28px",
             ...(maxWidth ? { maxWidth } : {}),
           }}
         >
@@ -56,7 +73,6 @@ const styles = {
     minWidth:      0,
   },
   content: {
-    padding:  "28px",
     flex:     1,
     minWidth: 0,
   },
@@ -69,10 +85,10 @@ const styles = {
     fontFamily:    fonts.heading,
   },
   pageSub: {
-    margin:    "5px 0 0",
-    fontSize:  "13.5px",
-    color:     colors.textSecondary,
-    lineHeight:1.6,
+    margin:     "5px 0 0",
+    fontSize:   "13.5px",
+    color:      colors.textSecondary,
+    lineHeight: 1.6,
   },
   card: {
     background:   "#fff",

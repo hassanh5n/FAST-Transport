@@ -120,14 +120,12 @@ const Icon = ({ name, size = 17 }) => {
       </svg>
     ),
     export: (
-     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-       <polyline points="7 10 12 15 17 10"/>
-       <line x1="12" y1="15" x2="12" y2="3"/>
-     </svg>
-   ),
-
-
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+    ),
   };
   return icons[name] || null;
 };
@@ -160,7 +158,7 @@ const adminGroups = [
       { to: "/admin/feeverifications",        label: "Fee Verifications",   icon: "fee"        },
       { to: "/admin/routechangerequests",     label: "Route Requests",      icon: "routeChange"},
       { to: "/admin/complaints",              label: "Complaints",          icon: "complaint"  },
-      { to: "/admin/export",                  label: "Export Data",         icon: "export"    },
+      { to: "/admin/export",                  label: "Export Data",         icon: "export"     },
     ],
   },
 ];
@@ -192,7 +190,12 @@ const studentGroups = [
 ];
 
 // ── Component ────────────────────────────────────────────────────────────────
-function Sidebar({ role = "student" }) {
+// Props:
+//   role      – "student" | "staff"
+//   isMobile  – boolean (injected by PageShell)
+//   isOpen    – boolean, controls drawer visibility on mobile
+//   onClose   – callback to close the drawer
+function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }) {
   const navigate = useNavigate();
   const groups = role === "staff" ? adminGroups : studentGroups;
 
@@ -201,8 +204,54 @@ function Sidebar({ role = "student" }) {
     navigate("/login");
   };
 
+  // On desktop: always visible. On mobile: slide-out drawer.
+  if (isMobile) {
+    return (
+      <>
+        {/* Backdrop */}
+        {isOpen && (
+          <div onClick={onClose} style={styles.backdrop} />
+        )}
+
+        {/* Drawer */}
+        <aside style={{
+          ...styles.aside,
+          position:   "fixed",
+          top:        0,
+          left:       0,
+          height:     "100vh",
+          zIndex:     300,
+          transform:  isOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform 0.25s ease",
+          boxShadow:  isOpen ? "4px 0 24px rgba(0,0,0,0.18)" : "none",
+        }}>
+          <SidebarContent
+            groups={groups}
+            role={role}
+            onClose={onClose}
+            isMobile={isMobile}
+            handleLogout={handleLogout}
+          />
+        </aside>
+      </>
+    );
+  }
+
   return (
     <aside style={styles.aside}>
+      <SidebarContent
+        groups={groups}
+        role={role}
+        handleLogout={handleLogout}
+      />
+    </aside>
+  );
+}
+
+// ── Inner content (shared between desktop and drawer) ─────────────────────────
+function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
+  return (
+    <>
       {/* Brand */}
       <div style={styles.brand}>
         <div style={styles.logoMark}>
@@ -213,10 +262,19 @@ function Sidebar({ role = "student" }) {
             <path d="M2 12h6l2-4h8l2 4" stroke="white" strokeWidth="1.6" strokeLinejoin="round"/>
           </svg>
         </div>
-        <div>
+        <div style={{ flex: 1, minWidth: 0 }}>
           <p style={styles.brandSub}>FAST NUCES</p>
           <p style={styles.brandName}>Transport</p>
         </div>
+
+        {/* Close button — only inside mobile drawer */}
+        {isMobile && (
+          <button onClick={onClose} style={styles.closeBtn} aria-label="Close menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        )}
       </div>
 
       {/* Role pill */}
@@ -231,7 +289,7 @@ function Sidebar({ role = "student" }) {
           <div key={group.label} style={styles.group}>
             <p style={styles.groupLabel}>{group.label}</p>
             {group.links.map(({ to, label, icon }) => (
-              <NavLink key={to} to={to} style={navLinkStyle}>
+              <NavLink key={to} to={to} style={navLinkStyle} onClick={isMobile ? onClose : undefined}>
                 {({ isActive }) => (
                   <span style={isActive ? styles.linkInnerActive : styles.linkInner}>
                     <span style={{ color: isActive ? colors.accent : "inherit", flexShrink: 0 }}>
@@ -254,164 +312,182 @@ function Sidebar({ role = "student" }) {
           <span>Sign Out</span>
         </button>
       </div>
-    </aside>
+    </>
   );
 }
 
-// ── NavLink style function (wrapper, not inline) ──────────────────────────────
+// ── NavLink style function ────────────────────────────────────────────────────
 const navLinkStyle = () => ({ textDecoration: "none", display: "block" });
 
 // ── Styles ───────────────────────────────────────────────────────────────────
 const styles = {
+  backdrop: {
+    position:   "fixed",
+    inset:      0,
+    background: "rgba(0,0,0,0.45)",
+    zIndex:     299,
+  },
   aside: {
-    width: "236px",
-    minHeight: "100vh",
-    background: colors.navyDeep,
-    flexShrink: 0,
-    display: "flex",
-    flexDirection: "column",
-    fontFamily: fonts.body,
-    position: "sticky",
-    top: 0,
-    height: "100vh",
-    overflowY: "auto",
-    scrollbarWidth: "none",
+    width:        "236px",
+    minHeight:    "100vh",
+    background:   colors.navyDeep,
+    flexShrink:   0,
+    display:      "flex",
+    flexDirection:"column",
+    fontFamily:   fonts.body,
+    position:     "sticky",
+    top:          0,
+    height:       "100vh",
+    overflowY:    "auto",
+    scrollbarWidth:"none",
   },
   brand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "22px 20px 16px",
+    display:      "flex",
+    alignItems:   "center",
+    gap:          "12px",
+    padding:      "22px 20px 16px",
     borderBottom: "1px solid rgba(255,255,255,0.06)",
   },
   logoMark: {
-    width: "38px",
-    height: "38px",
-    borderRadius: "10px",
-    background: colors.accent,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    boxShadow: `0 4px 12px rgba(40,141,196,0.35)`,
+    width:           "38px",
+    height:          "38px",
+    borderRadius:    "10px",
+    background:      colors.accent,
+    display:         "flex",
+    alignItems:      "center",
+    justifyContent:  "center",
+    flexShrink:      0,
+    boxShadow:       `0 4px 12px rgba(40,141,196,0.35)`,
   },
   brandSub: {
-    margin: 0,
-    fontSize: "9px",
+    margin:        0,
+    fontSize:      "9px",
     letterSpacing: "0.15em",
     textTransform: "uppercase",
-    color: "rgba(255,255,255,0.35)",
-    fontWeight: 500,
+    color:         "rgba(255,255,255,0.35)",
+    fontWeight:    500,
   },
   brandName: {
-    margin: "2px 0 0",
-    fontSize: "15px",
-    fontWeight: "700",
-    color: "#fff",
+    margin:        "2px 0 0",
+    fontSize:      "15px",
+    fontWeight:    "700",
+    color:         "#fff",
     letterSpacing: "-0.02em",
-    fontFamily: fonts.heading,
+    fontFamily:    fonts.heading,
+  },
+  closeBtn: {
+    background:   "transparent",
+    border:       "none",
+    color:        "rgba(255,255,255,0.5)",
+    cursor:       "pointer",
+    padding:      "4px",
+    display:      "flex",
+    alignItems:   "center",
+    justifyContent:"center",
+    borderRadius: "6px",
+    flexShrink:   0,
   },
   rolePill: {
-    margin: "14px 16px 6px",
-    padding: "6px 12px",
-    background: "rgba(40,141,196,0.1)",
-    border: "1px solid rgba(40,141,196,0.18)",
-    borderRadius: "999px",
-    fontSize: "11px",
-    fontWeight: "600",
-    color: colors.accentLight,
+    margin:        "14px 16px 6px",
+    padding:       "6px 12px",
+    background:    "rgba(40,141,196,0.1)",
+    border:        "1px solid rgba(40,141,196,0.18)",
+    borderRadius:  "999px",
+    fontSize:      "11px",
+    fontWeight:    "600",
+    color:         colors.accentLight,
     letterSpacing: "0.04em",
     textTransform: "uppercase",
-    display: "flex",
-    alignItems: "center",
-    gap: "7px",
+    display:       "flex",
+    alignItems:    "center",
+    gap:           "7px",
   },
   roleDot: {
-    width: "6px",
-    height: "6px",
+    width:        "6px",
+    height:       "6px",
     borderRadius: "50%",
-    background: colors.accent,
-    flexShrink: 0,
-    boxShadow: `0 0 6px ${colors.accent}`,
+    background:   colors.accent,
+    flexShrink:   0,
+    boxShadow:    `0 0 6px ${colors.accent}`,
   },
   nav: {
-    flex: 1,
-    padding: "8px 0 12px",
-    overflowY: "auto",
-    scrollbarWidth: "none",
+    flex:          1,
+    padding:       "8px 0 12px",
+    overflowY:     "auto",
+    scrollbarWidth:"none",
   },
   group: {
     marginBottom: "4px",
   },
   groupLabel: {
-    margin: "16px 20px 4px",
-    fontSize: "9.5px",
-    fontWeight: "700",
+    margin:        "16px 20px 4px",
+    fontSize:      "9.5px",
+    fontWeight:    "700",
     letterSpacing: "0.12em",
     textTransform: "uppercase",
-    color: "rgba(255,255,255,0.25)",
+    color:         "rgba(255,255,255,0.25)",
   },
   linkInner: {
-    display: "flex",
+    display:    "flex",
     alignItems: "center",
-    gap: "11px",
-    padding: "9px 16px",
-    margin: "1px 8px",
-    borderRadius: "9px",
-    color: "rgba(255,255,255,0.55)",
-    fontSize: "13px",
+    gap:        "11px",
+    padding:    "9px 16px",
+    margin:     "1px 8px",
+    borderRadius:"9px",
+    color:      "rgba(255,255,255,0.55)",
+    fontSize:   "13px",
     fontWeight: "500",
-    cursor: "pointer",
+    cursor:     "pointer",
     transition: "all 0.15s",
-    position: "relative",
+    position:   "relative",
   },
   linkInnerActive: {
-    display: "flex",
+    display:    "flex",
     alignItems: "center",
-    gap: "11px",
-    padding: "9px 16px",
-    margin: "1px 8px",
-    borderRadius: "9px",
-    color: "#ffffff",
-    fontSize: "13px",
+    gap:        "11px",
+    padding:    "9px 16px",
+    margin:     "1px 8px",
+    borderRadius:"9px",
+    color:      "#ffffff",
+    fontSize:   "13px",
     fontWeight: "600",
-    cursor: "pointer",
+    cursor:     "pointer",
     background: "rgba(40,141,196,0.14)",
-    border: "1px solid rgba(40,141,196,0.2)",
-    position: "relative",
+    border:     "1px solid rgba(40,141,196,0.2)",
+    position:   "relative",
   },
   linkLabel: {
-    flex: 1,
-    whiteSpace: "nowrap",
-    overflow: "hidden",
+    flex:         1,
+    whiteSpace:   "nowrap",
+    overflow:     "hidden",
     textOverflow: "ellipsis",
   },
   activeDot: {
-    width: "5px",
-    height: "5px",
+    width:        "5px",
+    height:       "5px",
     borderRadius: "50%",
-    background: colors.accent,
-    flexShrink: 0,
+    background:   colors.accent,
+    flexShrink:   0,
   },
   footer: {
-    padding: "12px 16px 20px",
-    borderTop: "1px solid rgba(255,255,255,0.06)",
+    padding:     "12px 16px 20px",
+    borderTop:   "1px solid rgba(255,255,255,0.06)",
   },
   logoutBtn: {
-    display: "flex",
-    alignItems: "center",
-    gap: "9px",
-    width: "100%",
-    padding: "9px 14px",
-    background: "rgba(239,68,68,0.08)",
-    border: "1px solid rgba(239,68,68,0.15)",
+    display:      "flex",
+    alignItems:   "center",
+    gap:          "9px",
+    width:        "100%",
+    padding:      "9px 14px",
+    background:   "rgba(239,68,68,0.08)",
+    border:       "1px solid rgba(239,68,68,0.15)",
     borderRadius: "9px",
-    color: "#f87171",
-    fontSize: "13px",
-    fontWeight: "600",
-    cursor: "pointer",
-    textAlign: "left",
-    fontFamily: fonts.body,
+    color:        "#f87171",
+    fontSize:     "13px",
+    fontWeight:   "600",
+    cursor:       "pointer",
+    textAlign:    "left",
+    fontFamily:   fonts.body,
   },
 };
 
