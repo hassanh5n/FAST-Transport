@@ -16,8 +16,8 @@
 Built with **Django REST Framework** and **React (Vite)**, it follows a clean three-tier architecture with JWT authentication, role-based access control, and responsive design across all devices.
 
 ### 🌐 Live Access
-**Frontend:** [https://fast-transport.vercel.app](https://fast-transport.vercel.app)
-**API:** [https://fast-transport-api.onrender.com](https://fast-transport-api.onrender.com)
+[https://fast-transport.vercel.app](https://fast-transport.vercel.app)
+
 
 ---
 
@@ -111,9 +111,9 @@ The application should now be accessible at `http://localhost:5173`.
 
 ## Deployment 🚀
 
-FAST Transport is deployed on free-forever cloud platforms with zero infrastructure cost.
+FAST Transport is deployed on multiple platforms for demo.
 
-### ☁️ Cloud Architecture
+### ☁️ Architecture
 *   **Frontend Hosting**: [Vercel](https://vercel.com) — React SPA with automatic builds from GitHub.
 *   **Backend Hosting**: [Render](https://render.com) — Django API served via Gunicorn with WhiteNoise for static files.
 *   **Database**: [Neon](https://neon.tech) — Serverless PostgreSQL with 0.5 GB free tier.
