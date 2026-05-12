@@ -4,6 +4,7 @@ export const getToken = (credentials) => api.post("/api/token/", credentials);
 export const getUser = () => api.get("/api/user/");
 export const signup = (data) => api.post("/api/signup/", data);
 export const forgotPassword = (data) => api.post("/api/forgot-password/", data);
+export const resetPassword = (data) => api.post("/api/reset-password/", data);
 
 export const getDashboard = () => api.get("/api/dashboard/");
 
