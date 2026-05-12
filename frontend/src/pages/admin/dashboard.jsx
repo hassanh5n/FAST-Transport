@@ -5,6 +5,7 @@ import PageShell from "../../components/PageShell";
 import { Spinner } from "../../components/ui";
 import { getDashboard } from "../../services/transportService";
 import { colors, fonts } from "../../theme";
+import { useBreakpoint } from "../../utils/useBreakpoint";
 
 // SVG icon components
 const Icons = {
@@ -152,6 +153,7 @@ function StatCard({ label, value, Icon, path, variant }) {
 function AdminDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
+  const isMobile = useBreakpoint(768);
 
   useEffect(() => {
     getDashboard()
@@ -180,9 +182,11 @@ function AdminDashboard() {
           <h2 style={styles.welcomeHeading}>Welcome, {fullName}</h2>
           <p style={styles.welcomeSub}>Here's an overview of the transport system for the current semester.</p>
         </div>
-        <div style={styles.dateBadge}>
-          {new Date().toLocaleDateString("en-PK", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
-        </div>
+        {!isMobile && (
+          <div className="welcome-row-date">
+            {new Date().toLocaleDateString("en-PK", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+          </div>
+        )}
       </div>
 
       {/* Stat grid */}
@@ -202,7 +206,7 @@ function AdminDashboard() {
       {/* Quick actions */}
       <div style={styles.quickActionsCard}>
         <h3 style={styles.sectionHeading}>Quick Actions</h3>
-        <div style={styles.quickActionsGrid}>
+        <div className="quick-actions-grid">
           {[
             { label: "Add New Bus",      path: "/admin/buses",            Icon: Icons.PlusCircle  },
             { label: "Add Driver",       path: "/admin/drivers",          Icon: Icons.UserPlus    },
@@ -257,7 +261,7 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",
     gap: "14px", marginBottom: "24px",
   },
   quickActionsCard: {
@@ -270,9 +274,7 @@ const styles = {
     margin: "0 0 14px", fontSize: "14px", fontWeight: "700",
     color: colors.textPrimary, fontFamily: fonts.heading,
   },
-  quickActionsGrid: {
-    display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px",
-  },
+  // quickActionsGrid is now a CSS class (.quick-actions-grid) in index.css
 };
 
 export default AdminDashboard;

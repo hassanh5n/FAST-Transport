@@ -77,3 +77,169 @@ aside { scrollbar-width: none; }
 .page-content {
   animation: fadeIn 0.22s ease both;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   RESPONSIVE UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Two-column auto grid ────────────────────────────────────────────────── */
+.grid-2col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Dashboard main layout: left col + right 320px sidebar ───────────────── */
+.dashboard-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ── Transport card row: capped 580px card + flex right panel ─────────────── */
+.transport-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 580px) 1fr;
+  gap: 20px;
+  align-items: stretch;
+  margin-bottom: 28px;
+}
+
+/* ── Student transport card ──────────────────────────────────────────────── */
+.student-transport-card {
+  position: relative;
+  background: linear-gradient(135deg, #1a4a68 0%, #0b2d42 60%, #0f3a55 100%);
+  border-radius: 18px;
+  padding: 28px 32px;
+  margin-bottom: 0;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(11,45,66,0.28), 0 2px 8px rgba(11,45,66,0.16);
+  height: 260px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* ── Stat summary row (e.g. Total/Available Seats) ───────────────────────── */
+.stat-cards-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+/* ── Admin quick-actions grid ────────────────────────────────────────────── */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+/* ── Detail row (label + value pair) ─────────────────────────────────────── */
+.detail-row {
+  display: grid;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid #e2e8f0;
+}
+.detail-row-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #8faabb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.detail-row-value {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #0f1f2d;
+  word-break: break-word;
+}
+
+/* ── Welcome row date badge ──────────────────────────────────────────────── */
+.welcome-row-date {
+  font-size: 12px;
+  font-weight: 500;
+  color: #8faabb;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  white-space: nowrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MOBILE  ≤ 767px
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* Two-column grids → single column */
+  .grid-2col {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dashboard-main-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .transport-card-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  /* Transport card: let height be natural */
+  .student-transport-card {
+    height: auto !important;
+    padding: 22px 20px !important;
+  }
+
+  /* Bottom row of transport card stacks */
+  .transport-card-bottom {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  /* Detail row: stack label above value */
+  .detail-row {
+    grid-template-columns: 1fr;
+    gap: 2px;
+    padding: 10px 0;
+  }
+
+  /* Stat mini-cards: at least 2 per row */
+  .stat-cards-row > * {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 130px;
+  }
+
+  /* Quick actions: 2 per row */
+  .quick-actions-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Hide date badge to save horizontal space */
+  .welcome-row-date {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SMALL MOBILE  ≤ 480px
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .stat-cards-row > * {
+    flex: 1 1 100%;
+  }
+
+  .quick-actions-grid {
+    grid-template-columns: 1fr;
+  }
+}

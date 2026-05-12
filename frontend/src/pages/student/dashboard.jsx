@@ -4,6 +4,7 @@ import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Spinner, DetailRow, Pill, Banner } from "../../components/ui";
 import { btn, colors, fonts, radius } from "../../theme";
 import { getDashboard } from "../../services/transportService";
+import { useBreakpoint } from "../../utils/useBreakpoint";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -26,22 +27,22 @@ async function downloadTransportCard() {
   }
 }
 
-// ── Student Transport Card ────────────────────────────────────────────────────
-function StudentCard({ profile, seat, active_registration }) {
+// ── Student Transport Card ────────────────────────────────────────────
+function StudentCard({ profile, seat, active_registration, isMobile }) {
   return (
-    <div style={{
+    <div className="student-transport-card" style={{
       position: "relative",
       background: "linear-gradient(135deg, #1a4a68 0%, #0b2d42 60%, #0f3a55 100%)",
       borderRadius: "18px",
-      padding: "28px 32px",
-      marginBottom: "28px",
+      padding: isMobile ? "22px 20px" : "28px 32px",
+      marginBottom: 0,
       overflow: "hidden",
       boxShadow: "0 8px 32px rgba(11,45,66,0.28), 0 2px 8px rgba(11,45,66,0.16)",
-      height: "260px",
-      maxWidth: "580px",
+      minHeight: isMobile ? "auto" : "260px",
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
+      gap: isMobile ? "20px" : "0",
     }}>
 
       {/* ── Watermark ── */}
@@ -89,10 +90,10 @@ function StudentCard({ profile, seat, active_registration }) {
       </div>
 
       {/* ── Bottom row: name + details ── */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
-        <div>
+      <div className="transport-card-bottom" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: "12px" }}>
+        <div style={{ minWidth: 0 }}>
           <p style={{ margin: "0 0 4px", fontSize: "9px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Card Holder</p>
-          <p style={{ margin: "0 0 4px", fontSize: "20px", fontWeight: "800", color: "#fff", letterSpacing: "0.02em", fontFamily: fonts.heading }}>
+          <p style={{ margin: "0 0 4px", fontSize: isMobile ? "16px" : "20px", fontWeight: "800", color: "#fff", letterSpacing: "0.02em", fontFamily: fonts.heading, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: isMobile ? "200px" : "none" }}>
             {(`${profile.first_name || ""} ${profile.last_name || ""}`.trim() || profile.roll_number).toUpperCase()}
           </p>
           <p style={{ margin: 0, fontSize: "11px", color: "rgba(255,255,255,0.45)", letterSpacing: "0.06em" }}>
@@ -100,7 +101,7 @@ function StudentCard({ profile, seat, active_registration }) {
           </p>
         </div>
 
-        <div style={{ display: "flex", gap: "28px", textAlign: "right" }}>
+        <div style={{ display: "flex", gap: "28px", textAlign: "right", flexShrink: 0 }}>
           {[
             { label: "Seat", value: seat ? `#${seat.seat_number}` : "—" },
             { label: "Stop", value: active_registration?.stop || "—" },
@@ -117,12 +118,13 @@ function StudentCard({ profile, seat, active_registration }) {
   );
 }
 
-// ── Main Dashboard ────────────────────────────────────────────────────────────
+// ── Main Dashboard ────────────────────────────────────────────────
 function StudentDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [downloading, setDownloading] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useBreakpoint(768);
 
   const pendingMsg = "Fees paid; Admin will assign seats shortly.";
   const unpaidMsg  = "Registration submitted. Please pay transport fee to proceed.";
@@ -165,6 +167,8 @@ function StudentDashboard() {
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: "12px",
         marginBottom: "24px",
       }}>
         <div /> {/* spacer — PageShell already renders the title */}
@@ -225,19 +229,19 @@ function StudentDashboard() {
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* ── Transport Card + Right Panel ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "580px 1fr", gap: "20px", alignItems: "stretch", marginBottom: "28px" }}>
+      <div className="transport-card-grid">
 
-        <StudentCard profile={profile} seat={seat} active_registration={active_registration} />
+        <StudentCard profile={profile} seat={seat} active_registration={active_registration} isMobile={isMobile} />
 
         <div style={{
           background: "#fff",
           border: `1px solid ${colors.borderLight}`,
           borderRadius: "18px",
-          padding: "24px",
+          padding: isMobile ? "16px" : "24px",
           boxShadow: "0 1px 3px rgba(11,45,66,0.06)",
           display: "flex",
           flexDirection: "column",
-          height: "260px",
+          minHeight: isMobile ? "auto" : "260px",
           boxSizing: "border-box",
         }}>
           <p style={{ margin: "0 0 14px", fontSize: "11px", fontWeight: "700", color: colors.textMuted, textTransform: "uppercase", letterSpacing: "0.08em" }}>Quick Actions</p>
@@ -319,7 +323,7 @@ function StudentDashboard() {
       </div>
 
       {/* ── Main two-column layout ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 320px", gap: "20px", alignItems: "start" }}>
+      <div className="dashboard-main-grid">
 
         {/* ── Left column ── */}
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>

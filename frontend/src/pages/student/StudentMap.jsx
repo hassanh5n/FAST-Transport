@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import Navbar from "../../components/Navbar";
-import Sidebar from "../../components/Sidebar";
+import PageShell, { PageTitle } from "../../components/PageShell";
+import { Banner } from "../../components/ui";
+import { colors, fonts, radius } from "../../theme";
+import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
 
 const POLL_INTERVAL_MS = 8000;
@@ -29,6 +31,7 @@ export default function StudentMap() {
   const busMarkerRef = useRef(null);
   const markerElRef  = useRef(null);
   const pollRef      = useRef(null);
+  const isMobile     = useBreakpoint(768);
 
   const [trackingData, setTrackingData] = useState(null);
   const [liveData, setLiveData]         = useState(null);
@@ -73,13 +76,11 @@ export default function StudentMap() {
       zoom: 12,
     });
 
-    mapRef.current = map; // ← MOVE IT HERE, not inside on("load")
+    mapRef.current = map;
 
     map.addControl(new maplibregl.NavigationControl(), "top-right");
 
     map.on("load", () => {
-      
-
       const busEl = document.createElement("div");
       busEl.style.cssText = `width: 36px; height: 36px;
       background: #c42828; border-radius: 50%;
@@ -148,7 +149,7 @@ export default function StudentMap() {
           [validStops[0].lng, validStops[0].lat]
         )
       );
-      map.fitBounds(bounds, { padding: 60, maxZoom: 14 });
+      map.fitBounds(bounds, { padding: isMobile ? 30 : 60, maxZoom: 14 });
 
       // Add stop markers
       validStops.forEach(stop => {
@@ -207,52 +208,61 @@ export default function StudentMap() {
   };
 
   return (
-    <div style={{ display: "flex" }}>
-      <Sidebar role="student" />
-      <div style={{ flex: 1 }}>
-        <Navbar title="Live Bus Tracking" />
-        <div style={{ padding: "24px" }}>
+    <PageShell role="student" title="Live Bus Tracking">
+      <PageTitle sub="Real-time GPS tracking for your assigned bus.">Live Bus Tracking</PageTitle>
 
-          {error && (
-            <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "14px 18px", color: "#dc2626", marginBottom: 16 }}>
-              {error}
-            </div>
-          )}
+      {error && <Banner variant="danger">{error}</Banner>}
 
-          {isStale && (
-            <div style={{ background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#92400e", marginBottom: 12 }}>
-               GPS signal lost or bus is offline. Showing last known position.
-            </div>
-          )}
+      {isStale && (
+        <Banner variant="warning">
+          GPS signal lost or bus is offline. Showing last known position.
+        </Banner>
+      )}
 
-          {/* Info cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 12, marginBottom: 16 }}>
-            <InfoCard label="Route"       value={trackingData?.route_name ?? "—"} />
-            <InfoCard label="Bus"         value={liveData?.bus_number ?? trackingData?.bus?.bus_number ?? "—"} />
-            <InfoCard label="Driver"      value={liveData?.driver_name ?? trackingData?.bus?.driver_name ?? "—"} />
-            <InfoCard label="Speed"       value={speedLabel()} accent={liveData?.speed > 0} />
-            <InfoCard label="GPS Updated" value={timeSince(lastUpdated)} warning={isStale} />
-          </div>
-
-          {/* Map — always mounted so ref is always available */}
-          <div style={{ position: "relative", height: 520, borderRadius: 12, border: "1px solid #e5e7eb" }}>
-            <div
-              ref={mapContainer}
-              style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 12 }}
-            />
-            {!trackingData && (
-              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.8)", borderRadius: 12, zIndex: 10 }}>
-                <div className="spinner-border text-primary" />
-              </div>
-            )}
-          </div>
-
-          <p style={{ fontSize: 12, color: "#9ca3af", marginTop: 8 }}>
-            🟡 Your stop &nbsp;·&nbsp; ⚫ Other stops &nbsp;·&nbsp; 🔵 Route &nbsp;·&nbsp; 🚌 Live bus position (updates every 8s)
-          </p>
-        </div>
+      {/* Info cards */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: isMobile
+          ? "repeat(auto-fit, minmax(130px, 1fr))"
+          : "repeat(auto-fit, minmax(160px, 1fr))",
+        gap: 12, marginBottom: 16,
+      }}>
+        <InfoCard label="Route"       value={trackingData?.route_name ?? "—"} />
+        <InfoCard label="Bus"         value={liveData?.bus_number ?? trackingData?.bus?.bus_number ?? "—"} />
+        <InfoCard label="Driver"      value={liveData?.driver_name ?? trackingData?.bus?.driver_name ?? "—"} />
+        <InfoCard label="Speed"       value={speedLabel()} accent={liveData?.speed > 0} />
+        <InfoCard label="GPS Updated" value={timeSince(lastUpdated)} warning={isStale} />
       </div>
-    </div>
+
+      {/* Map */}
+      <div style={{
+        position: "relative",
+        height: isMobile ? "calc(100vh - 380px)" : 520,
+        minHeight: 280,
+        borderRadius: 12,
+        border: `1px solid ${colors.borderLight}`,
+        overflow: "hidden",
+      }}>
+        <div
+          ref={mapContainer}
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, borderRadius: 12 }}
+        />
+        {!trackingData && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.8)", borderRadius: 12, zIndex: 10 }}>
+            <div style={{
+              width: "28px", height: "28px", borderRadius: "50%",
+              border: `3px solid ${colors.borderLight}`,
+              borderTopColor: colors.accent,
+              animation: "spin 0.7s linear infinite",
+            }} />
+          </div>
+        )}
+      </div>
+
+      <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>
+        🟡 Your stop &nbsp;·&nbsp; ⚫ Other stops &nbsp;·&nbsp; 🔵 Route &nbsp;·&nbsp; 🚌 Live bus position (updates every 8s)
+      </p>
+    </PageShell>
   );
 }
 
@@ -260,15 +270,19 @@ function InfoCard({ label, value, accent, warning }) {
   return (
     <div style={{
       background: "#fff",
-      border: warning ? "1px solid #fcd34d" : "1px solid #e5e7eb",
-      borderRadius: 10,
+      border: warning ? "1px solid #fcd34d" : `1px solid ${colors.borderLight}`,
+      borderRadius: radius.lg,
       padding: "12px 16px",
-      boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
+      boxShadow: "0 1px 3px rgba(11,45,66,0.06)",
     }}>
-      <div style={{ fontSize: 11, color: "#9ca3af", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
+      <div style={{ fontSize: 11, color: colors.textMuted, textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>
         {label}
       </div>
-      <div style={{ fontSize: 15, fontWeight: 600, color: accent ? "#16a34a" : warning ? "#d97706" : "#111827" }}>
+      <div style={{
+        fontSize: 15, fontWeight: 600,
+        color: accent ? colors.successText : warning ? colors.warningText : colors.textPrimary,
+        wordBreak: "break-word",
+      }}>
         {value}
       </div>
     </div>

@@ -170,9 +170,9 @@ function BusesPage() {
       <PageTitle sub="Manage fleet and seat availability.">Buses</PageTitle>
 
       {/* Seat summary */}
-      <div style={{ display: "flex", gap: "12px", marginBottom: "20px" }}>
+      <div className="stat-cards-row">
         {[["Total Seats", totalSeats], ["Available Seats", availSeats]].map(([label, val]) => (
-          <div key={label} style={{ background: "#fff", border: `1px solid ${colors.borderLight}`, borderRadius: radius.lg, padding: "14px 20px", minWidth: "150px", boxShadow: "0 1px 3px rgba(11,45,66,0.06)" }}>
+          <div key={label} style={{ background: "#fff", border: `1px solid ${colors.borderLight}`, borderRadius: radius.lg, padding: "14px 20px", minWidth: "130px", boxShadow: "0 1px 3px rgba(11,45,66,0.06)", flex: "1 1 130px" }}>
             <div style={{ fontSize: "11px", fontWeight: "600", color: colors.textMuted, textTransform: "uppercase", letterSpacing: "0.06em" }}>{label}</div>
             <div style={{ fontSize: "28px", fontWeight: "800", color: colors.textPrimary, fontFamily: fonts.heading, lineHeight: 1.2, marginTop: "4px" }}>{val}</div>
           </div>

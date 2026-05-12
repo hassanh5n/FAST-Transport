@@ -66,9 +66,10 @@ const modalStyles = {
   },
   box: {
     background: "#fff", borderRadius: radius.xl,
-    padding: "32px 28px", maxWidth: "420px", width: "90%",
+    padding: "28px 24px", maxWidth: "420px", width: "94%",
     boxShadow: "0 24px 64px rgba(11,45,66,0.22)",
     textAlign: "center",
+    maxHeight: "90vh", overflowY: "auto",
   },
   header: {
     display: "flex",
@@ -197,6 +198,7 @@ const formCardStyles = {
   sub: { margin: "3px 0 0", fontSize: "12px", color: colors.textSecondary },
   form: { display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "flex-end" },
 };
+// Note: FormCard already uses flexWrap on its form, which handles mobile stacking natively.
 
 // ── Labelled field wrapper ────────────────────────────────────────────────────
 export function Field({ label, required, children, flex = "1 1 160px", validators = [] }) {
@@ -281,12 +283,12 @@ export function Spinner() {
   );
 }
 
-// ── Detail row (label + value pair) ──────────────────────────────────────────
+// ── Detail row (label + value pair) ──────────────────────────────────────
 export function DetailRow({ label, value }) {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "160px 1fr", alignItems: "center", gap: "12px", padding: "9px 0", borderBottom: `1px solid ${colors.borderLight}` }}>
-      <span style={{ fontSize: "12px", fontWeight: "600", color: colors.textMuted, textTransform: "uppercase", letterSpacing: "0.05em" }}>{label}</span>
-      <span style={{ fontSize: "13.5px", fontWeight: "500", color: colors.textPrimary }}>{value ?? "—"}</span>
+    <div className="detail-row">
+      <span className="detail-row-label">{label}</span>
+      <span className="detail-row-value">{value ?? "—"}</span>
     </div>
   );
 }

@@ -234,7 +234,7 @@ function AdminExportPage() {
         <select
           value={selectedSemester}
           onChange={e => setSelectedSemester(e.target.value)}
-          style={{ padding: "9px 13px", borderRadius: radius.md, border: `1px solid ${colors.borderMid}`, fontSize: "14px", color: colors.textPrimary, background: "#fff", minWidth: "220px" }}
+          style={{ padding: "9px 13px", borderRadius: radius.md, border: `1px solid ${colors.borderMid}`, fontSize: "14px", color: colors.textPrimary, background: "#fff", minWidth: "220px", maxWidth: "100%", width: "100%", boxSizing: "border-box" }}
         >
           <option value="">All semesters</option>
           {semesters.map(s => (
@@ -247,7 +247,7 @@ function AdminExportPage() {
       <h3 style={{ margin: "0 0 14px", fontSize: "14px", fontWeight: "700", color: colors.textPrimary, fontFamily: fonts.heading }}>
         Semester Reports
       </h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "14px", marginBottom: "28px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "14px", marginBottom: "28px" }}>
         {semesterExports.map(e => (
           <ExportCard key={e.key} title={e.title} description={e.description} icon={e.icon}
             onExport={e.fn} loading={loadingKey === e.key} />
@@ -258,7 +258,7 @@ function AdminExportPage() {
       <h3 style={{ margin: "0 0 14px", fontSize: "14px", fontWeight: "700", color: colors.textPrimary, fontFamily: fonts.heading }}>
         Full Records
       </h3>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "14px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))", gap: "14px" }}>
         {globalExports.map(e => (
           <ExportCard key={e.key} title={e.title} description={e.description} icon={e.icon}
             onExport={e.fn} loading={loadingKey === e.key} />

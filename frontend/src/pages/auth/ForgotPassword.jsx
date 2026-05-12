@@ -7,20 +7,22 @@ function ForgotPassword() {
   const [email, setEmail]     = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent]       = useState(false);
+  const [error, setError]     = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
     try {
       await api.post("/api/forgot-password/", { email });
-    } catch {
-      // Intentionally swallowed — always show success to avoid
-      // revealing whether an email is registered (enumeration attack).
-    } finally {
-      setLoading(false);
       setSent(true);
       setTimeout(() => navigate("/reset-password", { state: { email } }), 1800);
+    } catch (err) {
+      const detail = err.response?.data?.detail || "Something went wrong. Please try again.";
+      setError(detail);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,6 +71,16 @@ function ForgotPassword() {
               </div>
 
               <form onSubmit={handleSubmit} style={styles.form}>
+                {error && (
+                  <div style={styles.errorBox}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="15" y1="9" x2="9" y2="15" />
+                      <line x1="9" y1="9" x2="15" y2="15" />
+                    </svg>
+                    <span>{error}</span>
+                  </div>
+                )}
                 <div style={styles.field}>
                   <label style={styles.label}>Email</label>
                   <input
@@ -133,6 +145,7 @@ const styles = {
   footer: { marginTop:"20px", textAlign:"center", fontSize:"13px", color:"rgba(255,255,255,0.35)", marginBottom:0 },
   link: { color:"rgba(255,255,255,0.75)", textDecoration:"none", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"1px" },
   bottomNote: { fontSize:"11px", color:"rgba(255,255,255,0.18)", letterSpacing:"0.03em", textAlign:"center", margin:0 },
+  errorBox: { display:"flex", alignItems:"center", gap:"8px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:"10px", padding:"10px 14px", fontSize:"13px", color:"#ff6b6b" },
 };
 
 export default ForgotPassword;

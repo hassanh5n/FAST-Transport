@@ -95,7 +95,7 @@ const styles = {
     borderCollapse:  "collapse",
     fontSize:        "13px",
     color:           colors.textPrimary,
-    minWidth:        "500px",
+    minWidth:        "400px",
   },
   th: {
     padding:         "12px 16px",

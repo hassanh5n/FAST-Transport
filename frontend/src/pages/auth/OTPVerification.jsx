@@ -168,7 +168,7 @@ const styles = {
   root: {
     position: "relative",
     width: "100vw",
-    height: "100vh",
+    minHeight: "100vh",
     overflow: "hidden",
     background: "#000",
     display: "flex",

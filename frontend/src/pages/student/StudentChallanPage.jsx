@@ -34,7 +34,7 @@ function StudentChallanPage() {
       ) : !registration ? (
         <p style={{ color: colors.textMuted, fontSize: "13.5px" }}>No transport registration found.</p>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px", alignItems: "start" }}>
+        <div className="grid-2col">
           <ContentCard>
             <DetailRow label="Route"    value={registration.route_name} />
             <DetailRow label="Stop"     value={registration.stop_name} />

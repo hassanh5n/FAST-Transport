@@ -993,8 +993,8 @@ def forgot_password(request):
     POST /api/forgot-password/
     Body: { "email": "k220001@nu.edu.pk" }
  
-    Sends a password-reset OTP to the email. Always returns 200 to avoid
-    leaking whether the email exists.
+    Sends a password-reset OTP to the email.
+    Returns 404 if the email is not registered.
     """
     email = request.data.get("email", "").lower().strip()
     if not email:
@@ -1003,7 +1003,7 @@ def forgot_password(request):
     try:
         user = User.objects.get(email__iexact=email)
     except User.DoesNotExist:
-        return Response({"detail": "If that email is registered, a reset OTP has been sent."})
+        return Response({"detail": "No account found with this email address."}, status=404)
  
     # Rate limit: same 60-second window as resend_otp
     existing = OTPVerification.objects.filter(user=user).first()
@@ -1036,7 +1036,7 @@ def forgot_password(request):
         fail_silently=False,
     )
  
-    return Response({"detail": "If that email is registered, a reset OTP has been sent."})
+    return Response({"detail": "A password reset OTP has been sent to your email."})
  
  
 @api_view(["POST"])

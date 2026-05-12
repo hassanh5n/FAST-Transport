@@ -80,7 +80,7 @@ function StripeCardForm({ amount, onSuccess, onCancel }) {
           validators={[{ check: "required", message: "Card number required" }, { check: "minLength", arg: 16, message: "Enter a valid card number" }]}
         />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px", minWidth: 0 }}>
         <div>
           <label style={stripeLabelSt}>Expiry</label>
           <ValidatedInput value={expiry} onChange={e => setExpiry(e.target.value)} placeholder="MM/YY" maxLength={5} style={stripeInputSt} validators={[{ check: "required", message: "Expiry required" }]} />
