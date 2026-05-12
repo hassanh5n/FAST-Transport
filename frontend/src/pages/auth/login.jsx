@@ -21,7 +21,7 @@ function Login() {
       const userRes = await getUser();
       localStorage.setItem("is_staff", userRes.data.is_staff ? "true" : "false");
       localStorage.setItem("username", userRes.data.username);
-      localStorage.setItem("full_name", userRes.data.full_name || "");
+      localStorage.setItem("full_name", `${userRes.data.first_name || ""} ${userRes.data.last_name || ""}`.trim());
       navigate(userRes.data.is_staff ? "/admin/dashboard" : "/student/dashboard");
     } catch {
       setError("Invalid username or password");
