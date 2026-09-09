@@ -1,6 +1,6 @@
 # FAST Transport — University Transport Management System
 
-> **A full-stack web application for digitizing and streamlining university transport operations at FAST NUCES, Karachi.**
+> **A full stack web application for digitizing and streamlining university transport operations at FAST NUCES, Karachi.**
 
 ![Project Status](https://img.shields.io/badge/status-active-success.svg)
 ![Django](https://img.shields.io/badge/Django-6.0-092E20?logo=django)
