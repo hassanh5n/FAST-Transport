@@ -43,3 +43,4 @@ pnpm-debug.log*
 Claudeoutputs
 .vercel
 .env*
+.testing
