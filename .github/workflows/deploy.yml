@@ -16,19 +16,39 @@ jobs:
         run: npm ci
         working-directory: frontend
 
+      - name: Build frontend
+        run: npm run build
+        working-directory: frontend
+
+      - name: Create Vercel Build Output
+        working-directory: frontend
+        run: |
+          rm -rf .vercel/output
+          mkdir -p .vercel/output/static
+
+          cp -r dist/. .vercel/output/static/
+
+          cat > .vercel/output/config.json <<'EOF'
+          {
+            "version": 3,
+            "routes": [
+              {
+                "handle": "filesystem"
+              },
+              {
+                "src": "/(.*)",
+                "dest": "/index.html"
+              }
+            ]
+          }
+          EOF
+
       - name: Install Vercel CLI
         run: npm install --global vercel@59.15.1
 
-      - name: Build with Vercel
-        run: vercel build --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
-        working-directory: frontend
-        env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-
       - name: Deploy to Vercel
-        run: vercel deploy --prebuilt --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
         working-directory: frontend
+        run: vercel deploy --prebuilt --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
         env:
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
