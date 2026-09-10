@@ -64,7 +64,14 @@ function AdminRouteDetail() {
     const q = search.trim().toLowerCase();
     return students.filter((s) => {
       if (statusFilter !== "All") {
-        if (statusFilter === "Pending") {
+        // A student is "confirmed" only when the fee is settled AND a seat is
+        // actually allocated. Either half missing means they are not riding yet.
+        const confirmed = Boolean(s.is_paid) && s.seat_number != null;
+        if (statusFilter === "Confirmed") {
+          if (!confirmed) return false;
+        } else if (statusFilter === "Unconfirmed") {
+          if (confirmed) return false;
+        } else if (statusFilter === "Pending") {
           if (s.status !== "Pending" && s.status !== "payment_submitted") return false;
         } else if (s.status !== statusFilter) {
           return false;
@@ -254,6 +261,8 @@ function AdminRouteDetail() {
             style={{ ...selectStyle, maxWidth: "200px" }}
           >
             <option value="All">All statuses</option>
+            <option value="Confirmed">Paid &amp; seated</option>
+            <option value="Unconfirmed">Not paid / no seat</option>
             <option value="Approved">Approved</option>
             <option value="Pending">Pending / Payment Submitted</option>
             <option value="Rejected">Rejected</option>
@@ -273,7 +282,11 @@ function AdminRouteDetail() {
           emptyMessage={
             students.length === 0
               ? "No students are registered on this route yet."
-              : "No students match the current filters."
+              : statusFilter === "Confirmed"
+                ? "No students on this route have both paid and been allocated a seat."
+                : statusFilter === "Unconfirmed"
+                  ? "Every student on this route has paid and holds a seat."
+                  : "No students match the current filters."
           }
         />
       </SectionBlock>
