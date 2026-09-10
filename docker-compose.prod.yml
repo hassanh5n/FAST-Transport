@@ -1,21 +1,4 @@
 services:
-  db:
-    image: postgres:15
-    container_name: fasttransport_db
-    environment:
-      POSTGRES_DB:       ${DATABASE_NAME}
-      POSTGRES_USER:     ${DATABASE_USER}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-
   backend:
     build:
       context: ./backend
@@ -36,19 +19,16 @@ services:
       - static_volume:/app/staticfiles
     expose:
       - "8000"
-    depends_on:
-      db:
-        condition: service_healthy
     environment:
       DJANGO_SETTINGS_MODULE: config.settings.prod
       DJANGO_SECRET_KEY:      ${DJANGO_SECRET_KEY}
       DJANGO_ALLOWED_HOST:    ${DJANGO_ALLOWED_HOST}
       FRONTEND_URL:           ${FRONTEND_URL}
-      DATABASE_HOST:          db
+      DATABASE_HOST:          ${DATABASE_HOST}
       DATABASE_NAME:          ${DATABASE_NAME}
       DATABASE_USER:          ${DATABASE_USER}
       DATABASE_PASSWORD:      ${DATABASE_PASSWORD}
-      DATABASE_PORT:          5432
+      DATABASE_PORT:          ${DATABASE_PORT}
       EMAIL_HOST_PASSWORD:    ${EMAIL_HOST_PASSWORD}
     restart: unless-stopped
 
@@ -80,6 +60,5 @@ services:
     restart: unless-stopped
 
 volumes:
-  postgres_data:
   static_volume:
   frontend_build:
