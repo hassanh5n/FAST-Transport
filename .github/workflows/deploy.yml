@@ -2,7 +2,8 @@ name: Vercel Deploy
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
   deploy:
@@ -13,12 +14,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: npm ci
         working-directory: frontend
+        run: npm ci
 
       - name: Build frontend
-        run: npm run build
         working-directory: frontend
+        run: npm run build
 
       - name: Create Vercel Build Output
         working-directory: frontend
@@ -48,7 +49,7 @@ jobs:
 
       - name: Deploy to Vercel
         working-directory: frontend
-        run: vercel deploy --prebuilt --prod --yes --token=${{ secrets.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --yes --token="${{ secrets.VERCEL_TOKEN }}"
         env:
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
