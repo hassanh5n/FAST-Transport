@@ -113,14 +113,36 @@ def _remove_waitlist_entry(registration):
 # ── Seat capacity ────────────────────────────────────────────────────────────
 
 def _get_next_available_seat_number(route_assignment):
-    occupied_seats = set(
+    """
+    The lowest free seat number on this bus, or None when it is full.
+
+    Capacity is judged by how many students are already seated, not by which
+    seat numbers happen to be in use - the two are not the same thing. A row
+    whose seat_number falls outside the current capacity (left behind when an
+    admin lowers a bus's capacity, or written straight through the seat
+    allocation endpoint) leaves a gap inside the 1..capacity range, and the old
+    number-only scan handed that gap out, seating a third student on a two-seat
+    bus. Counting rows first closes that hole.
+    """
+    occupied_seats = list(
         SeatAllocation.objects.filter(route_assignment=route_assignment)
         .values_list("seat_number", flat=True)
     )
-    for seat_number in range(1, route_assignment.bus.capacity + 1):
-        if seat_number not in occupied_seats:
+    capacity = route_assignment.bus.capacity
+    if len(occupied_seats) >= capacity:
+        return None
+
+    taken = set(occupied_seats)
+    for seat_number in range(1, capacity + 1):
+        if seat_number not in taken:
             return seat_number
     return None
+
+
+def seats_free_on_assignment(assignment):
+    """Seats still free on one bus. Never negative, even if capacity was cut."""
+    taken = SeatAllocation.objects.filter(route_assignment=assignment).count()
+    return max(assignment.bus.capacity - taken, 0)
 
 
 def free_seats_on_route(route, semester):
@@ -128,11 +150,7 @@ def free_seats_on_route(route, semester):
     assignments = RouteAssignment.objects.filter(
         route=route, semester=semester, is_active=True, bus__is_active=True
     ).select_related("bus")
-    free = 0
-    for assignment in assignments:
-        taken = SeatAllocation.objects.filter(route_assignment=assignment).count()
-        free += max(assignment.bus.capacity - taken, 0)
-    return free
+    return sum(seats_free_on_assignment(assignment) for assignment in assignments)
 
 
 def pick_route_for_stop(stop, semester):
@@ -440,14 +458,21 @@ def promote_next_from_waitlist(route, semester):
     if not entry:
         return None
 
-    assignment = RouteAssignment.objects.filter(
-        route=route, semester=semester, is_active=True, bus__is_active=True
-    ).select_related("bus").first()
-    if not assignment:
+    assignments = list(
+        RouteAssignment.objects.filter(
+            route=route, semester=semester, is_active=True, bus__is_active=True
+        ).select_related("bus")
+    )
+    if not assignments:
         return None
+    assignments.sort(key=lambda a: seats_free_on_assignment(a), reverse=True)
 
     registration = entry.registration
-    result = allocate_seat_on_assignment(registration, assignment)
+    result = "Bus is full"
+    for assignment in assignments:
+        result = allocate_seat_on_assignment(registration, assignment)
+        if result != "Bus is full":
+            break
     if result != "Seat Allocated":
         return None
 
@@ -505,16 +530,26 @@ def allocate_seat_for_student(registration):
     if existing and existing.status in ("waiting", "offered"):
         return "Already on waitlist"
 
-    assignment = RouteAssignment.objects.filter(
-        route=route, semester=semester, is_active=True, bus__is_active=True
-    ).select_related("bus").first()
+    # Every bus on the route, emptiest first. Trying only the first assignment
+    # queued students behind a full bus while a second bus on the same route
+    # still had room - and free_seats_on_route(), which the registration flow
+    # uses to decide whether a seat exists at all, counts every bus.
+    assignments = list(
+        RouteAssignment.objects.filter(
+            route=route, semester=semester, is_active=True, bus__is_active=True
+        ).select_related("bus")
+    )
 
-    if not assignment:
+    if not assignments:
         return "No active bus assignment"
 
-    allocation_result = allocate_seat_on_assignment(registration, assignment)
-    if allocation_result == "Bus is full":
-        add_to_waitlist(registration)
-        return "Added to Waitlist"
+    assignments.sort(key=lambda a: seats_free_on_assignment(a), reverse=True)
 
-    return allocation_result
+    last_result = "Bus is full"
+    for assignment in assignments:
+        last_result = allocate_seat_on_assignment(registration, assignment)
+        if last_result != "Bus is full":
+            return last_result
+
+    add_to_waitlist(registration)
+    return "Added to Waitlist"

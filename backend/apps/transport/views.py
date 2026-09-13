@@ -1014,6 +1014,28 @@ class SeatAllocationViewSet(viewsets.ModelViewSet):
     serializer_class = SeatAllocationSerializer
     permission_classes = [IsAdmin] # Only Admin full access
 
+    # Raw create/update wrote a SeatAllocation with whatever seat_number was
+    # posted: no capacity check, no lock, no waitlist bookkeeping. That is how
+    # rows numbered outside a bus's capacity appeared, which in turn let the
+    # seat picker hand the same bus out again. Seats are now created and moved
+    # only through the assign / reassign actions below, which lock the
+    # assignment and respect capacity. Deletion stays, since releasing a seat
+    # is safe and promotes the next student on the waitlist.
+    _MANUAL_WRITE_DETAIL = (
+        "Seats cannot be written directly. Use /seat-allocations/assign/ to "
+        "seat a student and /seat-allocations/reassign/ to move one, so that "
+        "bus capacity and the waitlist stay correct."
+    )
+
+    def create(self, request, *args, **kwargs):
+        return Response({"detail": self._MANUAL_WRITE_DETAIL}, status=405)
+
+    def update(self, request, *args, **kwargs):
+        return Response({"detail": self._MANUAL_WRITE_DETAIL}, status=405)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response({"detail": self._MANUAL_WRITE_DETAIL}, status=405)
+
     def _assignment_options_by_route_semester(self):
         active_assignments = list(
             RouteAssignment.objects.filter(
@@ -1580,36 +1602,73 @@ class RouteChangeRequestViewSet(viewsets.ModelViewSet):
         new_route = rcr.requested_route
         new_stop = rcr.requested_stop
  
-        # Check if there is an active assignment + available seat on new route
-        new_assignment = RouteAssignment.objects.filter(
-            route=new_route,
-            semester=semester,
-            is_active=True,
-        ).first()
-        if not new_assignment:
+        # Every bus on the requested route, emptiest first — a route may carry
+        # more than one, and the second could have the only free seat.
+        from .seatallocation import (
+            _get_next_available_seat_number,
+            seats_free_on_assignment,
+        )
+
+        new_assignments = list(
+            RouteAssignment.objects.filter(
+                route=new_route,
+                semester=semester,
+                is_active=True,
+                bus__is_active=True,
+            ).select_related("bus")
+        )
+        if not new_assignments:
             return Response({"detail": "No active bus assignment for the requested route."}, status=400)
- 
-        from .seatallocation import _get_next_available_seat_number
-        available_seat = _get_next_available_seat_number(new_assignment)
-        if available_seat is None:
+
+        new_assignments.sort(key=lambda a: seats_free_on_assignment(a), reverse=True)
+        if seats_free_on_assignment(new_assignments[0]) <= 0:
             return Response({"detail": "No seats available on the requested route."}, status=400)
- 
+
+        available_seat = None
+        new_assignment = None
+
+        # The seat is chosen inside the transaction, under a row lock on the
+        # assignment. Choosing it beforehand let two approvals read the same
+        # free seat and both write it.
         with transaction.atomic():
-            # 1. Free old seat allocation
+            locked_assignments = {
+                item.id: item
+                for item in RouteAssignment.objects.select_for_update()
+                .select_related("bus")
+                .filter(id__in=[a.id for a in new_assignments])
+            }
+
+            for candidate in new_assignments:
+                locked = locked_assignments.get(candidate.id, candidate)
+                seat_number = _get_next_available_seat_number(locked)
+                if seat_number is not None:
+                    new_assignment = locked
+                    available_seat = seat_number
+                    break
+
+            if available_seat is None:
+                return Response(
+                    {"detail": "No seats available on the requested route."},
+                    status=400,
+                )
+
+            # 1. Free old seat allocation. The post_delete receiver offers that
+            #    seat to the old route's queue once this commits, which is what
+            #    should happen — the student is leaving that route for good.
             SeatAllocation.objects.filter(registration=registration).delete()
- 
+
             # 2. Update the SemesterRegistration to new route + stop
             registration.route = new_route
             registration.stop = new_stop
             registration.save(update_fields=["route", "stop", "updated_at"])
- 
+
             # 3. Allocate seat on new route
             SeatAllocation.objects.create(
                 registration=registration,
                 route_assignment=new_assignment,
                 seat_number=available_seat,
             )
- 
+
             # 4. Update TransportRegistration too (keeps data consistent)
             TransportRegistration.objects.filter(
                 student=student,

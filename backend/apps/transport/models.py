@@ -200,6 +200,22 @@ class SeatAllocation(models.Model):
     seat_number = models.IntegerField(default=1)
     allocated_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        constraints = [
+            # Two students can never hold the same seat on the same bus, and a
+            # student can never hold two seats. Application code already checks
+            # both, but only the database can enforce them against concurrent
+            # requests and against rows written by other code paths.
+            models.UniqueConstraint(
+                fields=["route_assignment", "seat_number"],
+                name="uniq_seat_number_per_assignment",
+            ),
+            models.UniqueConstraint(
+                fields=["registration"],
+                name="uniq_seat_per_registration",
+            ),
+        ]
+
     def __str__(self):
         return f"Seat {self.seat_number} - {self.registration.student.roll_number}"
 
