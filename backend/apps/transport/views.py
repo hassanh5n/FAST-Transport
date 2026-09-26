@@ -103,6 +103,7 @@ from .seatallocation import (
     SEAT_OFFER_HOURS,
 )
 from .crime_risk import _setting_bbox
+from .rbac import get_effective_permissions, is_super_admin, staff_with_module
 
 
 @api_view(["GET"])
@@ -341,6 +342,13 @@ class CurrentUserView(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "is_staff": user.is_staff,
+            "is_super_admin": is_super_admin(user),
+            "admin_role": (
+                user.admin_profile.role.name
+                if user.is_staff and hasattr(user, "admin_profile") and user.admin_profile.role
+                else None
+            ),
+            "permissions": get_effective_permissions(user) if user.is_staff else {},
         })
 
 
@@ -2305,7 +2313,7 @@ def pay_challan(request, pk):
     )
 
     # Notify all admin/staff users
-    admin_users = User.objects.filter(is_staff=True)
+    admin_users = staff_with_module("fees")  # only admins who handle fees
     for admin in admin_users:
         Notification.objects.create(
             user=admin,
@@ -2623,7 +2631,7 @@ def verify_payment_otp(request, pk):
             },
         )
 
-        admin_users = User.objects.filter(is_staff=True)
+        admin_users = staff_with_module("fees")  # only admins who handle fees
         for admin in admin_users:
             Notification.objects.create(
                 user=admin,

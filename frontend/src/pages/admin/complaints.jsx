@@ -4,11 +4,13 @@ import Table from "../../components/Table";
 import { Pill } from "../../components/ui";
 import { btn, colors} from "../../theme";
 import { getComplaints, resolveComplaint } from "../../services/transportService";
+import { can } from "../../utils/permissions";
 
 function AdminComplaintsPage() {
   const [complaints, setComplaints] = useState([]);
   const [responses, setResponses] = useState({});
   const [resolvingId, setResolvingId] = useState(null);
+  const canReply = can("complaints", "manage");
 
   const fetchComplaints = () =>
     getComplaints().then((res) => setComplaints(res.data)).catch(() => alert("Failed to fetch complaints."));
@@ -67,6 +69,8 @@ function AdminComplaintsPage() {
         admin_response: (c.admin_response && c.admin_response !== "N/A") ? c.admin_response : "-",
         action: resolved ? (
           <span style={{ color: colors.textMuted, fontSize: "13px" }}>Completed</span>
+        ) : !canReply ? (
+          <span style={{ color: colors.textMuted, fontSize: "13px" }}>View only</span>
         ) : (
           <div style={{ display: "grid", gap: "6px", minWidth: "220px" }}>
             <textarea

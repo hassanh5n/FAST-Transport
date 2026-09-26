@@ -35,6 +35,9 @@ import AdminIncidents from "./pages/admin/AdminIncidents";
 import RouteBuilder from "./pages/admin/RouteBuilder";
 import AdminRouteDetail from "./pages/admin/AdminRouteDetail";
 import AdminWaitlist from "./pages/admin/AdminWaitlist";
+import AdminManagement from "./pages/admin/AdminManagement";
+import ActivityLogs from "./pages/admin/ActivityLogs";
+import { can, isSuperAdmin } from "./utils/permissions";
 
 // Redirect /dashboard based on stored role
 function DashboardRedirect() {
@@ -48,13 +51,32 @@ function PrivateRoute({ children }) {
   return token ? children : <Navigate to="/login" replace />;
 }
 
-// Protect staff-only routes
-function StaffRoute({ children }) {
+// Protect staff-only routes.
+//   module  – admin module key the page belongs to (see backend rbac.MODULES);
+//             an array means "any of these".
+//   superOnly – page is only for the super admin.
+function StaffRoute({ children, module, superOnly = false }) {
   const token = localStorage.getItem("access");
   const isStaff = localStorage.getItem("is_staff") === "true";
   if (!token) return <Navigate to="/login" replace />;
   if (!isStaff) return <Navigate to="/student/dashboard" replace />;
+  if (superOnly && !isSuperAdmin()) return <NoAccess />;
+  if (module && !can(module)) return <NoAccess />;
   return children;
+}
+
+function NoAccess() {
+  return (
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans', system-ui, sans-serif", padding: "16px" }}>
+      <div style={{ textAlign: "center", maxWidth: "380px" }}>
+        <h2 style={{ margin: "0 0 8px", color: "#0f1f2d" }}>No access</h2>
+        <p style={{ margin: "0 0 18px", color: "#4a6178", fontSize: "14px" }}>
+          Your admin role doesn't include this section. Ask the super admin if you need it.
+        </p>
+        <a href="/admin/dashboard" style={{ color: "#288dc4", fontWeight: 600 }}>Back to dashboard</a>
+      </div>
+    </div>
+  );
 }
 
 // Protect student-only routes — staff get redirected to their own dashboard
@@ -94,24 +116,28 @@ function App() {
 
         {/* Admin routes */}
         <Route path="/admin/dashboard" element={<StaffRoute><AdminDashboard /></StaffRoute>} />
-        <Route path="/admin/students" element={<StaffRoute><StudentsPage /></StaffRoute>} />
-        <Route path="/admin/buses" element={<StaffRoute><BusesPage /></StaffRoute>} />
-        <Route path="/admin/drivers" element={<StaffRoute><DriversPage /></StaffRoute>} />
-        <Route path="/admin/routes" element={<StaffRoute><RoutesPage /></StaffRoute>} />
-        <Route path="/admin/routes/:id" element={<StaffRoute><AdminRouteDetail /></StaffRoute>} />
-        <Route path="/admin/routes/:id/edit" element={<StaffRoute><RouteBuilder /></StaffRoute>} />
-        <Route path="/admin/routes/:id/builder" element={<StaffRoute><RouteBuilder /></StaffRoute>} />
-        <Route path="/admin/assignments" element={<StaffRoute><AssignmentsPage /></StaffRoute>} />
-        <Route path="/admin/complaints" element={<StaffRoute><AdminComplaintsPage /></StaffRoute>} />
-        <Route path="/admin/stops" element={<StaffRoute><StopsPage /></StaffRoute>} />
-        <Route path="/admin/semesters" element={<StaffRoute><SemestersPage /></StaffRoute>} />
-        <Route path="/admin/routestop" element={<StaffRoute><RouteStopsPage /></StaffRoute>} />
-        <Route path="/admin/feeverifications" element={<StaffRoute><AdminFeeVerifications /></StaffRoute>} />
-        <Route path="/admin/student-bus-assignments" element={<StaffRoute><StudentBusAssignmentsPage /></StaffRoute>} />
-        <Route path="/admin/waitlist" element={<StaffRoute><AdminWaitlist /></StaffRoute>} />
-        <Route path="/admin/routechangerequests" element={<StaffRoute><AdminRouteChangeRequests /></StaffRoute>} />
-        <Route path="/admin/incidents" element={<StaffRoute><AdminIncidents /></StaffRoute>} />
-        <Route path="/admin/export" element={<StaffRoute><AdminExportPage /></StaffRoute>} />
+        <Route path="/admin/students" element={<StaffRoute module="students"><StudentsPage /></StaffRoute>} />
+        <Route path="/admin/buses" element={<StaffRoute module="fleet"><BusesPage /></StaffRoute>} />
+        <Route path="/admin/drivers" element={<StaffRoute module="fleet"><DriversPage /></StaffRoute>} />
+        <Route path="/admin/routes" element={<StaffRoute module="routes"><RoutesPage /></StaffRoute>} />
+        <Route path="/admin/routes/:id" element={<StaffRoute module="routes"><AdminRouteDetail /></StaffRoute>} />
+        <Route path="/admin/routes/:id/edit" element={<StaffRoute module="routes"><RouteBuilder /></StaffRoute>} />
+        <Route path="/admin/routes/:id/builder" element={<StaffRoute module="routes"><RouteBuilder /></StaffRoute>} />
+        <Route path="/admin/assignments" element={<StaffRoute module="fleet"><AssignmentsPage /></StaffRoute>} />
+        <Route path="/admin/complaints" element={<StaffRoute module="complaints"><AdminComplaintsPage /></StaffRoute>} />
+        <Route path="/admin/stops" element={<StaffRoute module="routes"><StopsPage /></StaffRoute>} />
+        <Route path="/admin/semesters" element={<StaffRoute module="semesters"><SemestersPage /></StaffRoute>} />
+        <Route path="/admin/routestop" element={<StaffRoute module="routes"><RouteStopsPage /></StaffRoute>} />
+        <Route path="/admin/feeverifications" element={<StaffRoute module="fees"><AdminFeeVerifications /></StaffRoute>} />
+        <Route path="/admin/student-bus-assignments" element={<StaffRoute module="seats"><StudentBusAssignmentsPage /></StaffRoute>} />
+        <Route path="/admin/waitlist" element={<StaffRoute module="seats"><AdminWaitlist /></StaffRoute>} />
+        <Route path="/admin/routechangerequests" element={<StaffRoute module="route_requests"><AdminRouteChangeRequests /></StaffRoute>} />
+        <Route path="/admin/incidents" element={<StaffRoute module="incidents"><AdminIncidents /></StaffRoute>} />
+        <Route path="/admin/export" element={<StaffRoute module="export"><AdminExportPage /></StaffRoute>} />
+
+        {/* Super admin only */}
+        <Route path="/admin/admins" element={<StaffRoute superOnly><AdminManagement /></StaffRoute>} />
+        <Route path="/admin/activity-logs" element={<StaffRoute superOnly><ActivityLogs /></StaffRoute>} />
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

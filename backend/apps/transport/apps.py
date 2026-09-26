@@ -6,3 +6,5 @@ class TransportConfig(AppConfig):
 
     def ready(self):
         import apps.transport.signals  # noqa: F401
+        from . import audit
+        audit.connect()  # admin activity log

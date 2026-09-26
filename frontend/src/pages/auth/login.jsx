@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MeshGradient } from "@paper-design/shaders-react";
 import { getToken, getUser } from "../../services/transportService";
+import { storeUserSession } from "../../utils/permissions";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -19,9 +20,7 @@ function Login() {
       localStorage.setItem("access",  tokenRes.data.access);
       localStorage.setItem("refresh", tokenRes.data.refresh);
       const userRes = await getUser();
-      localStorage.setItem("is_staff", userRes.data.is_staff ? "true" : "false");
-      localStorage.setItem("username", userRes.data.username);
-      localStorage.setItem("full_name", `${userRes.data.first_name || ""} ${userRes.data.last_name || ""}`.trim());
+      storeUserSession(userRes.data);
       navigate(userRes.data.is_staff ? "/admin/dashboard" : "/student/dashboard");
     } catch {
       setError("Invalid username or password");

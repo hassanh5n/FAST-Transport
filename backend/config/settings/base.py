@@ -51,6 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Admin role permissions + activity log (keep last, after CORS/auth)
+    'apps.transport.middleware.AdminAccessMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

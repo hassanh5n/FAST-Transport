@@ -1,5 +1,7 @@
 // frontend/src/components/Sidebar.jsx
+import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { can, isSuperAdmin, roleLabel } from "../utils/permissions";
 import { colors, fonts } from "../theme";
 
 // ── Inline SVG icons (no library needed) ────────────────────────────────────
@@ -132,6 +134,18 @@ const Icon = ({ name, size = 17 }) => {
         <path d="M12 7v5l3 2"/>
       </svg>
     ),
+    shield: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    ),
+    log: (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>
+      </svg>
+    ),
     incident: (
       <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
@@ -149,32 +163,49 @@ const adminGroups = [
     label: "Overview",
     links: [
       { to: "/admin/dashboard",               label: "Dashboard",           icon: "dashboard"  },
-      { to: "/admin/students",                label: "Students",            icon: "students"   },
+      { to: "/admin/students",                label: "Students",            icon: "students",   module: "students" },
     ],
   },
   {
     label: "Fleet",
     links: [
-      { to: "/admin/buses",                   label: "Buses",               icon: "bus"        },
-      { to: "/admin/drivers",                 label: "Drivers",             icon: "driver"     },
-      { to: "/admin/routes",                  label: "Routes",              icon: "route"      },
-      { to: "/admin/assignments",             label: "Assignments",         icon: "assignment" },
+      { to: "/admin/buses",                   label: "Buses",               icon: "bus",        module: "fleet" },
+      { to: "/admin/drivers",                 label: "Drivers",             icon: "driver",     module: "fleet" },
+      { to: "/admin/routes",                  label: "Routes",              icon: "route",      module: "routes" },
+      { to: "/admin/assignments",             label: "Assignments",         icon: "assignment", module: "fleet" },
     ],
   },
   {
     label: "Operations",
     links: [
-      { to: "/admin/semesters",               label: "Semesters",           icon: "semester"   },
-      { to: "/admin/student-bus-assignments", label: "Bus Assignments",     icon: "seat"       },
-      { to: "/admin/waitlist",                label: "Waiting List",        icon: "waitlist"   },
-      { to: "/admin/feeverifications",        label: "Fee Verifications",   icon: "fee"        },
-      { to: "/admin/routechangerequests",     label: "Route Requests",      icon: "routeChange"},
-      { to: "/admin/incidents",               label: "Incidents",           icon: "incident"   },
-      { to: "/admin/complaints",              label: "Complaints",          icon: "complaint"  },
-      { to: "/admin/export",                  label: "Export Data",         icon: "export"     },
+      { to: "/admin/semesters",               label: "Semesters",           icon: "semester",   module: "semesters" },
+      { to: "/admin/student-bus-assignments", label: "Bus Assignments",     icon: "seat",       module: "seats" },
+      { to: "/admin/waitlist",                label: "Waiting List",        icon: "waitlist",   module: "seats" },
+      { to: "/admin/feeverifications",        label: "Fee Verifications",   icon: "fee",        module: "fees" },
+      { to: "/admin/routechangerequests",     label: "Route Requests",      icon: "routeChange",module: "route_requests" },
+      { to: "/admin/incidents",               label: "Incidents",           icon: "incident",   module: "incidents" },
+      { to: "/admin/complaints",              label: "Complaints",          icon: "complaint",  module: "complaints" },
+      { to: "/admin/export",                  label: "Export Data",         icon: "export",     module: "export" },
     ],
   },
 ];
+
+// Only rendered for the super admin
+const superAdminGroup = {
+  label: "Administration",
+  links: [
+    { to: "/admin/admins",        label: "Admins & Roles", icon: "shield" },
+    { to: "/admin/activity-logs", label: "Activity Logs",  icon: "log"    },
+  ],
+};
+
+// Hide links the admin's role can't open, and drop groups left empty.
+function visibleAdminGroups() {
+  const groups = adminGroups
+    .map((g) => ({ ...g, links: g.links.filter((l) => can(l.module)) }))
+    .filter((g) => g.links.length > 0);
+  return isSuperAdmin() ? [...groups, superAdminGroup] : groups;
+}
 
 const studentGroups = [
   {
@@ -211,7 +242,14 @@ const studentGroups = [
 //   onClose   – callback to close the drawer
 function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }) {
   const navigate = useNavigate();
-  const groups = role === "staff" ? adminGroups : studentGroups;
+  // Re-render when permissions are refreshed from the server (see PageShell).
+  const [, setPermVersion] = useState(0);
+  useEffect(() => {
+    const bump = () => setPermVersion((v) => v + 1);
+    window.addEventListener("app:permissions-updated", bump);
+    return () => window.removeEventListener("app:permissions-updated", bump);
+  }, []);
+  const groups = role === "staff" ? visibleAdminGroups() : studentGroups;
 
   const handleLogout = () => {
     localStorage.clear();
@@ -295,7 +333,7 @@ function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
       {/* Role pill */}
       <div style={styles.rolePill}>
         <span style={styles.roleDot} />
-        {role === "staff" ? "Admin Panel" : "Student Portal"}
+        {role === "staff" ? roleLabel() : "Student Portal"}
       </div>
 
       {/* Nav groups */}

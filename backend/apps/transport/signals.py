@@ -101,7 +101,8 @@ def check_bus_geofence(sender, instance, created, **kwargs):
 
     bus = instance.bus
     if off_route and not bus.is_off_route:
-        for admin in User.objects.filter(is_staff=True):
+        from .rbac import staff_with_module
+        for admin in staff_with_module("fleet"):  # only admins who handle the fleet
             Notification.objects.create(
                 user=admin, type="alert",
                 title=f"Bus {bus.bus_number} is off route",

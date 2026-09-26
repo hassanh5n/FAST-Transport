@@ -1,13 +1,27 @@
 // frontend/src/components/PageShell.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar  from "./Navbar";
 import { useBreakpoint } from "../utils/useBreakpoint";
 import { colors, fonts } from "../theme";
+import { getUser } from "../services/transportService";
+import { storeUserSession } from "../utils/permissions";
+
+// Refresh the admin's permissions once per page load so changes made by the
+// super admin apply without the admin having to log out and back in.
+let permissionsRefreshed = false;
+function useRefreshStaffPermissions(role) {
+  useEffect(() => {
+    if (role !== "staff" || permissionsRefreshed) return;
+    permissionsRefreshed = true;
+    getUser().then((res) => storeUserSession(res.data)).catch(() => {});
+  }, [role]);
+}
 
 function PageShell({ role = "student", title, children, maxWidth }) {
   const isMobile = useBreakpoint(768);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  useRefreshStaffPermissions(role);
 
   return (
     <div style={styles.root}>

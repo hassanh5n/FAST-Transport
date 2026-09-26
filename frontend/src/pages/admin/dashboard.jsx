@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../../components/PageShell";
 import { Spinner } from "../../components/ui";
-import { getDashboard } from "../../services/transportService";
+import { getActivityLogs, getDashboard } from "../../services/transportService";
+import { can, isSuperAdmin } from "../../utils/permissions";
 import { colors, fonts } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 
@@ -91,13 +92,13 @@ const Icons = {
 };
 
 const STAT_CONFIG = [
-  { key: "total_students",             label: "Total Students",     Icon: Icons.Students,     path: "/admin/students",            variant: "blue"   },
-  { key: "active_buses",               label: "Active Buses",       Icon: Icons.Bus,          path: "/admin/buses",               variant: "teal"   },
-  { key: "active_routes",              label: "Active Routes",      Icon: Icons.Route,        path: "/admin/routes",              variant: "teal"   },
-  { key: "active_route_assignments",   label: "Assignments",        Icon: Icons.Clipboard,    path: "/admin/assignments",         variant: "blue"   },
-  { key: "pending_complaints",         label: "Pending Complaints", Icon: Icons.MessageCircle,path: "/admin/complaints",          variant: "amber"  },
-  { key: "open_route_change_requests", label: "Route Requests",     Icon: Icons.RefreshCw,    path: "/admin/routechangerequests", variant: "amber"  },
-  { key: "unverified_fees",            label: "Unverified Fees",    Icon: Icons.CreditCard,   path: "/admin/feeverifications",    variant: "danger" },
+  { key: "total_students",             label: "Total Students",     Icon: Icons.Students,     path: "/admin/students",            variant: "blue"   , module: "students" },
+  { key: "active_buses",               label: "Active Buses",       Icon: Icons.Bus,          path: "/admin/buses",               variant: "teal"   , module: "fleet" },
+  { key: "active_routes",              label: "Active Routes",      Icon: Icons.Route,        path: "/admin/routes",              variant: "teal"   , module: "routes" },
+  { key: "active_route_assignments",   label: "Assignments",        Icon: Icons.Clipboard,    path: "/admin/assignments",         variant: "blue"   , module: "fleet" },
+  { key: "pending_complaints",         label: "Pending Complaints", Icon: Icons.MessageCircle,path: "/admin/complaints",          variant: "amber"  , module: "complaints" },
+  { key: "open_route_change_requests", label: "Route Requests",     Icon: Icons.RefreshCw,    path: "/admin/routechangerequests", variant: "amber"  , module: "route_requests" },
+  { key: "unverified_fees",            label: "Unverified Fees",    Icon: Icons.CreditCard,   path: "/admin/feeverifications",    variant: "danger" , module: "fees" },
 ];
 
 const VARIANT_STYLES = {
@@ -191,7 +192,7 @@ function AdminDashboard() {
 
       {/* Stat grid */}
       <div style={styles.grid}>
-        {STAT_CONFIG.map((cfg) => (
+        {STAT_CONFIG.filter((cfg) => can(cfg.module)).map((cfg) => (
           <StatCard
             key={cfg.key}
             label={cfg.label}
@@ -208,14 +209,70 @@ function AdminDashboard() {
         <h3 style={styles.sectionHeading}>Quick Actions</h3>
         <div className="quick-actions-grid">
           {[
-            { label: "Add New Bus",      path: "/admin/buses",            Icon: Icons.PlusCircle  },
-            { label: "Add Driver",       path: "/admin/drivers",          Icon: Icons.UserPlus    },
-            { label: "Manage Semesters", path: "/admin/semesters",        Icon: Icons.Calendar    },
-            { label: "Verify Fees",      path: "/admin/feeverifications", Icon: Icons.CheckSquare },
-          ].map((a) => <QuickAction key={a.path} {...a} />)}
+            { label: "Add New Bus",      path: "/admin/buses",            Icon: Icons.PlusCircle,  module: "fleet"     },
+            { label: "Add Driver",       path: "/admin/drivers",          Icon: Icons.UserPlus,    module: "fleet"     },
+            { label: "Manage Semesters", path: "/admin/semesters",        Icon: Icons.Calendar,    module: "semesters" },
+            { label: "Verify Fees",      path: "/admin/feeverifications", Icon: Icons.CheckSquare, module: "fees"      },
+            { label: "Complaints",       path: "/admin/complaints",       Icon: Icons.MessageCircle, module: "complaints" },
+          ].filter((a) => can(a.module, "manage")).map((a) => <QuickAction key={a.path} label={a.label} path={a.path} Icon={a.Icon} />)}
         </div>
       </div>
+
+      {/* Super admin: latest admin activity */}
+      {isSuperAdmin() && <RecentAdminActivity />}
     </PageShell>
+  );
+}
+
+const ACTION_COLORS = {
+  create: { bg: colors.successBg, text: colors.successText },
+  update: { bg: colors.infoBg,    text: colors.infoText    },
+  delete: { bg: colors.dangerBg,  text: colors.dangerText  },
+  action: { bg: colors.warningBg, text: colors.warningText },
+  login:  { bg: colors.neutralBg, text: colors.neutralText },
+};
+
+function RecentAdminActivity() {
+  const navigate = useNavigate();
+  const [items, setItems] = useState(null);
+
+  useEffect(() => {
+    getActivityLogs({ page_size: 8 })
+      .then((res) => setItems(res.data.items || []))
+      .catch(() => setItems([]));
+  }, []);
+
+  return (
+    <div style={{ ...styles.quickActionsCard, marginTop: "20px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", gap: "12px" }}>
+        <h3 style={{ ...styles.sectionHeading, margin: 0 }}>Recent Admin Activity</h3>
+        <button onClick={() => navigate("/admin/activity-logs")} style={styles.linkBtn}>View all logs →</button>
+      </div>
+      {items === null ? (
+        <Spinner />
+      ) : items.length === 0 ? (
+        <p style={{ margin: 0, fontSize: "13px", color: colors.textMuted }}>No admin activity yet.</p>
+      ) : (
+        <div style={{ display: "grid", gap: "2px" }}>
+          {items.map((log) => {
+            const c = ACTION_COLORS[log.action] || ACTION_COLORS.action;
+            return (
+              <div key={log.id} style={styles.activityRow}>
+                <span style={{ ...styles.actionTag, background: c.bg, color: c.text }}>{log.action}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={styles.activityText}>
+                    <strong>{log.actor_name || log.actor_username || "System"}</strong> — {log.description}
+                  </div>
+                  <div style={styles.activityMeta}>
+                    {log.module_label} · {new Date(log.created_at).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -274,6 +331,20 @@ const styles = {
     margin: "0 0 14px", fontSize: "14px", fontWeight: "700",
     color: colors.textPrimary, fontFamily: fonts.heading,
   },
+  linkBtn: {
+    background: "transparent", border: "none", color: colors.accent,
+    fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: fonts.body, padding: 0,
+  },
+  activityRow: {
+    display: "flex", alignItems: "flex-start", gap: "10px",
+    padding: "9px 0", borderBottom: `1px solid ${colors.tableRowBorder}`,
+  },
+  actionTag: {
+    fontSize: "10.5px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em",
+    padding: "3px 8px", borderRadius: "999px", flexShrink: 0, marginTop: "1px", minWidth: "54px", textAlign: "center",
+  },
+  activityText: { fontSize: "13px", color: colors.textPrimary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  activityMeta: { fontSize: "11.5px", color: colors.textMuted, marginTop: "2px" },
   // quickActionsGrid is now a CSS class (.quick-actions-grid) in index.css
 };
 

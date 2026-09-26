@@ -133,3 +133,15 @@ export const getWaitlist = () => api.get("/api/waitlist/");
 export const getWaitlistOverview = () => api.get("/api/waitlist/overview/");
 export const fillEmptySeats = (routeId) =>
   api.post("/api/waitlist/fill-empty-seats/", routeId ? { route_id: routeId } : {});
+
+// ── Super admin: admin accounts, roles, activity log ─────────────────────────
+export const getAdminModules   = () => api.get("/api/admin-management/modules/");
+export const getAdminUsers     = () => api.get("/api/admin-management/admins/");
+export const createAdminUser   = (data) => api.post("/api/admin-management/admins/", data);
+export const updateAdminUser   = (id, data) => api.patch(`/api/admin-management/admins/${id}/`, data);
+export const getAdminRoles     = () => api.get("/api/admin-management/roles/");
+export const createAdminRole   = (data) => api.post("/api/admin-management/roles/", data);
+export const updateAdminRole   = (id, data) => api.patch(`/api/admin-management/roles/${id}/`, data);
+export const deleteAdminRole   = (id) => api.delete(`/api/admin-management/roles/${id}/`);
+// params: { actor, module, action, date_from, date_to, q, page, page_size }
+export const getActivityLogs   = (params = {}) => api.get("/api/admin-management/activity-logs/", { params });

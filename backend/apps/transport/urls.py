@@ -11,6 +11,10 @@ from .views import BusLocationPingCreateView, IncidentViewSet, approved_incident
 from .views import eligible_route_stops
 from .views import resolve_map_location, preview_route_geometry
 from .views import crime_risk_zones
+from .admin_views import (
+    AdminRoleViewSet, AdminUserViewSet, LoggedTokenObtainPairView,
+    activity_logs, modules_meta,
+)
 router = DefaultRouter()
 
 # Existing ViewSets
@@ -33,6 +37,10 @@ router.register(r'notifications', NotificationViewSet)
 router.register(r"transport-registrations", TransportRegistrationViewSet)
 router.register(r"incidents", IncidentViewSet, basename="incident")
 
+# Super admin: admin accounts & roles
+router.register(r"admin-management/roles", AdminRoleViewSet, basename="admin-role")
+router.register(r"admin-management/admins", AdminUserViewSet, basename="admin-user")
+
 urlpatterns = [
     # Explicit paths FIRST
     path('signup/', StudentSignupView.as_view(), name='student-signup'),
@@ -45,7 +53,7 @@ urlpatterns = [
     path("students-list/", students_list),
     path('transport-registrations/<int:pk>/challan/', get_challan),
     path("transport-registrations/<int:pk>/challan/pay/", pay_challan),
-    path('login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('login/', LoggedTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path("fee-verifications/list/", list_fee_verifications),
     path("fee-verifications/<int:pk>/verify/", verify_fee),
@@ -61,4 +69,6 @@ urlpatterns = [
     path("admin/maps/location/", resolve_map_location, name="resolve-map-location"),
     path("admin/maps/route-preview/", preview_route_geometry, name="preview-route-geometry"),
     path("crime-risk/zones/", crime_risk_zones, name="crime-risk-zones"),
+    path("admin-management/modules/", modules_meta, name="admin-modules"),
+    path("admin-management/activity-logs/", activity_logs, name="admin-activity-logs"),
 ] + router.urls  # Router LAST
