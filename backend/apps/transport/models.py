@@ -131,6 +131,8 @@ class Bus(models.Model):
         return self.bus_number
 
 class Driver(models.Model):
+    # Optional login, created by an admin. Null for drivers who never sign in.
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="driver_profile")
     name = models.CharField(max_length=150, default="N/A")
     cnic = models.CharField(max_length=15, default="N/A")
     license_no = models.CharField(max_length=30, default="N/A")

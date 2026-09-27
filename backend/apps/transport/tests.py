@@ -885,3 +885,71 @@ class SignalHandlersTests(TestCase):
 		)
 
 		mock_allocate.assert_not_called()
+
+
+# ── Driver console ──────────────────────────────────────────────────────────
+import requests as _requests
+from unittest import mock as _mock
+from rest_framework.test import APIClient as _APIClient
+from apps.transport.models import BusLocationPing as _Ping, RouteStop as _RouteStop
+from apps.transport.serializers import DriverSerializer as _DriverSerializer
+
+
+@_mock.patch("apps.transport.signals.is_off_route", return_value=(False, 5.0))
+@_mock.patch("apps.transport.views.req_lib.get", side_effect=_requests.RequestException("offline"))
+class DriverConsoleTests(TestCase):
+	def setUp(self):
+		self.semester = Semester.objects.create(name="Drv Sem", year=2029, term="F", is_active=True, registration_open=True)
+		self.route = Route.objects.create(name="Drv Route", is_active=True)
+		stop_a = Stop.objects.create(name="Drv A", latitude="24.921500", longitude="67.084700")
+		self.stop_b = Stop.objects.create(name="Drv B", latitude="24.931500", longitude="67.094700")
+		self.rs_a = _RouteStop.objects.create(route=self.route, stop=stop_a, stop_order=1)
+		self.rs_b = _RouteStop.objects.create(route=self.route, stop=self.stop_b, stop_order=2)
+		bus = Bus.objects.create(bus_number="DRV-1", capacity=10, is_active=True)
+		serializer = _DriverSerializer(data={"name": "Drv One", "cnic": "1", "username": "drv_one", "password": "drivepass1"})
+		self.assertTrue(serializer.is_valid(), serializer.errors)
+		self.driver = serializer.save()
+		assignment = RouteAssignment.objects.create(route=self.route, bus=bus, driver=self.driver, semester=self.semester, is_active=True)
+		self.student = User.objects.create_user(username="drv_student", password="pass1234")
+		profile = StudentProfile.objects.create(user=self.student, roll_number="22K-DRV-1", department="CS", batch="22", phone="0", address="x")
+		registration = SemesterRegistration.objects.create(student=profile, semester=self.semester, route=self.route, stop=self.stop_b, status="Confirmed")
+		SeatAllocation.objects.create(registration=registration, route_assignment=assignment, seat_number=3)
+		self.client = _APIClient()
+
+	def test_driver_login_role_and_overview(self, *_):
+		self.assertTrue(self.driver.user.groups.filter(name="Driver").exists())
+		self.client.force_authenticate(user=self.driver.user)
+		self.assertEqual(self.client.get("/api/user/").data["role"], "driver")
+		response = self.client.get("/api/driver/overview/")
+		self.assertEqual(response.status_code, 200, response.data)
+		self.assertEqual(response.data["assignment"]["bus"]["bus_number"], "DRV-1")
+		counts = {s["id"]: s["student_count"] for s in response.data["stops"]}
+		self.assertEqual(counts[self.stop_b.id], 1)
+		self.assertEqual(response.data["passengers"][0]["seat_number"], 3)
+
+	def test_students_cannot_use_driver_endpoints_or_list_profiles(self, *_):
+		self.client.force_authenticate(user=self.student)
+		self.assertEqual(self.client.get("/api/driver/overview/").status_code, 403)
+		self.client.force_authenticate(user=self.driver.user)
+		self.assertEqual(self.client.get("/api/students/").data["count"], 0)  # list is paginated
+
+	def test_location_ping_stores_fix_and_returns_ordered_etas(self, *_):
+		self.client.force_authenticate(user=self.driver.user)
+		response = self.client.post(
+			"/api/driver/location/",
+			{"latitude": 24.9215, "longitude": 67.0847, "remaining": [self.rs_b.id, self.rs_a.id]},
+			format="json",
+		)
+		self.assertEqual(response.status_code, 200, response.data)
+		self.assertEqual(_Ping.objects.count(), 1)
+		etas = response.data["etas"]
+		self.assertEqual([e["route_stop_id"] for e in etas], [self.rs_b.id, self.rs_a.id])
+		self.assertLess(etas[0]["eta_seconds"], etas[1]["eta_seconds"])
+		self.assertEqual(response.data["eta_source"], "estimate")
+
+	def test_deleting_driver_removes_login(self, *_):
+		admin = User.objects.create_user(username="drv_admin", password="adminpass", is_staff=True)
+		user_id = self.driver.user_id
+		self.client.force_authenticate(user=admin)
+		self.assertEqual(self.client.delete(f"/api/drivers/{self.driver.id}/").status_code, 204)
+		self.assertFalse(User.objects.filter(pk=user_id).exists())

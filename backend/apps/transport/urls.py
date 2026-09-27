@@ -71,4 +71,6 @@ urlpatterns = [
     path("crime-risk/zones/", crime_risk_zones, name="crime-risk-zones"),
     path("admin-management/modules/", modules_meta, name="admin-modules"),
     path("admin-management/activity-logs/", activity_logs, name="admin-activity-logs"),
+    path("driver/overview/", driver_overview, name="driver-overview"),
+    path("driver/location/", driver_location, name="driver-location"),
 ] + router.urls  # Router LAST

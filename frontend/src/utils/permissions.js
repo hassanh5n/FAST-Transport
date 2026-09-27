@@ -7,6 +7,7 @@ const RANK = { none: 0, view: 1, manage: 2 };
 
 // Save the /api/user/ response after login (or a refresh).
 export function storeUserSession(user) {
+  localStorage.setItem("role", user.role || (user.is_staff ? "staff" : "student"));
   localStorage.setItem("is_staff", user.is_staff ? "true" : "false");
   localStorage.setItem("is_super_admin", user.is_super_admin ? "true" : "false");
   localStorage.setItem("admin_role", user.admin_role || "");

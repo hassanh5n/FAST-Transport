@@ -145,3 +145,7 @@ export const updateAdminRole   = (id, data) => api.patch(`/api/admin-management/
 export const deleteAdminRole   = (id) => api.delete(`/api/admin-management/roles/${id}/`);
 // params: { actor, module, action, date_from, date_to, q, page, page_size }
 export const getActivityLogs   = (params = {}) => api.get("/api/admin-management/activity-logs/", { params });
+
+// ── Driver console ──
+export const getDriverOverview = () => api.get("/api/driver/overview/");
+export const sendDriverLocation = (data) => api.post("/api/driver/location/", data);

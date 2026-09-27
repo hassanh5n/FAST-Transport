@@ -234,9 +234,20 @@ const studentGroups = [
   },
 ];
 
+const driverGroups = [
+  {
+    label: "My Duty",
+    links: [
+      { to: "/driver/dashboard",  label: "Dashboard",  icon: "dashboard" },
+      { to: "/driver/trip",       label: "Live Trip",  icon: "map"       },
+      { to: "/driver/passengers", label: "Passengers", icon: "students"  },
+    ],
+  },
+];
+
 // ── Component ────────────────────────────────────────────────────────────────
 // Props:
-//   role      – "student" | "staff"
+//   role      – "student" | "staff" | "driver"
 //   isMobile  – boolean (injected by PageShell)
 //   isOpen    – boolean, controls drawer visibility on mobile
 //   onClose   – callback to close the drawer
@@ -249,7 +260,7 @@ function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }
     window.addEventListener("app:permissions-updated", bump);
     return () => window.removeEventListener("app:permissions-updated", bump);
   }, []);
-  const groups = role === "staff" ? visibleAdminGroups() : studentGroups;
+  const groups = role === "staff" ? visibleAdminGroups() : role === "driver" ? driverGroups : studentGroups;
 
   const handleLogout = () => {
     localStorage.clear();
@@ -333,7 +344,7 @@ function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
       {/* Role pill */}
       <div style={styles.rolePill}>
         <span style={styles.roleDot} />
-        {role === "staff" ? roleLabel() : "Student Portal"}
+        {role === "staff" ? roleLabel() : role === "driver" ? "Driver Console" : "Student Portal"}
       </div>
 
       {/* Nav groups */}
