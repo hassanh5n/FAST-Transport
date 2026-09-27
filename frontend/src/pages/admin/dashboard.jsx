@@ -322,7 +322,7 @@ function RecentAdminActivity() {
 
   return (
     <div style={{ ...styles.activityCard, marginTop: 0, height: "100%", boxSizing: "border-box" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px", gap: "12px" }}>
+      <div style={styles.activityHeader}>
         <h3 style={{ ...styles.sectionHeading, margin: 0 }}>Recent Admin Activity</h3>
         <button onClick={() => navigate("/admin/activity-logs")} style={styles.linkBtn}>View all logs →</button>
       </div>
@@ -419,6 +419,7 @@ const styles = {
     boxShadow: "0 1px 3px rgba(11,45,66,0.06)",
   },
   activityCard: {
+    minWidth: 0,
     background: "#fff", borderRadius: "14px",
     border: `1px solid ${colors.borderLight}`,
     padding: "20px 24px",
@@ -429,20 +430,24 @@ const styles = {
     color: colors.textPrimary, fontFamily: fonts.heading,
   },
   actionHint: { color: colors.textMuted, fontSize: "11px" },
+  activityHeader: {
+    display: "flex", justifyContent: "space-between", alignItems: "flex-start",
+    flexWrap: "wrap", marginBottom: "12px", gap: "8px",
+  },
   linkBtn: {
     background: "transparent", border: "none", color: colors.accent,
     fontSize: "13px", fontWeight: "600", cursor: "pointer", fontFamily: fonts.body, padding: 0,
   },
   activityRow: {
-    display: "flex", alignItems: "flex-start", gap: "10px",
+    display: "flex", alignItems: "flex-start", gap: "10px", minWidth: 0,
     padding: "9px 0", borderBottom: `1px solid ${colors.tableRowBorder}`,
   },
   actionTag: {
     fontSize: "10.5px", fontWeight: "700", textTransform: "uppercase", letterSpacing: "0.04em",
     padding: "3px 8px", borderRadius: "999px", flexShrink: 0, marginTop: "1px", minWidth: "54px", textAlign: "center",
   },
-  activityText: { fontSize: "13px", color: colors.textPrimary, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
-  activityMeta: { fontSize: "11.5px", color: colors.textMuted, marginTop: "2px" },
+  activityText: { fontSize: "13px", color: colors.textPrimary, overflowWrap: "anywhere", lineHeight: 1.4 },
+  activityMeta: { fontSize: "11.5px", color: colors.textMuted, marginTop: "3px", overflowWrap: "anywhere", lineHeight: 1.35 },
   chartsLoading: {
     minHeight: "218px", marginBottom: "20px", borderRadius: "14px",
     background: colors.neutralBg, color: colors.textMuted, display: "flex",
