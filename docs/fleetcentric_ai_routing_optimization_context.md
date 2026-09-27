@@ -69,7 +69,7 @@ The ordered `RouteStop` records are the source of truth for the route sequence.
 
 ## Current routing provider
 
-The backend currently uses an OSRM-compatible routing provider.
+The backend currently uses an OSRM compatible routing provider.
 
 The default routing URL is:
 
