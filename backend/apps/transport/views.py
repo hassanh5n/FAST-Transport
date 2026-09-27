@@ -6,9 +6,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Exists, OuterRef, Q, Prefetch
 from django.db import transaction
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.cache import cache
@@ -35,6 +36,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
 import io
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from .permissions import (
     IsAdmin,
     IsStudent,
@@ -2672,6 +2674,146 @@ BUS_TRACKER_TOKENS = {
 }
 
 ITECKNOLOGI_BASE = "https://iot.itecknologi.com/fleet"
+
+LIVE_FLEET_FRESHNESS_SECONDS = 60
+
+
+def _parse_tracker_timestamp(value):
+    if not value:
+        return None
+    parsed = parse_datetime(str(value))
+    if parsed is None:
+        return None
+    if timezone.is_naive(parsed):
+        return timezone.make_aware(parsed, timezone.get_current_timezone())
+    return parsed
+
+
+def _location_status(position_timestamp, now):
+    if position_timestamp is None:
+        return "offline"
+    age = (now - position_timestamp).total_seconds()
+    return "live" if 0 <= age <= LIVE_FLEET_FRESHNESS_SECONDS else "stale"
+
+
+def _fetch_tracker_location(bus):
+    cache_key = f"admin-live-fleet:tracker:{bus.id}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    token = bus.tracker_token
+    if not token:
+        result = {"status": "no_tracker", "error": "No tracker is configured."}
+        cache.set(cache_key, result, 30)
+        return result
+    try:
+        response = req_lib.get(
+            f"{ITECKNOLOGI_BASE}/live_data_api_token.php",
+            params={"token": token},
+            timeout=5,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        data = payload.get("data") or {}
+        latitude = float(data["lat"])
+        longitude = float(data["lng"])
+        if not -90 <= latitude <= 90 or not -180 <= longitude <= 180:
+            raise ValueError("Tracker returned coordinates outside valid ranges.")
+        result = {
+            "status": "provider",
+            "latitude": latitude,
+            "longitude": longitude,
+            "speed_kmh": data.get("speed"),
+            "heading_degrees": data.get("angle"),
+            "ignition": data.get("ign_value") == 1,
+            "position_timestamp": _parse_tracker_timestamp(data.get("message")),
+        }
+        cache.set(cache_key, result, 5)
+        return result
+    except (req_lib.RequestException, ValueError, KeyError, TypeError) as exc:
+        result = {"status": "offline", "error": str(exc)}
+        cache.set(cache_key, result, 2)
+        return result
+
+
+def _serialize_fleet_bus(bus, now):
+    assignment = bus.active_assignments[0] if bus.active_assignments else None
+    tracker = _fetch_tracker_location(bus)
+    source = tracker.get("status")
+    latitude = tracker.get("latitude")
+    longitude = tracker.get("longitude")
+    position_timestamp = tracker.get("position_timestamp")
+
+    if latitude is None and bus.recent_location_pings:
+        ping = bus.recent_location_pings[0]
+        ping_age = (now - ping.recorded_at).total_seconds()
+        if ping_age <= LIVE_FLEET_FRESHNESS_SECONDS:
+            latitude = float(ping.latitude)
+            longitude = float(ping.longitude)
+            position_timestamp = ping.recorded_at
+            source = "ping"
+
+    status = "ping" if source == "ping" else (_location_status(position_timestamp, now) if latitude is not None else source)
+    return {
+        "bus_id": bus.id,
+        "bus_number": bus.bus_number,
+        "model": bus.model,
+        "is_active": bus.is_active,
+        "status": status,
+        "latitude": latitude,
+        "longitude": longitude,
+        "speed_kmh": tracker.get("speed_kmh"),
+        "heading_degrees": tracker.get("heading_degrees"),
+        "ignition": tracker.get("ignition"),
+        "position_timestamp": position_timestamp,
+        "source": source,
+        "route": {"id": assignment.route_id, "name": assignment.route.name} if assignment else None,
+        "driver": {"id": assignment.driver_id, "name": assignment.driver.name} if assignment else None,
+        "capacity": assignment.bus.capacity if assignment else None,
+        "allocated_seats": getattr(assignment, "allocated_seats", 0) if assignment else 0,
+        "available_seats": max(assignment.bus.capacity - assignment.allocated_seats, 0) if assignment else None,
+        "is_off_route": bus.is_off_route,
+        "distance_from_route_m": bus.recent_location_pings[0].distance_from_route_m if bus.recent_location_pings else None,
+        "error": tracker.get("error"),
+    }
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def admin_live_fleet(request):
+    """Return one normalized snapshot for every active bus in the fleet."""
+    active_semester = Semester.objects.filter(is_active=True).first()
+    assignments = RouteAssignment.objects.filter(
+        is_active=True,
+        semester=active_semester,
+    ).select_related("route", "driver").annotate(
+        allocated_seats=Count("seatallocation", distinct=True),
+    ) if active_semester else RouteAssignment.objects.none()
+    buses = list(
+        Bus.objects.filter(is_active=True)
+        .prefetch_related(
+            Prefetch("routeassignment_set", queryset=assignments, to_attr="active_assignments"),
+            Prefetch(
+                "location_pings",
+                queryset=BusLocationPing.objects.order_by("-recorded_at")[:1],
+                to_attr="recent_location_pings",
+            ),
+        )
+        .order_by("bus_number", "id")
+    )
+    now = timezone.now()
+    results = []
+    with ThreadPoolExecutor(max_workers=min(8, max(len(buses), 1))) as executor:
+        futures = [executor.submit(_serialize_fleet_bus, bus, now) for bus in buses]
+        for future in as_completed(futures):
+            results.append(future.result())
+    results.sort(key=lambda item: (item["route"]["name"] if item["route"] else "", item["bus_number"], item["bus_id"]))
+    return Response({
+        "server_time": now,
+        "freshness_threshold_seconds": LIVE_FLEET_FRESHNESS_SECONDS,
+        "buses": results,
+    })
 
 
 @api_view(["GET"])

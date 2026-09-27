@@ -25,7 +25,7 @@ export default function DriverPassengers() {
       .catch(() => setError("Failed to load your passengers. Please try again."));
   }, []);
 
-  const stops = data?.stops ?? [];
+  const stops = useMemo(() => data?.stops || [], [data]);
   const orderByStop = useMemo(() => Object.fromEntries(stops.map((s) => [s.id, s.stop_order])), [stops]);
 
   const rows = useMemo(() => {

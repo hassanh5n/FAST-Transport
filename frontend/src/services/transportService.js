@@ -7,6 +7,7 @@ export const forgotPassword = (data) => api.post("/api/forgot-password/", data);
 export const resetPassword = (data) => api.post("/api/reset-password/", data);
 
 export const getDashboard = () => api.get("/api/dashboard/");
+export const getAdminLiveFleet = () => api.get("/api/admin/live-fleet/");
 
 export const getStudents = () => api.get("/api/students/");
 

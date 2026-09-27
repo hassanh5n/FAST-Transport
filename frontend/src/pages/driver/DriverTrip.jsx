@@ -171,7 +171,8 @@ export default function DriverTrip() {
   useEffect(() => {
     if (!position || !nextStop) return;
     if (metersBetween(position, { lat: nextStop.latitude, lng: nextStop.longitude }) <= ARRIVAL_RADIUS_M) {
-      markReached(nextStop.route_stop_id);
+      const timer = setTimeout(() => markReached(nextStop.route_stop_id), 0);
+      return () => clearTimeout(timer);
     }
   }, [position, nextStop, markReached]);
 
