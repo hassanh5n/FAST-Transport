@@ -57,7 +57,7 @@ def _build_html(notification, recipient_name):
                  style="display:inline-block;background:#288dc4;color:#ffffff;
                         text-decoration:none;font-weight:600;font-size:14px;
                         padding:11px 22px;border-radius:8px;">
-                Open FAST Transport
+                Open Fleetcentric.ai
               </a>
             </td>
           </tr>
@@ -79,7 +79,7 @@ def _build_html(notification, recipient_name):
               <td style="background:#0b2d42;padding:18px 32px;">
                 <div style="color:rgba(255,255,255,0.55);font-size:11px;
                             letter-spacing:0.08em;text-transform:uppercase;">
-                  FAST NUCES
+                  Fleetcentric.ai
                 </div>
                 <div style="color:#ffffff;font-size:18px;font-weight:700;
                             margin-top:2px;">
@@ -109,7 +109,7 @@ def _build_html(notification, recipient_name):
               <td style="padding:18px 32px;border-top:1px solid #edf2f7;
                          background:#f8fafc;">
                 <p style="margin:0;font-size:11.5px;color:#8faabb;line-height:1.6;">
-                  This is an automated message from the FAST Transport portal.
+                  This is an automated message from the Fleetcentric.ai portal.
                   Please do not reply to this email.
                 </p>
               </td>
@@ -162,7 +162,7 @@ def send_notification_email(notification):
             return False
 
         recipient_name = (user.first_name or "").strip() or user.username
-        subject = f"[FAST Transport] {notification.title}"
+        subject = f"[Fleetcentric.ai] {notification.title}"
         text_body = (
             f"Hi {recipient_name},\n\n"
             f"{notification.title}\n\n"
@@ -172,7 +172,7 @@ def send_notification_email(notification):
         if portal:
             text_body += f"\nOpen the portal: {portal}\n"
         text_body += (
-            "\n---\nThis is an automated message from the FAST Transport portal. "
+            "\n---\nThis is an automated message from the Fleetcentric.ai portal. "
             "Please do not reply.\n"
         )
 

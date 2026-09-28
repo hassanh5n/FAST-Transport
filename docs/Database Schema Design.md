@@ -161,7 +161,7 @@ Here's the **Core Modules → Entities** mapping:
 
 | # | Core Module | Entities (Tables) | Description |
 |---|---|---|---|
-| 1 | **User & Authentication** | `User`, `StudentProfile` | User accounts with role-based access (student/admin) and FAST-specific student profiles |
+| 1 | **User & Authentication** | `User`, `StudentProfile` | User accounts with role-based access (student/admin) and student profiles |
 | 2 | **Academic Management** | `Semester` | Semester periods controlling registration windows and data archival |
 | 3 | **Route Management** | `Route`, `Stop`, `RouteStop` | Bus routes with ordered stops, each having morning/evening ETAs |
 | 4 | **Bus & Driver Management** | `Bus`, `Driver`, `RouteAssignment` | Vehicle inventory, standalone driver records, and bus+driver assignment to routes per semester |

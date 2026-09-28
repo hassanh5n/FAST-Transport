@@ -375,14 +375,14 @@ class MapRouteApiTests(TestCase):
 	def test_admin_location_search_proxies_and_normalizes_results(self, mock_get):
 		mock_response = Mock()
 		mock_response.json.return_value = [{
-			"lat": "24.9215", "lon": "67.0847", "display_name": "FAST NUCES, Karachi",
+			"lat": "24.9215", "lon": "67.0847", "display_name": "Fleetcentric.ai, Karachi",
 			"osm_type": "node", "osm_id": 123,
 		}]
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.admin)
-		response = self.client.post("/api/admin/maps/location/", {"action": "search", "query": "FAST NUCES"}, format="json")
+		response = self.client.post("/api/admin/maps/location/", {"action": "search", "query": "Fleetcentric.ai"}, format="json")
 		self.assertEqual(response.status_code, 200, response.data)
-		self.assertEqual(response.data["results"][0]["label"], "FAST NUCES, Karachi")
+		self.assertEqual(response.data["results"][0]["label"], "Fleetcentric.ai, Karachi")
 		self.assertEqual(response.data["results"][0]["provider_place_id"], "node:123")
 
 	@patch("apps.transport.views.req_lib.get")

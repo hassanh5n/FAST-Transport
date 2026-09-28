@@ -118,7 +118,7 @@ function Login() {
         </div>
 
         <p style={styles.bottomNote}>
-          © {new Date().getFullYear()} FAST-NUCES · Transport Management System
+          © {new Date().getFullYear()} Fleetcentric.ai · Transport Management System
         </p>
       </div>
     </div>

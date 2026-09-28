@@ -29,7 +29,7 @@ PASSWORD  = os.environ.get("EMAIL_HOST_PASSWORD", "")
 FROM_ADDR = "thundermarks.agency@gmail.com"
 TO_ADDR   = sys.argv[1] if len(sys.argv) > 1 else None
 
-print("\n── FAST Transport SMTP Diagnostics ──")
+print("\n── Fleetcentric.ai SMTP Diagnostics ──")
 print(f"  Host     : {HOST}:{PORT}")
 print(f"  User     : {USER}")
 print(f"  Password : {'(set, length=' + str(len(PASSWORD)) + ')' if PASSWORD else '(NOT SET — check .env)'}")
@@ -93,15 +93,15 @@ except Exception as e:
 # ── Step 4: Send test email ───────────────────────────────────────────────────
 print(f"\nStep 4 — Sending test email to {TO_ADDR}...")
 msg = MIMEMultipart("alternative")
-msg["Subject"] = "FAST Transport — SMTP Test"
-msg["From"]    = f"FAST Transport <{FROM_ADDR}>"
+msg["Subject"] = "Fleetcentric.ai — SMTP Test"
+msg["From"]    = f"Fleetcentric.ai <{FROM_ADDR}>"
 msg["To"]      = TO_ADDR
 
 html = """\
 <html><body>
 <h2 style="color:#0b2d42">SMTP Test Successful ✓</h2>
 <p>If you're reading this, your Brevo SMTP relay is configured correctly.</p>
-<p style="color:#888;font-size:12px">Sent from FAST Transport diagnostic script</p>
+<p style="color:#888;font-size:12px">Sent from Fleetcentric.ai diagnostic script</p>
 </body></html>
 """
 msg.attach(MIMEText("SMTP Test Successful. Your Brevo relay is working.", "plain"))

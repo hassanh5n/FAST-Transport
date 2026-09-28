@@ -1840,7 +1840,7 @@ class StudentSignupView(generics.CreateAPIView):
         # Send OTP email — if this fails we still want the user created
         try:
             send_mail(
-                subject="Your FAST Transport OTP Code",
+                subject="Your Fleetcentric.ai OTP Code",
                 message=(
                     f"Hello {user.username},\n\n"
                     f"Your OTP verification code is: {otp_code}\n\n"
@@ -1951,7 +1951,7 @@ def resend_otp(request):
     )
  
     send_mail(
-        subject="Your FAST Transport OTP",
+        subject="Your Fleetcentric.ai OTP",
         message=f"Your OTP is: {otp_code}\nIt expires in 10 minutes.",
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[email],
@@ -2000,7 +2000,7 @@ def forgot_password(request):
     )
  
     send_mail(
-        subject="Reset your FAST Transport password",
+        subject="Reset your Fleetcentric.ai password",
         message=(
             f"Your password reset OTP is: {otp_code}\n"
             "It expires in 10 minutes.\n\n"
@@ -2567,7 +2567,7 @@ def confirm_stripe_payment(request, pk):
 
     try:
         send_mail(
-            subject="FAST Transport — Payment OTP",
+            subject="Fleetcentric.ai — Payment OTP",
             message=(
                 f"Hello {request.user.username},\n\n"
                 f"Your payment verification OTP is: {otp_code}\n\n"
@@ -2968,7 +2968,7 @@ def download_transport_card(request):
         story.append(logo)
         story.append(Spacer(1, 0.45 * cm))
 
-    story.append(Paragraph("FAST NUCES", title_style))
+    story.append(Paragraph("Fleetcentric.ai", title_style))
     story.append(Paragraph("Transport Management System", subtitle_style))
     story.append(Spacer(1, 0.5*cm))
     story.append(Paragraph("STUDENT TRANSPORT CARD", ParagraphStyle(

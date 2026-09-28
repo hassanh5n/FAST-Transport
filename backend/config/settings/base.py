@@ -98,7 +98,7 @@ EMAIL_PORT         = 587
 EMAIL_USE_TLS      = True
 EMAIL_HOST_USER    = 'a8d609001@smtp-brevo.com'
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
-DEFAULT_FROM_EMAIL = 'FAST-Transport <hassannafees.4017@gmail.com>'
+DEFAULT_FROM_EMAIL = 'Fleetcentric.ai <hassannafees.4017@gmail.com>'
 
 # ── Notification emails ──────────────────────────────────────────────────────
 # Every Notification row is mirrored to the recipient's inbox (see

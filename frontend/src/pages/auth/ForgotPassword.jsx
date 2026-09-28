@@ -67,7 +67,7 @@ function ForgotPassword() {
               <div style={styles.cardHeader}>
                 <h2 style={styles.cardTitle}>Forgot password?</h2>
                 <p style={styles.cardDesc}>
-                  Enter your NUCES email and we'll send a reset code.
+                  Enter your edu.pk email and we'll send a reset code.
                 </p>
               </div>
 
@@ -114,7 +114,7 @@ function ForgotPassword() {
         </div>
 
         <p style={styles.bottomNote}>
-          © {new Date().getFullYear()} FAST-NUCES · Transport Management System
+          © {new Date().getFullYear()} Fleetcentric.ai · Transport Management System
         </p>
       </div>
     </div>
