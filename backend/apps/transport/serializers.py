@@ -1,5 +1,7 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from django.utils import timezone
 from .models import (
     Challan,
@@ -168,10 +170,80 @@ class BusSerializer(serializers.ModelSerializer):
 
 
 class DriverSerializer(serializers.ModelSerializer):
+    # Login is optional. Admin sets username + password to let a driver sign in;
+    # later edits may change either one, and a blank value leaves it unchanged.
+    username = serializers.CharField(write_only=True, required=False, allow_blank=True, max_length=150)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True,
+                                     style={"input_type": "password"})
+    login_username = serializers.SerializerMethodField()
+
     class Meta:
         model = Driver
         fields = '__all__'
-        read_only_fields = ['created_at', 'updated_at']
+        read_only_fields = ['user', 'created_at', 'updated_at']
+
+    def get_login_username(self, obj):
+        return obj.user.username if obj.user_id else None
+
+    def validate(self, attrs):
+        username = (attrs.get("username") or "").strip()
+        password = attrs.get("password") or ""
+        user = getattr(self.instance, "user", None)
+
+        if username:
+            try:
+                User._meta.get_field("username").run_validators(username)
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"username": exc.messages})
+            clash = User.objects.filter(username__iexact=username)
+            if user:
+                clash = clash.exclude(pk=user.pk)
+            if clash.exists():
+                raise serializers.ValidationError({"username": "This username is already taken."})
+        if password and len(password) < 8:
+            raise serializers.ValidationError({"password": "Password must be at least 8 characters."})
+        if user is None and bool(username) != bool(password):
+            raise serializers.ValidationError(
+                {"password" if username else "username": "Username and password are both needed to create a login."}
+            )
+
+        attrs["username"] = username
+        return attrs
+
+    def create(self, validated_data):
+        login = validated_data.pop("username", ""), validated_data.pop("password", "")
+        with transaction.atomic():
+            driver = super().create(validated_data)
+            self._save_login(driver, *login)
+        return driver
+
+    def update(self, instance, validated_data):
+        login = validated_data.pop("username", ""), validated_data.pop("password", "")
+        with transaction.atomic():
+            driver = super().update(instance, validated_data)
+            self._save_login(driver, *login)
+        return driver
+
+    @staticmethod
+    def _save_login(driver, username, password):
+        user = driver.user
+        if not (username or password):
+            # Keep the navbar name in step with the driver record.
+            if user and user.first_name != driver.name[:150]:
+                user.first_name = driver.name[:150]
+                user.save(update_fields=["first_name"])
+            return
+        user = user or User(username=username)
+        if username:
+            user.username = username
+        user.first_name = driver.name[:150]
+        if password:
+            user.set_password(password)
+        user.save()
+        user.groups.add(Group.objects.get_or_create(name="Driver")[0])
+        if driver.user_id != user.pk:
+            driver.user = user
+            driver.save(update_fields=["user"])
 
 
 class RouteAssignmentSerializer(serializers.ModelSerializer):

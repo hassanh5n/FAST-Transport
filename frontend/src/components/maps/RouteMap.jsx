@@ -72,10 +72,14 @@ function makeSelectedRouteFeatures(routes, selectedRouteId) {
   };
 }
 
-export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, onStopSelect, height = 480 }) {
+// White bus glyph for the live-position marker (same shape as the dashboard bus icon).
+const BUS_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h20"/><path d="M18 18h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>';
+
+export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, onStopSelect, height = 480, livePosition = null }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const popupRef = useRef(null);
+  const liveMarkerRef = useRef(null);
   const callbackRef = useRef({ onRouteSelect, onStopSelect });
 
   useEffect(() => {
@@ -157,6 +161,7 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
       popupRef.current?.remove();
       map.remove();
       mapRef.current = null;
+      liveMarkerRef.current = null;
     };
   }, []);
 
@@ -194,6 +199,32 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
       hasSelected ? ["case", ["==", ["get", "routeId"], selectedId], 6, 4] : 4
     );
   }, [selectedRouteId]);
+
+  // Live bus position (driver pages) — one marker, moved in place.
+  const liveLat = livePosition?.lat;
+  const liveLng = livePosition?.lng;
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (liveLat == null || liveLng == null) {
+      liveMarkerRef.current?.remove();
+      liveMarkerRef.current = null;
+      return;
+    }
+    const lngLat = [Number(liveLng), Number(liveLat)];
+    if (liveMarkerRef.current) {
+      liveMarkerRef.current.setLngLat(lngLat);
+      return;
+    }
+    const el = document.createElement("div");
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", "Bus position");
+    el.style.cssText = "width:34px;height:34px;border-radius:50%;background:#0b2d42;border:3px solid #fff;"
+      + "box-shadow:0 0 0 6px rgba(40,141,196,0.22),0 3px 10px rgba(11,45,66,0.45);"
+      + "display:flex;align-items:center;justify-content:center;";
+    el.innerHTML = BUS_SVG;
+    liveMarkerRef.current = new maplibregl.Marker({ element: el, anchor: "center" }).setLngLat(lngLat).addTo(map);
+  }, [liveLat, liveLng]);
 
   return <div ref={containerRef} style={{ height, width: "100%", borderRadius: 12, overflow: "hidden" }} aria-label="Transport route map" />;
 }

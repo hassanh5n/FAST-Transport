@@ -1,6 +1,6 @@
 # FleetCentric.ai — Transport Management System
 
-> **A full stack web application for digitizing and streamlining university transport operations at FAST NUCES, Karachi.**
+> **A full stack web application for digitizing and streamlining university transport operations.**
 
 ![Project Status](https://img.shields.io/badge/status-active-success.svg)
 ![Django](https://img.shields.io/badge/Django-6.0-092E20?logo=django)
@@ -11,7 +11,7 @@
 
 ## Introduction
 
-**FAST Transport** is a transport management platform built for FAST NUCES to replace manual, paper based processes with a modern digital system. It enables students to register for transport each semester, pay fees online, track buses in real-time, and manage route changes — while giving administrators a centralized dashboard for managing the entire fleet, verifying payments, and resolving complaints.
+**Fleetcentric.ai** is a transport management platform built for Fleetcentric.ai to replace manual, paper based processes with a modern digital system. It enables students to register for transport each semester, pay fees online, track buses in real-time, and manage route changes — while giving administrators a centralized dashboard for managing the entire fleet, verifying payments, and resolving complaints.
 
 Built with **Django REST Framework** and **React (Vite)**, it follows a clean three-tier architecture with JWT authentication, role-based access control, and responsive design across all devices.
 
@@ -27,7 +27,7 @@ Built with **Django REST Framework** and **React (Vite)**, it follows a clean th
 *   **JWT Authentication**: Secure token-based auth with automatic access token refresh.
 *   **Email OTP Verification**: 6-digit OTP sent via Brevo SMTP for signup and password reset.
 *   **Role-Based Access Control**: Separate Student and Admin portals with permission enforcement.
-*   **NUCES Email Restriction**: Only `@nu.edu.pk` email addresses are accepted for student registration.
+*   **edu.pk Email Restriction**: Only `@nu.edu.pk` email addresses are accepted for student registration.
 
 ### Student Portal
 *   **Semester Registration**: Register for transport each semester, select preferred stops, and get auto-assigned to the optimal route.
@@ -133,7 +133,7 @@ This creates low, elevated, and high/very-high sample cells; do not run it again
 
 ## Deployment 🚀
 
-FAST Transport is deployed on multiple platforms for demo.
+Fleetcentric.ai is deployed on multiple platforms for demo.
 
 ### ☁️ Architecture
 *   **Frontend Hosting**: [Vercel](https://vercel.com) — React SPA with automatic builds from GitHub.

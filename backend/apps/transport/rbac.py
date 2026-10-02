@@ -84,6 +84,7 @@ SUPER = "__super__"
 #  these endpoints, so hiding them from staff would only break pages).
 PATH_RULES = [
     (r"^admin-management/",                         SUPER,            (),                               False),
+    (r"^admin/live-fleet/",                          "fleet",          (),                               False),
     (r"^students(-list)?/",                         "students",       ("export", "fees", "seats", "complaints"), False),
     (r"^semester-registrations/",                   "students",       ("export", "seats"),              False),
     (r"^semesters/",                                "semesters",      (),                               True),

@@ -6,9 +6,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import Count, Exists, OuterRef, Q, Prefetch
 from django.db import transaction
 from django.utils import timezone
+from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
 from django.conf import settings
 from django.core.cache import cache
@@ -16,6 +17,9 @@ from datetime import timedelta
 import random
 import string as _string
 import hashlib
+import math
+from collections import Counter
+from decimal import Decimal
 from rest_framework.response import Response
 from rest_framework import viewsets,permissions
 from rest_framework.decorators import action
@@ -32,6 +36,7 @@ from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
 import io
 import os
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from .permissions import (
     IsAdmin,
     IsStudent,
@@ -342,6 +347,9 @@ class CurrentUserView(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "is_staff": user.is_staff,
+            "role": "staff" if user.is_staff else (
+                "driver" if Driver.objects.filter(user=user).exists() else "student"
+            ),
             "is_super_admin": is_super_admin(user),
             "admin_role": (
                 user.admin_profile.role.name
@@ -359,9 +367,11 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name="Student").exists():
-            return StudentProfile.objects.filter(user=user) # Student sees only their own profile
-        return StudentProfile.objects.all() # Admin sees all profiles
+        # Scope on staff status, not group membership: drivers and group-less
+        # users must only ever see their own profile.
+        if user.is_staff:
+            return StudentProfile.objects.all()
+        return StudentProfile.objects.filter(user=user)
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
@@ -754,6 +764,13 @@ class DriverViewSet(viewsets.ModelViewSet):
     serializer_class = DriverSerializer
     permission_classes = [IsAdmin]  # keeps admin-only for all other actions
 
+    def perform_destroy(self, instance):
+        # Never leave an orphan account that can still sign in.
+        user = instance.user
+        instance.delete()
+        if user:
+            user.delete()
+
     @action(detail=True, methods=["get"], permission_classes=[IsAuthenticated])
     def public_detail(self, request, pk=None):
         try:
@@ -795,10 +812,9 @@ class SemesterRegistrationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name="Student").exists():
-            student_profile = StudentProfile.objects.get(user=user)
-            return SemesterRegistration.objects.filter(student=student_profile)
-        return SemesterRegistration.objects.all()
+        if user.is_staff:
+            return SemesterRegistration.objects.all()
+        return SemesterRegistration.objects.filter(student__user=user)
 
 class TransportRegistrationViewSet(viewsets.ModelViewSet):
     queryset = TransportRegistration.objects.all()
@@ -1476,9 +1492,9 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        if user.groups.filter(name="Student").exists():
-            return Complaint.objects.filter(submitted_by=user)
-        return Complaint.objects.all()
+        if user.is_staff:
+            return Complaint.objects.all()
+        return Complaint.objects.filter(submitted_by=user)
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)
@@ -1824,7 +1840,7 @@ class StudentSignupView(generics.CreateAPIView):
         # Send OTP email — if this fails we still want the user created
         try:
             send_mail(
-                subject="Your FAST Transport OTP Code",
+                subject="Your Fleetcentric.ai OTP Code",
                 message=(
                     f"Hello {user.username},\n\n"
                     f"Your OTP verification code is: {otp_code}\n\n"
@@ -1935,7 +1951,7 @@ def resend_otp(request):
     )
  
     send_mail(
-        subject="Your FAST Transport OTP",
+        subject="Your Fleetcentric.ai OTP",
         message=f"Your OTP is: {otp_code}\nIt expires in 10 minutes.",
         from_email=settings.DEFAULT_FROM_EMAIL,
         recipient_list=[email],
@@ -1984,7 +2000,7 @@ def forgot_password(request):
     )
  
     send_mail(
-        subject="Reset your FAST Transport password",
+        subject="Reset your Fleetcentric.ai password",
         message=(
             f"Your password reset OTP is: {otp_code}\n"
             "It expires in 10 minutes.\n\n"
@@ -2210,7 +2226,7 @@ class DashboardView(APIView):
 
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([IsAdmin])
 def students_list(request):
     students = StudentProfile.objects.select_related("user").all()
 
@@ -2551,7 +2567,7 @@ def confirm_stripe_payment(request, pk):
 
     try:
         send_mail(
-            subject="FAST Transport — Payment OTP",
+            subject="Fleetcentric.ai — Payment OTP",
             message=(
                 f"Hello {request.user.username},\n\n"
                 f"Your payment verification OTP is: {otp_code}\n\n"
@@ -2658,6 +2674,146 @@ BUS_TRACKER_TOKENS = {
 }
 
 ITECKNOLOGI_BASE = "https://iot.itecknologi.com/fleet"
+
+LIVE_FLEET_FRESHNESS_SECONDS = 60
+
+
+def _parse_tracker_timestamp(value):
+    if not value:
+        return None
+    parsed = parse_datetime(str(value))
+    if parsed is None:
+        return None
+    if timezone.is_naive(parsed):
+        return timezone.make_aware(parsed, timezone.get_current_timezone())
+    return parsed
+
+
+def _location_status(position_timestamp, now):
+    if position_timestamp is None:
+        return "offline"
+    age = (now - position_timestamp).total_seconds()
+    return "live" if 0 <= age <= LIVE_FLEET_FRESHNESS_SECONDS else "stale"
+
+
+def _fetch_tracker_location(bus):
+    cache_key = f"admin-live-fleet:tracker:{bus.id}"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+
+    token = bus.tracker_token
+    if not token:
+        result = {"status": "no_tracker", "error": "No tracker is configured."}
+        cache.set(cache_key, result, 30)
+        return result
+    try:
+        response = req_lib.get(
+            f"{ITECKNOLOGI_BASE}/live_data_api_token.php",
+            params={"token": token},
+            timeout=5,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        data = payload.get("data") or {}
+        latitude = float(data["lat"])
+        longitude = float(data["lng"])
+        if not -90 <= latitude <= 90 or not -180 <= longitude <= 180:
+            raise ValueError("Tracker returned coordinates outside valid ranges.")
+        result = {
+            "status": "provider",
+            "latitude": latitude,
+            "longitude": longitude,
+            "speed_kmh": data.get("speed"),
+            "heading_degrees": data.get("angle"),
+            "ignition": data.get("ign_value") == 1,
+            "position_timestamp": _parse_tracker_timestamp(data.get("message")),
+        }
+        cache.set(cache_key, result, 5)
+        return result
+    except (req_lib.RequestException, ValueError, KeyError, TypeError) as exc:
+        result = {"status": "offline", "error": str(exc)}
+        cache.set(cache_key, result, 2)
+        return result
+
+
+def _serialize_fleet_bus(bus, now):
+    assignment = bus.active_assignments[0] if bus.active_assignments else None
+    tracker = _fetch_tracker_location(bus)
+    source = tracker.get("status")
+    latitude = tracker.get("latitude")
+    longitude = tracker.get("longitude")
+    position_timestamp = tracker.get("position_timestamp")
+
+    if latitude is None and bus.recent_location_pings:
+        ping = bus.recent_location_pings[0]
+        ping_age = (now - ping.recorded_at).total_seconds()
+        if ping_age <= LIVE_FLEET_FRESHNESS_SECONDS:
+            latitude = float(ping.latitude)
+            longitude = float(ping.longitude)
+            position_timestamp = ping.recorded_at
+            source = "ping"
+
+    status = "ping" if source == "ping" else (_location_status(position_timestamp, now) if latitude is not None else source)
+    return {
+        "bus_id": bus.id,
+        "bus_number": bus.bus_number,
+        "model": bus.model,
+        "is_active": bus.is_active,
+        "status": status,
+        "latitude": latitude,
+        "longitude": longitude,
+        "speed_kmh": tracker.get("speed_kmh"),
+        "heading_degrees": tracker.get("heading_degrees"),
+        "ignition": tracker.get("ignition"),
+        "position_timestamp": position_timestamp,
+        "source": source,
+        "route": {"id": assignment.route_id, "name": assignment.route.name} if assignment else None,
+        "driver": {"id": assignment.driver_id, "name": assignment.driver.name} if assignment else None,
+        "capacity": assignment.bus.capacity if assignment else None,
+        "allocated_seats": getattr(assignment, "allocated_seats", 0) if assignment else 0,
+        "available_seats": max(assignment.bus.capacity - assignment.allocated_seats, 0) if assignment else None,
+        "is_off_route": bus.is_off_route,
+        "distance_from_route_m": bus.recent_location_pings[0].distance_from_route_m if bus.recent_location_pings else None,
+        "error": tracker.get("error"),
+    }
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def admin_live_fleet(request):
+    """Return one normalized snapshot for every active bus in the fleet."""
+    active_semester = Semester.objects.filter(is_active=True).first()
+    assignments = RouteAssignment.objects.filter(
+        is_active=True,
+        semester=active_semester,
+    ).select_related("route", "driver").annotate(
+        allocated_seats=Count("seatallocation", distinct=True),
+    ) if active_semester else RouteAssignment.objects.none()
+    buses = list(
+        Bus.objects.filter(is_active=True)
+        .prefetch_related(
+            Prefetch("routeassignment_set", queryset=assignments, to_attr="active_assignments"),
+            Prefetch(
+                "location_pings",
+                queryset=BusLocationPing.objects.order_by("-recorded_at")[:1],
+                to_attr="recent_location_pings",
+            ),
+        )
+        .order_by("bus_number", "id")
+    )
+    now = timezone.now()
+    results = []
+    with ThreadPoolExecutor(max_workers=min(8, max(len(buses), 1))) as executor:
+        futures = [executor.submit(_serialize_fleet_bus, bus, now) for bus in buses]
+        for future in as_completed(futures):
+            results.append(future.result())
+    results.sort(key=lambda item: (item["route"]["name"] if item["route"] else "", item["bus_number"], item["bus_id"]))
+    return Response({
+        "server_time": now,
+        "freshness_threshold_seconds": LIVE_FLEET_FRESHNESS_SECONDS,
+        "buses": results,
+    })
 
 
 @api_view(["GET"])
@@ -2812,7 +2968,7 @@ def download_transport_card(request):
         story.append(logo)
         story.append(Spacer(1, 0.45 * cm))
 
-    story.append(Paragraph("FAST NUCES", title_style))
+    story.append(Paragraph("Fleetcentric.ai", title_style))
     story.append(Paragraph("Transport Management System", subtitle_style))
     story.append(Spacer(1, 0.5*cm))
     story.append(Paragraph("STUDENT TRANSPORT CARD", ParagraphStyle(
@@ -3009,3 +3165,212 @@ def approved_incidents(request):
         })
 
     return Response(data)
+
+
+# ── Driver console ───────────────────────────────────────────────────────────
+# Drivers are admin-created logins linked to a Driver row (Driver.user). Every
+# endpoint below is scoped to the requesting driver's own active assignment.
+
+
+class IsDriver(permissions.BasePermission):
+    """A signed-in user whose account is linked to a Driver record."""
+
+    def has_permission(self, request, view):
+        return bool(
+            request.user and request.user.is_authenticated
+            and Driver.objects.filter(user=request.user).exists()
+        )
+
+AVERAGE_CITY_SPEED_MPS = 5.5   # ~20 km/h door to door in city traffic
+ROAD_DETOUR_FACTOR = 1.3       # straight line -> road distance
+STOP_DWELL_SECONDS = 60        # boarding time at each intermediate stop
+
+
+def _driver_for(user):
+    return Driver.objects.filter(user=user).first()
+
+
+def _driver_assignment(driver):
+    """The driver's active assignment, preferring the active semester."""
+    qs = RouteAssignment.objects.filter(driver=driver, is_active=True).select_related(
+        "route", "bus", "semester"
+    )
+    return qs.filter(semester__is_active=True).first() or qs.order_by("-created_at").first()
+
+
+def _haversine_m(a, b):
+    (lng1, lat1), (lng2, lat2) = a, b
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    h = (math.sin((p2 - p1) / 2) ** 2
+         + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lng2 - lng1) / 2) ** 2)
+    return 2 * 6371000 * math.asin(math.sqrt(h))
+
+
+def _route_legs(coordinates):
+    """[(duration_s, distance_m)] per leg from the road router, or None."""
+    # 4 decimals (~11 m) so consecutive pings from a parked bus share a cache hit.
+    path = ";".join(f"{lng:.4f},{lat:.4f}" for lng, lat in coordinates)
+    cache_key = _map_cache_key("eta", path)
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
+    try:
+        response = req_lib.get(
+            f"{settings.MAP_ROUTING_URL}/route/v1/driving/{path}",
+            params={"overview": "false"},
+            timeout=6,
+        )
+        response.raise_for_status()
+        legs = [(leg["duration"], leg["distance"]) for leg in response.json()["routes"][0]["legs"]]
+    except (req_lib.RequestException, ValueError, KeyError, IndexError, TypeError):
+        return None
+    cache.set(cache_key, legs, timeout=60)
+    return legs
+
+
+def _stop_etas(origin, route_stops):
+    """Cumulative ETA from origin (lng, lat) through route_stops, in order."""
+    if not route_stops:
+        return [], None
+    coordinates = [origin] + [(float(rs.stop.longitude), float(rs.stop.latitude)) for rs in route_stops]
+    # ponytail: OSRM durations are free-flow; scale them if drivers report ETAs as optimistic at rush hour.
+    legs, source = _route_legs(coordinates), "road"
+    if legs is None or len(legs) != len(route_stops):
+        source = "estimate"
+        legs = []
+        for a, b in zip(coordinates, coordinates[1:]):
+            distance = _haversine_m(a, b) * ROAD_DETOUR_FACTOR
+            legs.append((distance / AVERAGE_CITY_SPEED_MPS, distance))
+
+    etas, elapsed, travelled = [], 0.0, 0.0
+    for index, (route_stop, (duration, distance)) in enumerate(zip(route_stops, legs)):
+        elapsed += duration + (STOP_DWELL_SECONDS if index else 0)
+        travelled += distance
+        etas.append({
+            "route_stop_id": route_stop.id,
+            "eta_seconds": round(elapsed),
+            "distance_m": round(travelled),
+        })
+    return etas, source
+
+
+@api_view(["GET"])
+@permission_classes([IsDriver])
+def driver_overview(request):
+    """Bus, route, ordered stops with per-stop rider counts, and the passenger list."""
+    driver = _driver_for(request.user)
+    assignment = _driver_assignment(driver)
+    data = {
+        "driver": {
+            "id": driver.id,
+            "name": driver.name,
+            "phone": driver.phone,
+            "license_no": driver.license_no,
+            "is_available": driver.is_available,
+        },
+        "assignment": None,
+        "route_map": None,
+        "stops": [],
+        "passengers": [],
+        "last_ping": None,
+    }
+    if not assignment:
+        return Response(data)
+
+    route, bus = assignment.route, assignment.bus
+    route_map = RouteViewSet()._map_route_data(route)
+
+    passengers = []
+    seats = SeatAllocation.objects.filter(route_assignment=assignment).select_related(
+        "registration__student__user", "registration__stop"
+    ).order_by("seat_number")
+    for seat in seats:
+        registration = seat.registration
+        user = registration.student.user
+        passengers.append({
+            "seat_number": seat.seat_number,
+            "roll_number": registration.student.roll_number,
+            "name": f"{user.first_name} {user.last_name}".strip() or user.username,
+            "stop_id": registration.stop_id,
+            "stop_name": registration.stop.name,
+            "status": registration.status,
+        })
+    riders_per_stop = Counter(p["stop_id"] for p in passengers)
+    ping = bus.location_pings.order_by("-recorded_at").first()
+
+    data.update({
+        "assignment": {
+            "id": assignment.id,
+            "semester": str(assignment.semester),
+            "bus": {
+                "id": bus.id,
+                "bus_number": bus.bus_number,
+                "model": bus.model,
+                "capacity": bus.capacity,
+                "is_active": bus.is_active,
+                "is_off_route": bus.is_off_route,
+            },
+            "route": {"id": route.id, "name": route.name, "description": route.description},
+        },
+        "route_map": route_map,
+        "stops": [
+            {**stop, "student_count": riders_per_stop.get(stop["id"], 0)}
+            for stop in route_map["stops"]
+        ],
+        "passengers": passengers,
+        "last_ping": {
+            "latitude": float(ping.latitude),
+            "longitude": float(ping.longitude),
+            "recorded_at": ping.recorded_at,
+            "distance_from_route_m": ping.distance_from_route_m,
+        } if ping else None,
+    })
+    return Response(data)
+
+
+@api_view(["POST"])
+@permission_classes([IsDriver])
+def driver_location(request):
+    """
+    A GPS fix from the driver's phone. Stored as a BusLocationPing, so the
+    existing geofence signal still flags off-route buses, and answered with
+    live ETAs for the stops the driver has not reached yet.
+    """
+    assignment = _driver_assignment(_driver_for(request.user))
+    if not assignment:
+        return Response({"detail": "You have no active bus assignment."}, status=400)
+
+    try:
+        latitude = float(request.data["latitude"])
+        longitude = float(request.data["longitude"])
+    except (KeyError, TypeError, ValueError):
+        raise ValidationError("Latitude and longitude are required.")
+    if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
+        raise ValidationError("Coordinates are out of range.")
+
+    remaining = request.data.get("remaining") or []
+    if not isinstance(remaining, list) or len(remaining) > 60:
+        raise ValidationError({"remaining": "Send up to 60 route stop IDs."})
+    try:
+        remaining = [int(item) for item in remaining]
+    except (TypeError, ValueError):
+        raise ValidationError({"remaining": "Route stop IDs must be integers."})
+
+    # ponytail: one row per 15 s ping per bus; prune old pings with a cron once the table grows.
+    ping = BusLocationPing.objects.create(
+        bus=assignment.bus,
+        latitude=Decimal(f"{latitude:.6f}"),
+        longitude=Decimal(f"{longitude:.6f}"),
+    )
+    assignment.bus.refresh_from_db(fields=["is_off_route"])
+
+    by_id = RouteStop.objects.filter(route=assignment.route, id__in=remaining).select_related("stop").in_bulk()
+    etas, source = _stop_etas((longitude, latitude), [by_id[i] for i in remaining if i in by_id])
+
+    return Response({
+        "recorded_at": ping.recorded_at,
+        "is_off_route": assignment.bus.is_off_route,
+        "distance_from_route_m": ping.distance_from_route_m,
+        "etas": etas,
+        "eta_source": source,
+    })

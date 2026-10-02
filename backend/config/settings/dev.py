@@ -4,6 +4,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+# Local PostgreSQL and the Docker Compose database do not provide TLS.
+# Production keeps SSL enabled through prod.py / DATABASE_URL.
+DATABASES['default']['OPTIONS']['sslmode'] = os.environ.get('DATABASE_SSLMODE', 'disable')
+
 # Allow the React dev server
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',

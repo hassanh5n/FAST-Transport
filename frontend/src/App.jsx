@@ -37,12 +37,20 @@ import AdminRouteDetail from "./pages/admin/AdminRouteDetail";
 import AdminWaitlist from "./pages/admin/AdminWaitlist";
 import AdminManagement from "./pages/admin/AdminManagement";
 import ActivityLogs from "./pages/admin/ActivityLogs";
+import DriverDashboard from "./pages/driver/DriverDashboard";
+import DriverTrip from "./pages/driver/DriverTrip";
+import DriverPassengers from "./pages/driver/DriverPassengers";
 import { can, isSuperAdmin } from "./utils/permissions";
+
+// Where a signed-in user belongs, based on what login stored.
+function homePath() {
+  if (localStorage.getItem("is_staff") === "true") return "/admin/dashboard";
+  return localStorage.getItem("role") === "driver" ? "/driver/dashboard" : "/student/dashboard";
+}
 
 // Redirect /dashboard based on stored role
 function DashboardRedirect() {
-  const isStaff = localStorage.getItem("is_staff") === "true";
-  return <Navigate to={isStaff ? "/admin/dashboard" : "/student/dashboard"} replace />;
+  return <Navigate to={homePath()} replace />;
 }
 
 // Protect any route that requires authentication
@@ -59,7 +67,7 @@ function StaffRoute({ children, module, superOnly = false }) {
   const token = localStorage.getItem("access");
   const isStaff = localStorage.getItem("is_staff") === "true";
   if (!token) return <Navigate to="/login" replace />;
-  if (!isStaff) return <Navigate to="/student/dashboard" replace />;
+  if (!isStaff) return <Navigate to={homePath()} replace />;
   if (superOnly && !isSuperAdmin()) return <NoAccess />;
   if (module && !can(module)) return <NoAccess />;
   return children;
@@ -79,12 +87,19 @@ function NoAccess() {
   );
 }
 
-// Protect student-only routes — staff get redirected to their own dashboard
+// Protect student-only routes — staff and drivers go to their own dashboard
 function StudentRoute({ children }) {
   const token = localStorage.getItem("access");
-  const isStaff = localStorage.getItem("is_staff") === "true";
   if (!token) return <Navigate to="/login" replace />;
-  if (isStaff) return <Navigate to="/admin/dashboard" replace />;
+  if (homePath() !== "/student/dashboard") return <Navigate to={homePath()} replace />;
+  return children;
+}
+
+// Protect driver-only routes
+function DriverRoute({ children }) {
+  const token = localStorage.getItem("access");
+  if (!token) return <Navigate to="/login" replace />;
+  if (homePath() !== "/driver/dashboard") return <Navigate to={homePath()} replace />;
   return children;
 }
 
@@ -113,6 +128,11 @@ function App() {
         <Route path="/student/map" element={<StudentRoute><StudentMap /></StudentRoute>} />
         <Route path="/student/incidents" element={<StudentRoute><StudentIncidents /></StudentRoute>} />
         <Route path="/student/route-change" element={<StudentRoute><StudentRouteChange /></StudentRoute>} /> {/* ✅ NEW */}
+
+        {/* Driver routes */}
+        <Route path="/driver/dashboard" element={<DriverRoute><DriverDashboard /></DriverRoute>} />
+        <Route path="/driver/trip" element={<DriverRoute><DriverTrip /></DriverRoute>} />
+        <Route path="/driver/passengers" element={<DriverRoute><DriverPassengers /></DriverRoute>} />
 
         {/* Admin routes */}
         <Route path="/admin/dashboard" element={<StaffRoute><AdminDashboard /></StaffRoute>} />

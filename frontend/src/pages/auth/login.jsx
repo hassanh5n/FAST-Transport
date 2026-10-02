@@ -21,7 +21,8 @@ function Login() {
       localStorage.setItem("refresh", tokenRes.data.refresh);
       const userRes = await getUser();
       storeUserSession(userRes.data);
-      navigate(userRes.data.is_staff ? "/admin/dashboard" : "/student/dashboard");
+      const home = { staff: "/admin/dashboard", driver: "/driver/dashboard" };
+      navigate(home[localStorage.getItem("role")] || "/student/dashboard");
     } catch {
       setError("Invalid username or password");
     } finally {
@@ -117,7 +118,7 @@ function Login() {
         </div>
 
         <p style={styles.bottomNote}>
-          © {new Date().getFullYear()} FAST-NUCES · Transport Management System
+          © {new Date().getFullYear()} Fleetcentric.ai · Transport Management System
         </p>
       </div>
     </div>

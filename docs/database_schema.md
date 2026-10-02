@@ -1,8 +1,8 @@
-# FAST Transport Management System — Database Schema Design (v2)
+# Fleetcentric.ai Management System — Database Schema Design (v2)
 
 ## 1. Overview
 
-This document presents the **finalized** database schema design for the **FAST Transport Management System**. The schema is designed for **PostgreSQL** and maps to **Django models**. It covers all core modules identified in the project proposal.
+This document presents the **finalized** database schema design for the **Fleetcentric.ai Management System**. The schema is designed for **PostgreSQL** and maps to **Django models**. It covers all core modules identified in the project proposal.
 
 > [!IMPORTANT]
 > **Schedule**: Mon–Thu only. Morning pickup: 6:00 AM (first stop) → 8:00 AM (university). Evening drop-off: 4:00 PM (university) → 6:00 PM (last stop). Multiple buses can operate on a single route.
@@ -60,7 +60,7 @@ Django provides a built-in `User` model. We extend it with role-based access.
 
 ### Step 2: Student Profile
 
-Stores FAST-specific student info linked to the User.
+Stores student info linked to the User.
 
 ```
 ┌──────────────────────────────┐
@@ -388,7 +388,7 @@ erDiagram
 | # | Table | Purpose |
 |---|---|---|
 | 1 | `User` | Authentication + role (student, admin) |
-| 2 | `StudentProfile` | FAST-specific student details |
+| 2 | `StudentProfile` | student details |
 | 3 | `Semester` | Academic periods |
 | 4 | `Route` | Bus routes |
 | 5 | `Stop` | Physical pickup/dropoff locations |

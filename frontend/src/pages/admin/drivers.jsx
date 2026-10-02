@@ -1,20 +1,29 @@
 import { useEffect, useState } from "react";
 import PageShell, { PageTitle } from "../../components/PageShell";
 import Table from "../../components/Table";
-import { ConfirmModal, FormModal, StatusBadge, FormCard, Field, SectionBlock } from "../../components/ui";
+import { ConfirmModal, FormModal, StatusBadge, Pill, FormCard, Field, SectionBlock } from "../../components/ui";
 import { inputStyle } from "../../styles/formStyles";
-import { btn } from "../../theme";
+import { btn, colors } from "../../theme";
 import { getDrivers, createDriver, updateDriver, deleteDriver } from "../../services/transportService";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
+const EMPTY_FORM = { name: "", cnic: "", license_no: "", phone: "", address: "", username: "", password: "" };
+
+// DRF field errors arrive as { field: ["message"] }; show the first readable one.
+const apiError = (err) => {
+  const data = err.response?.data;
+  if (!data || typeof data !== "object") return err.message;
+  const first = Object.values(data)[0];
+  return Array.isArray(first) ? first[0] : String(first);
+};
 
 function DriversPage() {
   const [drivers, setDrivers] = useState([]);
-  const [form, setForm] = useState({ name: "", cnic: "", license_no: "", phone: "", address: "" });
+  const [form, setForm] = useState(EMPTY_FORM);
   const [pendingToggle, setPendingToggle] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [editingDriver, setEditingDriver] = useState(null);
-  const [editForm, setEditForm] = useState({ name: "", cnic: "", license_no: "", phone: "", address: "" });
+  const [editForm, setEditForm] = useState(EMPTY_FORM);
   const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchDrivers = () =>
@@ -30,7 +39,7 @@ function DriversPage() {
       await updateDriver(id, { is_available: !currentValue });
       fetchDrivers();
     } catch (err) {
-      alert(`Failed to update driver: ${JSON.stringify(err.response?.data || err.message)}`);
+      alert(`Failed to update driver: ${apiError(err)}`);
     }
   };
 
@@ -45,6 +54,8 @@ function DriversPage() {
       license_no: driver.license_no || "",
       phone: driver.phone || "",
       address: driver.address || "",
+      username: driver.login_username || "",
+      password: "",
     });
   };
 
@@ -57,7 +68,7 @@ function DriversPage() {
       setPendingDelete(null);
       fetchDrivers();
     } catch (err) {
-      alert(`Failed to delete driver: ${JSON.stringify(err.response?.data || err.message)}`);
+      alert(`Failed to delete driver: ${apiError(err)}`);
     }
   };
 
@@ -70,20 +81,25 @@ function DriversPage() {
       setEditingDriver(null);
       fetchDrivers();
     } catch (err) {
-      alert(`Failed to update driver: ${JSON.stringify(err.response?.data || err.message)}`);
+      alert(`Failed to update driver: ${apiError(err)}`);
     } finally {
       setSavingEdit(false);
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.cnic) { alert("Name and CNIC are required"); return; }
+    if (Boolean(form.username) !== Boolean(form.password)) {
+      alert("Enter both a username and a password to give this driver a login, or leave both empty.");
+      return;
+    }
     try {
       await createDriver(form);
-      setForm({ name: "", cnic: "", license_no: "", phone: "", address: "" });
+      setForm(EMPTY_FORM);
       fetchDrivers();
     } catch (err) {
-      alert(`Failed to add driver: ${JSON.stringify(err.response?.data || err.message)}`);
+      alert(`Failed to add driver: ${apiError(err)}`);
     }
   };
 
@@ -93,6 +109,12 @@ function DriversPage() {
     { key: "license_no", label: "License No" },
     { key: "phone", label: "Phone" },
     { key: "address", label: "Address" },
+    {
+      key: "login_username", label: "Login",
+      render: (row) => row.login_username
+        ? <span style={{ fontWeight: 600, color: colors.textPrimary }}>{row.login_username}</span>
+        : <Pill label="No login" variant="neutral" />,
+    },
     {
       key: "is_available", label: "Status",
       render: (row) => (
@@ -131,7 +153,7 @@ function DriversPage() {
       {pendingDelete && (
         <ConfirmModal
           title="Delete Driver?"
-          message={`Deleting driver ${pendingDelete.name} will remove any route assignments that reference this driver. This cannot be undone.`}
+          message={`Deleting driver ${pendingDelete.name} will remove any route assignments that reference this driver${pendingDelete.login_username ? " and their login" : ""}. This cannot be undone.`}
           confirmLabel="Yes, Delete"
           onConfirm={confirmDelete}
           onCancel={() => setPendingDelete(null)}
@@ -141,7 +163,9 @@ function DriversPage() {
       {editingDriver && (
         <FormModal
           title="Edit Driver"
-          sub="Update the driver details. Availability is managed separately."
+          sub={editingDriver.login_username
+            ? "Update the driver details. Leave the password empty to keep the current one."
+            : "Update the driver details. Add a username and password to let this driver sign in."}
           submitLabel="Save Changes"
           loading={savingEdit}
           onClose={() => setEditingDriver(null)}
@@ -163,12 +187,18 @@ function DriversPage() {
           <Field label="Address" flex="2 1 240px">
             <input name="address" placeholder="Home address" value={editForm.address} onChange={handleEditChange} style={inputStyle} />
           </Field>
+          <Field label="Login Username" flex="1 1 180px">
+            <input name="username" placeholder="e.g. ahmed.khan" autoComplete="off" value={editForm.username} onChange={handleEditChange} style={inputStyle} />
+          </Field>
+          <Field label={editingDriver.login_username ? "New Password" : "Password"} flex="1 1 180px">
+            <input name="password" type="password" placeholder={editingDriver.login_username ? "Leave empty to keep" : "At least 8 characters"} autoComplete="new-password" value={editForm.password} onChange={handleEditChange} style={inputStyle} />
+          </Field>
         </FormModal>
       )}
 
-      <PageTitle sub="Manage bus drivers and their availability.">Drivers</PageTitle>
+      <PageTitle sub="Manage bus drivers, their availability and their sign-in accounts.">Drivers</PageTitle>
 
-      <FormCard title="Add New Driver" onSubmit={handleSubmit} submitLabel="Add Driver">
+      <FormCard title="Add New Driver" sub="Username and password are optional — fill both to let the driver sign in and see their route." onSubmit={handleSubmit} submitLabel="Add Driver">
         <Field label="Full Name" required flex="1 1 160px">
           <input name="name" placeholder="e.g. Ahmed Khan" value={form.name} onChange={handleChange} style={inputStyle} />
         </Field>
@@ -183,6 +213,12 @@ function DriversPage() {
         </Field>
         <Field label="Address" flex="2 1 240px">
           <input name="address" placeholder="Home address" value={form.address} onChange={handleChange} style={inputStyle} />
+        </Field>
+        <Field label="Login Username" flex="1 1 160px">
+          <input name="username" placeholder="e.g. ahmed.khan" autoComplete="off" value={form.username} onChange={handleChange} style={inputStyle} />
+        </Field>
+        <Field label="Password" flex="1 1 160px">
+          <input name="password" type="password" placeholder="At least 8 characters" autoComplete="new-password" value={form.password} onChange={handleChange} style={inputStyle} />
         </Field>
       </FormCard>
 
