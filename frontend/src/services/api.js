@@ -1,4 +1,5 @@
 import axios from "axios";
+import { queryClient, clearQueryCache } from "./queryClient";
 
 const LOADING_EVENT = "app:network-loading";
 let pendingRequestCount = 0;
@@ -74,15 +75,51 @@ api.interceptors.response.use(
           return api(originalRequest);
         } catch {
           localStorage.clear();
+          clearQueryCache();
           window.location.href = "/login";
         }
       } else {
         localStorage.clear();
+          clearQueryCache();
         window.location.href = "/login";
       }
     }
     return Promise.reject(error);
   }
 );
+
+// ── TanStack Query cache for GETs ────────────────────────────────────────────
+// Coming back to a page within 2 min reuses the cached response. Any successful
+// write marks everything stale so the next visit refetches. { noCache: true }
+// on a call always hits the API.
+const NO_CACHE = [
+  /\/api\/user\/?$/, /\/api\/notifications\//, /\/api\/student\/(live-location|bus-tracking)\//,
+  /\/api\/incidents\/approved\//, /\/api\/crime-risk\//, /\/challan\/?$/,
+  /\/api\/admin\/live-fleet\//, /\/api\/driver\//,
+];
+// Writes that don't change admin/student data (pings, read receipts).
+const NO_INVALIDATE = [/\/api\/notifications\//, /\/api\/driver\/location\//, /\/api\/bus-location\//];
+
+const rawGet = api.get.bind(api);
+api.get = (url, config = {}) => {
+  const { noCache, ...cfg } = config;
+  if (noCache || NO_CACHE.some((rx) => rx.test(url))) return rawGet(url, cfg);
+  return queryClient
+    .fetchQuery({
+      queryKey: ["api", url, cfg.params ?? null, cfg.responseType ?? null],
+      queryFn: () => rawGet(url, cfg).then(({ data, status, headers }) => ({ data, status, headers })),
+    })
+    .then((res) => ({ ...res, data: structuredClone(res.data) })); // pages can't mutate the cache
+};
+
+api.interceptors.response.use((response) => {
+  const method = (response.config?.method || "").toLowerCase();
+  const url = response.config?.url || "";
+  if (method !== "get") {
+    if (/\/api\/(token|login)\/?$/.test(url)) clearQueryCache();
+    else if (!NO_INVALIDATE.some((rx) => rx.test(url))) queryClient.invalidateQueries({ queryKey: ["api"] });
+  }
+  return response;
+});
 
 export default api;

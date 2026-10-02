@@ -1,5 +1,6 @@
 // frontend/src/components/Navbar.jsx
 import { useNavigate } from "react-router-dom";
+import { clearQueryCache } from "../services/queryClient";
 import { colors, fonts, shadow } from "../theme";
 import NotificationBell from "./NotificationBell";
 
@@ -11,16 +12,18 @@ function Navbar({ title = "Fleetcentric.ai", isMobile = false, onMenuToggle }) {
   const navigate = useNavigate();
 
   const isStaff  = localStorage.getItem("is_staff") === "true";
+  const isDriver = localStorage.getItem("role") === "driver";
   const fullName = localStorage.getItem("full_name")
                 || localStorage.getItem("username")
                 || "";
 
   const initials = fullName
     ? fullName.split(" ").map(w => w[0]).slice(0, 2).join("").toUpperCase()
-    : isStaff ? "AD" : "ST";
+    : isStaff ? "AD" : isDriver ? "DR" : "ST";
 
   const handleLogout = () => {
     localStorage.clear();
+    clearQueryCache();
     navigate("/login");
   };
 
@@ -53,7 +56,7 @@ function Navbar({ title = "Fleetcentric.ai", isMobile = false, onMenuToggle }) {
         {/* Role badge — hide on mobile */}
         {!isMobile && (
           <span style={isStaff ? styles.roleAdmin : styles.roleStudent}>
-            {isStaff ? "Admin" : "Student"}
+            {isStaff ? "Admin" : isDriver ? "Driver" : "Student"}
           </span>
         )}
 
