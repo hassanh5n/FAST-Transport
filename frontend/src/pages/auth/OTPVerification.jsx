@@ -7,6 +7,8 @@ import { storeUserSession } from "../../utils/permissions";
 import { validateField } from "../../utils/validation";
 import { ErrorText } from "../../components/ui";
 
+import { BrandLockup } from "../../components/Brand";
+import { refineAuthStyles } from "../../styles/authRefine";
 function OTPVerification() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -67,7 +69,7 @@ function OTPVerification() {
   };
 
   return (
-    <div style={styles.root}>
+    <div className="fc-auth" style={styles.root}>
       <MeshGradient
         style={styles.shader}
         colors={["#0f3247", "#62a1be", "#f5f8de", "#288dc4"]}
@@ -76,23 +78,10 @@ function OTPVerification() {
         speed={0.5}
       />
       <div style={styles.grain} />
+      <div style={styles.scrim} />
 
       <div style={styles.container}>
-        <div style={styles.brand}>
-          <div style={styles.logoMark}>
-            <img
-              src="/fleetcentric-icon.svg"
-              alt="Fleetcentric.ai"
-              width="28"
-              height="28"
-              style={{ display: "block" }}
-            />
-          </div>
-          <div>
-            <p style={styles.brandSub}>Fleetcentric.ai</p>
-            <h1 style={styles.brandName}>Transport Portal</h1>
-          </div>
-        </div>
+        <BrandLockup caption="Transport portal" />
 
         <div style={styles.card}>
           <div style={styles.cardHeader}>
@@ -165,7 +154,7 @@ function OTPVerification() {
   );
 }
 
-const styles = {
+const styles = refineAuthStyles({
   root: {
     position: "relative",
     width: "100vw",
@@ -204,38 +193,6 @@ const styles = {
     maxWidth: "400px",
     padding: "0 20px",
     boxSizing: "border-box",
-  },
-  brand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-  },
-  logoMark: {
-    width: "52px",
-    height: "52px",
-    borderRadius: "14px",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "blur(8px)",
-  },
-  brandSub: {
-    margin: 0,
-    fontSize: "10px",
-    letterSpacing: "0.2em",
-    color: "rgba(255,255,255,0.35)",
-    textTransform: "uppercase",
-    fontWeight: 500,
-  },
-  brandName: {
-    margin: 0,
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "#fff",
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   card: {
     width: "100%",
@@ -409,6 +366,6 @@ const styles = {
     textAlign: "center",
     margin: 0,
   },
-};
+});
 
 export default OTPVerification;

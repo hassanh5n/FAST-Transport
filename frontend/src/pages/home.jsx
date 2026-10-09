@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { MeshGradient } from "@paper-design/shaders-react";
+import { BrandMark, BrandWordmark } from "../components/Brand";
 
 function Home() {
   const navigate = useNavigate();
@@ -8,79 +9,60 @@ function Home() {
     <div style={styles.root}>
       <MeshGradient
   style={styles.shader}
-  colors={["#0f3247", "#62a1be", "#f5f8de", "#288dc4"]}
+  colors={["#0f3247", "#1186d4", "#f5f8de", "#7ccfc4"]}
   distortion={0.5}
   swirl={0.3}
   speed={0.5}
 />
 
       <div style={styles.grain} />
+      {/* Barely-there centre veil so the copy holds up on the light swirls */}
+      <div style={styles.veil} />
 
-      <div style={styles.container}>
-        {/* Logo — full lockup; the dark variant has a white wordmark for
-            this dark hero, and it replaces the separate text eyebrow. */}
-        <img
-          src="/fleetcentric-primary-light.svg"
-          alt="Fleetcentric.ai"
-          style={styles.logoLockup}
-        />
+      <main className="fc-hero" style={styles.container}>
+        <div style={styles.brand} translate="no">
+          <BrandMark size={76} />
+          <BrandWordmark height={36} />
+        </div>
 
-        {/* Headline */}
         <h1 style={styles.headline}>
-          <span style={styles.glowText}>Student Transport</span><br />
-          <span style={styles.headlineDim}>Made Simple</span>
+          <span style={styles.headlineGlow}>AI-Enabled Transport</span><br />
+          <span style={styles.headlineSoft}>Management System</span>
         </h1>
 
-        {/* Subtext */}
         <p style={styles.sub}>
-          Track your bus, manage your route, and stay on schedule —<br />
-          all in one place.
+          Track your bus, manage your route, and stay on schedule, all in one place.
         </p>
 
-        {/* CTA Buttons */}
         <div style={styles.actions}>
-          <button
-            style={styles.btnPrimary}
-            onClick={() => navigate("/login")}
-            onMouseEnter={(e) => Object.assign(e.target.style, styles.btnPrimaryHover)}
-            onMouseLeave={(e) => Object.assign(e.target.style, styles.btnPrimary)}
-          >
+          <button className="fc-btn fc-btn--primary" onClick={() => navigate("/login")}>
             Sign In
           </button>
-          <button
-            style={styles.btnSecondary}
-            onClick={() => navigate("/signup")}
-            onMouseEnter={(e) => Object.assign(e.target.style, styles.btnSecondaryHover)}
-            onMouseLeave={(e) => Object.assign(e.target.style, styles.btnSecondary)}
-          >
+          <button className="fc-btn fc-btn--glass" onClick={() => navigate("/signup")}>
             Create Account
           </button>
         </div>
+      </main>
 
-        {/* Bottom note */}
-        <p style={styles.note}>
-          © {new Date().getFullYear()} Fleetcentric.ai · Transport Management System
-        </p>
-      </div>
+      <p style={styles.note}>© {new Date().getFullYear()} Fleetcentric.ai</p>
     </div>
   );
 }
+
+// One soft shadow for all copy: lifts it off light swirls without looking embossed.
+const softShadow = "0 1px 16px rgba(0,22,38,0.22)";
 
 const styles = {
   root: {
     position: "relative",
     width: "100vw",
-    height: "100vh",
+    minHeight: "100dvh",
     overflow: "hidden",
-    background: "#000",
+    background: "#0f3247",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontFamily: "'DM Sans', 'Helvetica Neue', sans-serif",
-  },
-  glowText: {
-    color: "#ffffff",
-    textShadow: "0 0 8px rgba(255,255,255,0.35), 0 0 18px rgba(96, 165, 250, 0.25)",
   },
   shader: {
     position: "absolute",
@@ -98,6 +80,14 @@ const styles = {
     backgroundSize: "128px 128px",
     pointerEvents: "none",
   },
+  veil: {
+    position: "absolute",
+    inset: 0,
+    zIndex: 1,
+    pointerEvents: "none",
+    background:
+      "radial-gradient(ellipse 55% 45% at 50% 50%, rgba(8,36,56,0.26) 0%, rgba(8,36,56,0.10) 60%, rgba(8,36,56,0) 100%)",
+  },
   container: {
     position: "relative",
     zIndex: 2,
@@ -105,95 +95,60 @@ const styles = {
     flexDirection: "column",
     alignItems: "center",
     textAlign: "center",
-    gap: "20px",
     padding: "0 24px",
-    maxWidth: "540px",
+    maxWidth: "1240px",
     width: "100%",
   },
-  logoLockup: {
-    width: "min(300px, 72vw)",
-    height: "auto",
-    display: "block",
-    marginBottom: "6px",
+  brand: {
+    display: "flex",
+    alignItems: "center",
+    gap: "14px",
+    marginBottom: "34px",
   },
   headline: {
     margin: 0,
-    fontSize: "clamp(36px, 7vw, 58px)",
+    fontSize: "clamp(26px, 2.8vw, 36px)",
     fontWeight: 700,
     color: "#ffffff",
-    letterSpacing: "-0.04em",
-    lineHeight: 1.1,
+    letterSpacing: "-0.03em",
+    lineHeight: 1.12,
   },
-  headlineDim: {
-    color: "rgba(255,255,255,0.3)",
+  headlineGlow: {
+    color: "#ffffff",
+    textShadow: "0 0 8px rgba(255,255,255,0.35), 0 0 18px rgba(96,165,250,0.25)",
+  },
+  headlineSoft: {
+    fontSize: "0.86em",
+    color: "rgba(255,255,255,0.45)",
   },
   sub: {
-    margin: 0,
-    fontSize: "15px",
-    color: "rgba(255,255,255,0.4)",
-    lineHeight: 1.7,
-    maxWidth: "380px",
+    margin: "18px 0 0",
+    fontSize: "clamp(13px, 1.1vw, 15px)",
+    fontWeight: 400,
+    color: "rgba(255,255,255,0.78)",
+    lineHeight: 1.6,
+    textShadow: softShadow,
   },
   actions: {
     display: "flex",
-    gap: "12px",
-    marginTop: "8px",
+    gap: "10px",
+    marginTop: "28px",
     flexWrap: "wrap",
     justifyContent: "center",
-  },
-  btnPrimary: {
-    background: "#fff",
-    color: "#000",
-    border: "none",
-    borderRadius: "10px",
-    padding: "13px 32px",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    letterSpacing: "-0.01em",
-    transition: "background 0.2s",
-  },
-  btnPrimaryHover: {
-    background: "#e0e0e0",
-    color: "#000",
-    border: "none",
-    borderRadius: "10px",
-    padding: "13px 32px",
-    fontSize: "14px",
-    fontWeight: 600,
-    cursor: "pointer",
-    letterSpacing: "-0.01em",
-  },
-  btnSecondary: {
-    background: "rgba(255,255,255,0.07)",
-    color: "rgba(255,255,255,0.8)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    borderRadius: "10px",
-    padding: "13px 32px",
-    fontSize: "14px",
-    fontWeight: 500,
-    cursor: "pointer",
-    letterSpacing: "-0.01em",
-    backdropFilter: "blur(8px)",
-    transition: "background 0.2s",
-  },
-  btnSecondaryHover: {
-    background: "rgba(255,255,255,0.12)",
-    color: "rgba(255,255,255,0.95)",
-    border: "1px solid rgba(255,255,255,0.2)",
-    borderRadius: "10px",
-    padding: "13px 32px",
-    fontSize: "14px",
-    fontWeight: 500,
-    cursor: "pointer",
-    letterSpacing: "-0.01em",
-    backdropFilter: "blur(8px)",
+    width: "min(100%, 300px)",
   },
   note: {
-    marginTop: "20px",
+    position: "absolute",
+    bottom: "22px",
+    left: 0,
+    right: 0,
+    zIndex: 2,
+    margin: 0,
+    textAlign: "center",
     fontSize: "11px",
-    color: "rgba(255,255,255,0.15)",
+    color: "rgba(255,255,255,0.7)",
     letterSpacing: "0.03em",
+    textShadow: softShadow,
   },
 };
 

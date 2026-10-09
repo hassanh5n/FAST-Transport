@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { MeshGradient } from "@paper-design/shaders-react";
 import api from "../../services/api";
 
+import { BrandLockup } from "../../components/Brand";
+import { refineAuthStyles } from "../../styles/authRefine";
 function ForgotPassword() {
   const [email, setEmail]     = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,30 +29,17 @@ function ForgotPassword() {
   };
 
   return (
-    <div style={styles.root}>
+    <div className="fc-auth" style={styles.root}>
       <MeshGradient
         style={styles.shader}
         colors={["#0f3247", "#62a1be", "#f5f8de", "#288dc4"]}
         distortion={0.5} swirl={0.3} speed={0.5}
       />
       <div style={styles.grain} />
+      <div style={styles.scrim} />
 
       <div style={styles.container}>
-        <div style={styles.brand}>
-          <div style={styles.logoMark}>
-            <img
-              src="/fleetcentric-icon.svg"
-              alt="Fleetcentric.ai"
-              width="28"
-              height="28"
-              style={{ display: "block" }}
-            />
-          </div>
-          <div>
-            <p style={styles.brandSub}>Fleetcentric.ai</p>
-            <h1 style={styles.brandName}>Transport Portal</h1>
-          </div>
-        </div>
+        <BrandLockup caption="Transport portal" />
 
         <div style={styles.card}>
           {sent ? (
@@ -121,15 +110,11 @@ function ForgotPassword() {
   );
 }
 
-const styles = {
+const styles = refineAuthStyles({
   root: { position:"relative", width:"100vw", height:"100vh", overflow:"hidden", background:"#000", display:"flex", alignItems:"center", justifyContent:"center", fontFamily:"'DM Sans','Helvetica Neue',sans-serif" },
   shader: { position:"absolute", inset:0, width:"100%", height:"100%", zIndex:0 },
   grain: { position:"absolute", inset:0, zIndex:1, backgroundImage:`url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E")`, backgroundRepeat:"repeat", backgroundSize:"128px 128px", pointerEvents:"none" },
   container: { position:"relative", zIndex:2, display:"flex", flexDirection:"column", alignItems:"center", gap:"32px", width:"100%", maxWidth:"400px", padding:"0 20px", boxSizing:"border-box" },
-  brand: { display:"flex", alignItems:"center", gap:"14px" },
-  logoMark: { width:"52px", height:"52px", borderRadius:"14px", background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.12)", display:"flex", alignItems:"center", justifyContent:"center", backdropFilter:"blur(8px)" },
-  brandSub: { margin:0, fontSize:"10px", letterSpacing:"0.2em", color:"rgba(255,255,255,0.35)", textTransform:"uppercase", fontWeight:500 },
-  brandName: { margin:0, fontSize:"20px", fontWeight:700, color:"#fff", letterSpacing:"-0.02em", lineHeight:1.2 },
   card: { width:"100%", background:"rgba(255,255,255,0.04)", border:"1px solid rgba(255,255,255,0.10)", borderRadius:"20px", padding:"36px 32px", backdropFilter:"blur(20px)", WebkitBackdropFilter:"blur(20px)", boxShadow:"0 0 0 1px rgba(255,255,255,0.03), 0 32px 64px rgba(0,0,0,0.5)", boxSizing:"border-box" },
   successIcon: { width:"56px", height:"56px", borderRadius:"50%", background:"rgba(34,197,94,0.15)", border:"1px solid rgba(34,197,94,0.3)", display:"flex", alignItems:"center", justifyContent:"center", margin:"0 auto 16px", fontSize:"24px", color:"#4ade80" },
   cardHeader: { marginBottom:"28px" },
@@ -147,6 +132,6 @@ const styles = {
   link: { color:"rgba(255,255,255,0.75)", textDecoration:"none", fontWeight:500, borderBottom:"1px solid rgba(255,255,255,0.2)", paddingBottom:"1px" },
   bottomNote: { fontSize:"11px", color:"rgba(255,255,255,0.18)", letterSpacing:"0.03em", textAlign:"center", margin:0 },
   errorBox: { display:"flex", alignItems:"center", gap:"8px", background:"rgba(255,107,107,0.08)", border:"1px solid rgba(255,107,107,0.2)", borderRadius:"10px", padding:"10px 14px", fontSize:"13px", color:"#ff6b6b" },
-};
+});
 
 export default ForgotPassword;

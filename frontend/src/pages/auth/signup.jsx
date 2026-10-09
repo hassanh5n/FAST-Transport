@@ -5,6 +5,8 @@ import { signup } from "../../services/transportService";
 import { validateField } from "../../utils/validation";
 import { ErrorText } from "../../components/ui";
 
+import { BrandLockup } from "../../components/Brand";
+import { refineAuthStyles } from "../../styles/authRefine";
 function Signup() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -104,33 +106,20 @@ function Signup() {
   };
 
   return (
-    <div style={styles.root}>
+    <div className="fc-auth" style={styles.root}>
       <MeshGradient
         style={styles.shader}
-        colors={["#0f3247", "#62a1be", "#f5f8de", "#288dc4"]}
+        colors={["#0f3247", "#1186d4", "#f5f8de", "#7ccfc4"]}
         distortion={0.5}
         swirl={0.3}
         speed={0.5}
       />
       <div style={styles.grain} />
+      <div style={styles.scrim} />
 
       <div style={styles.container}>
         {/* Brand */}
-        <div style={styles.brand}>
-          <div style={styles.logoMark}>
-            <img
-              src="/fleetcentric-icon.svg"
-              alt="Fleetcentric.ai"
-              width="28"
-              height="28"
-              style={{ display: "block" }}
-            />
-          </div>
-          <div>
-            <p style={styles.brandSub}>Fleetcentric.ai</p>
-            <h1 style={styles.brandName}>Transport Portal</h1>
-          </div>
-        </div>
+        <BrandLockup caption="Transport portal" />
 
         {/* Card */}
         <div style={styles.card}>
@@ -375,7 +364,7 @@ function Signup() {
 
           <p style={styles.footer}>
             Already have an account?{" "}
-            <Link to="/login" style={styles.link}>
+            <Link to="/login" style={styles.link} tabIndex={-1}>
               Sign in
             </Link>
           </p>
@@ -389,7 +378,7 @@ function Signup() {
   );
 }
 
-const styles = {
+const styles = refineAuthStyles({
   root: {
     position: "relative",
     width: "100vw",
@@ -430,38 +419,6 @@ const styles = {
     maxWidth: "420px",
     padding: "0 20px",
     boxSizing: "border-box",
-  },
-  brand: {
-    display: "flex",
-    alignItems: "center",
-    gap: "14px",
-  },
-  logoMark: {
-    width: "52px",
-    height: "52px",
-    borderRadius: "14px",
-    background: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.12)",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backdropFilter: "blur(8px)",
-  },
-  brandSub: {
-    margin: 0,
-    fontSize: "10px",
-    letterSpacing: "0.2em",
-    color: "rgba(255,255,255,0.35)",
-    textTransform: "uppercase",
-    fontWeight: 500,
-  },
-  brandName: {
-    margin: 0,
-    fontSize: "20px",
-    fontWeight: 700,
-    color: "#fff",
-    letterSpacing: "-0.02em",
-    lineHeight: 1.2,
   },
   card: {
     width: "100%",
@@ -594,8 +551,8 @@ const styles = {
   },
   buttonHover: {
     marginTop: "2px",
-    background: "#288dc4",
-    color: "#fff",
+    background: "#e0e0e0",
+    color: "#000",
     border: "none",
     borderRadius: "10px",
     padding: "12px",
@@ -608,8 +565,8 @@ const styles = {
     justifyContent: "center",
     letterSpacing: "-0.01em",
     boxSizing: "border-box",
-    transform: "translateY(-1px)",
-    boxShadow: "0 0 14px rgba(40,141,196,0.45)",
+    transform: "none",
+    boxShadow: "0 0 12px rgba(255,255,255,0.5)",
   },
   buttonDisabled: {
     background: "rgba(255,255,255,0.12)",
@@ -678,6 +635,6 @@ const styles = {
     textAlign: "center",
     margin: 0,
   },
-};
+});
 
 export default Signup;

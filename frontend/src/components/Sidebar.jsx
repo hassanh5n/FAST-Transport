@@ -4,6 +4,7 @@ import { clearQueryCache } from "../services/queryClient";
 import { NavLink, useNavigate } from "react-router-dom";
 import { can, isSuperAdmin, roleLabel } from "../utils/permissions";
 import { colors, fonts } from "../theme";
+import { BrandMark, BrandWordmark } from "./Brand";
 
 // ── Inline SVG icons (no library needed) ────────────────────────────────────
 const Icon = ({ name, size = 17 }) => {
@@ -319,18 +320,9 @@ function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
     <>
       {/* Brand */}
       <div style={styles.brand}>
-        <div style={styles.logoMark}>
-          <img
-            src="/fleetcentric-icon.svg"
-            alt="Fleetcentric.ai"
-            width="26"
-            height="26"
-            style={{ display: "block" }}
-          />
-        </div>
+        <BrandMark size={25} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={styles.brandSub}>Fleetcentric.ai</p>
-          <p style={styles.brandName}>Transport</p>
+          <BrandWordmark height={15} style={{ maxWidth: "100%" }} />
         </div>
 
         {/* Close button — only inside mobile drawer */}
@@ -413,35 +405,6 @@ const styles = {
     gap:          "12px",
     padding:      "22px 20px 16px",
     borderBottom: "1px solid rgba(255,255,255,0.06)",
-  },
-  logoMark: {
-    width:           "38px",
-    height:          "38px",
-    borderRadius:    "10px",
-    // The brand mark is navy + teal, so it needs a light tile to stay
-    // legible against the navy sidebar.
-    background:      "#fff",
-    display:         "flex",
-    alignItems:      "center",
-    justifyContent:  "center",
-    flexShrink:      0,
-    boxShadow:       "0 4px 12px rgba(0,0,0,0.28)",
-  },
-  brandSub: {
-    margin:        0,
-    fontSize:      "9px",
-    letterSpacing: "0.15em",
-    textTransform: "uppercase",
-    color:         "rgba(255,255,255,0.35)",
-    fontWeight:    500,
-  },
-  brandName: {
-    margin:        "2px 0 0",
-    fontSize:      "15px",
-    fontWeight:    "700",
-    color:         "#fff",
-    letterSpacing: "-0.02em",
-    fontFamily:    fonts.heading,
   },
   closeBtn: {
     background:   "transparent",

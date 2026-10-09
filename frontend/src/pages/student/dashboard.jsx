@@ -5,6 +5,7 @@ import { Spinner, DetailRow, Pill, Banner } from "../../components/ui";
 import { btn, colors, fonts, radius } from "../../theme";
 import { getDashboard } from "../../services/transportService";
 import { useBreakpoint } from "../../utils/useBreakpoint";
+import { BrandMark, BrandWordmark } from "../../components/Brand";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -59,21 +60,9 @@ function StudentCard({ profile, seat, active_registration, isMobile }) {
       {/* ── Top row: brand + status ── */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <div style={{
-            width: "34px", height: "34px", borderRadius: "8px",
-            background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.18)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-          }}>
-            <img
-              src="/fleetcentric-icon.svg"
-              alt="Fleetcentric.ai"
-              width="18"
-              height="18"
-              style={{ display: "block" }}
-            />
-          </div>
+          <BrandMark size={34} />
           <div>
-            <p style={{ margin: 0, fontSize: "9px", letterSpacing: "0.16em", color: "rgba(255,255,255,0.4)", textTransform: "uppercase" }}>Fleetcentric.ai</p>
+            <BrandWordmark height={12} style={{ marginBottom: 4 }} />
             <p style={{ margin: 0, fontSize: "13px", fontWeight: "700", color: "#fff" }}>Transport Card</p>
           </div>
         </div>
