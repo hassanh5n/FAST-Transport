@@ -9,6 +9,7 @@ import StudentsPage from "./pages/admin/students";
 import BusesPage from "./pages/admin/buses";
 import DriversPage from "./pages/admin/drivers";
 import RoutesPage from "./pages/admin/routes";
+import RoutePlansPage from "./pages/admin/RoutePlans";
 import AssignmentsPage from "./pages/admin/assignments";
 import StudentDashboard from "./pages/student/dashboard";
 import StudentTransport from "./pages/student/transport";
@@ -81,7 +82,7 @@ function NoAccess() {
         <p style={{ margin: "0 0 18px", color: "#4a6178", fontSize: "14px" }}>
           Your admin role doesn't include this section. Ask the super admin if you need it.
         </p>
-        <a href="/admin/dashboard" style={{ color: "#288dc4", fontWeight: 600 }}>Back to dashboard</a>
+        <a href="/admin/dashboard" style={{ color: "#288dc4", fontWeight: 600 }}>Back to console</a>
       </div>
     </div>
   );
@@ -140,6 +141,7 @@ function App() {
         <Route path="/admin/buses" element={<StaffRoute module="fleet"><BusesPage /></StaffRoute>} />
         <Route path="/admin/drivers" element={<StaffRoute module="fleet"><DriversPage /></StaffRoute>} />
         <Route path="/admin/routes" element={<StaffRoute module="routes"><RoutesPage /></StaffRoute>} />
+        <Route path="/admin/route-plans" element={<StaffRoute module="routes"><RoutePlansPage /></StaffRoute>} />
         <Route path="/admin/routes/:id" element={<StaffRoute module="routes"><AdminRouteDetail /></StaffRoute>} />
         <Route path="/admin/routes/:id/edit" element={<StaffRoute module="routes"><RouteBuilder /></StaffRoute>} />
         <Route path="/admin/routes/:id/builder" element={<StaffRoute module="routes"><RouteBuilder /></StaffRoute>} />

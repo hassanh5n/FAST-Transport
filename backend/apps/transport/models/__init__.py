@@ -8,3 +8,4 @@ from .support import *  # noqa: F401,F403
 from .tracking import *  # noqa: F401,F403
 from .crime import *  # noqa: F401,F403
 from .admin_rbac import *  # noqa: F401,F403
+from .plans import *  # noqa: F401,F403

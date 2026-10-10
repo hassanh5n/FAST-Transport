@@ -32,6 +32,21 @@ export const saveRouteBuilder = (id, data) => api.patch(`/api/routes/${id}/build
 export const resolveMapLocation = (data) => api.post("/api/admin/maps/location/", data);
 export const previewRouteGeometry = (stopIds) => api.post("/api/admin/maps/route-preview/", { stop_ids: stopIds });
 
+export const getRoutePlans = () => api.get("/api/route-plans/");
+export const getRoutePlan = (id) => api.get(`/api/route-plans/${id}/`);
+export const updateRoutePlan = (id, data) => api.patch(`/api/route-plans/${id}/`, data);
+export const deleteRoutePlan = (id) => api.delete(`/api/route-plans/${id}/`);
+export const duplicateRoutePlan = (id, name) => api.post(`/api/route-plans/${id}/duplicate/`, { name });
+export const importRoutePlan = (file) => {
+  const form = new FormData();
+  form.append("file", file);
+  return api.post("/api/route-plans/import/", form, { headers: { "Content-Type": "multipart/form-data" } });
+};
+export const exportRoutePlan = (id, format) => api.get(`/api/route-plans/${id}/export/?file=${format}`, { responseType: "blob" });
+export const previewRoutePlan = (id) => api.get(`/api/route-plans/${id}/preview/`);
+export const activateRoutePlan = (id) => api.post(`/api/route-plans/${id}/activate/`);
+export const getRoutePlanAttention = () => api.get("/api/route-plans/attention/");
+
 export const getAssignments = () => api.get("/api/route-assignments/");
 export const createAssignment = (data) => api.post("/api/route-assignments/", data);
 export const updateAssignment = (id, data) => api.patch(`/api/route-assignments/${id}/`, data);

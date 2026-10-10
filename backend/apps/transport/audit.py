@@ -14,6 +14,7 @@ How it works
 
 Student requests never set the context, so they are never logged.
 """
+import contextlib
 import contextvars
 import datetime
 import decimal
@@ -40,7 +41,7 @@ MODEL_MODULE = {
     "studentprofile": "students",
     "semesterregistration": "students",
     "semester": "semesters",
-    "route": "routes", "stop": "routes", "routestop": "routes",
+    "route": "routes", "stop": "routes", "routestop": "routes", "routeplan": "routes",
     "bus": "fleet", "driver": "fleet", "routeassignment": "fleet", "maintenanceschedule": "fleet",
     "transportregistration": "seats", "seatallocation": "seats", "waitlist": "seats",
     "feeverification": "fees", "challan": "fees",
@@ -76,6 +77,16 @@ def end(token):
 
 def current():
     return _ctx.get()
+
+
+@contextlib.contextmanager
+def suspended():
+    """Skip per-row logging for a bulk operation that writes its own summary entry."""
+    token = _ctx.set(None)
+    try:
+        yield
+    finally:
+        _ctx.reset(token)
 
 
 # ── Helpers ─────────────────────────────────────────────────────────────────

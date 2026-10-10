@@ -7,164 +7,51 @@ import { colors, fonts } from "../theme";
 import { BrandMark, BrandWordmark } from "./Brand";
 
 // ── Inline SVG icons (no library needed) ────────────────────────────────────
-const Icon = ({ name, size = 17 }) => {
-  const icons = {
-    dashboard: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-        <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
-      </svg>
-    ),
-    students: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-    ),
-    bus: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="7" width="20" height="11" rx="2"/><path d="M2 11h20"/><path d="M7 7V3"/><path d="M17 7V3"/>
-        <circle cx="7" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/>
-      </svg>
-    ),
-    driver: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-        <path d="M12 12v2"/><path d="M10 14h4"/>
-      </svg>
-    ),
-    route: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 17h3a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H3"/><path d="M21 7h-3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h3"/>
-        <line x1="9" y1="12" x2="15" y2="12"/>
-      </svg>
-    ),
-    stop: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2a7 7 0 0 1 7 7c0 4.9-7 13-7 13S5 13.9 5 9a7 7 0 0 1 7-7z"/>
-        <circle cx="12" cy="9" r="2.5"/>
-      </svg>
-    ),
-    routeStop: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="6" cy="6" r="2"/><circle cx="18" cy="18" r="2"/>
-        <path d="M6 8v2a6 6 0 0 0 6 6h2"/><path d="M14 4h4v4"/>
-      </svg>
-    ),
-    semester: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/>
-        <path d="M3 10h18"/><path d="M8 14h8"/>
-      </svg>
-    ),
-    assignment: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/>
-        <rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6"/><path d="M9 16h4"/>
-      </svg>
-    ),
-    complaint: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        <path d="M12 8v4"/><circle cx="12" cy="15" r="0.5" fill="currentColor"/>
-      </svg>
-    ),
-    seat: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 9V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v4"/><rect x="3" y="9" width="18" height="6" rx="1"/>
-        <path d="M5 15v4"/><path d="M19 15v4"/><path d="M8 19h8"/>
-      </svg>
-    ),
-    fee: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
-        <circle cx="12" cy="15" r="2"/>
-      </svg>
-    ),
-    routeChange: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M17 3l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/>
-        <path d="M7 21l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>
-      </svg>
-    ),
-    transport: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="2" y="8" width="20" height="10" rx="2"/>
-        <circle cx="7" cy="20" r="2"/><circle cx="17" cy="20" r="2"/>
-        <path d="M2 12h20"/><path d="M7 8V4"/><path d="M17 8V4"/>
-      </svg>
-    ),
-    register: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <path d="M14 2v6h6"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/>
-      </svg>
-    ),
-    challan: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/>
-        <path d="M8 9h8"/><path d="M8 13h6"/><path d="M8 17h4"/>
-      </svg>
-    ),
-    map: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <polygon points="3,6 9,3 15,6 21,3 21,18 15,21 9,18 3,21"/>
-        <line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/>
-      </svg>
-    ),
-    viewRoute: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="2"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/>
-      </svg>
-    ),
-    logout: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-        <polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/>
-      </svg>
-    ),
-    export: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/>
-        <line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-    ),
-    waitlist: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9"/>
-        <path d="M12 7v5l3 2"/>
-      </svg>
-    ),
-    shield: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-        <path d="M9 12l2 2 4-4"/>
-      </svg>
-    ),
-    log: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <path d="M14 2v6h6"/><path d="M8 13h8"/><path d="M8 17h5"/>
-      </svg>
-    ),
-    incident: (
-      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
-        <line x1="12" y1="9" x2="12" y2="13"/>
-        <line x1="12" y1="17" x2="12.01" y2="17"/>
-      </svg>
-    ),
-  };
-  return icons[name] || null;
+// One distinct glyph per destination, all on a 24px grid with the same stroke.
+const ICON_PATHS = {
+  dashboard: <><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></>,
+  // People
+  students: <><path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 2.5 9 2.5 12 0v-5"/><path d="M22 10v6"/></>,
+  passengers: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>,
+  driver: <><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 14v7"/><path d="M10.1 11.4 3.4 9.6"/><path d="M13.9 11.4l6.7-1.8"/></>,
+  // Fleet
+  bus: <><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M4 11h16"/><path d="M8 14.5h.01"/><path d="M16 14.5h.01"/><path d="M7 17v3"/><path d="M17 17v3"/><path d="M2 8v3"/><path d="M22 8v3"/></>,
+  route: <><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/></>,
+  routePlans: <><path d="m12 2 10 5-10 5L2 7z"/><path d="m2 12 10 5 10-5"/><path d="m2 17 10 5 10-5"/></>,
+  stop: <><path d="M12 2a7 7 0 0 1 7 7c0 4.9-7 13-7 13S5 13.9 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></>,
+  assignment: <><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></>,
+  // Operations
+  semester: <><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h.01"/><path d="M12 14h.01"/><path d="M16 14h.01"/><path d="M8 18h.01"/><path d="M12 18h.01"/></>,
+  seat: <><path d="M19 9V6a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v3"/><path d="M3 16a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-5a2 2 0 0 0-4 0v1.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V11a2 2 0 0 0-4 0z"/><path d="M5 18v2"/><path d="M19 18v2"/></>,
+  waitlist: <><path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.17a2 2 0 0 0-.59-1.42L12 12l-4.41 4.41A2 2 0 0 0 7 17.83V22"/><path d="M7 2v4.17a2 2 0 0 0 .59 1.42L12 12l4.41-4.41A2 2 0 0 0 17 6.17V2"/></>,
+  fee: <><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="m9 12 2 2 4-4"/></>,
+  challan: <><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></>,
+  routeChange: <><path d="M17 3l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 21l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></>,
+  incident: <><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></>,
+  complaint: <><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8"/><path d="M8 13h5"/></>,
+  export: <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></>,
+  // Administration
+  shield: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></>,
+  log: <><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></>,
+  // Student / driver
+  register: <><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11v6"/><path d="M9 14h6"/></>,
+  liveMap: <><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/></>,
+  trip: <path d="m3 11 19-9-9 19-2-8-8-2z"/>,
+  logout: <><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></>,
 };
+
+const Icon = ({ name, size = 17 }) => (ICON_PATHS[name] ? (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    {ICON_PATHS[name]}
+  </svg>
+) : null);
 
 // ── Nav link definitions ─────────────────────────────────────────────────────
 const adminGroups = [
   {
     label: "Overview",
     links: [
-      { to: "/admin/dashboard",               label: "Dashboard",           icon: "dashboard"  },
+      { to: "/admin/dashboard",               label: "Console",             icon: "dashboard"  },
       { to: "/admin/students",                label: "Students",            icon: "students",   module: "students" },
     ],
   },
@@ -174,6 +61,7 @@ const adminGroups = [
       { to: "/admin/buses",                   label: "Buses",               icon: "bus",        module: "fleet" },
       { to: "/admin/drivers",                 label: "Drivers",             icon: "driver",     module: "fleet" },
       { to: "/admin/routes",                  label: "Routes",              icon: "route",      module: "routes" },
+      { to: "/admin/route-plans",             label: "Route Plans",         icon: "routePlans",      module: "routes" },
       { to: "/admin/stops",                   label: "Stops",               icon: "stop",       module: "routes" },
       { to: "/admin/assignments",             label: "Assignments",         icon: "assignment", module: "fleet" },
     ],
@@ -214,8 +102,8 @@ const studentGroups = [
   {
     label: "My Portal",
     links: [
-      { to: "/student/dashboard",               label: "Dashboard",         icon: "dashboard"  },
-      { to: "/student/transport",               label: "My Transport",      icon: "transport"  },
+      { to: "/student/dashboard",               label: "Console",           icon: "dashboard"  },
+      { to: "/student/transport",               label: "My Transport",      icon: "bus"  },
       { to: "/student/transport-registrations", label: "Register",          icon: "register"   },
       { to: "/student/challan",                 label: "View Challan",      icon: "challan"    },
     ],
@@ -223,10 +111,10 @@ const studentGroups = [
   {
     label: "Routes & Map",
     links: [
-      { to: "/student/routes",                  label: "Routes",            icon: "map"        },
+      { to: "/student/routes",                  label: "Routes",            icon: "route"        },
       { to: "/student/route-change",            label: "Route Change",      icon: "routeChange"},
       { to: "/student/incidents",               label: "Report Incident",   icon: "incident"   },
-      { to: "/student/map",                     label: "Live Bus Map",      icon: "map"        },
+      { to: "/student/map",                     label: "Live Bus Map",      icon: "liveMap"        },
     ],
   },
   {
@@ -241,9 +129,9 @@ const driverGroups = [
   {
     label: "My Duty",
     links: [
-      { to: "/driver/dashboard",  label: "Dashboard",  icon: "dashboard" },
-      { to: "/driver/trip",       label: "Live Trip",  icon: "map"       },
-      { to: "/driver/passengers", label: "Passengers", icon: "students"  },
+      { to: "/driver/dashboard",  label: "Console",    icon: "dashboard" },
+      { to: "/driver/trip",       label: "Live Trip",  icon: "trip"       },
+      { to: "/driver/passengers", label: "Passengers", icon: "passengers"  },
     ],
   },
 ];

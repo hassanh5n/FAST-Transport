@@ -90,6 +90,7 @@ PATH_RULES = [
     (r"^semesters/",                                "semesters",      (),                               True),
     (r"^routes/\d+/(overview|map-detail)/",         "routes",         ("fleet", "seats"),               False),
     (r"^(routes|stops|routestops)/",                "routes",         (),                               True),
+    (r"^route-plans/",                              "routes",         (),                               False),
     (r"^admin/maps/",                               "routes",         (),                               False),
     (r"^(buses|drivers|route-assignments)/",        "fleet",          ("routes", "seats", "incidents"), False),
     (r"^maintenance-schedules/",                    "fleet",          (),                               False),

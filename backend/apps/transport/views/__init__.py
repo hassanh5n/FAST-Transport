@@ -6,6 +6,7 @@ from .maps import _valid_karachi_coordinate, _map_cache_key, _is_line_string, _i
 from .auth import *  # noqa: F401,F403
 from .students import *  # noqa: F401,F403
 from .routes import *  # noqa: F401,F403
+from .route_plans import RoutePlanViewSet  # noqa: F401
 from .fleet import *  # noqa: F401,F403
 from .registration import *  # noqa: F401,F403
 from .fees import *  # noqa: F401,F403

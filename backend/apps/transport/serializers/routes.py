@@ -8,6 +8,7 @@ from ..models import (
     StudentProfile,
     Semester,
     Route,
+    RoutePlan,
     Stop,
     RouteStop,
     Bus,
@@ -68,6 +69,37 @@ class StopSerializer(serializers.ModelSerializer):
         if float(latitude) == 0 and float(longitude) == 0:
             raise serializers.ValidationError("0,0 is not a valid active pickup stop.")
         return attrs
+
+
+class RoutePlanSerializer(serializers.ModelSerializer):
+    """List/rename shape. The routes themselves come from route_plans.plan_snapshot()."""
+    route_count = serializers.SerializerMethodField()
+    stop_count = serializers.SerializerMethodField()
+    fingerprint = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RoutePlan
+        fields = [
+            "id", "name", "description", "is_active", "activated_at",
+            "created_at", "updated_at", "route_count", "stop_count", "fingerprint",
+        ]
+        read_only_fields = ["is_active", "activated_at", "created_at", "updated_at"]
+
+    def _summary(self, obj):
+        from ..route_plans import counts, fingerprint, plan_snapshot
+        if not hasattr(obj, "_plan_summary"):
+            snapshot = plan_snapshot(obj)
+            obj._plan_summary = {**counts(snapshot), "fingerprint": fingerprint(snapshot)}
+        return obj._plan_summary
+
+    def get_route_count(self, obj):
+        return self._summary(obj)["route_count"]
+
+    def get_stop_count(self, obj):
+        return self._summary(obj)["stop_count"]
+
+    def get_fingerprint(self, obj):
+        return self._summary(obj)["fingerprint"]
 
 
 class RouteStopSerializer(serializers.ModelSerializer):

@@ -126,7 +126,7 @@ function StudentDashboard() {
         if (d.role === "staff") { navigate("/admin/dashboard", { replace: true }); return; }
         setData(d);
       })
-      .catch(() => setError("Failed to load dashboard data."));
+      .catch(() => setError("Failed to load console data."));
   }, [navigate]);
 
   const handleDownload = async () => {
@@ -136,11 +136,11 @@ function StudentDashboard() {
   };
 
   if (error) return (
-    <PageShell role="student" title="Student Dashboard">
+    <PageShell role="student" title="Student Console">
       <Banner variant="danger">{error}</Banner>
     </PageShell>
   );
-  if (!data) return <PageShell role="student" title="Student Dashboard"><Spinner /></PageShell>;
+  if (!data) return <PageShell role="student" title="Student Console"><Spinner /></PageShell>;
 
   const { profile, recent_notifications, active_registration, seat, waitlist_position } = data;
   const normStatus      = (active_registration?.status || "").toLowerCase();
@@ -150,7 +150,7 @@ function StudentDashboard() {
   const canRequestRouteChange = active_registration && ["approved", "confirmed"].includes(normStatus) && seat;
 
   return (
-    <PageShell role="student" title="Student Dashboard">
+    <PageShell role="student" title="Student Console">
 
       {/* ── Page header row: title + download button ── */}
       <div style={{

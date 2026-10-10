@@ -2,8 +2,7 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { CAMPUS, addCampusMarker } from "./campus";
-
-const ROUTE_COLORS = ["#2563EB", "#DC2626", "#16A34A", "#9333EA", "#EA580C", "#0891B2", "#BE123C"];
+import { ROUTE_COLORS } from "./routeColors";
 
 const colorFor = (id) => {
   const numericId = Number(id);

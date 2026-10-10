@@ -6,7 +6,7 @@ import { ConfirmModal, FormModal, StatusBadge, FormCard, Field, SectionBlock } f
 import { inputStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
-import { getRoutes, createRoute, updateRoute, deleteRoute, getRoutesMap } from "../../services/transportService";
+import { getRoutes, createRoute, updateRoute, deleteRoute, getRoutesMap, getRoutePlans } from "../../services/transportService";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
 
@@ -38,11 +38,13 @@ function RoutesPage() {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [mapRoutes, setMapRoutes] = useState([]);
   const [selectedRouteId, setSelectedRouteId] = useState(null);
+  const [activePlan, setActivePlan] = useState(null);
 
   const fetchRoutes = () =>
     getRoutes().then((res) => setRoutes(res.data)).catch(() => alert("Failed to fetch routes."));
 
   useEffect(() => {
+    getRoutePlans().then((res) => setActivePlan(res.data.find((plan) => plan.is_active) || null)).catch(() => {});
     getRoutesMap()
       .then((res) => {
         const nextRoutes = res.data?.routes || [];
@@ -153,6 +155,12 @@ function RoutesPage() {
       )}
 
       <PageTitle sub="Manage transport routes. Use the map to browse route coverage, then open a route for full administration.">Routes</PageTitle>
+      {activePlan && (
+        <p style={{ margin: "-8px 0 16px", fontSize: 13, color: colors.textSecondary }}>
+          Active route plan: <strong>{activePlan.name}</strong>. Changes here go live for everyone.{" "}
+          <Link to="/admin/route-plans" style={routeLinkStyle}>Switch or export plans</Link>
+        </p>
+      )}
 
       <ContentCard style={{ marginBottom: 20 }}>
         <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 320px) minmax(0, 1fr)", gap: 16, alignItems: "start" }}>

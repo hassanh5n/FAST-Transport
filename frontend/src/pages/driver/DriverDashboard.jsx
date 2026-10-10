@@ -40,16 +40,16 @@ function DriverDashboard() {
   }, []);
 
   if (error) return (
-    <PageShell role="driver" title="Driver Dashboard">
+    <PageShell role="driver" title="Driver Console">
       <Banner variant="danger">{error}</Banner>
     </PageShell>
   );
-  if (!data) return <PageShell role="driver" title="Driver Dashboard"><Spinner /></PageShell>;
+  if (!data) return <PageShell role="driver" title="Driver Console"><Spinner /></PageShell>;
 
   const { driver, assignment, stops, passengers, last_ping: lastPing, route_map: routeMap } = data;
 
   if (!assignment) return (
-    <PageShell role="driver" title="Driver Dashboard">
+    <PageShell role="driver" title="Driver Console">
       <PageTitle sub="Your bus, route and passengers will appear here once you are assigned.">Welcome, {driver.name}</PageTitle>
       <Banner variant="warning">
         You have not been assigned a bus for this semester yet. Please contact the transport office.
@@ -69,7 +69,7 @@ function DriverDashboard() {
   const busiest = stops.reduce((best, s) => (s.student_count > (best?.student_count ?? 0) ? s : best), null);
 
   return (
-    <PageShell role="driver" title="Driver Dashboard">
+    <PageShell role="driver" title="Driver Console">
       <PageTitle sub={`Your duty assignment for ${semester}.`}>Welcome, {driver.name}</PageTitle>
 
       {bus.is_off_route && (

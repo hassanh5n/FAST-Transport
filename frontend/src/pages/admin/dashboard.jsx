@@ -157,7 +157,7 @@ function AdminDashboard() {
   useEffect(() => {
     getDashboard()
       .then((res) => setData(res.data))
-      .catch(() => setError("Failed to load dashboard data."));
+      .catch(() => setError("Failed to load console data."));
   }, []);
 
   useEffect(() => {
@@ -210,13 +210,13 @@ function AdminDashboard() {
   }, []);
 
   if (error) return (
-    <PageShell role="staff" title="Admin Dashboard">
+    <PageShell role="staff" title="Admin Console">
       <div style={{ padding: "48px 0", textAlign: "center", color: colors.dangerText }}>{error}</div>
     </PageShell>
   );
 
   if (!data) return (
-    <PageShell role="staff" title="Admin Dashboard">
+    <PageShell role="staff" title="Admin Console">
       <Spinner />
     </PageShell>
   );
@@ -232,7 +232,7 @@ function AdminDashboard() {
   ].filter((action) => can(action.module, "manage"));
 
   return (
-    <PageShell role="staff" title="Admin Dashboard">
+    <PageShell role="staff" title="Admin Console">
       {/* Welcome header */}
       <div style={styles.welcomeRow}>
         <div>
@@ -294,7 +294,7 @@ function AdminDashboard() {
 
       {!can("fleet") && isSuperAdmin() && <RecentAdminActivity />}
 
-      <Suspense fallback={<div style={styles.chartsLoading}>Loading dashboard charts...</div>}>
+      <Suspense fallback={<div style={styles.chartsLoading}>Loading console charts...</div>}>
         <DashboardCharts stats={stats} fleetData={fleetData} showFleet={can("fleet")} />
       </Suspense>
 

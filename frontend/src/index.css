@@ -178,6 +178,43 @@ aside { scrollbar-width: none; }
   }
 }
 
+/* ── Route plan cards (admin) ────────────────────────────────────────────── */
+.plan-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  box-shadow: 0 1px 3px rgba(11, 45, 66, 0.08), 0 4px 16px rgba(11, 45, 66, 0.04);
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease;
+}
+.plan-card--active {
+  border-color: #288dc4;
+  box-shadow: 0 0 0 2px rgba(40, 141, 196, 0.14), 0 4px 16px rgba(11, 45, 66, 0.06);
+}
+/* Lift plus a soft accent glow. :has(:focus-visible) gives keyboard users the same cue
+   without leaving the card raised after a mouse click. */
+.plan-card:hover,
+.plan-card:has(:focus-visible) {
+  transform: translateY(-4px);
+  border-color: rgba(40, 141, 196, 0.6);
+  box-shadow:
+    0 14px 30px rgba(11, 45, 66, 0.12),
+    0 0 0 1px rgba(40, 141, 196, 0.16),
+    0 0 26px rgba(40, 141, 196, 0.24);
+}
+.plan-card__map img { transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+.plan-card:hover .plan-card__map img { transform: scale(1.05); }
+.plan-card button:focus-visible { outline: 2px solid #288dc4; outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .plan-card { transition: box-shadow 0.2s ease, border-color 0.2s ease; }
+  .plan-card:hover,
+  .plan-card:has(:focus-visible),
+  .plan-card:hover .plan-card__map img { transform: none; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    RESPONSIVE UTILITY CLASSES
    ═══════════════════════════════════════════════════════════════════════════ */
