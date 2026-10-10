@@ -111,6 +111,8 @@ from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
 from .maps import _display_route_geometry
+from .. import audit
+from ..stop_import import import_stops, parse_file
 
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
@@ -396,6 +398,33 @@ class StopViewSet(viewsets.ModelViewSet):
     queryset = Stop.objects.all()
     serializer_class = StopSerializer
     permission_classes = [IsAdminOrReadOnly] # Admin full access, Students read only
+
+    @action(detail=False, methods=["post"], url_path="import", permission_classes=[IsAdmin])
+    def import_file(self, request):
+        """Bulk-create stops from an uploaded CSV/JSON file; duplicates are skipped and reported."""
+        upload = request.FILES.get("file")
+        if not upload:
+            raise ValidationError({"file": "Choose a CSV or JSON file."})
+        if not upload.name.lower().endswith((".csv", ".json")):
+            raise ValidationError({"file": "Only .csv or .json files are supported."})
+        if upload.size > 2 * 1024 * 1024:
+            raise ValidationError({"file": "The file must be smaller than 2 MB."})
+        try:
+            rows, first_row = parse_file(upload.name, upload.read())
+            report = import_stops(rows, first_row)
+        except ValueError as exc:
+            raise ValidationError({"file": str(exc)})
+
+        audit.write_log(
+            action="create",
+            module="routes",
+            model_name="stop",
+            description=(
+                f"Imported stops from {upload.name}: {len(report['created'])} created, "
+                f"{len(report['skipped'])} skipped, {len(report['invalid'])} invalid."
+            ),
+        )
+        return Response(report, status=status.HTTP_201_CREATED)
 
 
 class RouteStopViewSet(viewsets.ModelViewSet):

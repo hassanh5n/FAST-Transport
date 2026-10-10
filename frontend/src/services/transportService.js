@@ -51,6 +51,11 @@ export const getStops = () => api.get("/api/stops/");
 export const createStop = (data) => api.post("/api/stops/", data);
 export const updateStop = (id, data) => api.patch(`/api/stops/${id}/`, data);
 export const deleteStop = (id) => api.delete(`/api/stops/${id}/`);
+export const importStops = (file) => {
+  const form = new FormData();
+  form.append("file", file);
+  return api.post("/api/stops/import/", form, { headers: { "Content-Type": "multipart/form-data" } });
+};
 
 export const getRouteStops = () => api.get("/api/routestops/");
 export const createRouteStop = (data) => api.post("/api/routestops/", data);

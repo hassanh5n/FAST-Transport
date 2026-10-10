@@ -6,6 +6,7 @@ import { inputStyle } from "../../styles/formStyles";
 import { btn } from "../../theme";
 import { getStops, createStop, updateStop, deleteStop } from "../../services/transportService";
 import StopLocationPicker from "../../components/maps/StopLocationPicker";
+import StopImport from "../../components/StopImport";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
 
@@ -185,6 +186,7 @@ function StopsPage() {
           <StopLocationPicker latitude={form.latitude} longitude={form.longitude} onChange={setFormLocation} height={260} />
         </div>
       </FormCard>
+      <StopImport stops={stops} onChanged={fetchStops} />
       <Table columns={columns} rows={stops} />
     </PageShell>
   );

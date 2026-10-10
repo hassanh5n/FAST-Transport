@@ -8,6 +8,10 @@ import RouteMap from "../../components/maps/RouteMap";
 import StopLocationPicker from "../../components/maps/StopLocationPicker";
 import { getRouteMapDetail, getStops, saveRouteBuilder, createStop, updateRoute, updateStop } from "../../services/transportService";
 import { routeGeometry } from "../../services/routingService";
+import StopImport from "../../components/StopImport";
+
+const usableStops = (res) => (res.data?.results || res.data || [])
+  .filter((stop) => stop.is_active !== false && Number(stop.latitude) !== 0 && Number(stop.longitude) !== 0);
 
 const stopCardStyle = {
   display: "grid",
@@ -84,6 +88,8 @@ export default function RouteBuilder() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const reloadStops = () => getStops().then((res) => setAllStops(usableStops(res))).catch(() => {});
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
@@ -97,8 +103,7 @@ export default function RouteBuilder() {
         setSelectedStops(orderedStops);
         setExpandedStops(new Set(orderedStops.map((stop) => Number(stop.id))));
         setEtaEditingStops(new Set());
-        const stops = stopsResponse.data?.results || stopsResponse.data || [];
-        setAllStops(stops.filter((stop) => stop.is_active !== false && Number(stop.latitude) !== 0 && Number(stop.longitude) !== 0));
+        setAllStops(usableStops(stopsResponse));
         setError("");
       })
       .catch(() => {
@@ -483,6 +488,7 @@ export default function RouteBuilder() {
             >
               + Create New Stop
             </button>
+            <StopImport stops={allStops} onChanged={reloadStops} />
             <div style={{ display: "grid", gap: 8, maxHeight: 400, overflowY: "auto" }}>
               {availableStops.length > 0 ? (
                 availableStops.map((stop) => (
