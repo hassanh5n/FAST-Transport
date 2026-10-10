@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { resolveMapLocation } from "../../services/transportService";
+import { CAMPUS, addCampusMarker } from "./campus";
 
-const KARACHI_CENTER = [67.0847, 24.9215];
 const KARACHI_BOUNDS = {
   latitude: { min: 24.4, max: 25.4 },
   longitude: { min: 66.5, max: 67.8 },
@@ -23,18 +23,22 @@ const toSafeCoordinate = (value, axis) => {
   return Math.min(180, Math.max(-180, numeric));
 };
 
-export default function StopLocationPicker({ latitude, longitude, onChange, height = 260 }) {
+const NO_STOPS = [];
+
+export default function StopLocationPicker({ latitude, longitude, onChange, height = 260, stops = NO_STOPS, onStopClick }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const changeRef = useRef(onChange);
+  const stopClickRef = useRef(onStopClick);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [lookupMessage, setLookupMessage] = useState("");
 
   useEffect(() => {
     changeRef.current = onChange;
-  }, [onChange]);
+    stopClickRef.current = onStopClick;
+  }, [onChange, onStopClick]);
 
   const applyLocation = useCallback((location) => {
     changeRef.current({
@@ -61,12 +65,36 @@ export default function StopLocationPicker({ latitude, longitude, onChange, heig
 
   useEffect(() => {
     if (mapRef.current) return undefined;
-    const map = new maplibregl.Map({ container: containerRef.current, style: "https://tiles.openfreemap.org/styles/liberty", center: KARACHI_CENTER, zoom: 11 });
+    const map = new maplibregl.Map({ container: containerRef.current, style: "https://tiles.openfreemap.org/styles/liberty", center: CAMPUS.center, zoom: CAMPUS.zoom });
+    addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.on("click", (event) => updatePosition(event.lngLat));
     mapRef.current = map;
     return () => { map.remove(); mapRef.current = null; markerRef.current = null; };
   }, [updatePosition]);
+
+  // Existing stops, shown as small blue reference pins behind the red one being placed.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return undefined;
+    const markers = stops.flatMap((stop) => {
+      const lat = toSafeCoordinate(stop.latitude, "latitude");
+      const lng = toSafeCoordinate(stop.longitude, "longitude");
+      if (lat === null || lng === null || (lat === 0 && lng === 0)) return [];
+      const marker = new maplibregl.Marker({ color: "#1976b9", scale: 0.6 }).setLngLat([lng, lat]).addTo(map);
+      const element = marker.getElement();
+      element.title = stop.name || "";
+      element.style.zIndex = "0";
+      element.style.cursor = "pointer";
+      // Clicking an existing stop opens it instead of dropping the new pin on top of it.
+      element.addEventListener("click", (event) => {
+        event.stopPropagation();
+        stopClickRef.current?.(stop);
+      });
+      return [marker];
+    });
+    return () => markers.forEach((marker) => marker.remove());
+  }, [stops]);
 
   useEffect(() => {
     const lat = toSafeCoordinate(latitude, "latitude");
@@ -75,7 +103,7 @@ export default function StopLocationPicker({ latitude, longitude, onChange, heig
     if (!map) return;
 
     if (lat === null || lng === null) {
-      map.flyTo({ center: KARACHI_CENTER, zoom: 11, duration: 300 });
+      map.flyTo({ center: CAMPUS.center, zoom: CAMPUS.zoom, duration: 300 });
       return;
     }
 
@@ -144,7 +172,7 @@ export default function StopLocationPicker({ latitude, longitude, onChange, heig
       )}
       <div ref={containerRef} style={{ height, borderRadius: 10, overflow: "hidden", border: "1px solid #dbe3ea" }} aria-label="Stop location picker map" />
       <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", marginTop: 8, fontSize: 12, color: "#64748b" }}>
-        <span>Click the map or drag the pin to set the stop location.</span>
+        <span>Click the map or drag the pin to set the stop location.{stops.length > 0 && " Blue pins are existing stops; hover one for its name, click to edit it."}</span>
         <button type="button" onClick={useMyLocation} style={{ border: 0, background: "transparent", color: "#1976b9", cursor: "pointer", fontWeight: 600 }}>Use my location</button>
       </div>
       {lookupMessage && <div style={{ color: "#64748b", fontSize: 12, marginTop: 5 }}>{lookupMessage}</div>}

@@ -6,6 +6,8 @@ import { Banner, Pill } from "../../components/ui";
 import { colors, fonts, radius, btn, input, shadow } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
+import { CAMPUS, addCampusMarker } from "../../components/maps/campus";
+import { circleRing } from "../../components/maps/incidents";
 
 const Icon = ({ name, size = 18, color = "currentColor" }) => {
   const icons = {
@@ -43,17 +45,8 @@ const INCIDENT_TYPES = [
 const statusVariant = (s) =>
   s === "Approved" ? "success" : s === "Rejected" ? "danger" : "warning";
 
-function buildCircleGeoJSON(lng, lat, radiusM, steps = 64) {
-  const coords = [];
-  const earthR = 6371000;
-  const latRad = (lat * Math.PI) / 180;
-  for (let i = 0; i <= steps; i++) {
-    const angle = (i / steps) * 2 * Math.PI;
-    const dLat  = (radiusM / earthR) * (180 / Math.PI);
-    const dLng  = dLat / Math.cos(latRad);
-    coords.push([lng + dLng * Math.sin(angle), lat + dLat * Math.cos(angle)]);
-  }
-  return { type: "FeatureCollection", features: [{ type: "Feature", geometry: { type: "Polygon", coordinates: [coords] } }] };
+function buildCircleGeoJSON(lng, lat, radiusM) {
+  return { type: "FeatureCollection", features: [{ type: "Feature", geometry: { type: "Polygon", coordinates: [circleRing(lng, lat, radiusM)] } }] };
 }
 
 export default function StudentIncidents() {
@@ -86,9 +79,10 @@ export default function StudentIncidents() {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: "https://tiles.openfreemap.org/styles/liberty",
-      center: [67.0847, 24.9215], zoom: 12,
+      center: CAMPUS.center, zoom: CAMPUS.zoom,
     });
     mapRef.current = map;
+    addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
 
     map.on("load", () => {

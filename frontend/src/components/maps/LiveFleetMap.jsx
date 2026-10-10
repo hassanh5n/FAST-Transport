@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { CAMPUS, addCampusMarker } from "./campus";
 import { colors } from "../../theme";
 
-const DEFAULT_CENTER = [67.0847, 24.9215];
 const ROUTE_COLORS = ["#2563EB", "#DC2626", "#16A34A", "#9333EA", "#EA580C", "#0891B2", "#BE123C"];
 
 const colorForRoute = (id) => ROUTE_COLORS[Math.abs(Number(id) || 0) % ROUTE_COLORS.length];
@@ -57,9 +57,10 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: "https://tiles.openfreemap.org/styles/liberty",
-      center: DEFAULT_CENTER,
-      zoom: 11,
+      center: CAMPUS.center,
+      zoom: CAMPUS.zoom,
     });
+    addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
@@ -131,6 +132,7 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
       const points = buses.filter((bus) => bus.latitude != null && bus.longitude != null).map((bus) => [Number(bus.longitude), Number(bus.latitude)]);
       if (points.length) {
         const bounds = points.reduce((result, point) => result.extend(point), new maplibregl.LngLatBounds(points[0], points[0]));
+        bounds.extend(CAMPUS.center); // keep the campus in frame with the buses
         map.fitBounds(bounds, { padding: 50, maxZoom: 13, duration: 0 });
         fittedRef.current = true;
       }

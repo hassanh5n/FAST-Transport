@@ -99,6 +99,7 @@ function RoutesPage() {
   );
 
   const columns = [
+    { key: "id", label: "ID", width: "6%" },
     {
       key: "name",
       label: "Name",

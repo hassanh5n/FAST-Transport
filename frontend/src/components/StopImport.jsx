@@ -1,14 +1,26 @@
-// Bulk stop import (CSV/JSON) + address filling, shared by the Stops page and Route Builder.
+// Bulk stop import/export (CSV/JSON) + address filling, used by the Stops page.
 // The server creates the stops instantly; addresses are then looked up from the map one per
 // second (the free geocoder's limit) and saved onto each stop.
 import { useEffect, useRef, useState } from "react";
 import { FormModal, Banner } from "./ui";
+import Icon from "./Icon";
 import { btn, colors } from "../theme";
 import { importStops, resolveMapLocation, updateStop } from "../services/transportService";
+import { downloadFile, toCsv } from "../utils/transferFiles";
 
 const SAMPLE_CSV = "name,latitude,longitude,address\nGulshan Chowrangi,24.921500,67.084700,\n";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const hasNoAddress = (stop) => !stop.address || stop.address.trim() === "" || stop.address === "N/A";
+
+// Same columns the import accepts, so an exported file can be imported back as-is.
+const EXPORT_COLUMNS = ["name", "latitude", "longitude", "address", "is_active", "location_accuracy_m", "provider_place_id"];
+function exportStops(stops, format) {
+  const rows = stops.map((stop) => Object.fromEntries(EXPORT_COLUMNS.map((column) => [
+    column,
+    column === "address" && hasNoAddress(stop) ? "" : stop[column] ?? (column === "is_active" ? true : null),
+  ])));
+  downloadFile(`stops_${new Date().toISOString().slice(0, 10)}.${format}`, format === "json" ? JSON.stringify(rows, null, 2) : toCsv(EXPORT_COLUMNS, rows));
+}
 
 async function fillAddresses(stops, onProgress, isCancelled) {
   for (let i = 0; i < stops.length; i += 1) {
@@ -93,23 +105,37 @@ export default function StopImport({ stops = [], onChanged }) {
   };
 
   const sampleHref = `data:text/csv;charset=utf-8,${encodeURIComponent(SAMPLE_CSV)}`;
-  const smallBtn = { ...btn.ghost, fontSize: 13, flex: "1 1 auto" };
+  const inline = { display: "inline-flex", alignItems: "center", gap: 6 };
+  const smallBtn = { ...btn.ghost, ...inline, padding: "7px 12px", fontSize: 13, background: "#fff" };
+  const group = { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", padding: "8px 12px", border: `1px solid ${colors.borderLight}`, borderRadius: 10, background: colors.tableHeaderBg };
+  const groupLabel = { ...inline, fontSize: 13, fontWeight: 700, color: colors.textPrimary };
 
   return (
     <>
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12, alignItems: "center" }}>
-        <button type="button" style={smallBtn} onClick={() => fileInput.current?.click()} disabled={uploading}>
-          {uploading ? "Importing…" : "Import CSV/JSON"}
-        </button>
-        {missing.length > 0 && !filling && (
-          <button type="button" style={smallBtn} onClick={() => { setOpen(true); setReport(null); setError(""); runFill(missing); }}>
-            Fill {missing.length} missing address{missing.length === 1 ? "" : "es"}
+      <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12, alignItems: "stretch" }}>
+        <div style={group}>
+          <span style={groupLabel}><Icon name="upload" /> Import stops</span>
+          <button type="button" style={smallBtn} onClick={() => fileInput.current?.click()} disabled={uploading}>
+            <Icon name="file" size={14} /> {uploading ? "Importing…" : "Choose CSV or JSON file"}
           </button>
+          <a href={sampleHref} download="stops_sample.csv" style={{ ...inline, fontSize: 12, color: colors.textSecondary }}>
+            <Icon name="download" size={13} /> Sample CSV
+          </a>
+          <input ref={fileInput} type="file" accept=".csv,.json,text/csv,application/json" hidden onChange={handleFile} />
+        </div>
+        <div style={group}>
+          <span style={groupLabel}><Icon name="download" /> Export {stops.length} stop{stops.length === 1 ? "" : "s"}</span>
+          <button type="button" style={smallBtn} onClick={() => exportStops(stops, "csv")} disabled={stops.length === 0}>CSV</button>
+          <button type="button" style={smallBtn} onClick={() => exportStops(stops, "json")} disabled={stops.length === 0}>JSON</button>
+        </div>
+        {missing.length > 0 && !filling && (
+          <div style={{ ...group, background: colors.warningBg, borderColor: "rgba(245,158,11,0.25)" }}>
+            <span style={{ ...groupLabel, color: colors.warningText }}><Icon name="pin" /> {missing.length} without an address</span>
+            <button type="button" style={smallBtn} onClick={() => { setOpen(true); setReport(null); setError(""); runFill(missing); }}>
+              Fill from map
+            </button>
+          </div>
         )}
-        <a href={sampleHref} download="stops_sample.csv" style={{ fontSize: 12, color: colors.textSecondary }}>
-          Download sample CSV
-        </a>
-        <input ref={fileInput} type="file" accept=".csv,.json,text/csv,application/json" hidden onChange={handleFile} />
       </div>
 
       {open && (

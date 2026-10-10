@@ -7,6 +7,7 @@ import { inputStyle, selectStyle } from "../../styles/formStyles";
 import { btn, colors, fonts } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
 import { getRouteOverview, getRouteMapDetail } from "../../services/transportService";
+import RouteTransfer from "../../components/RouteTransfer";
 
 // Maps a TransportRegistration status onto one of the theme's badge variants.
 const statusVariant = (status) => {
@@ -166,7 +167,10 @@ function AdminRouteDetail() {
         {route.name}
       </PageTitle>
 
+      {routeMap && <RouteTransfer route={routeMap} stops={routeMap.stops || []} />}
+
       <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "20px" }}>
+        <Pill label={`Route ID ${route.id}`} variant="neutral" />
         <Pill label={route.is_active ? "Active" : "Inactive"} variant={route.is_active ? "success" : "neutral"} />
         {semester && <Pill label={semester} variant="info" />}
       </div>

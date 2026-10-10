@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import { CAMPUS, addCampusMarker } from "./campus";
 
-const DEFAULT_CENTER = [67.0847, 24.9215];
 const ROUTE_COLORS = ["#2563EB", "#DC2626", "#16A34A", "#9333EA", "#EA580C", "#0891B2", "#BE123C"];
 
 const colorFor = (id) => {
@@ -91,9 +91,10 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     const map = new maplibregl.Map({
       container: containerRef.current,
       style: "https://tiles.openfreemap.org/styles/liberty",
-      center: DEFAULT_CENTER,
-      zoom: 11,
+      center: CAMPUS.center,
+      zoom: CAMPUS.zoom,
     });
+    addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
@@ -178,6 +179,7 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
       const allCoordinates = features.stops.features.map((feature) => feature.geometry.coordinates);
       if (allCoordinates.length) {
         const bounds = allCoordinates.reduce((result, point) => result.extend(point), new maplibregl.LngLatBounds(allCoordinates[0], allCoordinates[0]));
+        bounds.extend(CAMPUS.center); // keep the campus in frame with the route
         map.fitBounds(bounds, { padding: 48, maxZoom: 13, duration: 0 });
       }
     };

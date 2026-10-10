@@ -1,14 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import PageShell, { ContentCard, PageTitle } from "../../components/PageShell";
-import { Banner, Spinner, Pill, ConfirmModal, FormModal, Field } from "../../components/ui";
+import { Banner, Spinner, Pill, ConfirmModal, Field } from "../../components/ui";
 import { inputStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
-import StopLocationPicker from "../../components/maps/StopLocationPicker";
-import { getRouteMapDetail, getStops, saveRouteBuilder, createStop, updateRoute, updateStop } from "../../services/transportService";
+import { getRouteMapDetail, getStops, saveRouteBuilder, updateRoute } from "../../services/transportService";
 import { routeGeometry } from "../../services/routingService";
-import StopImport from "../../components/StopImport";
+import RouteTransfer from "../../components/RouteTransfer";
 
 const usableStops = (res) => (res.data?.results || res.data || [])
   .filter((stop) => stop.is_active !== false && Number(stop.latitude) !== 0 && Number(stop.longitude) !== 0);
@@ -77,18 +76,9 @@ export default function RouteBuilder() {
   const [showSaveConfirm, setShowSaveConfirm] = useState(false);
   const [expandedStops, setExpandedStops] = useState(new Set());
   const [etaEditingStops, setEtaEditingStops] = useState(new Set());
-  const [showCreateStop, setShowCreateStop] = useState(false);
-  const [showEditStop, setShowEditStop] = useState(false);
-  const [newStopForm, setNewStopForm] = useState({ name: "", latitude: "", longitude: "", address: "" });
-  const [editingStop, setEditingStop] = useState(null);
-  const [editStopForm, setEditStopForm] = useState({ name: "", latitude: "", longitude: "", address: "" });
-  const [creatingStop, setCreatingStop] = useState(false);
-  const [savingEditStop, setSavingEditStop] = useState(false);
   const [previewGeometry, setPreviewGeometry] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  const reloadStops = () => getStops().then((res) => setAllStops(usableStops(res))).catch(() => {});
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +114,16 @@ export default function RouteBuilder() {
     setExpandedStops((prev) => new Set([...prev, stopId]));
   };
 
+  // Loads an imported file's stops into the builder; nothing is saved until the admin publishes.
+  const applyImport = (imported) => {
+    const importedIds = new Set(imported.map((stop) => Number(stop.id)));
+    setAllStops((current) => [...current.filter((stop) => !importedIds.has(Number(stop.id))), ...imported]);
+    setSelectedStops(imported.map((stop, index) => ({ ...stop, stop_order: index + 1 })));
+    setExpandedStops(importedIds);
+    setEtaEditingStops(new Set());
+    setMessage(`File loaded successfully: ${imported.length} stop${imported.length === 1 ? "" : "s"}. Review them below, then click Save & Publish Route to apply.`);
+  };
+
   const removeStop = (stopId) => setSelectedStops((items) => items.filter((item) => Number(item.id) !== Number(stopId)));
   const moveStop = (index, direction) => setSelectedStops((items) => {
     const nextIndex = index + direction;
@@ -146,115 +146,6 @@ export default function RouteBuilder() {
       next.has(Number(stopId)) ? next.delete(Number(stopId)) : next.add(Number(stopId));
       return next;
     });
-  };
-
-  const handleCreateStopChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "latitude" || name === "longitude") {
-      const numeric = Number(value);
-      if (value === "" || !Number.isFinite(numeric)) {
-        setNewStopForm({ ...newStopForm, [name]: "" });
-      } else if (name === "latitude") {
-        setNewStopForm({ ...newStopForm, [name]: String(Math.max(-90, Math.min(90, numeric))) });
-      } else {
-        setNewStopForm({ ...newStopForm, [name]: String(Math.max(-180, Math.min(180, numeric))) });
-      }
-      return;
-    }
-    setNewStopForm({ ...newStopForm, [name]: value });
-  };
-
-  const setNewStopLocation = (location) => setNewStopForm((current) => ({ ...current, ...location }));
-
-  const openEditStop = (stop) => {
-    setEditingStop(stop);
-    setEditStopForm({
-      name: stop.name || "",
-      latitude: stop.latitude ?? "",
-      longitude: stop.longitude ?? "",
-      address: stop.address || "",
-    });
-    setShowEditStop(true);
-  };
-
-  const handleEditStopChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "latitude" || name === "longitude") {
-      const numeric = Number(value);
-      if (value === "" || !Number.isFinite(numeric)) {
-        setEditStopForm((current) => ({ ...current, [name]: "" }));
-      } else if (name === "latitude") {
-        setEditStopForm((current) => ({ ...current, [name]: String(Math.max(-90, Math.min(90, numeric))) }));
-      } else {
-        setEditStopForm((current) => ({ ...current, [name]: String(Math.max(-180, Math.min(180, numeric))) }));
-      }
-      return;
-    }
-    setEditStopForm((current) => ({ ...current, [name]: value }));
-  };
-
-  const setEditStopLocation = (location) => setEditStopForm((current) => ({ ...current, ...location }));
-
-  const handleCreateStop = async (e) => {
-    e.preventDefault();
-    if (!newStopForm.name) { alert("Stop name is required"); return; }
-    const lat = Number(newStopForm.latitude);
-    const lng = Number(newStopForm.longitude);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) {
-      alert("Choose a valid stop location on the map."); return;
-    }
-    setCreatingStop(true);
-    try {
-      const payload = {
-        name: newStopForm.name,
-        latitude: lat,
-        longitude: lng,
-        address: newStopForm.address || "",
-      };
-      const response = await createStop(payload);
-      const newStop = response.data;
-      setAllStops((prev) => [...prev, newStop]);
-      addStop(newStop);
-      setNewStopForm({ name: "", latitude: "", longitude: "", address: "" });
-      setShowCreateStop(false);
-      setMessage(`Stop "${newStop.name}" created and added to route.`);
-    } catch (err) {
-      alert(`Failed to create stop: ${JSON.stringify(err.response?.data || err.message)}`);
-    } finally {
-      setCreatingStop(false);
-    }
-  };
-
-  const handleEditStop = async (e) => {
-    e.preventDefault();
-    if (!editingStop) return;
-    if (!editStopForm.name) { alert("Stop name is required"); return; }
-    const lat = Number(editStopForm.latitude);
-    const lng = Number(editStopForm.longitude);
-    if (!Number.isFinite(lat) || !Number.isFinite(lng) || (lat === 0 && lng === 0)) {
-      alert("Choose a valid stop location on the map."); return;
-    }
-    setSavingEditStop(true);
-    try {
-      const payload = {
-        name: editStopForm.name.trim(),
-        latitude: lat,
-        longitude: lng,
-        address: editStopForm.address || "",
-      };
-      const response = await updateStop(editingStop.id, payload);
-      const updatedStop = response.data;
-      setAllStops((prev) => prev.map((stop) => Number(stop.id) === Number(updatedStop.id) ? updatedStop : stop));
-      setSelectedStops((prev) => prev.map((stop) => Number(stop.id) === Number(updatedStop.id) ? { ...stop, ...updatedStop } : stop));
-      setMessage(`Stop "${updatedStop.name}" updated successfully.`);
-      setShowEditStop(false);
-      setEditingStop(null);
-      setEditStopForm({ name: "", latitude: "", longitude: "", address: "" });
-    } catch (err) {
-      alert(`Failed to update stop: ${JSON.stringify(err.response?.data || err.message)}`);
-    } finally {
-      setSavingEditStop(false);
-    }
   };
 
   const selectedStopIds = new Set(selectedStops.map((s) => Number(s.id)));
@@ -359,64 +250,8 @@ export default function RouteBuilder() {
         />
       )}
 
-      {showEditStop && editingStop && (
-        <FormModal
-          title="Edit Stop"
-          sub="Update the stop details and map location."
-          submitLabel="Save Stop"
-          loading={savingEditStop}
-          onClose={() => { setShowEditStop(false); setEditingStop(null); setEditStopForm({ name: "", latitude: "", longitude: "", address: "" }); }}
-          onSubmit={handleEditStop}
-          width="700px"
-        >
-          <Field label="Stop Name" required flex="1 1 180px">
-            <input name="name" placeholder="e.g. Gulshan Chowrangi" value={editStopForm.name} onChange={handleEditStopChange} style={inputStyle} />
-          </Field>
-          <Field label="Latitude" required flex="0 1 140px">
-            <input name="latitude" type="number" step="0.000001" placeholder="24.9215" value={editStopForm.latitude} onChange={handleEditStopChange} style={inputStyle} />
-          </Field>
-          <Field label="Longitude" required flex="0 1 140px">
-            <input name="longitude" type="number" step="0.000001" placeholder="67.0847" value={editStopForm.longitude} onChange={handleEditStopChange} style={inputStyle} />
-          </Field>
-          <Field label="Address" flex="2 1 280px">
-            <input name="address" placeholder="Full address" value={editStopForm.address} onChange={handleEditStopChange} style={inputStyle} />
-          </Field>
-          <div style={{ flex: "1 1 100%" }}>
-            <StopLocationPicker latitude={editStopForm.latitude} longitude={editStopForm.longitude} onChange={setEditStopLocation} height={250} />
-          </div>
-        </FormModal>
-      )}
-
-      {showCreateStop && (
-        <FormModal
-          title="Create New Stop"
-          sub="Add a new pickup/dropoff stop to the system. You'll add it to the route immediately after."
-          submitLabel="Create Stop"
-          loading={creatingStop}
-          onClose={() => { setShowCreateStop(false); setNewStopForm({ name: "", latitude: "", longitude: "", address: "" }); }}
-          onSubmit={handleCreateStop}
-          width="700px"
-        >
-          <Field label="Stop Name" required flex="1 1 180px">
-            <input name="name" placeholder="e.g. Gulshan Chowrangi" value={newStopForm.name} onChange={handleCreateStopChange} style={inputStyle} />
-          </Field>
-          <Field label="Latitude" required flex="0 1 140px">
-            <input name="latitude" type="number" step="0.000001" placeholder="24.9215" value={newStopForm.latitude} onChange={handleCreateStopChange} style={inputStyle} />
-          </Field>
-          <Field label="Longitude" required flex="0 1 140px">
-            <input name="longitude" type="number" step="0.000001" placeholder="67.0847" value={newStopForm.longitude} onChange={handleCreateStopChange} style={inputStyle} />
-          </Field>
-          <Field label="Address" flex="2 1 280px">
-            <input name="address" placeholder="Full address" value={newStopForm.address} onChange={handleCreateStopChange} style={inputStyle} />
-          </Field>
-          <div style={{ flex: "1 1 100%" }}>
-            <StopLocationPicker latitude={newStopForm.latitude} longitude={newStopForm.longitude} onChange={setNewStopLocation} height={250} />
-          </div>
-        </FormModal>
-      )}
-
       <Link to="/admin/routes" style={{ color: colors.textSecondary, fontSize: 13 }}>← Back to routes</Link>
-      <PageTitle sub="View and edit route stops, track registrations, and monitor driver/bus assignments.">{route?.name || "Route Manager"}</PageTitle>
+      <PageTitle sub="View and edit route stops, track registrations, and monitor driver/bus assignments.">{route?.name || "Route Manager"} <span style={{ fontSize: 14, fontWeight: 500, color: colors.textSecondary }}>· Route ID {route?.id}</span></PageTitle>
 
       {message && <Banner variant={message.includes("saved") || message.includes("successfully") ? "success" : "danger"}>{message}</Banner>}
 
@@ -444,6 +279,8 @@ export default function RouteBuilder() {
           </button>
         </div>
       </ContentCard>
+
+      <RouteTransfer route={{ ...route, ...routeMeta }} stops={selectedStops} onImport={applyImport} />
 
       {/* ─── Route Builder Section ─────────────────────────────────────────────── */}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 1fr)", gap: 16, alignItems: "start", marginBottom: 24 }}>
@@ -481,19 +318,14 @@ export default function RouteBuilder() {
               onChange={(e) => setSearchTerm(e.target.value)}
               style={{ ...inputStyle, marginBottom: 12, width: "100%" }}
             />
-            <button
-              onClick={() => setShowCreateStop(true)}
-              type="button"
-              style={{ ...btn.ghost, marginBottom: 12, width: "100%", fontSize: 13 }}
-            >
-              + Create New Stop
-            </button>
-            <StopImport stops={allStops} onChanged={reloadStops} />
+            <Link to="/admin/stops" style={{ display: "block", marginBottom: 12, fontSize: 13, color: colors.accent }}>
+              Create, edit or import stops on the Stops page →
+            </Link>
             <div style={{ display: "grid", gap: 8, maxHeight: 400, overflowY: "auto" }}>
               {availableStops.length > 0 ? (
                 availableStops.map((stop) => (
-                  <div key={stop.id} style={{ display: "grid", gridTemplateColumns: "1fr auto auto", gap: 8, alignItems: "stretch" }}>
                     <button
+                      key={stop.id}
                       onClick={() => addStop(stop)}
                       type="button"
                       style={{
@@ -519,14 +351,6 @@ export default function RouteBuilder() {
                       </div>
                       <div style={{ fontSize: 11, color: colors.accent, fontWeight: 600, whiteSpace: "nowrap" }}>+ Add</div>
                     </button>
-                    <button
-                      type="button"
-                      onClick={(e) => { e.stopPropagation(); openEditStop(stop); }}
-                      style={{ ...btn.ghost, padding: "8px 10px", fontSize: 11, minWidth: 52 }}
-                    >
-                      Edit
-                    </button>
-                  </div>
                 ))
               ) : (
                 <div style={{ color: colors.textMuted, fontSize: 13, padding: "20px 10px", textAlign: "center" }}>

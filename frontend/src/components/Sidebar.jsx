@@ -174,6 +174,7 @@ const adminGroups = [
       { to: "/admin/buses",                   label: "Buses",               icon: "bus",        module: "fleet" },
       { to: "/admin/drivers",                 label: "Drivers",             icon: "driver",     module: "fleet" },
       { to: "/admin/routes",                  label: "Routes",              icon: "route",      module: "routes" },
+      { to: "/admin/stops",                   label: "Stops",               icon: "stop",       module: "routes" },
       { to: "/admin/assignments",             label: "Assignments",         icon: "assignment", module: "fleet" },
     ],
   },

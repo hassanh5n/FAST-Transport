@@ -1,7 +1,7 @@
 // frontend/src/components/Table.jsx
 import { colors, fonts } from "../theme";
 
-function Table({ columns, rows, emptyMessage = "No data available." }) {
+function Table({ columns, rows, emptyMessage = "No data available.", onRowHover }) {
   return (
     <div style={styles.wrapper}>
       <div style={styles.tableScroll}>
@@ -32,7 +32,7 @@ function Table({ columns, rows, emptyMessage = "No data available." }) {
               </tr>
             ) : (
               rows.map((row, i) => (
-                <TableRow key={row.id ?? i} row={row} columns={columns} index={i} />
+                <TableRow key={row.id ?? i} row={row} columns={columns} index={i} onRowHover={onRowHover} />
               ))
             )}
           </tbody>
@@ -50,7 +50,7 @@ function Table({ columns, rows, emptyMessage = "No data available." }) {
 // ── Row with hover state via useState ────────────────────────────────────────
 import { useState } from "react";
 
-function TableRow({ row, columns, index }) {
+function TableRow({ row, columns, index, onRowHover }) {
   const [hovered, setHovered] = useState(false);
 
   const rowStyle = {
@@ -65,8 +65,8 @@ function TableRow({ row, columns, index }) {
   return (
     <tr
       style={rowStyle}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => { setHovered(true); onRowHover?.(row); }}
+      onMouseLeave={() => { setHovered(false); onRowHover?.(null); }}
     >
               {columns.map((col) => (
                 <td key={col.key ?? col} style={{ ...styles.td, ...(col.width ? { width: col.width } : {}), ...(col.key === "actions" ? styles.actionCell : {}) }}>

@@ -6,6 +6,7 @@ import { Banner } from "../../components/ui";
 import { colors, radius } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
+import { CAMPUS, addCampusMarker } from "../../components/maps/campus";
 
 const POLL_INTERVAL_MS = 8000;
 const INCIDENT_POLL_INTERVAL_MS = 30000;
@@ -133,12 +134,13 @@ export default function StudentMap() {
     const map = new maplibregl.Map({
       container: mapContainer.current,
       style: "https://tiles.openfreemap.org/styles/liberty",
-      center: [67.0847, 24.9215],
-      zoom: 12,
+      center: CAMPUS.center,
+      zoom: CAMPUS.zoom,
     });
 
     mapRef.current = map;
 
+    addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
 
     map.on("load", () => {
@@ -341,6 +343,7 @@ export default function StudentMap() {
           [validStops[0].lng, validStops[0].lat]
         )
       );
+      bounds.extend(CAMPUS.center); // keep the campus in frame with the route
       map.fitBounds(bounds, { padding: isMobileRef.current ? 30 : 60, maxZoom: 14 });
 
       // Add stop markers
