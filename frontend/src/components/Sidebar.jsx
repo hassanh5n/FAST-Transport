@@ -1,5 +1,5 @@
 // frontend/src/components/Sidebar.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { clearQueryCache } from "../services/queryClient";
 import { NavLink, useNavigate } from "react-router-dom";
 import { can, isSuperAdmin, roleLabel } from "../utils/permissions";
@@ -203,8 +203,26 @@ function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }
   );
 }
 
+// Every page renders its own PageShell, so the sidebar remounts on each navigation.
+// The menu's scroll position is kept here, outside React, to survive that.
+let savedNavScroll = null; // null until the menu has been shown once since the page loaded
+
 // ── Inner content (shared between desktop and drawer) ─────────────────────────
 function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
+  const navRef = useRef(null);
+  // Layout effect: restore before paint, so the menu never flashes at the top.
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    if (savedNavScroll !== null) {
+      nav.scrollTop = savedNavScroll;
+      return;
+    }
+    // First show after a full reload: nothing to restore, so bring the current page's link
+    // into view. Centred, so it stays visible if late-loading fonts shift the layout a little.
+    nav.querySelector('a[aria-current="page"]')?.scrollIntoView({ block: "center" });
+    savedNavScroll = nav.scrollTop;
+  }, []);
+
   return (
     <>
       {/* Brand */}
@@ -231,7 +249,7 @@ function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
       </div>
 
       {/* Nav groups */}
-      <nav style={styles.nav}>
+      <nav ref={navRef} className="sidebar-nav" style={styles.nav} onScroll={(e) => { savedNavScroll = e.currentTarget.scrollTop; }}>
         {groups.map((group) => (
           <div key={group.label} style={styles.group}>
             <p style={styles.groupLabel}>{group.label}</p>
@@ -285,8 +303,7 @@ const styles = {
     position:     "sticky",
     top:          0,
     height:       "100vh",
-    overflowY:    "auto",
-    scrollbarWidth:"none",
+    overflow:     "hidden", // the nav list is the one scroll area; brand and Sign Out stay put
   },
   brand: {
     display:      "flex",
@@ -334,7 +351,7 @@ const styles = {
     flex:          1,
     padding:       "8px 0 12px",
     overflowY:     "auto",
-    scrollbarWidth:"none",
+    minHeight:     0,
   },
   group: {
     marginBottom: "4px",

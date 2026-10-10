@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Spinner, Banner, Field, ErrorText } from "../../components/ui";
 import { selectStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
+import RegistrationStatus from "./RegistrationStatus";
 import { getSemesters, createRegistration, getRegistration, getChallan, getEligibleRouteStops } from "../../services/transportService";
 
 // A student accumulates one row per attempt. The live registration is
@@ -24,9 +24,11 @@ function TransportRegistration() {
   const [selectedRouteStop, setSelectedRouteStop] = useState("");
   const [selectedSemester, setSelectedSemester] = useState("");
   const [loading, setLoading] = useState(false);
+  // True until the existing registration (and its challan) has been looked up. Without it the
+  // empty form shows for a moment before an already-registered student's status replaces it.
+  const [initializing, setInitializing] = useState(true);
   const [challan, setChallan] = useState(null);
   const [message, setMessage] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
@@ -40,6 +42,7 @@ function TransportRegistration() {
           try { const cr = await getChallan(reg.id); setChallan(cr.data); } catch { setChallan(null); }
         }
       } catch { alert("Failed to load data"); }
+      finally { setInitializing(false); }
     };
     loadData();
   }, []);
@@ -101,80 +104,29 @@ function TransportRegistration() {
   }, {}));
   const selectedStop = eligibleStops.find((stop) => String(stop.id) === String(selectedRouteStop));
 
+  if (initializing) {
+    return (
+      <PageShell role="student" title="Transport Registration" maxWidth="860px">
+        <PageTitle sub="Register for transport service this semester.">Transport Registration</PageTitle>
+        <Spinner />
+      </PageShell>
+    );
+  }
+
+  const hasLiveRegistration = Boolean(registration) && status !== "cancelled";
+
   return (
-    <PageShell role="student" title="Transport Registration" maxWidth="860px">
-      <PageTitle sub="Register for transport service this semester.">Transport Registration</PageTitle>
+    <PageShell role="student" title="Transport Registration" maxWidth={hasLiveRegistration ? "920px" : "860px"}>
+      <PageTitle sub={hasLiveRegistration ? "Your registration for this semester and what happens next." : "Register for transport service this semester."}>Transport Registration</PageTitle>
 
-      {/* Status banners */}
-      {status === "pending" && (
-        challan?.status === "paid" ? (
-          <Banner variant="info"><strong>Payment Received</strong> — Your payment has been recorded. Waiting for admin verification.</Banner>
-        ) : (
-          <Banner variant="warning">
-            <strong>Registration Pending</strong> — Please pay the transport fee and wait for admin verification.
-            <br />
-            <span style={{ fontSize: "13px" }}>Pay via bank transfer using your challan number. Your seat will be confirmed after admin review.</span>
-            <div>
-              <button style={{ ...btn.primary, marginTop: "10px" }} onClick={() => navigate(`/student/challan/${registration.id}`)}>
-                Pay Fee (View Challan)
-              </button>
-            </div>
-          </Banner>
-        )
-      )}
-      {status === "approved" && (
-        <Banner variant="success"><strong>Approved</strong> — Your transport registration has been confirmed.</Banner>
-      )}
-
-      {status === "seat held" && (
-        <Banner variant="warning">
-          <strong>Seat Held</strong> — A seat is reserved for you, but it is not
-          confirmed until the fee is paid. If payment is not received by the
-          deadline the seat passes to the next student on the waiting list.
-          <div>
-            <button style={{ ...btn.primary, marginTop: "10px" }} onClick={() => navigate(`/student/challan/${registration.id}`)}>
-              Pay Fee (View Challan)
-            </button>
-          </div>
-        </Banner>
-      )}
-
-      {status === "waitlisted" && (
-        <Banner variant="info">
-          <strong>On the Waiting List</strong> — This route is currently full, so
-          you are queued for the next available seat.
-          <br />
-          <span style={{ fontSize: "13px" }}>
-            You have not been charged. A challan is issued only once a seat is
-            confirmed for you, and you will be notified the moment one opens up.
-          </span>
-          <div>
-            <button style={{ ...btn.ghost, marginTop: "10px" }} onClick={() => navigate("/student/transport")}>
-              View my position
-            </button>
-          </div>
-        </Banner>
-      )}
-
-      {status === "payment_submitted" && (
-        <Banner variant="info">
-          <strong>Payment Submitted</strong> — Waiting for the transport office to
-          verify your payment.
-        </Banner>
-      )}
+      {/* A live registration gets the full status view; the form below is for everyone else. */}
+      {hasLiveRegistration && <RegistrationStatus registration={registration} challan={challan} />}
 
       {status === "cancelled" && (
         <Banner variant="warning">
           <strong>Registration Cancelled</strong> — Your previous registration was
           cancelled or its seat offer expired. You have not been charged, and you
           can register again below while registration is open.
-        </Banner>
-      )}
-
-      {status === "rejected" && (
-        <Banner variant="danger">
-          <strong>Registration Rejected</strong> — Please contact the transport
-          office for details.
         </Banner>
       )}
 
