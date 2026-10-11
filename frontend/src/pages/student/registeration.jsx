@@ -147,7 +147,7 @@ function TransportRegistration() {
               <Field label="Pickup Stop" required>
                 <select value={selectedRouteStop} onChange={(e) => setSelectedRouteStop(e.target.value)} style={selectStyle} disabled={!selectedSemester}>
                   <option value="">Select a route and stop</option>
-                  {eligibleStops.map((stop) => <option key={stop.id} value={stop.id}>{stop.route_name} — {stop.stop_name}{stop.morning_eta ? ` (${stop.morning_eta})` : ""}</option>)}
+                  {eligibleStops.filter((stop) => !stop.is_campus).map((stop) => <option key={stop.id} value={stop.id}>{stop.route_name} — {stop.stop_name}{stop.morning_eta ? ` (${stop.morning_eta})` : ""}</option>)}
                 </select>
               </Field>
               {selectedStop && <p style={{ margin: 0, color: colors.successText, fontSize: 13 }}><strong>Selected:</strong> {selectedStop.route_name} · {selectedStop.stop_name}{selectedStop.morning_eta ? ` · AM ${selectedStop.morning_eta}` : ""}</p>}
@@ -162,7 +162,7 @@ function TransportRegistration() {
             <ContentCard style={{ gridColumn: "1 / -1" }}>
               <h3 style={{ margin: "0 0 6px", fontSize: 15 }}>Choose your route and stop on the map</h3>
               <p style={{ margin: "0 0 14px", color: colors.textSecondary, fontSize: 13 }}>Click a route to focus it, then choose the exact route-stop pair from the list above. This prevents ambiguous stop assignments.</p>
-              {mapRoutes.length ? <RouteMap routes={mapRoutes} height={400} onStopSelect={(stop) => setSelectedRouteStop(String(stop.routeStopId))} /> : <Banner variant="warning">No assigned routes have selectable mapped stops for this semester.</Banner>}
+              {mapRoutes.length ? <RouteMap routes={mapRoutes} height={400} onStopSelect={(stop) => { if (!stop.isCampus) setSelectedRouteStop(String(stop.routeStopId)); }} /> : <Banner variant="warning">No assigned routes have selectable mapped stops for this semester.</Banner>}
             </ContentCard>
           )}
 

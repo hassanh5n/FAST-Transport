@@ -72,50 +72,99 @@ class RoutePlanTests(APITestCase):
             self.assertEqual(exported.status_code, 200)
             res = self.upload(f"plan.{kind}", exported.content.decode("utf-8"))
             self.assertEqual(res.status_code, 201, res.content)
-            self.assertEqual((res.data["is_active"], res.data["route_count"], res.data["stop_count"]), (False, 2, 3))
+            self.assertEqual((res.data["is_active"], res.data["route_count"], res.data["stop_count"]), (False, 2, 4))  # + campus
             detail = self.client.get(f"/api/route-plans/{res.data['id']}/").data
-            self.assertEqual(detail["routes"], live)
-            # Importing never touches the live routes, and an identical plan changes nothing.
+            # Same routes, now ending at the campus stop the import adds.
+            self.assertEqual([{**r, "stops": r["stops"][:-1]} for r in detail["routes"]], live)
+            self.assertEqual({r["stops"][-1]["name"] for r in detail["routes"]}, {"FAST NUCES Main Campus"})
+            # Importing never touches the live routes.
             preview = self.client.get(f"/api/route-plans/{res.data['id']}/preview/").data
-            self.assertEqual((preview["routes"]["unchanged"], preview["routes"]["updated"], preview["affected_students"]), (2, [], []))
+            self.assertEqual((preview["routes"]["updated"], preview["moved_students"]), (["R1", "R2"], []))
 
-    def test_activate_swaps_routes_keeps_riders_and_swaps_back(self):
+    def test_activate_swaps_routes_moves_riders_and_swaps_back(self):
         plan_b = self.upload("b.json", json.dumps(PLAN_B)).data
         self.assertEqual(plan_b["name"], "Plan B")
         self.assertEqual(self.stops_of(self.r1), [("Stop A", "07:00", None), ("Stop B", None, "16:40")])  # untouched so far
+        # Importing creates the plan's new stops right away (for the address fill); routes wait for activation.
+        self.assertEqual(sorted(s["name"] for s in plan_b["stops"]["created"]), ["FAST NUCES Main Campus", "Stop D"])
 
         preview = self.client.get(f"/api/route-plans/{plan_b['id']}/preview/").data
-        self.assertEqual(preview["routes"], {"created": ["R3"], "updated": ["r1"], "unchanged": 0, "archived": ["R2"]})
-        self.assertEqual(preview["stops"], {"created": ["Stop D"], "reactivated": []})
-        self.assertEqual([s["roll_number"] for s in preview["affected_students"]], ["22K-0001"])
-        self.assertFalse(Stop.objects.filter(name="Stop D").exists())  # a preview writes nothing
+        self.assertEqual(preview["routes"], {"created": ["R3"], "updated": ["r1"], "unchanged": 0, "removed": ["R2"], "archived": []})
+        moved = preview["moved_students"]
+        self.assertEqual([(m["roll_number"], m["from_stop"], m["to_route"], m["to_stop"], m["seat"]) for m in moved],
+                         [("22K-0001", "Stop B", "R1", "Stop A", "kept")])
+        self.assertEqual(preview["affected_students"], [])
+        # A preview writes nothing and notifies nobody.
+        self.assertFalse(Route.objects.filter(name="R3").exists())
+        self.assertTrue(Route.objects.filter(pk=self.r2.pk).exists())
+        self.assertEqual(TransportRegistration.objects.get().stop_id, self.b.id)
+        self.assertFalse(Notification.objects.filter(user=self.student_user).exists())
 
         res = self.client.post(f"/api/route-plans/{plan_b['id']}/activate/")
         self.assertEqual(res.status_code, 200, res.content)
         self.assertEqual(list(RoutePlan.objects.filter(is_active=True).values_list("name", flat=True)), ["Plan B"])
 
-        # Same Route row, new stops; the rider keeps their seat and bus.
-        self.assertEqual(self.stops_of(self.r1), [("Stop A", "08:00", None)])
-        self.assertEqual(Route.objects.get(name="R3").status, "published")
-        self.r2.refresh_from_db()
-        self.assertEqual((self.r2.status, self.r2.is_active), ("archived", True))
+        # Same Route row, new stops ending at campus; R2 and the stops nobody uses are gone.
+        self.assertEqual(self.stops_of(self.r1), [("Stop A", "08:00", None), ("FAST NUCES Main Campus", None, None)])
+        self.assertFalse(Route.objects.filter(pk=self.r2.pk).exists())
+        self.assertFalse(Stop.objects.filter(pk__in=[self.b.pk, self.c.pk]).exists())
+        # The rider moved to the nearest stop on their route and kept seat and bus.
+        self.assertEqual((TransportRegistration.objects.get().route_id, TransportRegistration.objects.get().stop_id), (self.r1.id, self.a.id))
         self.assertTrue(SeatAllocation.objects.filter(pk=self.seat.pk).exists())
         self.assertTrue(RouteAssignment.objects.get(pk=self.assignment.pk).is_active)
-        self.assertEqual(TransportRegistration.objects.get().route_id, self.r1.id)
+        self.assertEqual(Notification.objects.filter(user=self.student_user, title="Your transport stop has changed").count(), 1)
+        self.assertEqual(self.client.get("/api/route-plans/attention/").data, [])
 
-        self.assertEqual(Notification.objects.filter(user=self.student_user, title="Your transport route has changed").count(), 1)
-        attention = self.client.get("/api/route-plans/attention/").data
-        self.assertEqual([(s["roll_number"], s["stop"]) for s in attention], [("22K-0001", "Stop B")])
-
-        # Swapping back restores the original plan exactly.
+        # Swapping back restores the original plan's routes.
         res = self.client.post(f"/api/route-plans/{self.current.id}/activate/")
         self.assertEqual(res.status_code, 200, res.content)
         self.assertEqual(self.stops_of(self.r1), [("Stop A", "07:00", None), ("Stop B", None, "16:40")])
-        self.assertEqual(Route.objects.get(pk=self.r2.pk).status, "published")
-        self.assertEqual(Route.objects.get(name="R3").status, "archived")
+        self.assertTrue(Route.objects.filter(name="R2").exists())
+        self.assertFalse(Route.objects.filter(name="R3").exists())
         self.assertEqual(self.client.get("/api/route-plans/attention/").data, [])
         # Plan B was captured as it ran, so it can be activated again later.
         self.assertEqual(len(RoutePlan.objects.get(name="Plan B").data["routes"]), 2)
+
+    def test_buses_follow_the_admins_pick_and_unpicked_riders_are_queued(self):
+        plan = RoutePlan.objects.create(name="Next", data={"routes": [
+            {"name": "R9", "description": "x", "status": "published", "stops": [
+                {"name": "Near B", "latitude": 24.9101, "longitude": 67.0101, "morning_eta": None, "evening_eta": None},
+            ]},
+        ]})
+        preview = route_plans.preview(plan)
+        self.assertEqual([(b["bus"], b["from_route"], b["to_route"]) for b in preview["buses"]], [("B-1", "R1", None)])
+        self.assertEqual(preview["moved_students"][0]["seat"], "queued")
+
+        # Picking R9 for the bus keeps the student's seat.
+        picked = route_plans.preview(plan, {str(self.assignment.id): "R9"})
+        self.assertEqual((picked["buses"][0]["to_route"], picked["moved_students"][0]["seat"]), ("R9", "kept"))
+        self.assertIn("errors", route_plans.preview(plan, {str(self.assignment.id): "Nope"}))
+
+        # Leaving it unassigned: the bus loses the old route, the student waits first in line on R9.
+        route_plans.activate(plan)
+        registration = SemesterRegistration.objects.get()
+        self.assertEqual((registration.route.name, registration.stop.name, registration.status), ("R9", "Near B", "Waitlisted"))
+        self.assertEqual(registration.waitlist.status, "waiting")
+        self.assertFalse(RouteAssignment.objects.exists())
+        self.assertTrue(Bus.objects.exists() and Driver.objects.exists())  # buses and drivers are kept
+        self.assertEqual(TransportRegistration.objects.get().status, "Waitlisted")
+
+    def test_routes_other_semesters_use_are_archived_not_deleted(self):
+        old = Semester.objects.create(name="Spring", is_active=False)
+        other = StudentProfile.objects.create(user=User.objects.create_user("old", password="Str0ng!pass9"), roll_number="21K-0001")
+        TransportRegistration.objects.create(student=other, semester=old, route=self.r2, stop=self.c, status="Approved")
+        plan = self.upload("b.json", json.dumps(PLAN_B)).data
+        report = self.client.post(f"/api/route-plans/{plan['id']}/activate/").data
+        self.assertEqual((report["routes"]["removed"], report["routes"]["archived"]), ([], ["R2"]))
+        self.assertTrue(Stop.objects.filter(pk=self.c.pk).exists())  # still on the archived route
+
+    def test_campus_is_never_a_pickup_stop(self):
+        self.upload("b.json", json.dumps(PLAN_B))
+        campus = Stop.objects.get(is_campus=True)
+        self.client.force_authenticate(self.student_user)
+        res = self.client.post("/api/transport-registrations/", {"stop_id": campus.id, "semester_id": Semester.objects.get().id})
+        self.assertEqual(res.status_code, 400)
+        self.assertIn("campus", str(res.data).lower())
 
     def test_only_one_active_plan_and_it_cannot_be_deleted(self):
         with self.assertRaises(IntegrityError), transaction.atomic():

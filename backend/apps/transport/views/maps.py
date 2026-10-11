@@ -174,7 +174,7 @@ def _map_cache_key(prefix, value):
 def resolve_map_location(request):
     """Rate-limited, cached admin-only forward and reverse geocoding proxy."""
     action_name = request.data.get("action")
-    params = {"format": "jsonv2", "addressdetails": 1, "limit": 5}
+    params = {"format": "jsonv2", "addressdetails": 1, "limit": 5, "accept-language": "en"}
     if action_name == "search":
         query = str(request.data.get("query", "")).strip()
         if len(query) < 3 or len(query) > 160:
@@ -192,7 +192,7 @@ def resolve_map_location(request):
         if not _valid_karachi_coordinate(latitude, longitude):
             raise ValidationError("Location must be within the Karachi service area.")
         params.update({"lat": latitude, "lon": longitude, "zoom": 18})
-        cache_value = f"reverse:{latitude:.6f},{longitude:.6f}"
+        cache_value = f"reverse:en:{latitude:.6f},{longitude:.6f}"
         endpoint = "/reverse"
     else:
         raise ValidationError({"action": "Use 'search' or 'reverse'."})
@@ -322,10 +322,23 @@ def _road_geometry(coordinates):
     return fallback, "fallback"
 
 
-def _display_route_geometry(route, fallback_geometry):
+def _display_route_geometry(route, fallback_geometry, fetch=False):
+    """The route's saved road line, as (geometry, source).
+
+    Page loads (fetch=False) never call the routing service: a route without a saved
+    line is drawn stop to stop at once, instead of the page waiting up to 8 s per
+    route. fetch=True (one route at a time) asks the service and saves the result.
+    """
     geometry = route.geometry if isinstance(route.geometry, dict) else None
     # A previous provider outage may have persisted a rounded or interpolated
     # stop-to-stop fallback. Treat any collinear fallback as stale.
-    if not _is_line_string(geometry) or _is_straight_fallback(geometry, fallback_geometry):
-        return _road_geometry(fallback_geometry)
-    return geometry, "stored"
+    if _is_line_string(geometry) and not _is_straight_fallback(geometry, fallback_geometry):
+        return geometry, "stored"
+    if not fetch:
+        return {"type": "LineString", "coordinates": [[lng, lat] for lng, lat in fallback_geometry]}, "fallback"
+    geometry, source = _road_geometry(fallback_geometry)
+    if source in ("provider", "cache"):
+        Route.objects.filter(pk=route.pk).update(geometry=geometry, geometry_updated_at=timezone.now())
+        route.geometry = geometry
+        return geometry, "stored"
+    return geometry, source

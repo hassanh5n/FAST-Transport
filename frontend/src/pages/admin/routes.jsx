@@ -7,6 +7,8 @@ import { inputStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
 import { getRoutes, createRoute, updateRoute, deleteRoute, getRoutesMap, getRoutePlans } from "../../services/transportService";
+import { useContractor, ContractorSwitch, ContractorSelect } from "../../components/ContractorSwitch";
+import RoadLineBuilder from "../../components/RoadLineBuilder";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
 
@@ -32,26 +34,32 @@ const routeButton = {
 };
 
 function RoutesPage() {
-  const [routes, setRoutes] = useState([]);
-  const [form, setForm] = useState({ name: "", description: "" });
+  const contractor = useContractor();
+  const [allRoutes, setRoutes] = useState([]);
+  const [form, setForm] = useState({ name: "", description: "", contractor: "" });
   const [pendingToggle, setPendingToggle] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
-  const [mapRoutes, setMapRoutes] = useState([]);
+  const [allMapRoutes, setMapRoutes] = useState([]);
+  const routes = allRoutes.filter((r) => contractor.matches(r.contractor));
+  const mapRoutes = allMapRoutes.filter((r) => contractor.matches(r.contractor));
   const [selectedRouteId, setSelectedRouteId] = useState(null);
   const [activePlan, setActivePlan] = useState(null);
 
   const fetchRoutes = () =>
     getRoutes().then((res) => setRoutes(res.data)).catch(() => alert("Failed to fetch routes."));
 
-  useEffect(() => {
-    getRoutePlans().then((res) => setActivePlan(res.data.find((plan) => plan.is_active) || null)).catch(() => {});
-    getRoutesMap()
+  const loadMap = (config) =>
+    getRoutesMap(config)
       .then((res) => {
         const nextRoutes = res.data?.routes || [];
         setMapRoutes(nextRoutes);
         setSelectedRouteId((current) => current ?? nextRoutes[0]?.id ?? null);
       })
       .catch(() => setMapRoutes([]));
+
+  useEffect(() => {
+    getRoutePlans().then((res) => setActivePlan(res.data.find((plan) => plan.is_active) || null)).catch(() => {});
+    loadMap();
   }, []);
 
   const handleToggle = (id, currentValue) => {
@@ -87,8 +95,8 @@ function RoutesPage() {
     e.preventDefault();
     if (!form.name) { alert("Route name is required"); return; }
     try {
-      await createRoute(form);
-      setForm({ name: "", description: "" });
+      await createRoute({ ...form, contractor: form.contractor || null });
+      setForm({ name: "", description: "", contractor: "" });
       fetchRoutes();
     } catch (err) {
       alert(`Failed to add route: ${JSON.stringify(err.response?.data || err.message)}`);
@@ -112,7 +120,8 @@ function RoutesPage() {
         </Link>
       ),
     },
-    { key: "description", label: "Description", width: "25%" },
+    { key: "contractor", label: "Contractor", width: "10%", render: (row) => contractor.nameOf(row.contractor) || "—" },
+    { key: "description", label: "Description", width: "20%" },
     {
       key: "is_active", label: "Status",
       width: "15%",
@@ -155,6 +164,8 @@ function RoutesPage() {
       )}
 
       <PageTitle sub="Manage transport routes. Use the map to browse route coverage, then open a route for full administration.">Routes</PageTitle>
+      <ContractorSwitch value={contractor} />
+      <RoadLineBuilder onDone={() => loadMap({ noCache: true })} />
       {activePlan && (
         <p style={{ margin: "-8px 0 16px", fontSize: 13, color: colors.textSecondary }}>
           Active route plan: <strong>{activePlan.name}</strong>. Changes here go live for everyone.{" "}
@@ -179,7 +190,7 @@ function RoutesPage() {
                   }}
                 >
                   <strong>{route.name}</strong>
-                  <span>{route.stops?.length ?? 0} stop{(route.stops?.length ?? 0) === 1 ? "" : "s"}</span>
+                  <span>{route.stops?.length ?? 0} stop{(route.stops?.length ?? 0) === 1 ? "" : "s"}{route.contractor ? ` · ${contractor.nameOf(route.contractor)}` : ""}</span>
                   <small style={{ color: colors.textMuted }}>{route.status || "published"}</small>
                 </button>
               )) : <span style={{ color: colors.textMuted, fontSize: 13 }}>Map data is not available yet.</span>}
@@ -220,6 +231,9 @@ function RoutesPage() {
         </Field>
         <Field label="Description" flex="2 1 280px">
           <input name="description" placeholder="Brief description" value={form.description} onChange={handleChange} style={inputStyle} />
+        </Field>
+        <Field label="Contractor" flex="1 1 140px">
+          <ContractorSelect contractors={contractor.contractors} value={form.contractor} onChange={handleChange} />
         </Field>
       </FormCard>
 

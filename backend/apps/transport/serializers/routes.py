@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
 from django.utils import timezone
 from ..models import (
+    Contractor,
     Challan,
     StudentProfile,
     Semester,
@@ -37,6 +38,12 @@ class CrimeRiskZoneSerializer(serializers.ModelSerializer):
             "zone_id", "geometry", "current_score", "current_level",
             "confidence", "source_updated_at", "algorithm_version",
         ]
+
+
+class ContractorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contractor
+        fields = ["id", "name"]
 
 
 class RouteSerializer(serializers.ModelSerializer):

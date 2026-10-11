@@ -13,3 +13,4 @@ python-dotenv
 dj-database-url==2.3.0
 whitenoise[brotli]==6.9.0
 reportlab
+openpyxl==3.1.5

@@ -6,15 +6,19 @@ import PageShell, { PageTitle } from "../../components/PageShell";
 import Table from "../../components/Table";
 import { Banner, ConfirmModal, FormModal, Field, SectionBlock, StatusBadge } from "../../components/ui";
 import Icon from "../../components/Icon";
-import { inputStyle } from "../../styles/formStyles";
+import { inputStyle, selectStyle } from "../../styles/formStyles";
 import { btn, colors, fonts } from "../../theme";
 import { cachedThumbnail, planThumbnail, pruneThumbnails } from "../../components/maps/planThumbnail";
 import { downloadFile } from "../../utils/transferFiles";
+import { AddressProgress, fillAddresses, hasNoAddress } from "../../components/StopImport";
+import RoadLineBuilder from "../../components/RoadLineBuilder";
 import {
   getRoutePlans, getRoutePlan, updateRoutePlan, deleteRoutePlan, duplicateRoutePlan, importRoutePlan,
   exportRoutePlan, previewRoutePlan, activateRoutePlan, getRoutePlanAttention,
 } from "../../services/transportService";
 
+// Any spreadsheet with these headings works; extra columns (e.g. "Map link") are ignored.
+// Without Stop order or times, each route runs from the stop farthest from campus inwards.
 const SAMPLE_CSV =
   "route_name,route_description,route_status,stop_order,name,latitude,longitude,address,morning_eta,evening_eta\n" +
   "Gulshan Route,Via University Road,published,1,Gulshan Chowrangi,24.921500,67.084700,,07:05,16:40\n";
@@ -123,6 +127,11 @@ function PlanCard({ plan, busy, onActivate, onView, onExport, onCopy, onRename, 
 
 function RoutePlansPage() {
   const fileInput = useRef(null);
+  const fillCancelled = useRef(false);
+  const previewSeq = useRef(0); // only the newest preview request may update the dialog
+  const [previewing, setPreviewing] = useState(false);
+  const [activations, setActivations] = useState(0); // remounts the road line builder after each activation
+  const [imported, setImported] = useState(null); // { name, routes, created, reused, done, total, blocked? }
   const [plans, setPlans] = useState([]);
   const [attention, setAttention] = useState([]);
   const [notice, setNotice] = useState(null); // { variant, text, items? }
@@ -138,6 +147,7 @@ function RoutePlansPage() {
       .catch(() => setNotice({ variant: "danger", text: "Failed to load route plans." }));
 
   useEffect(() => { fetchData(); }, []);
+  useEffect(() => () => { fillCancelled.current = true; }, []); // leaving the page stops the address fill
 
   const fail = (text) => (err) => setNotice({ variant: "danger", text, items: errorList(err) });
 
@@ -157,12 +167,35 @@ function RoutePlansPage() {
     }
   };
 
-  const handleFile = (e) => {
+  // Import creates the plan (inactive) and its new stops at once; addresses are then
+  // looked up one stop per second while the popup shows progress.
+  const handleFile = async (e) => {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file) return;
     setNotice(null);
-    run(() => importRoutePlan(file), `Imported "${file.name}" as a new plan. It stays inactive until you activate it.`, `"${file.name}" was not imported. Fix these and try again:`);
+    setBusy(true);
+    let res;
+    try {
+      res = await importRoutePlan(file);
+      await fetchData();
+    } catch (err) {
+      fail(`"${file.name}" was not imported. Fix these and try again:`)(err);
+      return;
+    } finally {
+      setBusy(false);
+    }
+    const created = res.data.stops?.created || [];
+    const targets = created.filter(hasNoAddress);
+    setImported({ name: res.data.name, routes: res.data.route_count, created: created.length, reused: res.data.stops?.reused ?? 0, done: 0, total: targets.length });
+    fillCancelled.current = false;
+    const started = await fillAddresses(targets, (done) => setImported((current) => current && { ...current, done }), () => fillCancelled.current);
+    if (!started) setImported((current) => current && { ...current, total: 0, blocked: true });
+  };
+
+  const closeImported = () => {
+    fillCancelled.current = true; // stops not reached keep "N/A"; "Fill from map" on the Stops page finishes them
+    setImported(null);
   };
 
   const exportAs = (plan, format) =>
@@ -172,22 +205,52 @@ function RoutePlansPage() {
 
   const openView = (plan) => getRoutePlan(plan.id).then((res) => setViewing(res.data)).catch(fail(`Could not open "${plan.name}".`));
 
-  const openActivate = (plan) => {
-    setNotice(null);
-    previewRoutePlan(plan.id).then((res) => setActivating({ plan, report: res.data })).catch(fail(`Could not preview "${plan.name}".`));
+  // The preview is the real switch-over run and rolled back, so it is redone whenever a bus pick changes.
+  // While one runs the dialog is locked; if it fails, the previous picks and report stay and the admin is told,
+  // so what Activate sends is always exactly what the dialog shows.
+  const loadPreview = (plan, picks, previous = null) => {
+    const seq = ++previewSeq.current;
+    setPreviewing(true);
+    if (!previous) setNotice({ variant: "info", text: `Preparing the activation preview for "${plan.name}"…` });
+    const keepPrevious = (problem) => setActivating({ ...previous, problem });
+    return previewRoutePlan(plan.id, picks)
+      .then((res) => {
+        if (seq !== previewSeq.current) return;
+        if (!previous) setNotice(null);
+        if (res.data.busy && previous) keepPrevious(res.data.errors[0]);
+        else setActivating({ plan, picks, report: res.data });
+      })
+      .catch((err) => {
+        if (seq !== previewSeq.current) return;
+        if (previous) keepPrevious("The preview could not be updated, so that choice was not applied. Please pick it again.");
+        else fail(`Could not preview "${plan.name}".`)(err);
+      })
+      .finally(() => { if (seq === previewSeq.current) setPreviewing(false); });
+  };
+
+  const openActivate = (plan) => loadPreview(plan, {});
+
+  const pickBusRoute = (assignmentId, routeName) => {
+    const picks = { ...activating.picks, [assignmentId]: routeName };
+    if (!routeName) delete picks[assignmentId];
+    loadPreview(activating.plan, picks, activating);
   };
 
   const confirmActivate = async (e) => {
     e.preventDefault();
-    const { plan, report } = activating;
+    if (previewing) return; // Activate always sends the picks the finished preview showed
+    const { plan, report, picks } = activating;
     if (report.errors.length) { setActivating(null); return; }
-    const affected = report.affected_students.length;
+    const moved = report.moved_students.length;
     const done = await run(
-      () => activateRoutePlan(plan.id),
-      `"${plan.name}" is now the active plan.${affected ? ` ${plural(affected, "student")} ${affected === 1 ? "was" : "were"} notified to pick a new stop.` : ""}`,
+      () => activateRoutePlan(plan.id, picks),
+      `"${plan.name}" is now the active plan.${moved ? ` ${plural(moved, "student")} ${moved === 1 ? "was" : "were"} moved to the nearest new stop and notified.` : ""}`,
       `Could not activate "${plan.name}".`,
     );
-    if (done) setActivating(null);
+    if (done) {
+      setActivating(null);
+      setActivations((n) => n + 1); // new routes have no road lines yet: build them now
+    }
   };
 
   const submitName = async (e) => {
@@ -217,13 +280,21 @@ function RoutePlansPage() {
     { key: "reason", label: "Problem" },
   ];
 
-  const report = activating?.report;
+  // A preview that fails returns only { errors }; fill the rest so the dialog can render.
+  const report = activating && {
+    routes: { created: [], updated: [], unchanged: 0, removed: [], archived: [] },
+    stops: { created: [], reactivated: [], removed: 0, deactivated: 0 },
+    buses: [], plan_routes: [], moved_students: [], affected_students: [], errors: [],
+    ...activating.report,
+  };
 
   return (
     <PageShell role="staff" title="Admin — Route Plans">
       <PageTitle sub="A route plan is a full set of routes, stops and ETAs. One plan is active for everyone; activate another to switch. To change the active plan, edit its routes on the Routes page.">
         Route Plans
       </PageTitle>
+
+      {activations > 0 && <RoadLineBuilder key={activations} autoStart />}
 
       {notice && (
         <Banner variant={notice.variant}>
@@ -234,6 +305,24 @@ function RoutePlansPage() {
             </ul>
           )}
         </Banner>
+      )}
+
+      {imported && (
+        <FormModal
+          title="Plan imported"
+          sub={`"${imported.name}" is saved as an inactive plan. The live routes change only when you activate it.`}
+          submitLabel="Done"
+          onSubmit={(e) => { e.preventDefault(); closeImported(); }}
+          onClose={closeImported}
+          width="560px"
+        >
+          <div style={{ ...fullRow, gap: 14 }}>
+            <p style={{ margin: 0, fontSize: 14 }}>
+              <strong>{imported.routes}</strong> routes · <strong>{imported.created}</strong> new stops · <strong>{imported.reused}</strong> existing stops reused
+            </p>
+            <AddressProgress done={imported.done} total={imported.total} blocked={imported.blocked} />
+          </div>
+        </FormModal>
       )}
 
       {deleting && (
@@ -297,13 +386,14 @@ function RoutePlansPage() {
         <FormModal
           title={`Activate "${activating.plan.name}"?`}
           sub={`This replaces the routes everyone sees${activePlan ? `. The current plan "${activePlan.name}" is saved as it is now and can be activated again later` : ""}.`}
-          submitLabel={report.errors.length ? "Close" : "Activate Plan"}
+          submitLabel={report.errors.length ? "Close" : previewing ? "Updating preview…" : "Activate Plan"}
           loading={busy}
           onSubmit={confirmActivate}
           onClose={() => { if (!busy) setActivating(null); }}
           width="640px"
         >
           <div style={fullRow}>
+            {activating.problem && <Banner variant="warning">{activating.problem}</Banner>}
             {report.errors.length > 0 && (
               <Banner variant="danger">
                 This plan cannot be activated yet:
@@ -311,17 +401,57 @@ function RoutePlansPage() {
               </Banner>
             )}
             <p style={{ margin: 0, fontSize: 14 }}>
-              Routes: <strong>{report.routes.created.length}</strong> new · <strong>{report.routes.updated.length}</strong> changed · <strong>{report.routes.unchanged}</strong> unchanged · <strong>{report.routes.archived.length}</strong> archived
+              Routes: <strong>{report.routes.created.length}</strong> new · <strong>{report.routes.updated.length}</strong> changed · <strong>{report.routes.unchanged}</strong> unchanged · <strong>{report.routes.removed.length}</strong> removed
+              {report.stops.removed > 0 && <> · Stops: <strong>{report.stops.removed}</strong> no longer used are removed</>}
             </p>
-            {report.affected_students.length > 0 && (
+            {report.buses.length > 0 && (
+              <div>
+                <strong style={{ fontSize: 13 }}>Buses on routes being removed ({report.buses.length})</strong>
+                <p style={{ ...mutedText, margin: "4px 0 8px" }}>
+                  Pick the new route for each bus. Its seated students move with it to the nearest stop on that route and keep their seats.
+                  A bus left unassigned can be assigned later on the Assignments page; its students are queued for a seat on their nearest new route.
+                </p>
+                <div style={{ display: "grid", gap: 8 }}>
+                  {report.buses.map((bus) => (
+                    <label key={bus.assignment_id} style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap", fontSize: 13 }}>
+                      <span style={{ minWidth: 220 }}><strong>{bus.bus}</strong> · {bus.driver} <span style={mutedText}>(was on {bus.from_route})</span></span>
+                      <select
+                        value={activating.picks[bus.assignment_id] || ""}
+                        disabled={busy || previewing}
+                        onChange={(e) => pickBusRoute(bus.assignment_id, e.target.value)}
+                        style={{ ...selectStyle, width: "auto", minWidth: 200, flex: "1 1 200px" }}
+                      >
+                        <option value="">Leave unassigned</option>
+                        {report.plan_routes
+                          .filter((route) => !bus.contractor || !route.contractor || route.contractor === bus.contractor)
+                          .map((route) => <option key={route.name} value={route.name}>{route.name}</option>)}
+                      </select>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+            {report.moved_students.some((s) => s.far) && (
               <Banner variant="warning">
-                {plural(report.affected_students.length, "registered student")} will be on a route or stop this plan does not serve. They keep their registration and seat, are notified to request a new stop, and are listed under "Needs attention".
+                Some students would be moved more than 1 km. Check them below; after activation they can be moved on Route Change Requests or Student Bus Assignments.
               </Banner>
             )}
-            <NoteList title="Affected students" tone={colors.warningText} items={report.affected_students.map((s) => `${s.roll_number} · ${s.name}: ${s.reason}`)} />
+            <NoteList
+              title="Students moved to the nearest new stop (each is notified)"
+              items={report.moved_students.map((s) =>
+                `${s.far ? "⚠ " : ""}${s.roll_number} · ${s.name}: ${s.from_stop} → ${s.to_stop} on ${s.to_route} (${s.distance_m} m)` +
+                (s.seat === "kept" ? " · keeps seat" : s.seat === "queued" ? " · queued for a seat" : ""))}
+            />
+            {report.affected_students.length > 0 && (
+              <Banner variant="warning">
+                {plural(report.affected_students.length, "registered student")} could not be given a stop on the new routes and will be listed under "Needs attention".
+              </Banner>
+            )}
+            <NoteList title="Students without a stop" tone={colors.warningText} items={report.affected_students.map((s) => `${s.roll_number} · ${s.name}: ${s.reason}`)} />
             <NoteList title="New routes" items={report.routes.created} />
             <NoteList title="Changed routes" items={report.routes.updated} />
-            <NoteList title="Archived routes (hidden, not deleted; their buses and riders are kept)" items={report.routes.archived} />
+            <NoteList title="Routes removed" items={report.routes.removed} />
+            <NoteList title="Routes kept as archived (older semesters' registrations still use them)" items={report.routes.archived} />
             <NoteList title="New stops to create" items={report.stops.created} />
             <NoteList title="Inactive stops to reactivate" items={report.stops.reactivated} />
           </div>
@@ -332,12 +462,12 @@ function RoutePlansPage() {
         <div style={group}>
           <span style={groupLabel}><Icon name="upload" /> Import plan</span>
           <button type="button" style={smallBtn} onClick={() => fileInput.current?.click()} disabled={busy}>
-            <Icon name="file" size={14} /> {busy ? "Working…" : "Choose CSV or JSON file"}
+            <Icon name="file" size={14} /> {busy ? "Working…" : "Choose Excel, CSV or JSON file"}
           </button>
           <a href={`data:text/csv;charset=utf-8,${encodeURIComponent(SAMPLE_CSV)}`} download="route_plan_sample.csv" style={{ ...inline, ...mutedText }}>
             <Icon name="download" size={13} /> Sample CSV
           </a>
-          <input ref={fileInput} type="file" accept=".csv,.json,text/csv,application/json" hidden onChange={handleFile} />
+          <input ref={fileInput} type="file" accept=".xlsx,.csv,.json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/csv,application/json" hidden onChange={handleFile} />
         </div>
         {activePlan && (
           <div style={group}>

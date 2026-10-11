@@ -125,7 +125,7 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
-    queryset = Semester.objects.all()
+    queryset = Semester.objects.order_by("id")
     serializer_class = SemesterSerializer
     permission_classes = [IsStudentCreateOnly] # Students create, Admin full acccess
 

@@ -1,0 +1,2555 @@
+{
+ "transport_notification": [
+  {
+   "id": 23,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-9090 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-04-21T18:51:40.822246+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 28,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 26K-0911 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-04-30T22:11:08.323159+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 32,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 20K-1234 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-01T14:36:06.723167+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 36,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 19K-1078 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-02T13:54:34.327936+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 40,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-9600 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-04T07:39:04.376259+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 44,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 20K-1065 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-04T10:28:51.494588+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 48,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-0099 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-04T11:23:34.015653+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 53,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-0621 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-05T03:47:21.803373+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 54,
+   "title": "Seat Allocation Update",
+   "message": "Your seat has been allocated. Seat No: 7",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-05-05T05:38:37.41311+00:00",
+   "user_id": 63
+  },
+  {
+   "id": 55,
+   "title": "Fee Verified",
+   "message": "Your transport fee for Spring 2024 has been verified. Your registration is now approved.",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-05-05T05:38:37.450545+00:00",
+   "user_id": 63
+  },
+  {
+   "id": 57,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-3000 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-05T06:07:51.064972+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 61,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-0675 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-11T11:32:21.580037+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 62,
+   "title": "Seat Allocation Update",
+   "message": "Your seat has been allocated. Seat No: 8",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-11T11:32:43.793695+00:00",
+   "user_id": 65
+  },
+  {
+   "id": 63,
+   "title": "Fee Verified",
+   "message": "Your transport fee for Spring 2024 has been verified. Your registration is now approved.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-11T11:32:43.807764+00:00",
+   "user_id": 65
+  },
+  {
+   "id": 64,
+   "title": "Route Change Approved",
+   "message": "Your route change request to 6B has been approved. New stop: Fast. Seat no: 1.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-12T22:58:36.702458+00:00",
+   "user_id": 65
+  },
+  {
+   "id": 65,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-0769 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-13T09:05:34.811241+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 69,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-0769 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-13T09:54:25.103082+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 70,
+   "title": "Seat Allocation Update",
+   "message": "Your seat has been allocated. Seat No: 2",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-05-13T09:55:43.634258+00:00",
+   "user_id": 70
+  },
+  {
+   "id": 71,
+   "title": "Fee Verified",
+   "message": "Your transport fee for Spring 2024 has been verified. Your registration is now approved.",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-05-13T09:55:44.152362+00:00",
+   "user_id": 70
+  },
+  {
+   "id": 72,
+   "title": "Route Change Approved",
+   "message": "Your route change request to 5B has been approved. New stop: Karimabad. Seat no: 1.",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-05-13T09:57:47.114038+00:00",
+   "user_id": 70
+  },
+  {
+   "id": 73,
+   "title": "Fee Payment Received (Stripe + OTP)",
+   "message": "Student 23K-0531 has paid transport fees for Spring 2024 via Stripe. Amount: PKR 45000.00. Please verify.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-05-13T17:42:09.624805+00:00",
+   "user_id": 51
+  },
+  {
+   "id": 74,
+   "title": "Seat Allocation Update",
+   "message": "Your seat has been allocated. Seat No: 2",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-06-04T20:05:40.390193+00:00",
+   "user_id": 71
+  },
+  {
+   "id": 75,
+   "title": "Fee Verified",
+   "message": "Your transport fee for Spring 2024 has been verified. Your registration is now approved.",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-06-04T20:05:40.976966+00:00",
+   "user_id": 71
+  },
+  {
+   "id": 76,
+   "title": "Incident Report Approved",
+   "message": "Your Traffic Jam incident report has been approved and is now visible on the live map.",
+   "type": "info",
+   "is_read": true,
+   "created_at": "2026-07-25T10:27:38.463371+00:00",
+   "user_id": 65
+  },
+  {
+   "id": 77,
+   "title": "Seat Allocation Update",
+   "message": "Seat No: 2 is being held for you. It is confirmed once the transport fee is paid.",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-09-08T06:22:15.215922+00:00",
+   "user_id": 79
+  },
+  {
+   "id": 78,
+   "title": "Registration cancelled",
+   "message": "Your transport registration has been cancelled. Your seat has been released to the next student in the queue.",
+   "type": "info",
+   "is_read": false,
+   "created_at": "2026-09-08T06:22:51.577769+00:00",
+   "user_id": 79
+  },
+  {
+   "id": 81,
+   "title": "You are on the waiting list",
+   "message": "Route 5B is currently full. You are number 1 of 1 in the queue. You have not been charged \u2014 a challan is only issued once a seat is confirmed for you.",
+   "type": "warning",
+   "is_read": false,
+   "created_at": "2026-09-13T09:14:17.222903+00:00",
+   "user_id": 80
+  }
+ ],
+ "transport_route": [
+  {
+   "id": 1,
+   "name": "6B",
+   "description": "Gulshan - Johar - Airport - Fast",
+   "is_active": true,
+   "created_at": "2026-03-24T08:22:50.14858+00:00",
+   "updated_at": "2026-03-24T08:22:50.148601+00:00",
+   "geometry": null,
+   "geometry_updated_at": null,
+   "status": "published"
+  },
+  {
+   "id": 2,
+   "name": "5B",
+   "description": "North Nazimabad - Karimabad - Hassan Square - Millinium - Fast",
+   "is_active": true,
+   "created_at": "2026-03-28T13:21:04.784354+00:00",
+   "updated_at": "2026-03-28T13:21:04.784375+00:00",
+   "geometry": null,
+   "geometry_updated_at": null,
+   "status": "published"
+  },
+  {
+   "id": 3,
+   "name": "11A",
+   "description": "North Nazimabad - Sohrab Goth - Gulshan - FAST",
+   "is_active": true,
+   "created_at": "2026-05-04T11:31:41.805162+00:00",
+   "updated_at": "2026-05-04T11:31:41.805172+00:00",
+   "geometry": null,
+   "geometry_updated_at": null,
+   "status": "published"
+  }
+ ],
+ "transport_routeassignment": [
+  {
+   "id": 1,
+   "is_active": true,
+   "created_at": "2026-03-24T08:28:10.779978+00:00",
+   "bus_id": 1,
+   "driver_id": 1,
+   "route_id": 1,
+   "semester_id": 1
+  },
+  {
+   "id": 2,
+   "is_active": true,
+   "created_at": "2026-03-28T13:26:58.315768+00:00",
+   "bus_id": 2,
+   "driver_id": 2,
+   "route_id": 2,
+   "semester_id": 1
+  },
+  {
+   "id": 3,
+   "is_active": true,
+   "created_at": "2026-05-04T11:51:02.552834+00:00",
+   "bus_id": 3,
+   "driver_id": 3,
+   "route_id": 3,
+   "semester_id": 1
+  }
+ ],
+ "transport_routechangerequest": [
+  {
+   "id": 4,
+   "status": "Cancelled",
+   "admin_remarks": "N/A",
+   "requested_at": "2026-05-12T22:45:17.67148+00:00",
+   "resolved_at": "2026-05-12T22:45:23.088055+00:00",
+   "current_route_id": 1,
+   "requested_route_id": 1,
+   "registration_id": 18,
+   "requested_stop_id": 4
+  },
+  {
+   "id": 5,
+   "status": "Cancelled",
+   "admin_remarks": "N/A",
+   "requested_at": "2026-05-12T22:45:30.499982+00:00",
+   "resolved_at": "2026-05-12T22:48:48.250869+00:00",
+   "current_route_id": 1,
+   "requested_route_id": 2,
+   "registration_id": 18,
+   "requested_stop_id": 8
+  },
+  {
+   "id": 6,
+   "status": "Approved",
+   "admin_remarks": "",
+   "requested_at": "2026-05-12T22:48:59.126879+00:00",
+   "resolved_at": "2026-05-12T22:58:36.559644+00:00",
+   "current_route_id": 1,
+   "requested_route_id": 1,
+   "registration_id": 18,
+   "requested_stop_id": 4
+  },
+  {
+   "id": 8,
+   "status": "Approved",
+   "admin_remarks": "",
+   "requested_at": "2026-05-13T09:56:56.051563+00:00",
+   "resolved_at": "2026-05-13T09:57:46.998157+00:00",
+   "current_route_id": 1,
+   "requested_route_id": 2,
+   "registration_id": 20,
+   "requested_stop_id": 6
+  }
+ ],
+ "transport_bus": [
+  {
+   "id": 1,
+   "bus_number": "ABC-123",
+   "capacity": 30,
+   "model": "2024",
+   "is_active": true,
+   "created_at": "2026-03-24T08:21:56.363707+00:00",
+   "updated_at": "2026-04-26T17:51:13.343965+00:00",
+   "tracker_token": "YgIw0Z",
+   "is_off_route": false,
+   "last_off_route_alert_at": null
+  },
+  {
+   "id": 2,
+   "bus_number": "DEF-456",
+   "capacity": 2,
+   "model": "2023",
+   "is_active": true,
+   "created_at": "2026-03-24T08:22:05.687435+00:00",
+   "updated_at": "2026-09-08T06:20:09.021924+00:00",
+   "tracker_token": "",
+   "is_off_route": false,
+   "last_off_route_alert_at": null
+  },
+  {
+   "id": 3,
+   "bus_number": "GHI-789",
+   "capacity": 30,
+   "model": "2025",
+   "is_active": true,
+   "created_at": "2026-05-04T11:27:23.587261+00:00",
+   "updated_at": "2026-05-04T11:27:23.587284+00:00",
+   "tracker_token": "",
+   "is_off_route": false,
+   "last_off_route_alert_at": null
+  }
+ ],
+ "transport_buslocationping": [],
+ "transport_challan": [
+  {
+   "id": 16,
+   "amount": 45000,
+   "status": "paid",
+   "created_at": "2026-05-05T03:45:47.186456+00:00",
+   "registration_id": 16,
+   "student_id": 25,
+   "payment_due_at": null
+  },
+  {
+   "id": 18,
+   "amount": 45000,
+   "status": "paid",
+   "created_at": "2026-05-11T11:31:10.814769+00:00",
+   "registration_id": 18,
+   "student_id": 27,
+   "payment_due_at": null
+  },
+  {
+   "id": 20,
+   "amount": 45000,
+   "status": "paid",
+   "created_at": "2026-05-13T09:53:45.837569+00:00",
+   "registration_id": 20,
+   "student_id": 32,
+   "payment_due_at": null
+  },
+  {
+   "id": 21,
+   "amount": 45000,
+   "status": "paid",
+   "created_at": "2026-05-13T17:41:30.885009+00:00",
+   "registration_id": 21,
+   "student_id": 33,
+   "payment_due_at": null
+  },
+  {
+   "id": 22,
+   "amount": 45000,
+   "status": "unpaid",
+   "created_at": "2026-05-14T19:31:08.244785+00:00",
+   "registration_id": 22,
+   "student_id": 38,
+   "payment_due_at": null
+  },
+  {
+   "id": 23,
+   "amount": 45000,
+   "status": "unpaid",
+   "created_at": "2026-05-15T14:04:37.350237+00:00",
+   "registration_id": 23,
+   "student_id": 39,
+   "payment_due_at": null
+  },
+  {
+   "id": 25,
+   "amount": 0,
+   "status": "unpaid",
+   "created_at": "2026-09-08T06:24:20.384015+00:00",
+   "registration_id": 24,
+   "student_id": 41,
+   "payment_due_at": null
+  },
+  {
+   "id": 27,
+   "amount": 0,
+   "status": "unpaid",
+   "created_at": "2026-09-13T09:01:33.486512+00:00",
+   "registration_id": 25,
+   "student_id": 42,
+   "payment_due_at": null
+  },
+  {
+   "id": 28,
+   "amount": 0,
+   "status": "unpaid",
+   "created_at": "2026-09-13T09:14:28.543422+00:00",
+   "registration_id": 26,
+   "student_id": 42,
+   "payment_due_at": null
+  }
+ ],
+ "transport_complaint": [
+  {
+   "id": 2,
+   "category": "General",
+   "subject": "Driver complaint",
+   "description": "Ye driver rizwan kafi galam galoch karta hae, isko sudharo",
+   "status": "Resolved",
+   "priority": "High",
+   "admin_response": "...",
+   "created_at": "2026-05-12T22:47:13.702807+00:00",
+   "resolved_at": "2026-05-13T09:58:14.303102+00:00",
+   "resolved_by_id": 51,
+   "submitted_by_id": 65,
+   "route_id": null,
+   "semester_id": null
+  },
+  {
+   "id": 4,
+   "category": "General",
+   "subject": "timely arrival",
+   "description": "buses dont arrive on time",
+   "status": "Resolved",
+   "priority": "High",
+   "admin_response": "it will arrive on time next time",
+   "created_at": "2026-05-13T09:57:21.272355+00:00",
+   "resolved_at": "2026-05-13T09:58:08.57668+00:00",
+   "resolved_by_id": 51,
+   "submitted_by_id": 70,
+   "route_id": null,
+   "semester_id": null
+  }
+ ],
+ "transport_crimeriskzone": [],
+ "transport_driver": [
+  {
+   "id": 1,
+   "name": "Rizwan",
+   "cnic": "67658954",
+   "license_no": "2468",
+   "phone": "7523735",
+   "address": "Johar",
+   "is_available": true,
+   "created_at": "2026-03-24T08:22:34.595152+00:00",
+   "updated_at": "2026-09-27T14:54:55.187685+00:00",
+   "user_id": 82
+  },
+  {
+   "id": 2,
+   "name": "Shayan",
+   "cnic": "242353645645",
+   "license_no": "123232",
+   "phone": "459064004645",
+   "address": "Airport",
+   "is_available": true,
+   "created_at": "2026-03-28T13:26:40.179484+00:00",
+   "updated_at": "2026-03-28T13:26:40.179496+00:00",
+   "user_id": null
+  },
+  {
+   "id": 3,
+   "name": "Suhaib",
+   "cnic": "4210118856568",
+   "license_no": "1234",
+   "phone": "03077899050",
+   "address": "Bahria Town",
+   "is_available": true,
+   "created_at": "2026-05-04T11:31:15.467325+00:00",
+   "updated_at": "2026-05-04T11:31:15.467334+00:00",
+   "user_id": null
+  }
+ ],
+ "transport_externalcrimeevent": [],
+ "transport_feeverification": [
+  {
+   "id": 14,
+   "amount": 45000,
+   "is_verified": true,
+   "challan_number": "CHN-0016",
+   "verified_at": "2026-05-05T05:38:36.882078+00:00",
+   "created_at": "2026-05-05T03:47:21.796305+00:00",
+   "verified_by_id": 51,
+   "semester_id": 1,
+   "student_id": 25
+  },
+  {
+   "id": 16,
+   "amount": 45000,
+   "is_verified": true,
+   "challan_number": "CHN-0018",
+   "verified_at": "2026-05-11T11:32:43.738285+00:00",
+   "created_at": "2026-05-11T11:32:21.54655+00:00",
+   "verified_by_id": 51,
+   "semester_id": 1,
+   "student_id": 27
+  },
+  {
+   "id": 18,
+   "amount": 45000,
+   "is_verified": true,
+   "challan_number": "CHN-0020",
+   "verified_at": "2026-05-13T09:55:42.41851+00:00",
+   "created_at": "2026-05-13T09:54:24.926682+00:00",
+   "verified_by_id": 51,
+   "semester_id": 1,
+   "student_id": 32
+  },
+  {
+   "id": 19,
+   "amount": 45000,
+   "is_verified": true,
+   "challan_number": "CHN-0021",
+   "verified_at": "2026-06-04T20:05:38.94111+00:00",
+   "created_at": "2026-05-13T17:42:09.424061+00:00",
+   "verified_by_id": 51,
+   "semester_id": 1,
+   "student_id": 33
+  }
+ ],
+ "transport_incident": [
+  {
+   "id": 1,
+   "incident_type": "traffic_jam",
+   "severity": "high",
+   "latitude": 24.932892,
+   "longitude": 67.070853,
+   "radius_meters": 750,
+   "description": "",
+   "status": "Approved",
+   "admin_notes": "",
+   "reviewed_at": "2026-07-25T10:27:38.336425+00:00",
+   "created_at": "2026-07-25T10:23:51.597767+00:00",
+   "expires_at": null,
+   "reported_by_id": 65,
+   "reviewed_by_id": 51,
+   "occurred_at": "2026-07-25T10:23:51.597353+00:00"
+  },
+  {
+   "id": 2,
+   "incident_type": "robbery",
+   "severity": "low",
+   "latitude": 24.917289,
+   "longitude": 67.095952,
+   "radius_meters": 300,
+   "description": "",
+   "status": "Pending",
+   "admin_notes": "",
+   "reviewed_at": null,
+   "created_at": "2026-07-26T10:07:10.315096+00:00",
+   "expires_at": null,
+   "reported_by_id": 65,
+   "reviewed_by_id": null,
+   "occurred_at": "2026-07-26T10:07:10.314639+00:00"
+  }
+ ],
+ "transport_maintenanceschedule": [],
+ "transport_routestop": [
+  {
+   "id": 1,
+   "stop_order": 2,
+   "morning_eta": "07:00:00",
+   "evening_eta": "17:00:00",
+   "route_id": 1,
+   "stop_id": 1
+  },
+  {
+   "id": 2,
+   "stop_order": 3,
+   "morning_eta": "07:10:00",
+   "evening_eta": "16:30:00",
+   "route_id": 1,
+   "stop_id": 2
+  },
+  {
+   "id": 3,
+   "stop_order": 4,
+   "morning_eta": "07:40:00",
+   "evening_eta": "16:20:00",
+   "route_id": 1,
+   "stop_id": 3
+  },
+  {
+   "id": 5,
+   "stop_order": 5,
+   "morning_eta": "08:00:00",
+   "evening_eta": "16:00:00",
+   "route_id": 1,
+   "stop_id": 4
+  },
+  {
+   "id": 6,
+   "stop_order": 1,
+   "morning_eta": "07:00:00",
+   "evening_eta": "06:23:00",
+   "route_id": 2,
+   "stop_id": 5
+  },
+  {
+   "id": 7,
+   "stop_order": 2,
+   "morning_eta": "07:20:00",
+   "evening_eta": "18:19:00",
+   "route_id": 2,
+   "stop_id": 6
+  },
+  {
+   "id": 8,
+   "stop_order": 3,
+   "morning_eta": "07:28:00",
+   "evening_eta": "17:40:00",
+   "route_id": 2,
+   "stop_id": 7
+  },
+  {
+   "id": 9,
+   "stop_order": 4,
+   "morning_eta": "07:40:00",
+   "evening_eta": "17:05:00",
+   "route_id": 2,
+   "stop_id": 8
+  },
+  {
+   "id": 10,
+   "stop_order": 5,
+   "morning_eta": "08:00:00",
+   "evening_eta": "16:15:00",
+   "route_id": 2,
+   "stop_id": 4
+  },
+  {
+   "id": 11,
+   "stop_order": 1,
+   "morning_eta": "06:50:00",
+   "evening_eta": "18:00:00",
+   "route_id": 1,
+   "stop_id": 5
+  },
+  {
+   "id": 12,
+   "stop_order": 2,
+   "morning_eta": "07:45:00",
+   "evening_eta": "16:00:00",
+   "route_id": 3,
+   "stop_id": 4
+  },
+  {
+   "id": 13,
+   "stop_order": 1,
+   "morning_eta": "07:00:00",
+   "evening_eta": "17:00:00",
+   "route_id": 3,
+   "stop_id": 1
+  }
+ ],
+ "transport_seatallocation": [
+  {
+   "id": 16,
+   "seat_number": 1,
+   "allocated_at": "2026-05-05T05:38:37.363059+00:00",
+   "route_assignment_id": 2,
+   "registration_id": 16
+  },
+  {
+   "id": 19,
+   "seat_number": 1,
+   "allocated_at": "2026-05-12T22:58:36.40599+00:00",
+   "route_assignment_id": 1,
+   "registration_id": 18
+  },
+  {
+   "id": 23,
+   "seat_number": 2,
+   "allocated_at": "2026-05-13T09:57:46.883234+00:00",
+   "route_assignment_id": 2,
+   "registration_id": 20
+  },
+  {
+   "id": 24,
+   "seat_number": 2,
+   "allocated_at": "2026-06-04T20:05:40.005536+00:00",
+   "route_assignment_id": 1,
+   "registration_id": 21
+  }
+ ],
+ "transport_semester": [
+  {
+   "id": 1,
+   "name": "Spring 2024",
+   "year": 2024,
+   "term": "Spring",
+   "start_date": "2024-01-01",
+   "end_date": "2024-06-01",
+   "is_active": true,
+   "registration_open": true,
+   "created_at": "2026-03-24T08:23:34.96634+00:00",
+   "registration_deadline": "2026-09-16T16:18:00+00:00",
+   "transport_fee": 5000
+  }
+ ],
+ "transport_semesterregistration": [
+  {
+   "id": 16,
+   "status": "Approved",
+   "registered_at": "2026-05-05T03:45:47.168209+00:00",
+   "updated_at": "2026-05-05T05:38:37.445527+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 5,
+   "student_id": 25
+  },
+  {
+   "id": 18,
+   "status": "Approved",
+   "registered_at": "2026-05-11T11:31:10.799109+00:00",
+   "updated_at": "2026-05-12T22:58:36.32937+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 4,
+   "student_id": 27
+  },
+  {
+   "id": 20,
+   "status": "Approved",
+   "registered_at": "2026-05-13T09:53:45.598271+00:00",
+   "updated_at": "2026-05-13T09:57:46.820898+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 6,
+   "student_id": 32
+  },
+  {
+   "id": 21,
+   "status": "Approved",
+   "registered_at": "2026-05-13T17:41:30.61021+00:00",
+   "updated_at": "2026-06-04T20:05:40.730325+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 1,
+   "student_id": 33
+  },
+  {
+   "id": 22,
+   "status": "Pending",
+   "registered_at": "2026-05-14T19:31:07.972104+00:00",
+   "updated_at": "2026-05-14T19:31:07.972117+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 2,
+   "student_id": 38
+  },
+  {
+   "id": 23,
+   "status": "Pending",
+   "registered_at": "2026-05-15T14:04:37.071803+00:00",
+   "updated_at": "2026-05-15T14:04:37.071814+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 3,
+   "student_id": 39
+  },
+  {
+   "id": 24,
+   "status": "Cancelled",
+   "registered_at": "2026-09-08T06:22:13.922081+00:00",
+   "updated_at": "2026-09-08T06:22:51.403232+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 5,
+   "student_id": 41
+  },
+  {
+   "id": 25,
+   "status": "Waitlisted",
+   "registered_at": "2026-09-13T08:49:57.555345+00:00",
+   "updated_at": "2026-09-13T09:14:16.286622+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 6,
+   "student_id": 42
+  }
+ ],
+ "transport_stop": [
+  {
+   "id": 1,
+   "name": "Gulshan",
+   "latitude": 24.927863,
+   "longitude": 67.088094,
+   "address": "Gulshan",
+   "created_at": "2026-03-24T08:24:02.334075+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 2,
+   "name": "Johar",
+   "latitude": 24.904637,
+   "longitude": 67.113506,
+   "address": "Johar",
+   "created_at": "2026-03-24T08:24:27.766964+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 3,
+   "name": "Airport",
+   "latitude": 24.886871,
+   "longitude": 67.15801,
+   "address": "abc",
+   "created_at": "2026-03-24T08:24:43.48621+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 4,
+   "name": "Fast",
+   "latitude": 24.856953,
+   "longitude": 67.264705,
+   "address": "Shah Latif",
+   "created_at": "2026-03-24T08:25:05.220442+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 5,
+   "name": "North Nazimabad",
+   "latitude": 24.95024,
+   "longitude": 67.054902,
+   "address": "North",
+   "created_at": "2026-03-28T13:21:32.403138+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 6,
+   "name": "Karimabad",
+   "latitude": 24.935,
+   "longitude": 67.05,
+   "address": "Meena",
+   "created_at": "2026-03-28T13:22:05.323638+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 7,
+   "name": "Hassan Square",
+   "latitude": 24.9213,
+   "longitude": 67.0598,
+   "address": "Square",
+   "created_at": "2026-03-28T13:22:35.384248+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 8,
+   "name": "Millinium",
+   "latitude": 24.9169,
+   "longitude": 67.1123,
+   "address": "Dalmia",
+   "created_at": "2026-03-28T13:23:07.458233+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 9,
+   "name": "test",
+   "latitude": 24.919175,
+   "longitude": 67.098982,
+   "address": "\u0631\u0627\u0634\u062f \u0645\u0646\u06c1\u0627\u0633 \u0631\u0648\u0688, Gulshan-e-Iqbal Block 11, \u0634\u0627\u0646\u062a\u06cc \u0646\u06af\u0631, \u06af\u0644\u0634\u0646 \u0627\u0642\u0628\u0627\u0644 \u0679\u0627\u0624\u0646, \u0636\u0644\u0639 \u06af\u0644\u0634\u0646, \u06a9\u0631\u0627\u0686\u06cc \u0688\u0648\u06cc\u0698\u0646, \u0633\u0646\u062f\u06be, 75300, \u067e\u0627\u06a9\u0633\u062a\u0627\u0646",
+   "created_at": "2026-09-01T04:11:16.456834+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "manual",
+   "provider_place_id": ""
+  },
+  {
+   "id": 10,
+   "name": "Babul Islam",
+   "latitude": 24.97614,
+   "longitude": 67.05541,
+   "address": "Bab-ul-Islam, Khawaja Ajmer Nagri Road, Sector 11-B, \u0627\u062c\u0645\u06cc\u0631 \u0646\u06af\u0631\u06cc, \u0646\u06cc\u0648 \u06a9\u0631\u0627\u0686\u06cc \u0679\u0627\u0624\u0646, \u0636\u0644\u0639 \u0646\u0627\u0638\u0645 \u0622\u0628\u0627\u062f, \u06a9\u0631\u0627\u0686\u06cc \u0688\u0648\u06cc\u0698\u0646, Kar\u0101chi District, \u0633\u0646\u062f\u06be, 74700, \u067e\u0627\u06a9\u0633\u062a\u0627\u0646",
+   "created_at": "2026-10-10T18:11:20.908288+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "import",
+   "provider_place_id": ""
+  },
+  {
+   "id": 11,
+   "name": "Dolmen Mall",
+   "latitude": 24.93556,
+   "longitude": 67.04023,
+   "address": "D 15, North Nazimabad Block C, \u0646\u0627\u0631\u062a\u06be \u0646\u0627\u0638\u0645 \u0622\u0628\u0627\u062f \u0679\u0627\u0624\u0646, \u0636\u0644\u0639 \u0646\u0627\u0638\u0645 \u0622\u0628\u0627\u062f, \u06a9\u0631\u0627\u0686\u06cc \u0688\u0648\u06cc\u0698\u0646, \u0633\u0646\u062f\u06be, 74700, \u067e\u0627\u06a9\u0633\u062a\u0627\u0646",
+   "created_at": "2026-10-10T18:11:20.908301+00:00",
+   "is_active": true,
+   "location_accuracy_m": null,
+   "location_source": "import",
+   "provider_place_id": ""
+  }
+ ],
+ "transport_studentprofile": [
+  {
+   "id": 25,
+   "roll_number": "23K-0621",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+92 309903000",
+   "address": "Bahria Town",
+   "created_at": "2026-05-05T03:43:51.863436+00:00",
+   "updated_at": "2026-05-05T03:43:51.863584+00:00",
+   "user_id": 63
+  },
+  {
+   "id": 27,
+   "roll_number": "23K-0675",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+92 309903987",
+   "address": "Gulshan-e-Iqbal",
+   "created_at": "2026-05-11T11:08:03.903172+00:00",
+   "updated_at": "2026-05-11T11:08:03.903185+00:00",
+   "user_id": 65
+  },
+  {
+   "id": 32,
+   "roll_number": "23K-0769",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+92 3077899052",
+   "address": "Gulshan",
+   "created_at": "2026-05-13T09:52:57.169603+00:00",
+   "updated_at": "2026-05-13T09:52:57.169616+00:00",
+   "user_id": 70
+  },
+  {
+   "id": 33,
+   "roll_number": "23K-0531",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+92 308 2616263",
+   "address": "Continental Bakers, gulshan block 1",
+   "created_at": "2026-05-13T17:39:54.145091+00:00",
+   "updated_at": "2026-05-13T17:39:54.145105+00:00",
+   "user_id": 71
+  },
+  {
+   "id": 34,
+   "roll_number": "23K-0061",
+   "department": "AI",
+   "batch": "2023",
+   "phone": "+923163677527",
+   "address": "Karachi",
+   "created_at": "2026-05-13T17:50:00.008614+00:00",
+   "updated_at": "2026-05-13T17:50:00.008626+00:00",
+   "user_id": 72
+  },
+  {
+   "id": 35,
+   "roll_number": "25k-0742",
+   "department": "CS",
+   "batch": "2025",
+   "phone": "0334 2406399",
+   "address": "Karachi Institute of Heart Disease",
+   "created_at": "2026-05-13T20:46:40.620772+00:00",
+   "updated_at": "2026-05-13T20:46:40.62079+00:00",
+   "user_id": 73
+  },
+  {
+   "id": 36,
+   "roll_number": "24k-1015",
+   "department": "CS",
+   "batch": "2024",
+   "phone": "03413691554",
+   "address": "Dow Medical",
+   "created_at": "2026-05-14T14:01:54.586628+00:00",
+   "updated_at": "2026-05-14T14:01:54.58664+00:00",
+   "user_id": 74
+  },
+  {
+   "id": 37,
+   "roll_number": "23K-0647",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "00000000000000000000",
+   "address": "ssssssssssssssssssssssssss",
+   "created_at": "2026-05-14T17:19:30.01453+00:00",
+   "updated_at": "2026-05-14T17:19:30.014541+00:00",
+   "user_id": 75
+  },
+  {
+   "id": 38,
+   "roll_number": "23K-0806",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+92 3020389941",
+   "address": "Highway",
+   "created_at": "2026-05-14T19:30:27.997959+00:00",
+   "updated_at": "2026-05-14T19:30:27.997974+00:00",
+   "user_id": 76
+  },
+  {
+   "id": 39,
+   "roll_number": "23k-0691",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "03338237882",
+   "address": "karachi",
+   "created_at": "2026-05-15T14:02:48.305571+00:00",
+   "updated_at": "2026-05-15T14:02:48.305589+00:00",
+   "user_id": 77
+  },
+  {
+   "id": 40,
+   "roll_number": "24k-0631",
+   "department": "cs",
+   "batch": "2024",
+   "phone": "+923352678296",
+   "address": "no",
+   "created_at": "2026-05-21T08:25:25.073663+00:00",
+   "updated_at": "2026-05-21T08:25:25.073677+00:00",
+   "user_id": 78
+  },
+  {
+   "id": 41,
+   "roll_number": "23k-3000",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+923345345665",
+   "address": "N Nazimabad",
+   "created_at": "2026-07-11T06:06:20.572112+00:00",
+   "updated_at": "2026-07-11T06:06:20.572125+00:00",
+   "user_id": 79
+  },
+  {
+   "id": 42,
+   "roll_number": "23k-0629",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "+92 3052047652",
+   "address": "Test",
+   "created_at": "2026-09-13T08:49:06.040765+00:00",
+   "updated_at": "2026-09-13T08:49:06.040777+00:00",
+   "user_id": 80
+  },
+  {
+   "id": 43,
+   "roll_number": "23K-0650",
+   "department": "CS",
+   "batch": "2023",
+   "phone": "0316-0127808",
+   "address": "korangu",
+   "created_at": "2026-10-09T10:12:43.45843+00:00",
+   "updated_at": "2026-10-09T10:12:43.458444+00:00",
+   "user_id": 83
+  }
+ ],
+ "transport_waitlist": [
+  {
+   "id": 1,
+   "position": 1,
+   "added_at": "2026-09-13T09:14:15.97261+00:00",
+   "registration_id": 25,
+   "status": "waiting",
+   "offered_at": null,
+   "offer_expires_at": null
+  }
+ ],
+ "transport_transportregistration": [
+  {
+   "id": 16,
+   "status": "Approved",
+   "created_at": "2026-05-05T03:45:47.097803+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 5,
+   "student_id": 25,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 18,
+   "status": "Approved",
+   "created_at": "2026-05-11T11:31:10.665047+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 4,
+   "student_id": 27,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 20,
+   "status": "Approved",
+   "created_at": "2026-05-13T09:53:45.3639+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 6,
+   "student_id": 32,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 21,
+   "status": "Approved",
+   "created_at": "2026-05-13T17:41:30.341306+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 1,
+   "student_id": 33,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 22,
+   "status": "Pending",
+   "created_at": "2026-05-14T19:31:07.705912+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 2,
+   "student_id": 38,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 23,
+   "status": "Pending",
+   "created_at": "2026-05-15T14:04:36.798916+00:00",
+   "route_id": 1,
+   "semester_id": 1,
+   "stop_id": 3,
+   "student_id": 39,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 24,
+   "status": "Cancelled",
+   "created_at": "2026-09-08T06:22:13.648528+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 5,
+   "student_id": 41,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 25,
+   "status": "Cancelled",
+   "created_at": "2026-09-13T08:49:56.87999+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 6,
+   "student_id": 42,
+   "fee_amount": 5000,
+   "is_paid": false
+  },
+  {
+   "id": 26,
+   "status": "Waitlisted",
+   "created_at": "2026-09-13T09:14:12.055968+00:00",
+   "route_id": 2,
+   "semester_id": 1,
+   "stop_id": 6,
+   "student_id": 42,
+   "fee_amount": 5000,
+   "is_paid": false
+  }
+ ],
+ "transport_crimerisksnapshot": [],
+ "transport_adminprofile": [
+  {
+   "id": 1,
+   "is_super_admin": true,
+   "custom_permissions": {},
+   "created_at": "2026-09-26T09:42:24.351197+00:00",
+   "updated_at": "2026-09-26T09:42:24.351214+00:00",
+   "created_by_id": null,
+   "user_id": 51,
+   "role_id": null
+  },
+  {
+   "id": 2,
+   "is_super_admin": false,
+   "custom_permissions": {
+    "students": "view",
+    "incidents": "view",
+    "route_requests": "view"
+   },
+   "created_at": "2026-09-26T09:46:33.840536+00:00",
+   "updated_at": "2026-09-26T09:46:33.840549+00:00",
+   "created_by_id": 51,
+   "user_id": 81,
+   "role_id": null
+  }
+ ],
+ "transport_adminactivitylog": [
+  {
+   "id": 1,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "e91cd44623ee415b8ae843e944ef408f",
+   "created_at": "2026-09-26T09:45:26.098324+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 2,
+   "actor_username": "admin",
+   "action": "create",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "81",
+   "object_repr": "admin2",
+   "description": "Created User \u201cadmin2\u201d",
+   "changes": {
+    "id": {
+     "to": 81
+    },
+    "is_staff": {
+     "to": true
+    },
+    "password": {
+     "to": "\u2022\u2022\u2022\u2022\u2022\u2022"
+    },
+    "username": {
+     "to": "admin2"
+    },
+    "is_active": {
+     "to": true
+    },
+    "date_joined": {
+     "to": "2026-09-26T09:46:32.135545+00:00"
+    },
+    "is_superuser": {
+     "to": false
+    }
+   },
+   "method": "POST",
+   "path": "/api/admin-management/admins/",
+   "ip_address": "127.0.0.1",
+   "request_id": "5ffa9a3098e54935977d5e0326dd28a0",
+   "created_at": "2026-09-26T09:46:33.502294+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 3,
+   "actor_username": "admin",
+   "action": "create",
+   "module": "admin_management",
+   "model_name": "Admin Profile",
+   "object_id": "2",
+   "object_repr": "admin2 (custom)",
+   "description": "Created Admin Profile \u201cadmin2 (custom)\u201d",
+   "changes": {
+    "id": {
+     "to": 2
+    },
+    "user": {
+     "to": 81
+    },
+    "created_at": {
+     "to": "2026-09-26T09:46:33.840536+00:00"
+    },
+    "created_by": {
+     "to": 51
+    },
+    "is_super_admin": {
+     "to": false
+    },
+    "custom_permissions": {
+     "to": {
+      "students": "view",
+      "incidents": "view",
+      "route_requests": "view"
+     }
+    }
+   },
+   "method": "POST",
+   "path": "/api/admin-management/admins/",
+   "ip_address": "127.0.0.1",
+   "request_id": "5ffa9a3098e54935977d5e0326dd28a0",
+   "created_at": "2026-09-26T09:46:34.025129+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 4,
+   "actor_username": "admin2",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "81",
+   "object_repr": "admin2",
+   "description": "admin2 signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "981e3290d21c48f4ae75f3bbee785b04",
+   "created_at": "2026-09-26T09:46:53.688542+00:00",
+   "actor_id": 81
+  },
+  {
+   "id": 5,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "d3a86b5ef54347b3b53976e6a553dfc4",
+   "created_at": "2026-09-26T10:35:17.598217+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 6,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "182.189.93.195",
+   "request_id": "bca88ced8d5f454796d99c5ffafe96e6",
+   "created_at": "2026-09-26T12:53:18.200058+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 7,
+   "actor_username": "admin2",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "81",
+   "object_repr": "admin2",
+   "description": "admin2 signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "182.189.93.195",
+   "request_id": "c7194d1287b14b969d03c69343a682a3",
+   "created_at": "2026-09-26T12:54:17.31108+00:00",
+   "actor_id": 81
+  },
+  {
+   "id": 8,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "182.189.93.195",
+   "request_id": "539cbbed3bd14d2cadc17c588e01191c",
+   "created_at": "2026-09-26T12:54:40.399362+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 9,
+   "actor_username": "admin2",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "81",
+   "object_repr": "admin2",
+   "description": "admin2 signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "182.189.93.195",
+   "request_id": "9038fcbb59fc433eb7ad1b2ed70d2296",
+   "created_at": "2026-09-26T13:03:16.550941+00:00",
+   "actor_id": 81
+  },
+  {
+   "id": 10,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "182.189.93.195",
+   "request_id": "4e913778b9184168b1a23306bb93244f",
+   "created_at": "2026-09-26T13:03:34.2457+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 11,
+   "actor_username": "admin2",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "81",
+   "object_repr": "admin2",
+   "description": "admin2 signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "338f3c5b1cfe41f18c66f61a7237e69c",
+   "created_at": "2026-09-27T14:53:23.83513+00:00",
+   "actor_id": 81
+  },
+  {
+   "id": 12,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "a58a58417f5445fab2918d4b78f11a4d",
+   "created_at": "2026-09-27T14:53:59.029714+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 13,
+   "actor_username": "admin",
+   "action": "create",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "82",
+   "object_repr": "rizwan",
+   "description": "Created User \u201crizwan\u201d",
+   "changes": {
+    "id": {
+     "to": 82
+    },
+    "is_staff": {
+     "to": false
+    },
+    "password": {
+     "to": "\u2022\u2022\u2022\u2022\u2022\u2022"
+    },
+    "username": {
+     "to": "rizwan"
+    },
+    "is_active": {
+     "to": true
+    },
+    "first_name": {
+     "to": "Rizwan"
+    },
+    "date_joined": {
+     "to": "2026-09-27T14:54:55.362658+00:00"
+    },
+    "is_superuser": {
+     "to": false
+    }
+   },
+   "method": "PATCH",
+   "path": "/api/drivers/1/",
+   "ip_address": "127.0.0.1",
+   "request_id": "e398d0b4465841b1aa20420f783ec747",
+   "created_at": "2026-09-27T14:54:57.468843+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 14,
+   "actor_username": "admin",
+   "action": "update",
+   "module": "fleet",
+   "model_name": "Driver",
+   "object_id": "1",
+   "object_repr": "Rizwan",
+   "description": "Updated Driver \u201cRizwan\u201d (user)",
+   "changes": {
+    "user": {
+     "to": 82,
+     "from": null
+    }
+   },
+   "method": "PATCH",
+   "path": "/api/drivers/1/",
+   "ip_address": "127.0.0.1",
+   "request_id": "e398d0b4465841b1aa20420f783ec747",
+   "created_at": "2026-09-27T14:54:58.86767+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 15,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "08dca3253ea549a6ac7a22a647abd6b7",
+   "created_at": "2026-09-27T15:42:18.220369+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 16,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "119.157.69.80",
+   "request_id": "979e7b9497ff496a9c435fbc1f225396",
+   "created_at": "2026-09-28T10:59:11.548864+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 17,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "119.157.69.80",
+   "request_id": "bd4281f115cc4c1f84287274ba2a0cea",
+   "created_at": "2026-09-28T12:40:11.155807+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 18,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "153.117.109.219",
+   "request_id": "fa189317b0464aaab788221db098a3e0",
+   "created_at": "2026-09-28T17:05:53.905513+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 19,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "153.117.109.219",
+   "request_id": "b68575d6964a4688a7468d858bd3f5ea",
+   "created_at": "2026-09-28T17:08:34.517921+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 20,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "153.117.109.219",
+   "request_id": "5f9ff46795824cfe85ff3f299e35c1c1",
+   "created_at": "2026-09-28T17:09:41.808735+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 21,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "0359dd217a384717ade80a81c05743d6",
+   "created_at": "2026-09-28T17:11:01.75444+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 22,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "153.117.109.219",
+   "request_id": "b33735f2e2ad4b73afe8387d6af5aa69",
+   "created_at": "2026-09-28T17:22:04.579635+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 23,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "153.117.109.219",
+   "request_id": "b96bf203d2374db7a3d910b16ac727ba",
+   "created_at": "2026-09-28T17:22:43.13136+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 24,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "154.81.253.61",
+   "request_id": "387f873e7ee64c3f976a29443cadc74f",
+   "created_at": "2026-09-29T06:28:21.679131+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 25,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "154.81.253.61",
+   "request_id": "1989fa680ae94f6fa1615a40f649ef6b",
+   "created_at": "2026-09-29T10:00:53.474712+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 26,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "35be19d911ea42e3b3654956e1f450e5",
+   "created_at": "2026-10-02T15:56:03.179368+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 27,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "e1f85981ae934446aca14ccdba2e6b2a",
+   "created_at": "2026-10-02T16:14:38.638743+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 28,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "153.117.109.219",
+   "request_id": "b1185a499854491692149aef05e196be",
+   "created_at": "2026-10-02T16:38:19.230368+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 29,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "153.117.109.219",
+   "request_id": "bc03e2ee19e74b5283a52fe44eb134f6",
+   "created_at": "2026-10-04T15:24:07.498974+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 30,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "110.38.229.3",
+   "request_id": "31d73b73928049adbe7f6bdff4185b20",
+   "created_at": "2026-10-07T04:58:20.171527+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 31,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "110.38.229.3",
+   "request_id": "333e67c516ab4b3fa2f5cd8b2b391f94",
+   "created_at": "2026-10-07T05:03:09.271956+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 32,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "110.38.229.3",
+   "request_id": "e602b5f4f3d94b08aae472a7dc02b5a4",
+   "created_at": "2026-10-07T06:24:46.904476+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 33,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "84a22a67950946b8a7e3317dd9f050b2",
+   "created_at": "2026-10-09T14:39:53.322037+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 34,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "153.117.109.219",
+   "request_id": "068b1e14921c4514b17026df73eed348",
+   "created_at": "2026-10-10T17:14:27.339826+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 35,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "182.189.93.98",
+   "request_id": "8d331f938a1a44e28cc857273f317dc1",
+   "created_at": "2026-10-10T17:14:31.711702+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 36,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "153.117.109.219",
+   "request_id": "0b33d50f46e3427bb12375717a916948",
+   "created_at": "2026-10-10T17:15:31.307015+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 37,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "182.189.93.98",
+   "request_id": "fbd0c9d33637486f974b15ce4f66be0c",
+   "created_at": "2026-10-10T17:17:22.666095+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 38,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "182.189.93.98",
+   "request_id": "2aabb854b5044652889545232696bb06",
+   "created_at": "2026-10-10T17:21:42.910917+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 39,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "119.157.70.54",
+   "request_id": "6e28ea827e0747caa2446d0aac7d5e33",
+   "created_at": "2026-10-10T17:37:03.710999+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 40,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "127.0.0.1",
+   "request_id": "af8c4d2c1b774c64babd75d28e34a73a",
+   "created_at": "2026-10-10T18:09:37.938379+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 41,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "127.0.0.1",
+   "request_id": "2fe9ad2a46074a918281b714bbeb28bc",
+   "created_at": "2026-10-10T18:10:05.65481+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 42,
+   "actor_username": "admin",
+   "action": "create",
+   "module": "routes",
+   "model_name": "stop",
+   "object_id": "",
+   "object_repr": "",
+   "description": "Imported stops from stops_test_3.csv: 2 created, 1 skipped, 0 invalid.",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/stops/import/",
+   "ip_address": "127.0.0.1",
+   "request_id": "d4a362fdbf1c4fe5a3aa721958d02cc2",
+   "created_at": "2026-10-10T18:11:21.370091+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 43,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/location/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/location/",
+   "ip_address": "127.0.0.1",
+   "request_id": "b0727d2f0ed44092af5c297bdf6db3c1",
+   "created_at": "2026-10-10T18:11:23.671481+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 44,
+   "actor_username": "admin",
+   "action": "update",
+   "module": "routes",
+   "model_name": "Stop",
+   "object_id": "10",
+   "object_repr": "Babul Islam",
+   "description": "Updated Stop \u201cBabul Islam\u201d (address)",
+   "changes": {
+    "address": {
+     "to": "Bab-ul-Islam, Khawaja Ajmer Nagri Road, Sector 11-B, \u0627\u062c\u0645\u06cc\u0631 \u0646\u06af\u0631\u06cc, \u0646\u06cc\u0648 \u06a9\u0631\u0627\u0686\u06cc \u0679\u0627\u0624\u0646, \u0636\u0644\u0639 \u0646\u0627\u0638\u0645 \u0622\u0628\u0627\u062f, \u06a9\u0631\u0627\u0686\u06cc \u0688\u0648\u06cc\u0698\u0646, Kar\u0101chi District, \u0633\u0646\u062f\u06be, 74700, \u067e\u0627\u06a9\u0633\u062a\u0627\u0646",
+     "from": "N/A"
+    }
+   },
+   "method": "PATCH",
+   "path": "/api/stops/10/",
+   "ip_address": "127.0.0.1",
+   "request_id": "78dfd93879ca48ea8434f17c9e8e1fa5",
+   "created_at": "2026-10-10T18:11:25.454385+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 45,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/location/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/location/",
+   "ip_address": "127.0.0.1",
+   "request_id": "6475b90071584c3687200e968ac9cd0e",
+   "created_at": "2026-10-10T18:11:29.915404+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 46,
+   "actor_username": "admin",
+   "action": "update",
+   "module": "routes",
+   "model_name": "Stop",
+   "object_id": "11",
+   "object_repr": "Dolmen Mall",
+   "description": "Updated Stop \u201cDolmen Mall\u201d (address)",
+   "changes": {
+    "address": {
+     "to": "D 15, North Nazimabad Block C, \u0646\u0627\u0631\u062a\u06be \u0646\u0627\u0638\u0645 \u0622\u0628\u0627\u062f \u0679\u0627\u0624\u0646, \u0636\u0644\u0639 \u0646\u0627\u0638\u0645 \u0622\u0628\u0627\u062f, \u06a9\u0631\u0627\u0686\u06cc \u0688\u0648\u06cc\u0698\u0646, \u0633\u0646\u062f\u06be, 74700, \u067e\u0627\u06a9\u0633\u062a\u0627\u0646",
+     "from": "N/A"
+    }
+   },
+   "method": "PATCH",
+   "path": "/api/stops/11/",
+   "ip_address": "127.0.0.1",
+   "request_id": "6654c1827106411b9c739d0c175acfd5",
+   "created_at": "2026-10-10T18:11:32.321511+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 47,
+   "actor_username": "admin",
+   "action": "action",
+   "module": "routes",
+   "model_name": "",
+   "object_id": "",
+   "object_repr": "",
+   "description": "POST /api/admin/maps/route-preview/",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/admin/maps/route-preview/",
+   "ip_address": "127.0.0.1",
+   "request_id": "8eeb99027afa4ef5941bd48f579c5b64",
+   "created_at": "2026-10-10T18:13:12.147726+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 48,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "119.157.70.54",
+   "request_id": "4df517167a86484194bbb5f02ace4a53",
+   "created_at": "2026-10-10T22:20:31.827238+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 49,
+   "actor_username": "admin",
+   "action": "create",
+   "module": "routes",
+   "model_name": "Route Plan",
+   "object_id": "2",
+   "object_repr": "Current routes copy",
+   "description": "Created Route Plan \u201cCurrent routes copy\u201d",
+   "changes": {
+    "id": {
+     "to": 2
+    },
+    "data": {
+     "to": "{'version': 1, 'routes': [{'name': '11A', 'description': 'North Nazimabad - Sohrab Goth - Gulshan - FAST', 'status': 'published', 'geometry': None, 'stops': [{'stop_order': 1, 'name': 'Gulshan', 'latitude': 24.927863, 'longitude': 67.088094, 'address': 'Gulshan', 'morning_eta': '07:00', 'evening_eta\u2026"
+    },
+    "name": {
+     "to": "Current routes copy"
+    },
+    "is_active": {
+     "to": false
+    },
+    "created_at": {
+     "to": "2026-10-10T22:38:00.822033+00:00"
+    },
+    "created_by": {
+     "to": 51
+    }
+   },
+   "method": "POST",
+   "path": "/api/route-plans/1/duplicate/",
+   "ip_address": "119.157.70.54",
+   "request_id": "4c8059afb59f4fdea35d680dbd3503c1",
+   "created_at": "2026-10-10T22:38:00.938911+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 50,
+   "actor_username": "admin",
+   "action": "update",
+   "module": "routes",
+   "model_name": "Route Plan",
+   "object_id": "2",
+   "object_repr": "Current routes copy",
+   "description": "Activated route plan \"Current routes copy\": 0 routes created, 0 updated, 0 archived, 0 students affected.",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/route-plans/2/activate/",
+   "ip_address": "119.157.70.54",
+   "request_id": "3da154a6aa7a4cdf8f71d5fecf322590",
+   "created_at": "2026-10-10T22:38:25.947122+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 51,
+   "actor_username": "admin",
+   "action": "update",
+   "module": "routes",
+   "model_name": "Route Plan",
+   "object_id": "1",
+   "object_repr": "Current routes",
+   "description": "Activated route plan \"Current routes\": 0 routes created, 0 updated, 0 archived, 0 students affected.",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/route-plans/1/activate/",
+   "ip_address": "119.157.70.54",
+   "request_id": "027f32c77f284ac3831d26d7607d41ab",
+   "created_at": "2026-10-10T22:38:47.222425+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 52,
+   "actor_username": "admin",
+   "action": "delete",
+   "module": "routes",
+   "model_name": "Route Plan",
+   "object_id": "2",
+   "object_repr": "Current routes copy",
+   "description": "Deleted Route Plan \u201cCurrent routes copy\u201d",
+   "changes": {
+    "id": {
+     "from": 2
+    },
+    "data": {
+     "from": "{'routes': [{'name': '11A', 'stops': [{'name': 'Gulshan', 'address': 'Gulshan', 'latitude': 24.927863, 'longitude': 67.088094, 'stop_order': 1, 'evening_eta': '17:00', 'morning_eta': '07:00'}, {'name': 'Fast', 'address': 'Shah Latif', 'latitude': 24.856953, 'longitude': 67.264705, 'stop_order': 2, '\u2026"
+    },
+    "name": {
+     "from": "Current routes copy"
+    },
+    "is_active": {
+     "from": false
+    },
+    "created_at": {
+     "from": "2026-10-10T22:38:00.822033+00:00"
+    },
+    "created_by": {
+     "from": 51
+    },
+    "activated_at": {
+     "from": "2026-10-10T22:38:25.420842+00:00"
+    }
+   },
+   "method": "DELETE",
+   "path": "/api/route-plans/2/",
+   "ip_address": "119.157.70.54",
+   "request_id": "39956521a0804bda97c3f9afde53b1e2",
+   "created_at": "2026-10-10T22:38:56.488576+00:00",
+   "actor_id": 51
+  },
+  {
+   "id": 53,
+   "actor_username": "admin",
+   "action": "login",
+   "module": "admin_management",
+   "model_name": "User",
+   "object_id": "51",
+   "object_repr": "admin",
+   "description": "admin signed in",
+   "changes": {},
+   "method": "POST",
+   "path": "/api/token/",
+   "ip_address": "153.117.109.219",
+   "request_id": "64651b0115714ce992b2d2d5c7f7163f",
+   "created_at": "2026-10-11T16:36:02.551684+00:00",
+   "actor_id": 51
+  }
+ ],
+ "transport_adminrole": [
+  {
+   "id": 1,
+   "name": "Complaints Officer",
+   "description": "Handles student complaints and replies.",
+   "permissions": {
+    "students": "view",
+    "complaints": "manage"
+   },
+   "is_system": true,
+   "created_at": "2026-09-26T09:42:20.003324+00:00",
+   "updated_at": "2026-09-26T09:42:20.003349+00:00"
+  },
+  {
+   "id": 2,
+   "name": "Finance Officer",
+   "description": "Verifies fee payments and exports finance data.",
+   "permissions": {
+    "fees": "manage",
+    "seats": "view",
+    "export": "view",
+    "students": "view"
+   },
+   "is_system": true,
+   "created_at": "2026-09-26T09:42:20.69708+00:00",
+   "updated_at": "2026-09-26T09:42:20.697098+00:00"
+  },
+  {
+   "id": 3,
+   "name": "Fleet Manager",
+   "description": "Manages buses, drivers, routes and stops.",
+   "permissions": {
+    "fleet": "manage",
+    "routes": "manage",
+    "incidents": "view"
+   },
+   "is_system": true,
+   "created_at": "2026-09-26T09:42:21.388733+00:00",
+   "updated_at": "2026-09-26T09:42:21.388756+00:00"
+  },
+  {
+   "id": 4,
+   "name": "Registration Officer",
+   "description": "Handles registrations, seat allocation, waiting list and route changes.",
+   "permissions": {
+    "fleet": "view",
+    "seats": "manage",
+    "routes": "view",
+    "students": "view",
+    "semesters": "manage",
+    "route_requests": "manage"
+   },
+   "is_system": true,
+   "created_at": "2026-09-26T09:42:22.086197+00:00",
+   "updated_at": "2026-09-26T09:42:22.086209+00:00"
+  },
+  {
+   "id": 5,
+   "name": "Safety Officer",
+   "description": "Reviews incident reports.",
+   "permissions": {
+    "routes": "view",
+    "incidents": "manage"
+   },
+   "is_system": true,
+   "created_at": "2026-09-26T09:42:22.778238+00:00",
+   "updated_at": "2026-09-26T09:42:22.778255+00:00"
+  },
+  {
+   "id": 6,
+   "name": "Auditor (Read-only)",
+   "description": "Can view every module but cannot change anything.",
+   "permissions": {
+    "fees": "view",
+    "fleet": "view",
+    "seats": "view",
+    "export": "view",
+    "routes": "view",
+    "students": "view",
+    "incidents": "view",
+    "semesters": "view",
+    "complaints": "view",
+    "route_requests": "view"
+   },
+   "is_system": true,
+   "created_at": "2026-09-26T09:42:23.469123+00:00",
+   "updated_at": "2026-09-26T09:42:23.469138+00:00"
+  }
+ ],
+ "transport_routeplan": [
+  {
+   "id": 1,
+   "name": "Current routes",
+   "description": "",
+   "data": {
+    "routes": [
+     {
+      "name": "11A",
+      "stops": [
+       {
+        "name": "Gulshan",
+        "address": "Gulshan",
+        "latitude": 24.927863,
+        "longitude": 67.088094,
+        "stop_order": 1,
+        "evening_eta": "17:00",
+        "morning_eta": "07:00"
+       },
+       {
+        "name": "Fast",
+        "address": "Shah Latif",
+        "latitude": 24.856953,
+        "longitude": 67.264705,
+        "stop_order": 2,
+        "evening_eta": "16:00",
+        "morning_eta": "07:45"
+       }
+      ],
+      "status": "published",
+      "geometry": null,
+      "description": "North Nazimabad - Sohrab Goth - Gulshan - FAST"
+     },
+     {
+      "name": "5B",
+      "stops": [
+       {
+        "name": "North Nazimabad",
+        "address": "North",
+        "latitude": 24.95024,
+        "longitude": 67.054902,
+        "stop_order": 1,
+        "evening_eta": "06:23",
+        "morning_eta": "07:00"
+       },
+       {
+        "name": "Karimabad",
+        "address": "Meena",
+        "latitude": 24.935,
+        "longitude": 67.05,
+        "stop_order": 2,
+        "evening_eta": "18:19",
+        "morning_eta": "07:20"
+       },
+       {
+        "name": "Hassan Square",
+        "address": "Square",
+        "latitude": 24.9213,
+        "longitude": 67.0598,
+        "stop_order": 3,
+        "evening_eta": "17:40",
+        "morning_eta": "07:28"
+       },
+       {
+        "name": "Millinium",
+        "address": "Dalmia",
+        "latitude": 24.9169,
+        "longitude": 67.1123,
+        "stop_order": 4,
+        "evening_eta": "17:05",
+        "morning_eta": "07:40"
+       },
+       {
+        "name": "Fast",
+        "address": "Shah Latif",
+        "latitude": 24.856953,
+        "longitude": 67.264705,
+        "stop_order": 5,
+        "evening_eta": "16:15",
+        "morning_eta": "08:00"
+       }
+      ],
+      "status": "published",
+      "geometry": null,
+      "description": "North Nazimabad - Karimabad - Hassan Square - Millinium - Fast"
+     },
+     {
+      "name": "6B",
+      "stops": [
+       {
+        "name": "North Nazimabad",
+        "address": "North",
+        "latitude": 24.95024,
+        "longitude": 67.054902,
+        "stop_order": 1,
+        "evening_eta": "18:00",
+        "morning_eta": "06:50"
+       },
+       {
+        "name": "Gulshan",
+        "address": "Gulshan",
+        "latitude": 24.927863,
+        "longitude": 67.088094,
+        "stop_order": 2,
+        "evening_eta": "17:00",
+        "morning_eta": "07:00"
+       },
+       {
+        "name": "Johar",
+        "address": "Johar",
+        "latitude": 24.904637,
+        "longitude": 67.113506,
+        "stop_order": 3,
+        "evening_eta": "16:30",
+        "morning_eta": "07:10"
+       },
+       {
+        "name": "Airport",
+        "address": "abc",
+        "latitude": 24.886871,
+        "longitude": 67.15801,
+        "stop_order": 4,
+        "evening_eta": "16:20",
+        "morning_eta": "07:40"
+       },
+       {
+        "name": "Fast",
+        "address": "Shah Latif",
+        "latitude": 24.856953,
+        "longitude": 67.264705,
+        "stop_order": 5,
+        "evening_eta": "16:00",
+        "morning_eta": "08:00"
+       }
+      ],
+      "status": "published",
+      "geometry": null,
+      "description": "Gulshan - Johar - Airport - Fast"
+     }
+    ],
+    "version": 1
+   },
+   "is_active": true,
+   "activated_at": "2026-10-10T22:38:46.710525+00:00",
+   "created_at": "2026-10-10T22:18:20.925353+00:00",
+   "updated_at": "2026-10-10T22:38:46.710613+00:00",
+   "created_by_id": null
+  }
+ ]
+}

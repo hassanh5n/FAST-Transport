@@ -44,6 +44,7 @@ from ..permissions import (
     IsStudentCreateOnly
 )
 from ..models import (
+    Contractor,
     BusLocationPing,
     StudentProfile,
     Semester,
@@ -69,6 +70,7 @@ from ..models import (
 )
 
 from ..serializers import (
+    ContractorSerializer,
     ChallanSerializer,
     UserSerializer,
     StudentProfileSerializer,
@@ -114,17 +116,25 @@ from .maps import _display_route_geometry
 from .. import audit
 from ..stop_import import import_stops, parse_file
 
+class ContractorViewSet(viewsets.ModelViewSet):
+    queryset = Contractor.objects.all()
+    serializer_class = ContractorSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = None
+
+
 class RouteViewSet(viewsets.ModelViewSet):
-    queryset = Route.objects.all()
+    queryset = Route.objects.order_by("name", "id")
     serializer_class = RouteSerializer
     permission_classes = [IsAdminOrReadOnly] # Admin full access, Students read only
 
-    def _map_route_data(self, route):
-        route_stops = list(
-            RouteStop.objects.filter(route=route, stop__is_active=True)
-            .select_related("stop")
-            .order_by("stop_order")
-        )
+    def _map_route_data(self, route, route_stops=None, fetch=False):
+        if route_stops is None:
+            route_stops = list(
+                RouteStop.objects.filter(route=route, stop__is_active=True)
+                .select_related("stop")
+                .order_by("stop_order")
+            )
         stops = [
             {
                 "id": route_stop.stop_id,
@@ -134,6 +144,7 @@ class RouteViewSet(viewsets.ModelViewSet):
                 "latitude": float(route_stop.stop.latitude),
                 "longitude": float(route_stop.stop.longitude),
                 "stop_order": route_stop.stop_order,
+                "is_campus": route_stop.stop.is_campus,  # drawn as the route's end, never offered as a pickup
                 "morning_eta": str(route_stop.morning_eta) if route_stop.morning_eta else None,
                 "evening_eta": str(route_stop.evening_eta) if route_stop.evening_eta else None,
             }
@@ -141,27 +152,42 @@ class RouteViewSet(viewsets.ModelViewSet):
             if not (float(route_stop.stop.latitude) == 0 and float(route_stop.stop.longitude) == 0)
         ]
         fallback_geometry = [[stop["longitude"], stop["latitude"]] for stop in stops]
-        geometry, geometry_source = _display_route_geometry(route, fallback_geometry)
+        geometry, geometry_source = _display_route_geometry(route, fallback_geometry, fetch=fetch)
         return {
             "id": route.id,
             "name": route.name,
             "description": route.description,
+            "contractor": route.contractor_id,
             "status": route.status,
             "is_active": route.is_active,
             "geometry": geometry,
             "geometry_is_cached": geometry_source in {"stored", "cache"},
+            "has_road_line": geometry_source == "stored",
             "stops": stops,
         }
 
     @action(detail=False, methods=["get"], url_path="map")
     def map(self, request):
         """Compact network payload consumed by the student and admin map views."""
-        routes = Route.objects.filter(is_active=True, status="published")
-        return Response({"routes": [self._map_route_data(route) for route in routes]})
+        routes = list(Route.objects.filter(is_active=True, status="published").order_by("name", "id"))
+        stops_by_route = {}
+        for route_stop in (
+            RouteStop.objects.filter(route__in=routes, stop__is_active=True)
+            .select_related("stop").order_by("route_id", "stop_order")
+        ):
+            stops_by_route.setdefault(route_stop.route_id, []).append(route_stop)
+        return Response({"routes": [self._map_route_data(route, stops_by_route.get(route.id, [])) for route in routes]})
 
     @action(detail=True, methods=["get"], url_path="map-detail")
     def map_detail(self, request, pk=None):
-        return Response(self._map_route_data(self.get_object()))
+        # One route: worth fetching (and saving) its road line if it has none yet.
+        return Response(self._map_route_data(self.get_object(), fetch=True))
+
+    @action(detail=True, methods=["post"], url_path="build-geometry", permission_classes=[IsAdmin])
+    def build_geometry(self, request, pk=None):
+        """Fetch and save this route's road line. The admin pages call it once per route."""
+        data = self._map_route_data(self.get_object(), fetch=True)
+        return Response({"id": data["id"], "has_road_line": data["has_road_line"]})
 
     @action(detail=True, methods=["patch"], url_path="builder", permission_classes=[IsAdmin])
     def builder(self, request, pk=None):
@@ -492,6 +518,7 @@ def eligible_route_stops(request):
                 "latitude": float(route_stop.stop.latitude),
                 "longitude": float(route_stop.stop.longitude),
                 "stop_order": route_stop.stop_order,
+                "is_campus": route_stop.stop.is_campus,  # drawn as the route's end, never offered as a pickup
                 "morning_eta": str(route_stop.morning_eta) if route_stop.morning_eta else None,
                 "evening_eta": str(route_stop.evening_eta) if route_stop.evening_eta else None,
             }

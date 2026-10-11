@@ -188,6 +188,14 @@ class RouteAssignmentSerializer(serializers.ModelSerializer):
                     "Cannot activate assignment: the semester is inactive."
                 )
 
+        # A contractor's bus and driver only run that contractor's routes. Records
+        # with no contractor yet are allowed, so old data keeps working.
+        owners = {item.contractor_id for item in (route, bus, driver) if item and item.contractor_id}
+        if len(owners) > 1:
+            raise serializers.ValidationError(
+                "The route, bus and driver must belong to the same contractor."
+            )
+
         # Prevent duplicate bus+semester assignment (skip current instance on update)
         qs_bus = RouteAssignment.objects.filter(
             bus=bus,

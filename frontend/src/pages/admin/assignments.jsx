@@ -8,6 +8,7 @@ import {
   getAssignments, createAssignment, updateAssignment, deleteAssignment,
   getRoutes, getBuses, getDrivers, getSemesters,
 } from "../../services/transportService";
+import { useContractor, ContractorSwitch } from "../../components/ContractorSwitch";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
 
@@ -19,7 +20,9 @@ const getOptionsWithCurrent = (options, currentItem) => {
 };
 
 function AssignmentsPage() {
-  const [assignments, setAssignments] = useState([]);
+  const contractor = useContractor();
+  const [allAssignments, setAssignments] = useState([]);
+  const assignments = allAssignments.filter((a) => contractor.matches(a.route?.contractor));
   const [routes, setRoutes] = useState([]);
   const [buses, setBuses] = useState([]);
   const [drivers, setDrivers] = useState([]);
@@ -108,6 +111,7 @@ function AssignmentsPage() {
 
   const columns = [
     { key: "route",    label: "Route",    render: (row) => row.route?.name },
+    { key: "contractor", label: "Contractor", render: (row) => contractor.nameOf(row.route?.contractor) || "—" },
     { key: "bus",      label: "Bus",      render: (row) => row.bus?.bus_number },
     { key: "driver",   label: "Driver",   render: (row) => row.driver?.name },
     { key: "semester", label: "Semester", render: (row) => row.semester?.name },
@@ -127,18 +131,26 @@ function AssignmentsPage() {
     },
   ];
 
-  const activeRoutes     = routes.filter(r => r.is_active);
-  const activeBuses      = buses.filter(b => b.is_active);
-  const availDrivers     = drivers.filter(d => d.is_available);
+  // Once a route is picked, only that contractor's buses and drivers (or ones with no contractor) fit it.
+  const sameOwner = (routeId) => {
+    const owner = routes.find((r) => String(r.id) === String(routeId))?.contractor;
+    return (item) => owner == null || item.contractor == null || item.contractor === owner;
+  };
+  const activeRoutes     = routes.filter(r => r.is_active && contractor.matches(r.contractor));
+  const activeBuses      = buses.filter(b => b.is_active && contractor.matches(b.contractor));
+  const availDrivers     = drivers.filter(d => d.is_available && contractor.matches(d.contractor));
   const activeSemesters  = semesters.filter(s => s.is_active);
+  const formBuses = activeBuses.filter(sameOwner(form.route_id));
+  const formDrivers = availDrivers.filter(sameOwner(form.route_id));
   const editRoutes = getOptionsWithCurrent(activeRoutes, editingAssignment?.route);
-  const editBuses = getOptionsWithCurrent(activeBuses, editingAssignment?.bus);
-  const editDrivers = getOptionsWithCurrent(availDrivers, editingAssignment?.driver);
+  const editBuses = getOptionsWithCurrent(activeBuses.filter(sameOwner(editForm.route_id)), editingAssignment?.bus);
+  const editDrivers = getOptionsWithCurrent(availDrivers.filter(sameOwner(editForm.route_id)), editingAssignment?.driver);
   const editSemesters = getOptionsWithCurrent(activeSemesters, editingAssignment?.semester);
 
   return (
     <PageShell role="staff" title="Admin — Assignments">
       <PageTitle sub="Assign buses and drivers to routes for each semester.">Route Assignments</PageTitle>
+      <ContractorSwitch value={contractor} />
 
       {pendingDelete && (
         <ConfirmModal
@@ -197,13 +209,13 @@ function AssignmentsPage() {
         <Field label="Bus" required flex="1 1 140px">
           <select name="bus_id" value={form.bus_id} onChange={handleChange} style={selectStyle}>
             <option value="">Select Bus</option>
-            {activeBuses.map(b => <option key={b.id} value={b.id}>{b.bus_number}</option>)}
+            {formBuses.map(b => <option key={b.id} value={b.id}>{b.bus_number}</option>)}
           </select>
         </Field>
         <Field label="Driver" required flex="1 1 140px">
           <select name="driver_id" value={form.driver_id} onChange={handleChange} style={selectStyle}>
             <option value="">Select Driver</option>
-            {availDrivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
+            {formDrivers.map(d => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
         </Field>
         <Field label="Semester" required flex="1 1 140px">

@@ -10,7 +10,7 @@ import { downloadFile, toCsv } from "../utils/transferFiles";
 
 const SAMPLE_CSV = "name,latitude,longitude,address\nGulshan Chowrangi,24.921500,67.084700,\n";
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-const hasNoAddress = (stop) => !stop.address || stop.address.trim() === "" || stop.address === "N/A";
+export const hasNoAddress = (stop) => !stop.address || stop.address.trim() === "" || stop.address === "N/A";
 
 // Same columns the import accepts, so an exported file can be imported back as-is.
 const EXPORT_COLUMNS = ["name", "latitude", "longitude", "address", "is_active", "location_accuracy_m", "provider_place_id"];
@@ -22,7 +22,23 @@ function exportStops(stops, format) {
   downloadFile(`stops_${new Date().toISOString().slice(0, 10)}.${format}`, format === "json" ? JSON.stringify(rows, null, 2) : toCsv(EXPORT_COLUMNS, rows));
 }
 
-async function fillAddresses(stops, onProgress, isCancelled) {
+// One fill at a time across the whole app: two loops would share the geocoder's
+// one-request-per-second limit and mostly get "too many requests" back.
+let fillRunning = false;
+
+// Returns false (and does nothing) when another fill is already running.
+export async function fillAddresses(stops, onProgress, isCancelled) {
+  if (fillRunning) return false;
+  fillRunning = true;
+  try {
+    await fillEach(stops, onProgress, isCancelled);
+  } finally {
+    fillRunning = false;
+  }
+  return true;
+}
+
+async function fillEach(stops, onProgress, isCancelled) {
   for (let i = 0; i < stops.length; i += 1) {
     if (isCancelled()) return;
     const stop = stops[i];
@@ -40,6 +56,30 @@ async function fillAddresses(stops, onProgress, isCancelled) {
     }
     onProgress(i + 1);
   }
+}
+
+// "Fetching addresses… 37 / 288" with a bar, shared by the stop and route plan imports.
+export function AddressProgress({ done, total, blocked }) {
+  if (blocked) return <p style={{ margin: 0, fontSize: 13 }}>Another address fill is already running. Use "Fill from map" on the Stops page once it finishes.</p>;
+  if (!total) return null;
+  const running = done < total;
+  return (
+    <div>
+      <p style={{ margin: "0 0 6px", fontSize: 13 }}>
+        {running
+          ? `Fetching addresses… ${done} / ${total}`
+          : `Addresses done (${total}). Any the map couldn't find stay "N/A" and can be fixed with Edit on the Stops page.`}
+      </p>
+      <div style={{ height: 6, borderRadius: 99, background: colors.borderLight, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${(done / total) * 100}%`, background: colors.accent, transition: "width 0.3s" }} />
+      </div>
+      {running && (
+        <p style={{ margin: "6px 0 0", fontSize: 12, color: colors.textSecondary }}>
+          The stops are already saved. You can close this; use "Fill from map" on the Stops page later to finish.
+        </p>
+      )}
+    </div>
+  );
 }
 
 function ReportList({ title, items, tone }) {
@@ -63,7 +103,7 @@ export default function StopImport({ stops = [], onChanged }) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [report, setReport] = useState(null);
-  const [progress, setProgress] = useState(null); // { done, total } while filling addresses
+  const [progress, setProgress] = useState(null); // { done, total, blocked? } while filling addresses
 
   useEffect(() => () => { cancelled.current = true; }, []);
 
@@ -74,7 +114,8 @@ export default function StopImport({ stops = [], onChanged }) {
     if (!targets.length) return;
     cancelled.current = false;
     setProgress({ done: 0, total: targets.length });
-    await fillAddresses(targets, (done) => setProgress({ done, total: targets.length }), () => cancelled.current);
+    const started = await fillAddresses(targets, (done) => setProgress({ done, total: targets.length }), () => cancelled.current);
+    if (!started) setProgress({ done: 0, total: 0, blocked: true });
     onChanged?.();
   };
 
@@ -164,23 +205,7 @@ export default function StopImport({ stops = [], onChanged }) {
                 <ReportList title="Invalid" items={report.invalid} tone={colors.dangerText} />
               </>
             )}
-            {progress && (
-              <div>
-                <p style={{ margin: "0 0 6px", fontSize: 13 }}>
-                  {filling
-                    ? `Fetching addresses… ${progress.done} / ${progress.total}`
-                    : `Addresses done (${progress.total}). Any the map couldn't find stay "N/A" and can be edited.`}
-                </p>
-                <div style={{ height: 6, borderRadius: 99, background: colors.borderLight, overflow: "hidden" }}>
-                  <div style={{ height: "100%", width: `${(progress.done / progress.total) * 100}%`, background: colors.accent, transition: "width 0.3s" }} />
-                </div>
-                {filling && (
-                  <p style={{ margin: "6px 0 0", fontSize: 12, color: colors.textSecondary }}>
-                    The stops are already saved. You can close this; use "Fill missing addresses" later to finish.
-                  </p>
-                )}
-              </div>
-            )}
+            {progress && <AddressProgress {...progress} />}
           </div>
         </FormModal>
       )}

@@ -88,6 +88,8 @@ class TransportRegistrationSerializer(serializers.ModelSerializer):
             attrs["selected_route_stop"] = route_stop
         elif not stop:
             raise serializers.ValidationError({"route_stop_id": "Select a route stop on the map."})
+        if attrs["stop"].is_campus:
+            raise serializers.ValidationError({"route_stop_id": "FAST campus is where every route ends, not a pickup stop. Choose the stop you board at."})
         return attrs
 
 class SeatAllocationSerializer(serializers.ModelSerializer):

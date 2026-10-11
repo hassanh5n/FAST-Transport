@@ -1,4 +1,7 @@
-from django.db.models.signals import post_save, post_delete
+import contextlib
+import threading
+
+from django.db.models.signals import post_save, post_delete, pre_save
 from django.db import transaction
 from django.dispatch import receiver
 from .models import Route, Stop, RouteStop, Bus, Driver, Semester, RouteAssignment, FeeVerification, SemesterRegistration, BusLocationPing, Notification, User, SeatAllocation
@@ -53,19 +56,47 @@ def deactivate_on_semester_inactive(sender, instance, **kwargs):
         _deactivate_assignments(semester=instance)
 
 
+def _stop_place(latitude, longitude, is_active):
+    return (round(float(latitude), 6), round(float(longitude), 6), bool(is_active))
+
+
+@receiver(pre_save, sender=Stop)
+def remember_stop_place(sender, instance, **kwargs):
+    row = Stop.objects.filter(pk=instance.pk).values_list("latitude", "longitude", "is_active").first() if instance.pk else None
+    instance._saved_place = _stop_place(*row) if row else None
+
+
 @receiver(post_save, sender=Stop)
 def invalidate_geometry_after_stop_change(sender, instance, created, **kwargs):
-    """A moved/disabled stop invalidates every cached road line that uses it."""
-    if not created:
-        Route.objects.filter(routestop__stop=instance).update(
-            geometry=None,
-            geometry_updated_at=None,
-        )
+    """A moved/disabled stop invalidates every cached road line that uses it.
+    Saving only its name or address (the background address fill) keeps them."""
+    if created or getattr(instance, "_saved_place", None) == _stop_place(instance.latitude, instance.longitude, instance.is_active):
+        return
+    Route.objects.filter(routestop__stop=instance).update(
+        geometry=None,
+        geometry_updated_at=None,
+    )
+
+
+_bulk = threading.local()
+
+
+@contextlib.contextmanager
+def routes_rewritten_in_bulk():
+    """Route plan activation replaces whole routes and sets their geometry itself;
+    skip the one-UPDATE-per-deleted-route-stop invalidation below while it runs."""
+    _bulk.active = True
+    try:
+        yield
+    finally:
+        _bulk.active = False
 
 
 @receiver(post_save, sender=RouteStop)
 @receiver(post_delete, sender=RouteStop)
 def invalidate_geometry_after_route_stop_change(sender, instance, **kwargs):
+    if getattr(_bulk, "active", False):
+        return
     Route.objects.filter(pk=instance.route_id).update(
         geometry=None,
         geometry_updated_at=None,

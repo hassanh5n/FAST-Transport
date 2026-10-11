@@ -5,9 +5,10 @@ import { ConfirmModal, FormModal, StatusBadge, Pill, FormCard, Field, SectionBlo
 import { inputStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
 import { getDrivers, createDriver, updateDriver, deleteDriver } from "../../services/transportService";
+import { useContractor, ContractorSwitch, ContractorSelect } from "../../components/ContractorSwitch";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
-const EMPTY_FORM = { name: "", cnic: "", license_no: "", phone: "", address: "", username: "", password: "" };
+const EMPTY_FORM = { name: "", cnic: "", license_no: "", phone: "", address: "", username: "", password: "", contractor: "" };
 
 // DRF field errors arrive as { field: ["message"] }; show the first readable one.
 const apiError = (err) => {
@@ -18,7 +19,9 @@ const apiError = (err) => {
 };
 
 function DriversPage() {
-  const [drivers, setDrivers] = useState([]);
+  const contractor = useContractor();
+  const [allDrivers, setDrivers] = useState([]);
+  const drivers = allDrivers.filter((d) => contractor.matches(d.contractor));
   const [form, setForm] = useState(EMPTY_FORM);
   const [pendingToggle, setPendingToggle] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
@@ -56,6 +59,7 @@ function DriversPage() {
       address: driver.address || "",
       username: driver.login_username || "",
       password: "",
+      contractor: driver.contractor ?? "",
     });
   };
 
@@ -77,7 +81,7 @@ function DriversPage() {
     if (!editForm.name || !editForm.cnic) { alert("Name and CNIC are required"); return; }
     setSavingEdit(true);
     try {
-      await updateDriver(editingDriver.id, editForm);
+      await updateDriver(editingDriver.id, { ...editForm, contractor: editForm.contractor || null });
       setEditingDriver(null);
       fetchDrivers();
     } catch (err) {
@@ -95,7 +99,7 @@ function DriversPage() {
       return;
     }
     try {
-      await createDriver(form);
+      await createDriver({ ...form, contractor: form.contractor || null });
       setForm(EMPTY_FORM);
       fetchDrivers();
     } catch (err) {
@@ -105,6 +109,7 @@ function DriversPage() {
 
   const columns = [
     { key: "name", label: "Name" },
+    { key: "contractor", label: "Contractor", render: (row) => contractor.nameOf(row.contractor) || "—" },
     { key: "cnic", label: "CNIC" },
     { key: "license_no", label: "License No" },
     { key: "phone", label: "Phone" },
@@ -178,6 +183,9 @@ function DriversPage() {
           <Field label="CNIC" required flex="1 1 160px">
             <input name="cnic" placeholder="42101-1234567-1" value={editForm.cnic} onChange={handleEditChange} style={inputStyle} />
           </Field>
+          <Field label="Contractor" flex="1 1 160px">
+            <ContractorSelect contractors={contractor.contractors} value={editForm.contractor} onChange={handleEditChange} />
+          </Field>
           <Field label="License No" flex="1 1 140px">
             <input name="license_no" placeholder="License number" value={editForm.license_no} onChange={handleEditChange} style={inputStyle} />
           </Field>
@@ -197,6 +205,7 @@ function DriversPage() {
       )}
 
       <PageTitle sub="Manage bus drivers, their availability and their sign-in accounts.">Drivers</PageTitle>
+      <ContractorSwitch value={contractor} />
 
       <FormCard title="Add New Driver" sub="Username and password are optional — fill both to let the driver sign in and see their route." onSubmit={handleSubmit} submitLabel="Add Driver">
         <Field label="Full Name" required flex="1 1 160px">
@@ -213,6 +222,9 @@ function DriversPage() {
         </Field>
         <Field label="Address" flex="2 1 240px">
           <input name="address" placeholder="Home address" value={form.address} onChange={handleChange} style={inputStyle} />
+        </Field>
+        <Field label="Contractor" flex="1 1 140px">
+          <ContractorSelect contractors={contractor.contractors} value={form.contractor} onChange={handleChange} />
         </Field>
         <Field label="Login Username" flex="1 1 160px">
           <input name="username" placeholder="e.g. ahmed.khan" autoComplete="off" value={form.username} onChange={handleChange} style={inputStyle} />

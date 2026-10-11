@@ -20,6 +20,7 @@ router = DefaultRouter()
 # Existing ViewSets
 router.register(r'students', StudentProfileViewSet)
 router.register(r'semesters', SemesterViewSet)
+router.register(r'contractors', ContractorViewSet)
 router.register(r'routes', RouteViewSet)
 router.register(r'stops', StopViewSet)
 router.register(r'routestops', RouteStopViewSet)

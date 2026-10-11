@@ -21,8 +21,10 @@ export const createDriver = (data) => api.post("/api/drivers/", data);
 export const updateDriver = (id, data) => api.patch(`/api/drivers/${id}/`, data);
 export const deleteDriver = (id) => api.delete(`/api/drivers/${id}/`);
 
+export const getContractors = () => api.get("/api/contractors/");
 export const getRoutes = () => api.get("/api/routes/");
-export const getRoutesMap = () => api.get("/api/routes/map/");
+export const getRoutesMap = (config) => api.get("/api/routes/map/", config);
+export const buildRouteGeometry = (id) => api.post(`/api/routes/${id}/build-geometry/`);
 export const createRoute = (data) => api.post("/api/routes/", data);
 export const updateRoute = (id, data) => api.patch(`/api/routes/${id}/`, data);
 export const deleteRoute = (id) => api.delete(`/api/routes/${id}/`);
@@ -43,8 +45,10 @@ export const importRoutePlan = (file) => {
   return api.post("/api/route-plans/import/", form, { headers: { "Content-Type": "multipart/form-data" } });
 };
 export const exportRoutePlan = (id, format) => api.get(`/api/route-plans/${id}/export/?file=${format}`, { responseType: "blob" });
-export const previewRoutePlan = (id) => api.get(`/api/route-plans/${id}/preview/`);
-export const activateRoutePlan = (id) => api.post(`/api/route-plans/${id}/activate/`);
+// busRoutes: { assignmentId: "new route name" } picked in the activation dialog.
+export const previewRoutePlan = (id, busRoutes = {}) =>
+  api.get(`/api/route-plans/${id}/preview/`, { params: { bus_routes: JSON.stringify(busRoutes) }, noCache: true });
+export const activateRoutePlan = (id, busRoutes = {}) => api.post(`/api/route-plans/${id}/activate/`, { bus_routes: busRoutes });
 export const getRoutePlanAttention = () => api.get("/api/route-plans/attention/");
 
 export const getAssignments = () => api.get("/api/route-assignments/");

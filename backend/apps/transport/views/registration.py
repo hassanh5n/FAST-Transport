@@ -803,6 +803,9 @@ class RouteChangeRequestViewSet(viewsets.ModelViewSet):
         if not registration:
             raise ValidationError("No active semester registration found.")
 
+        if requested_stop and requested_stop.is_campus:
+            raise ValidationError("FAST campus is where every route ends, not a pickup stop. Choose the stop you board at.")
+
         # Block if they pick the exact same stop they already have
         if requested_stop and registration.stop == requested_stop:
             raise ValidationError("You are already assigned to this stop.")

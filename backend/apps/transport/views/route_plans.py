@@ -1,6 +1,8 @@
+import json
 import re
 
 from django.http import HttpResponse
+from django.db import transaction
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
@@ -53,9 +55,9 @@ class RoutePlanViewSet(
         """Store an uploaded CSV/JSON file as a new inactive plan. Live routes are not touched."""
         upload = request.FILES.get("file")
         if not upload:
-            raise ValidationError({"file": ["Choose a CSV or JSON file."]})
-        if not upload.name.lower().endswith((".csv", ".json")):
-            raise ValidationError({"file": ["Only .csv or .json files are supported."]})
+            raise ValidationError({"file": ["Choose an Excel, CSV or JSON file."]})
+        if not upload.name.lower().endswith((".xlsx", ".csv", ".json")):
+            raise ValidationError({"file": ["Only .xlsx, .csv or .json files are supported."]})
         if upload.size > route_plans.MAX_FILE_BYTES:
             raise ValidationError({"file": ["The file must be smaller than 10 MB."]})
         try:
@@ -63,7 +65,11 @@ class RoutePlanViewSet(
         except route_plans.PlanError as exc:
             raise ValidationError({"file": exc.errors})
         name = str(request.data.get("name") or "").strip() or meta["name"] or upload.name.rsplit(".", 1)[0]
-        return self._create(request, name, meta["description"], snapshot)
+        with transaction.atomic():
+            response = self._create(request, name, meta["description"], snapshot)
+            # The plan stays inactive, but its stops exist now so the page can fill in their addresses.
+            response.data["stops"] = route_plans.create_plan_stops(snapshot)
+        return response
 
     @action(detail=True, methods=["get"])
     def export(self, request, pk=None):
@@ -76,14 +82,27 @@ class RoutePlanViewSet(
         response["Content-Disposition"] = f'attachment; filename="route_plan_{slug}.{kind}"'
         return response
 
+    @staticmethod
+    def _bus_routes(raw):
+        """{assignment id: new route name} picked in the activation dialog."""
+        if isinstance(raw, str):
+            try:
+                raw = json.loads(raw or "{}")
+            except ValueError:
+                raise ValidationError({"bus_routes": "Must be a JSON object."})
+        if not isinstance(raw, dict):
+            raise ValidationError({"bus_routes": "Must be a JSON object."})
+        return {str(key): str(value or "") for key, value in raw.items()}
+
     @action(detail=True, methods=["get"])
     def preview(self, request, pk=None):
-        return Response(route_plans.preview(self.get_object()))
+        bus_routes = self._bus_routes(request.query_params.get("bus_routes") or "{}")
+        return Response(route_plans.preview(self.get_object(), bus_routes))
 
     @action(detail=True, methods=["post"])
     def activate(self, request, pk=None):
         try:
-            report = route_plans.activate(self.get_object(), request.user)
+            report = route_plans.activate(self.get_object(), request.user, self._bus_routes(request.data.get("bus_routes") or {}))
         except route_plans.PlanError as exc:
             raise ValidationError({"detail": exc.errors})
         return Response(report)

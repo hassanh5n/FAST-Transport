@@ -3,28 +3,37 @@
 A plan is a JSON snapshot of every route with its ordered stops and ETAs.
 Activating one writes it onto the live Route/RouteStop tables. Routes are
 matched by name so their IDs survive the swap, which is what keeps students,
-seats, waitlists and bus assignments attached. A live route the plan does not
-mention is archived, never deleted (deleting a Route cascades to registrations)
-and never deactivated (that permanently drops its bus assignments).
+seats, waitlists and bus assignments attached. Every route ends at the FAST
+campus stop. Routes and stops the new plan does not use are removed after their
+buses (as the admin picks) and students (to the nearest stop) have moved onto
+the new routes; see _switch_over.
 
-Stops are matched like the stop import does: same name, else within
-DUPLICATE_RADIUS_M. A matched stop keeps its live coordinates and address.
+Stops are matched on exact coordinates only; a matched stop keeps its live
+name and address. Importing a plan (CSV, JSON or an Excel workbook) creates its
+missing stops straight away so their addresses can be filled in before the plan
+goes live.
 """
 import csv
+import datetime
 import hashlib
 import io
 import json
 import re
 from decimal import Decimal
 
-from django.db import transaction
-from django.db.models import Q
+from django.db import DatabaseError, transaction
+from django.db.models import Max, Q
 from django.utils import timezone
 
 from . import audit
-from .models import Notification, Route, RoutePlan, RouteStop, Semester, Stop, TransportRegistration
+from .models import (
+    Contractor, Notification, Route, RouteAssignment, RoutePlan, RouteStop, SeatAllocation, Semester,
+    SemesterRegistration, Stop, TransportRegistration, Waitlist,
+)
+from .seatallocation import suppress_promotion
+from .signals import routes_rewritten_in_bulk
 from .rbac import MANAGE, staff_with_module
-from .stop_import import DUPLICATE_RADIUS_M, _build_stop, _distance_m, _norm_name
+from .stop_import import _build_stop, _distance_m, _norm_name
 
 MAX_FILE_BYTES = 10 * 1024 * 1024
 MAX_ROUTES = 200
@@ -34,10 +43,31 @@ STATUSES = {"draft", "published"}
 NO_ADDRESS = "N/A"  # Stop.address placeholder; plans store it as ""
 # The single-route export uses these same names, so a route CSV imports as a one-route plan.
 CSV_COLUMNS = [
-    "route_name", "route_description", "route_status", "stop_order",
+    "route_name", "route_description", "route_status", "contractor", "stop_order",
     "name", "latitude", "longitude", "address", "morning_eta", "evening_eta",
 ]
-_TIME = re.compile(r"^(\d{1,2}):(\d{2})(?::\d{2})?$")
+_TIME = re.compile(r"^(\d{1,2}):(\d{2})(?::\d{2})?\s*([ap])?\.?m?\.?$", re.IGNORECASE)
+# FAST NUCES Karachi Main Campus. With no stop order or times, a route starts at
+# the stop farthest from campus and works inwards.
+CAMPUS = (24.8569128, 67.2646384)
+CAMPUS_NAME = "FAST NUCES Main Campus"
+CAMPUS_RADIUS_M = 500  # a file's own "FAST" stop within this distance is replaced by the campus stop
+# Spreadsheet headings people actually use, mapped to the plan's column names.
+HEADER_ALIASES = {
+    "route": "route_name", "route name": "route_name", "route_name": "route_name",
+    "stop": "name", "stop name": "name", "stop_name": "name", "name": "name",
+    "lat": "latitude", "latitude": "latitude",
+    "lng": "longitude", "lon": "longitude", "long": "longitude", "longitude": "longitude",
+    "order": "stop_order", "stop order": "stop_order", "stop_order": "stop_order", "sequence": "stop_order",
+    "morning": "morning_eta", "morning eta": "morning_eta", "morning time": "morning_eta",
+    "morning_eta": "morning_eta", "pickup time": "morning_eta", "pick up time": "morning_eta",
+    "evening": "evening_eta", "evening eta": "evening_eta", "evening time": "evening_eta",
+    "evening_eta": "evening_eta", "drop time": "evening_eta", "drop off time": "evening_eta",
+    "contractor": "contractor", "address": "address",
+    "description": "route_description", "route description": "route_description", "route_description": "route_description",
+    "status": "route_status", "route status": "route_status", "route_status": "route_status",
+}
+MAX_SHEET_ROWS = MAX_STOPS + 1000
 
 
 class PlanError(ValueError):
@@ -67,6 +97,7 @@ def snapshot_live():
             "address": "" if rs.stop.address == NO_ADDRESS else rs.stop.address,
             "morning_eta": _eta(rs.morning_eta),
             "evening_eta": _eta(rs.evening_eta),
+            **({"campus": True} if rs.stop.is_campus else {}),
         })
     return {
         "version": 1,
@@ -75,10 +106,11 @@ def snapshot_live():
                 "name": route.name,
                 "description": route.description,
                 "status": route.status,
+                "contractor": route.contractor.name if route.contractor_id else None,
                 "geometry": route.geometry,
                 "stops": stops_by_route.get(route.id, []),
             }
-            for route in Route.objects.exclude(status="archived").order_by("name", "id")
+            for route in Route.objects.exclude(status="archived").select_related("contractor").order_by("name", "id")
         ],
     }
 
@@ -127,7 +159,10 @@ def export_csv(plan):
     writer = csv.DictWriter(out, CSV_COLUMNS, extrasaction="ignore", lineterminator="\r\n")
     writer.writeheader()
     for route in plan_snapshot(plan)["routes"]:
-        head = {"route_name": route["name"], "route_description": route["description"], "route_status": route["status"]}
+        head = {
+            "route_name": route["name"], "route_description": route["description"],
+            "route_status": route["status"], "contractor": route.get("contractor") or "",
+        }
         for stop in route["stops"] or [{}]:  # a route without stops still gets its own row
             writer.writerow({**head, **{key: "" if value is None else value for key, value in stop.items()}})
     return "﻿" + out.getvalue()  # the BOM makes Excel read the file as UTF-8
@@ -139,35 +174,106 @@ def _parse_time(value):
     if not text:
         return None
     match = _TIME.match(text)
-    if not match or int(match[1]) > 23 or int(match[2]) > 59:
+    hour = int(match[1]) if match else 99
+    if match and match[3]:  # 7:30 AM / 1:15 pm
+        hour = 99 if not 1 <= hour <= 12 else hour % 12 + (12 if match[3].lower() == "p" else 0)
+    if not match or hour > 23 or int(match[2]) > 59:
         raise ValueError(f'"{text}" is not a time like 07:30.')
-    return f"{int(match[1]):02d}:{match[2]}"
+    return f"{hour:02d}:{match[2]}"
 
 
 def _lower_keys(row):
     return {str(key or "").strip().lower(): (value.strip() if isinstance(value, str) else value) for key, value in row.items()}
 
 
-def _raw_routes_from_csv(text):
-    reader = csv.DictReader(io.StringIO(text))
-    if "route_name" not in [str(name or "").strip().lower() for name in reader.fieldnames or []]:
-        raise PlanError("The CSV needs a route_name column (plus name, latitude, longitude for each stop).")
+def _heading(name):
+    key = " ".join(str(name or "").strip().lower().replace("_", " ").split())
+    return HEADER_ALIASES.get(key) or HEADER_ALIASES.get(key.replace(" ", "_")) or key
+
+
+def _cell(value):
+    """Excel hands back times as time/datetime objects; plans store "HH:MM" text."""
+    if isinstance(value, (datetime.time, datetime.datetime)):
+        return value.strftime("%H:%M")
+    return value.strip() if isinstance(value, str) else value
+
+
+def _tabular_rows(header, rows):
+    """[(row number, {canonical column: value})] from a header and its data rows."""
+    keys = [_heading(name) for name in header]
+    if "route_name" not in keys:
+        raise PlanError("The file needs a Route column (plus Stop, Latitude and Longitude for each stop).")
+    out = []
+    for number, values in rows:
+        row = {key: _cell(value) for key, value in zip(keys, values) if key}
+        for field in ("morning_eta", "evening_eta"):
+            value = row.get(field)
+            if isinstance(value, float) and 0 <= value < 1:  # Excel stores a time as a fraction of a day
+                minutes = round(value * 24 * 60)
+                row[field] = f"{minutes // 60:02d}:{minutes % 60:02d}"
+        out.append((number, row))
+    return out
+
+
+def _rows_from_csv(text):
+    lines = list(csv.reader(io.StringIO(text)))
+    if not lines:
+        return []
+    return _tabular_rows(lines[0], [(number, line) for number, line in enumerate(lines[1:], start=2)])
+
+
+def _rows_from_xlsx(raw):
+    """Every sheet's rows. Each sheet's header is the first row naming a Route and a Stop column,
+    so title rows above it and columns like "Map link" are skipped."""
+    from openpyxl import load_workbook  # only needed for Excel uploads
+
+    try:
+        book = load_workbook(io.BytesIO(raw), read_only=True, data_only=True)
+    except Exception:  # openpyxl raises many types for a damaged or non-Excel file
+        raise PlanError("The file is not a readable Excel (.xlsx) workbook.")
+    rows, total = [], 0
+    for sheet in book.worksheets:
+        header = None
+        for number, values in enumerate(sheet.iter_rows(values_only=True), start=1):
+            total += 1
+            if total > MAX_SHEET_ROWS:
+                raise PlanError(f"A plan can have at most {MAX_STOPS} route stops.")
+            if header is None:
+                keys = {_heading(value) for value in values}
+                if {"route_name", "name"} <= keys:
+                    header = values
+                continue
+            rows.append((f"{sheet.title} row {number}", header, values))
+    book.close()
+    if not rows:
+        raise PlanError("No sheet has a header row with Route and Stop columns.")
+    out = []
+    for where, header, values in rows:
+        out.extend(_tabular_rows(header, [(where, values)]))
+    return out
+
+
+def _raw_routes_from_rows(rows):
     routes = {}
-    for line, raw in enumerate(reader, start=2):  # line 1 is the header
-        row = _lower_keys(raw)
+    for line, row in rows:
         if all(value in (None, "") for value in row.values()):
             continue
-        where = f"Row {line}"
+        where = line if isinstance(line, str) else f"Row {line}"
         route = routes.setdefault(_norm_name(row.get("route_name") or "") or where, {
             "where": where,
             "name": row.get("route_name"),
             "description": row.get("route_description"),
             "status": row.get("route_status"),
+            "contractor": row.get("contractor"),
             "stops": [],
         })
         if any(row.get(key) not in (None, "") for key in ("name", "latitude", "longitude")):
             route["stops"].append({**row, "where": where})
     return list(routes.values())
+
+
+def _far_from_campus_first(item):
+    return -_distance_m(item["latitude"], item["longitude"], *CAMPUS)
 
 
 def _raw_routes_from_json(text):
@@ -190,6 +296,7 @@ def _raw_routes_from_json(text):
             "name": route.get("name"),
             "description": route.get("description"),
             "status": route.get("status"),
+            "contractor": route.get("contractor"),
             "geometry": route.get("geometry"),
             "stops": [{**_lower_keys(stop), "where": f"{where}, stop {n}"} for n, stop in enumerate(stops, start=1)],
         })
@@ -238,27 +345,46 @@ def _clean_stops(raw_stops, errors):
             errors.append(f"{stops[0][0]}: two stops on this route share a stop_order.")
         else:
             stops.sort(key=lambda pair: pair[1]["stop_order"])
-    # Without stop_order the file's own order is the route order.
-    return [{**item, "stop_order": n} for n, (_, item) in enumerate(stops, start=1)]
+    elif stops and all(item["morning_eta"] for _, item in stops):
+        stops.sort(key=lambda pair: pair[1]["morning_eta"])  # pickup times give the order
+    else:
+        stops.sort(key=lambda pair: _far_from_campus_first(pair[1]))
+    return [{**item, "stop_order": n} for n, item in enumerate(_end_at_campus([item for _, item in stops]), start=1)]
+
+
+def _end_at_campus(stops):
+    """Every route ends at the campus stop. A stop the file put at campus is replaced
+    by it (keeping its times), so a route never visits FAST twice."""
+    near = [s for s in stops if -_far_from_campus_first(s) <= CAMPUS_RADIUS_M]
+    campus = {
+        "name": CAMPUS_NAME, "latitude": CAMPUS[0], "longitude": CAMPUS[1], "address": "",
+        "morning_eta": near[0]["morning_eta"] if near else None,
+        "evening_eta": near[0]["evening_eta"] if near else None,
+        "campus": True,
+    }
+    return [s for s in stops if s not in near] + [campus]
 
 
 def parse_plan_file(filename, raw):
     """Return (snapshot, {"name", "description"}). Raises PlanError listing every problem found."""
     if len(raw) > MAX_FILE_BYTES:
         raise PlanError("The file must be smaller than 10 MB.")
-    try:
-        text = raw.decode("utf-8-sig")
-    except UnicodeDecodeError:
-        raise PlanError("The file is not UTF-8 text.")
-
     meta = {}
-    if filename.lower().endswith(".json"):
-        raw_routes, meta = _raw_routes_from_json(text)
+    lower = filename.lower()
+    if lower.endswith(".xlsx"):
+        raw_routes = _raw_routes_from_rows(_rows_from_xlsx(raw))
     else:
         try:
-            raw_routes = _raw_routes_from_csv(text)
-        except csv.Error as exc:
-            raise PlanError(f"Could not read the CSV file: {exc}")
+            text = raw.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            raise PlanError("The file is not UTF-8 text.")
+        if lower.endswith(".json"):
+            raw_routes, meta = _raw_routes_from_json(text)
+        else:
+            try:
+                raw_routes = _raw_routes_from_rows(_rows_from_csv(text))
+            except csv.Error as exc:
+                raise PlanError(f"Could not read the CSV file: {exc}")
 
     if not raw_routes:
         raise PlanError("The file has no routes.")
@@ -293,6 +419,7 @@ def parse_plan_file(filename, raw):
             "name": name,
             "description": str(raw_route.get("description") or "").strip() or "No description",
             "status": status,
+            "contractor": str(raw_route.get("contractor") or "").strip() or None,
             "geometry": geometry,
             "stops": _clean_stops(raw_route["stops"], errors),
         })
@@ -308,36 +435,45 @@ def parse_plan_file(filename, raw):
 
 # ── Matching a plan to the live tables ───────────────────────────────────────
 
+def _place(lat, lng):
+    return (round(float(lat), 6), round(float(lng), 6))  # Stop stores 6 decimals (~0.1 m)
+
+
 class _StopMatcher:
-    """Finds the live stop a plan stop means, or records it as one to create."""
+    """Finds the live stop a plan stop means, or records it as one to create.
+
+    Only a stop at exactly the same coordinates counts as the same stop, whatever
+    its name: two stops even a few metres apart stay separate. A dict keyed on the
+    coordinates makes each lookup O(1), so a 300-stop plan matches in milliseconds.
+    """
 
     def __init__(self):
-        self.entries = [
-            {"stop": stop, "name": stop.name, "lat": float(stop.latitude), "lng": float(stop.longitude)}
-            for stop in Stop.objects.order_by("id")
-        ]
-        self.by_name = {}
-        for entry in self.entries:
-            self.by_name.setdefault(_norm_name(entry["name"]), entry)
+        self.by_place = {}
+        for stop in Stop.objects.order_by("-is_active", "id"):  # prefer an active stop at a shared spot
+            self.by_place.setdefault(_place(stop.latitude, stop.longitude), {"stop": stop, "name": stop.name})
 
     def match(self, spec):
-        key = _norm_name(spec["name"])
-        # ponytail: linear scan per stop; fine up to MAX_STOPS, use a grid index if plans grow.
-        entry = self.by_name.get(key) or next(
-            (e for e in self.entries
-             if _distance_m(spec["latitude"], spec["longitude"], e["lat"], e["lng"]) <= DUPLICATE_RADIUS_M),
-            None,
-        )
+        key = _place(spec["latitude"], spec["longitude"])
+        entry = self.by_place.get(key)
         if entry is None:
-            entry = {"stop": None, "name": spec["name"], "lat": spec["latitude"], "lng": spec["longitude"], "spec": spec}
-            self.entries.append(entry)
-            self.by_name[key] = entry
+            entry = self.by_place[key] = {"stop": None, "name": spec["name"], "spec": spec}
         return entry
+
+
+def _contractor_id(spec, contractors, errors):
+    """The plan's contractor, else the first word of the route name ("Jadoon R-17"), else none."""
+    named = spec.get("contractor")
+    if named:
+        if _norm_name(named) not in contractors:
+            errors.append('Route "%s": unknown contractor "%s".' % (spec["name"], named))
+        return contractors.get(_norm_name(named))
+    return contractors.get(_norm_name(spec["name"].split()[0]))
 
 
 def resolve(snapshot):
     """Work out what applying `snapshot` would do. Reads only; apply/preview both build on it."""
     matcher = _StopMatcher()
+    contractors = {_norm_name(name): pk for pk, name in Contractor.objects.values_list("id", "name")}
     live_by_name = {}
     for route in Route.objects.order_by("id"):
         live_by_name.setdefault(_norm_name(route.name), []).append(route)
@@ -353,17 +489,19 @@ def resolve(snapshot):
         ids = [id(entry) for entry in entries]
         if len(set(ids)) != len(ids):
             # RouteStop allows a stop once per route; two plan stops landed on the same one.
-            errors.append(f'Route "{spec["name"]}": two of its stops are the same existing stop (same place within {DUPLICATE_RADIUS_M} m).')
+            errors.append(f'Route "{spec["name"]}": two of its stops have exactly the same coordinates.')
         planned = [
             (entry["stop"].id if entry["stop"] else None, stop["morning_eta"], stop["evening_eta"])
             for entry, stop in zip(entries, spec["stops"])
         ]
+        contractor_id = _contractor_id(spec, contractors, errors)
         changed = live is None or (
             live.status != spec["status"]
             or live.description != spec["description"]
+            or live.contractor_id != contractor_id
             or planned != live_stops.get(live.id, [])
         )
-        routes.append({"spec": spec, "live": live, "entries": entries, "changed": changed})
+        routes.append({"spec": spec, "live": live, "entries": entries, "changed": changed, "contractor_id": contractor_id})
 
     used = {id(entry): entry for item in routes for entry in item["entries"]}.values()
     return {
@@ -371,10 +509,8 @@ def resolve(snapshot):
         "errors": errors,
         "new_stops": [entry for entry in used if entry["stop"] is None],
         "reactivate": [entry["stop"] for entry in used if entry["stop"] is not None and not entry["stop"].is_active],
-        "archive": [
-            route for group in live_by_name.values() for route in group
-            if route.status != "archived"
-        ],
+        # Live routes the plan does not mention; activation removes them.
+        "dropped": [route for group in live_by_name.values() for route in group],
     }
 
 
@@ -386,17 +522,6 @@ def live_coverage():
     pairs = set(
         RouteStop.objects.filter(route_id__in=running, stop__is_active=True).values_list("route_id", "stop_id")
     )
-    return pairs, running
-
-
-def _plan_coverage(resolution):
-    pairs, running = set(), set()
-    for item in resolution["routes"]:
-        route = item["live"]
-        if route is None or not route.is_active or item["spec"]["status"] != "published":
-            continue  # a brand-new route has no students yet
-        running.add(route.id)
-        pairs.update((route.id, entry["stop"].id) for entry in item["entries"] if entry["stop"] is not None)
     return pairs, running
 
 
@@ -440,79 +565,361 @@ def find_orphans(pairs, running):
     return orphans
 
 
-def _newly_affected(after, before):
-    known = {orphan["registration_id"] for orphan in before}
-    return [orphan for orphan in after if orphan["registration_id"] not in known]
-
-
 # ── Preview and activation ───────────────────────────────────────────────────
+#
+# Activating a plan is one transaction (_switch_over) that writes everything and
+# sends nothing. preview() runs the very same transaction and rolls it back, so
+# what the admin is shown is exactly what activation will do. Notifications are
+# only created after the real transaction commits (each one is also emailed).
 
-def _report(resolution, affected):
-    routes = resolution["routes"]
+MOVE_WARN_M = 1000  # moves longer than this are flagged in the preview
+
+
+class _Rollback(Exception):
+    def __init__(self, report):
+        self.report = report
+
+
+def _create_stops(entries):
+    """Create the stops `entries` describe in one query, and point each entry at its stop."""
+    created = Stop.objects.bulk_create([
+        Stop(
+            name=entry["spec"]["name"],
+            latitude=Decimal(str(round(entry["spec"]["latitude"], 6))),
+            longitude=Decimal(str(round(entry["spec"]["longitude"], 6))),
+            address=entry["spec"].get("address") or NO_ADDRESS,
+            location_source="import",
+            is_campus=bool(entry["spec"].get("campus")),
+        )
+        for entry in entries
+    ])
+    for entry, stop in zip(entries, created):
+        entry["stop"] = stop
+    return created
+
+
+def _flag_campus(pairs):
+    """Mark the stops plan specs call the campus (an existing stop may have been reused)."""
+    ids = [entry["stop"].pk for entry, spec in pairs if spec.get("campus") and entry["stop"] is not None]
+    Stop.objects.filter(pk__in=ids, is_campus=False).update(is_campus=True)
+
+
+def create_plan_stops(snapshot):
+    """Create every stop the plan needs that does not exist yet, so addresses can be
+    filled in before the plan goes live. Routes are not touched. Returns a report."""
+    matcher = _StopMatcher()
+    specs = [stop for route in snapshot["routes"] for stop in route["stops"]]
+    entries = [matcher.match(stop) for stop in specs]
+    unique = list({id(entry): entry for entry in entries}.values())
+    new = [entry for entry in unique if entry["stop"] is None]
+    with transaction.atomic():
+        created = _create_stops(new)
+        _flag_campus(zip(entries, specs))
     return {
-        "routes": {
-            "created": [item["spec"]["name"] for item in routes if item["live"] is None],
-            "updated": [item["spec"]["name"] for item in routes if item["live"] is not None and item["changed"]],
-            "unchanged": sum(1 for item in routes if not item["changed"]),
-            "archived": [route.name for route in resolution["archive"]],
-        },
-        "stops": {
-            "created": [entry["name"] for entry in resolution["new_stops"]],
-            "reactivated": [stop.name for stop in resolution["reactivate"]],
-        },
-        "affected_students": affected,
-        "errors": resolution["errors"],
+        "created": [
+            {"id": s.id, "name": s.name, "address": s.address, "latitude": float(s.latitude), "longitude": float(s.longitude)}
+            for s in created
+        ],
+        "reused": len(unique) - len(new),
     }
 
 
-def preview(plan):
-    """What activating `plan` would change. Writes nothing."""
-    resolution = resolve(plan_snapshot(plan))
-    affected = _newly_affected(find_orphans(*_plan_coverage(resolution)), find_orphans(*live_coverage()))
-    return _report(resolution, affected)
-
-
 def _apply(resolution):
-    for entry in resolution["new_stops"]:
-        spec = entry["spec"]
-        entry["stop"] = Stop.objects.create(
-            name=spec["name"],
-            latitude=Decimal(str(round(spec["latitude"], 6))),
-            longitude=Decimal(str(round(spec["longitude"], 6))),
-            address=spec.get("address") or NO_ADDRESS,
-            location_source="import",
-        )
+    """Write the plan's routes and stops. Sets item["route"] to each plan route's live row."""
+    _create_stops(resolution["new_stops"])
+    _flag_campus((entry, stop) for item in resolution["routes"] for entry, stop in zip(item["entries"], item["spec"]["stops"]))
     for stop in resolution["reactivate"]:
         stop.is_active = True
         stop.save(update_fields=["is_active"])  # save, not update(): the signal drops stale route geometry
 
-    for item in resolution["routes"]:
-        spec, route = item["spec"], item["live"]
-        if route is None:
-            route = Route.objects.create(name=spec["name"])
-        elif not item["changed"]:
-            continue
-        # Same order as the route builder: the RouteStop delete signal clears
-        # geometry, so geometry is written last.
-        RouteStop.objects.filter(route=route).delete()
-        RouteStop.objects.bulk_create([
-            RouteStop(
-                route=route, stop=entry["stop"], stop_order=order,
-                morning_eta=stop["morning_eta"], evening_eta=stop["evening_eta"],
-            )
-            for order, (entry, stop) in enumerate(zip(item["entries"], spec["stops"]), start=1)
-        ])
+    # A handful of set-based queries, not several per route: each one is a round
+    # trip to the database, which is slow over a long network path.
+    routes = resolution["routes"]
+    new = [item for item in routes if item["live"] is None]
+    for item, route in zip(new, Route.objects.bulk_create([Route(name=item["spec"]["name"]) for item in new])):
+        item["route"] = route
+    for item in routes:
+        item.setdefault("route", item["live"])
+    changed = [item for item in routes if item["live"] is None or item["changed"]]
+    with routes_rewritten_in_bulk():  # geometry is written below, so skip the per-row invalidation
+        RouteStop.objects.filter(route__in=[item["route"] for item in changed]).delete()
+    RouteStop.objects.bulk_create([
+        RouteStop(
+            route=item["route"], stop=entry["stop"], stop_order=order,
+            morning_eta=stop["morning_eta"], evening_eta=stop["evening_eta"],
+        )
+        for item in changed
+        for order, (entry, stop) in enumerate(zip(item["entries"], item["spec"]["stops"]), start=1)
+    ])
+    now = timezone.now()
+    for item in changed:
+        route, spec = item["route"], item["spec"]
         route.description = spec["description"]
         route.status = spec["status"]
+        route.contractor_id = item["contractor_id"]
         route.geometry = spec.get("geometry")
-        route.geometry_updated_at = timezone.now() if route.geometry else None
-        route.save(update_fields=["description", "status", "geometry", "geometry_updated_at", "updated_at"])
+        route.geometry_updated_at = now if route.geometry else None
+        route.updated_at = now
+    Route.objects.bulk_update(
+        [item["route"] for item in changed],
+        ["description", "status", "contractor", "geometry", "geometry_updated_at", "updated_at"],
+    )
 
-    # update(), not save(): archiving must not touch is_active or its signal.
-    Route.objects.filter(pk__in=[route.pk for route in resolution["archive"]]).update(status="archived")
+
+def _nearest(choices, lat, lng):
+    """(distance_m, route_id, stop) of the closest (route_id, stop) pair, or None."""
+    # ponytail: linear scan; ~300 stops x a few hundred students is well under a second.
+    return min(
+        ((_distance_m(lat, lng, float(stop.latitude), float(stop.longitude)), route_id, stop) for route_id, stop in choices),
+        key=lambda found: (found[0], found[1]),
+        default=None,
+    )
 
 
-def activate(plan, user=None):
+def _move_buses(dropped_ids, plan_routes, bus_routes, errors):
+    """Move each bus on a removed route to the route the admin picked. Returns the choices shown in the report."""
+    by_name = {_norm_name(route.name): route for route in plan_routes}
+    choices = []
+    for assignment in (
+        RouteAssignment.objects.filter(route_id__in=dropped_ids, is_active=True)
+        .select_related("route", "bus", "driver").order_by("route__name", "bus__bus_number")
+    ):
+        picked = str(bus_routes.get(str(assignment.id)) or "")
+        target = by_name.get(_norm_name(picked)) if picked else None
+        if picked and target is None:
+            errors.append(f'Bus {assignment.bus.bus_number}: route "{picked}" is not in this plan.')
+        owners = {x for x in (assignment.bus.contractor_id, assignment.driver.contractor_id) if x}
+        if target is not None and target.contractor_id and owners - {target.contractor_id}:
+            errors.append(f"Bus {assignment.bus.bus_number}: route {target.name} belongs to another contractor.")
+            target = None
+        choices.append({
+            "assignment_id": assignment.id,
+            "bus": assignment.bus.bus_number,
+            "driver": assignment.driver.name,
+            "contractor": next(iter(owners), None),
+            "from_route": assignment.route.name,
+            "to_route": target.name if target else None,
+        })
+        if target is not None:
+            assignment.route = target
+            assignment.save(update_fields=["route"])
+    return choices
+
+
+def _move_students(semester, plan_routes):
+    """Put every active registration whose route/stop the plan dropped on the nearest plan stop.
+
+    A student whose bus moved to a plan route goes to the nearest stop on that route
+    and keeps the seat; one whose route survived keeps it; anyone else goes to the
+    nearest stop anywhere. Returns (moves, registrations that lost their seat)."""
+    route_by_id = {route.id: route for route in plan_routes}
+    on_route = {}
+    for rs in RouteStop.objects.filter(route__in=plan_routes, stop__is_campus=False, stop__is_active=True).select_related("stop"):
+        on_route.setdefault(rs.route_id, []).append(rs.stop)
+    served = {(route_id, stop.id) for route_id, stops in on_route.items() for stop in stops}
+    everywhere = [(route_id, stop) for route_id, stops in sorted(on_route.items(), key=lambda pair: route_by_id[pair[0]].name) for stop in stops]
+
+    semester_regs = {
+        reg.student_id: reg for reg in SemesterRegistration.objects.filter(semester=semester).exclude(status__in=("Cancelled", "Rejected"))
+    }
+    seat_route = {
+        seat.registration_id: seat.route_assignment.route_id
+        for seat in SeatAllocation.objects.filter(registration__semester=semester).select_related("route_assignment")
+    }
+    moves, lost_seat, moved_regs, moved_sem_regs = [], [], [], []
+    for reg in (
+        TransportRegistration.objects.filter(semester=semester).exclude(status__in=("Cancelled", "Rejected"))
+        .select_related("student__user", "stop", "route").order_by("student__roll_number")
+    ):
+        if (reg.route_id, reg.stop_id) in served:
+            continue
+        sem_reg = semester_regs.get(reg.student_id)
+        seat_on = seat_route.get(sem_reg.id) if sem_reg else None
+        home = seat_on if seat_on in on_route else reg.route_id if reg.route_id in on_route else None
+        lat, lng = float(reg.stop.latitude), float(reg.stop.longitude)
+        found = _nearest([(home, stop) for stop in on_route[home]], lat, lng) if home else None
+        found = found or _nearest(everywhere, lat, lng)
+        if found is None:
+            continue  # the plan has no pickup stops at all; find_orphans reports these
+        distance, route_id, stop = found
+        seat = "none" if seat_on is None else "kept" if seat_on == route_id else "queued"
+        user = reg.student.user
+        moves.append({
+            "registration_id": reg.id,
+            "user_id": user.id,
+            "roll_number": reg.student.roll_number,
+            "name": f"{user.first_name} {user.last_name}".strip() or user.username,
+            "from_route": reg.route.name if reg.route else None,
+            "from_stop": reg.stop.name,
+            "to_route": route_by_id[route_id].name,
+            "to_stop": stop.name,
+            "distance_m": round(distance),
+            "far": distance > MOVE_WARN_M,
+            "seat": seat,
+        })
+        reg.route_id, reg.stop = route_id, stop
+        moved_regs.append(reg)
+        if sem_reg:
+            sem_reg.route_id, sem_reg.stop = route_id, stop
+            moved_sem_regs.append(sem_reg)
+            if seat == "queued":
+                lost_seat.append(sem_reg)
+    TransportRegistration.objects.bulk_update(moved_regs, ["route", "stop"])
+    SemesterRegistration.objects.bulk_update(moved_sem_regs, ["route", "stop"])
+
+    # Anything else this semester still on a dropped route or stop (cancelled or rejected
+    # registrations, mostly) moves quietly too, so removing the old routes never deletes it.
+    done = {TransportRegistration: {reg.pk for reg in moved_regs}, SemesterRegistration: {reg.pk for reg in moved_sem_regs}}
+    for model in (TransportRegistration, SemesterRegistration):
+        quiet = []
+        for reg in model.objects.filter(semester=semester).exclude(pk__in=done[model]).select_related("stop"):
+            if (reg.route_id, reg.stop_id) in served:
+                continue
+            found = _nearest(everywhere, float(reg.stop.latitude), float(reg.stop.longitude))
+            if found:
+                reg.route_id, reg.stop = found[1], found[2]
+                quiet.append(reg)
+        model.objects.bulk_update(quiet, ["route", "stop"])
+    return moves, lost_seat
+
+
+def _queue_for_new_route(registrations):
+    """Students whose old bus did not come with them wait first in line for a seat on their new route.
+    Written directly (not via add_to_waitlist) so they get one notification about the move, not two."""
+    if not registrations:
+        return
+    semester_id = registrations[0].semester_id
+    last = dict(
+        Waitlist.objects.filter(registration__semester_id=semester_id)
+        .values_list("registration__route_id").annotate(Max("position"))
+    )
+    existing = {entry.registration_id: entry for entry in Waitlist.objects.filter(registration__in=registrations)}
+    new = []
+    for reg in registrations:
+        last[reg.route_id] = position = (last.get(reg.route_id) or 0) + 1
+        entry = existing.get(reg.pk) or Waitlist(registration=reg)
+        entry.position, entry.status, entry.offered_at, entry.offer_expires_at = position, "waiting", None, None
+        if entry.pk is None:
+            new.append(entry)
+    Waitlist.objects.bulk_update(existing.values(), ["position", "status", "offered_at", "offer_expires_at"])
+    Waitlist.objects.bulk_create(new)
+    SemesterRegistration.objects.filter(pk__in=[reg.pk for reg in registrations]).update(status="Waitlisted")
+    TransportRegistration.objects.filter(
+        semester_id=semester_id, student_id__in=[reg.student_id for reg in registrations],
+    ).exclude(status__in=("Cancelled", "Rejected")).update(status="Waitlisted")
+
+
+def _remove_unused(dropped):
+    """Delete the routes and stops the new plan does not use. Anything another semester's
+    registrations still point at is archived/deactivated instead, so history survives."""
+    referenced = set(TransportRegistration.objects.filter(route__in=dropped).values_list("route_id", flat=True))
+    referenced |= set(SemesterRegistration.objects.filter(route__in=dropped).values_list("route_id", flat=True))
+    keep = [route for route in dropped if route.id in referenced]
+    gone = [route for route in dropped if route.id not in referenced]
+    Route.objects.filter(pk__in=[route.pk for route in keep]).update(status="archived")
+    # Unmapped buses on these routes lose their assignment (and its seats) with the route.
+    with routes_rewritten_in_bulk():
+        Route.objects.filter(pk__in=[route.pk for route in gone]).delete()
+
+    unused = Stop.objects.filter(routestop__isnull=True)
+    still_referenced = unused.filter(Q(transportregistration__isnull=False) | Q(semesterregistration__isnull=False)).distinct()
+    deactivated = still_referenced.filter(is_active=True).update(is_active=False)
+    _, per_model = unused.exclude(pk__in=still_referenced.values("pk")).delete()
+    return {
+        "removed": [route.name for route in gone],
+        "archived": [route.name for route in keep],
+        "stops_removed": per_model.get(Stop._meta.label, 0),
+        "stops_deactivated": deactivated,
+    }
+
+
+def _switch_over(plan, bus_routes):
+    """Make `plan` the live plan inside the caller's transaction. Returns (report, notifications)."""
+    resolution = resolve(plan_snapshot(plan))
+    errors = list(resolution["errors"])
+    if errors:
+        raise PlanError(errors)
+    semester = Semester.objects.filter(is_active=True).first()
+
+    with audit.suspended(), suppress_promotion():
+        for current in RoutePlan.objects.filter(is_active=True).exclude(pk=plan.pk):
+            current.data = snapshot_live()  # keep the outgoing plan exactly as it was live
+            current.is_active = False
+            current.save(update_fields=["data", "is_active", "updated_at"])
+        _apply(resolution)
+        plan_routes = [item["route"] for item in resolution["routes"]]
+        dropped = resolution["dropped"]
+        buses = _move_buses({route.id for route in dropped}, plan_routes, bus_routes or {}, errors)
+        if errors:
+            raise PlanError(errors)
+        moves, lost_seat = _move_students(semester, plan_routes) if semester else ([], [])
+        removed = _remove_unused(dropped)
+        _queue_for_new_route(lost_seat)
+        plan.is_active = True
+        plan.activated_at = timezone.now()
+        plan.save(update_fields=["is_active", "activated_at", "updated_at"])
+
+    routes = resolution["routes"]
+    report = {
+        "routes": {
+            "created": [item["spec"]["name"] for item in routes if item["live"] is None],
+            "updated": [item["spec"]["name"] for item in routes if item["live"] is not None and item["changed"]],
+            "unchanged": sum(1 for item in routes if not item["changed"]),
+            "removed": removed["removed"],
+            "archived": removed["archived"],
+        },
+        "stops": {
+            "created": [entry["name"] for entry in resolution["new_stops"]],
+            "reactivated": [stop.name for stop in resolution["reactivate"]],
+            "removed": removed["stops_removed"],
+            "deactivated": removed["stops_deactivated"],
+        },
+        "buses": buses,
+        "plan_routes": [{"name": route.name, "contractor": route.contractor_id} for route in sorted(plan_routes, key=lambda r: r.name)],
+        "moved_students": [{k: v for k, v in move.items() if k != "user_id"} for move in moves],
+        "affected_students": find_orphans(*live_coverage()),
+        "errors": [],
+    }
+    notes = [_move_note(move) for move in moves]
+    return report, notes
+
+
+def _move_note(move):
+    seat = {
+        "kept": " Your bus moved to this route with you, so you keep your seat.",
+        "queued": " Your old bus is not on this route yet, so you are queued for a seat and will be notified when one is ready.",
+        "none": "",
+    }[move["seat"]]
+    return (
+        move["user_id"],
+        "Your transport stop has changed",
+        f'The new route plan is live. Your stop is now "{move["to_stop"]}" on route {move["to_route"]} '
+        f'({move["distance_m"]} m from your previous stop "{move["from_stop"]}").{seat} '
+        f"If another stop suits you better, submit a route change request.",
+    )
+
+
+def preview(plan, bus_routes=None):
+    """Exactly what activating `plan` would change: runs the activation and rolls it back."""
+    plan = RoutePlan.objects.get(pk=plan.pk)  # a copy: the dry run marks it active in memory
+    if plan.is_active:
+        return {"errors": ["This plan is already active."]}
+    try:
+        with transaction.atomic():
+            # Two previews (or a preview and an activation) would rewrite the same rows and
+            # wait on each other; the second one is told straight away instead of hanging.
+            list(RoutePlan.objects.select_for_update(nowait=True).filter(Q(pk=plan.pk) | Q(is_active=True)))
+            report, _ = _switch_over(plan, bus_routes)
+            raise _Rollback(report)
+    except _Rollback as done:
+        return done.report
+    except PlanError as exc:
+        return {"errors": exc.errors}
+    except DatabaseError:
+        return {"errors": ["Another preview or activation is running. Try again in a few seconds."], "busy": True}
+
+
+def activate(plan, user=None, bus_routes=None):
     """Make `plan` the live plan. Returns the same report as preview()."""
     with transaction.atomic():
         locked = list(RoutePlan.objects.select_for_update().filter(Q(pk=plan.pk) | Q(is_active=True)))
@@ -521,52 +928,30 @@ def activate(plan, user=None):
             raise PlanError("This plan no longer exists.")
         if plan.is_active:
             raise PlanError("This plan is already active.")
-
-        resolution = resolve(plan_snapshot(plan))
-        if resolution["errors"]:
-            raise PlanError(resolution["errors"])
-        before = find_orphans(*live_coverage())
-
-        # One summary entry below instead of a log row per route stop.
-        with audit.suspended():
-            for current in locked:
-                if current.is_active:
-                    current.data = snapshot_live()  # keep the outgoing plan exactly as it was live
-                    current.is_active = False
-                    current.save(update_fields=["data", "is_active", "updated_at"])
-            _apply(resolution)
-            plan.is_active = True
-            plan.activated_at = timezone.now()
-            plan.save(update_fields=["is_active", "activated_at", "updated_at"])
-
-        affected = _newly_affected(find_orphans(*live_coverage()), before)
-        report = _report(resolution, affected)
+        report, notes = _switch_over(plan, bus_routes)
         audit.write_log(
             action="update", module="routes", model_name="Route Plan",
             object_id=plan.pk, object_repr=plan.name, actor=user,
             description=(
                 f'Activated route plan "{plan.name}": {len(report["routes"]["created"])} routes created, '
-                f'{len(report["routes"]["updated"])} updated, {len(report["routes"]["archived"])} archived, '
-                f'{len(affected)} students affected.'
+                f'{len(report["routes"]["updated"])} updated, {len(report["routes"]["removed"])} removed, '
+                f'{len(report["moved_students"])} students moved.'
             ),
         )
 
-    for orphan in affected:
-        Notification.objects.create(
-            user_id=orphan["user_id"],
-            type="warning",
-            title="Your transport route has changed",
-            message=(
-                f"The route plan was updated and your registration is affected. {orphan['reason']} "
-                f"Please submit a route change request to choose a new stop. Your current seat is kept until then."
-            ),
-        )
-    if affected:
+    # Only now that everything is saved: one notification (and email) per moved student.
+    for user_id, title, message in notes:
+        Notification.objects.create(user_id=user_id, type="warning", title=title, message=message)
+    if report["moved_students"] or report["affected_students"]:
         for admin in staff_with_module("routes", MANAGE):
             Notification.objects.create(
                 user=admin,
                 type="alert",
                 title=f'Route plan "{plan.name}" activated',
-                message=f"{len(affected)} registered student(s) are on a route or stop the new plan no longer serves. See Route Plans > Needs attention.",
+                message=(
+                    f'{len(report["moved_students"])} student(s) were moved to the nearest stop on the new routes'
+                    + (f', {len(report["affected_students"])} still need a stop (see Route Plans > Needs attention)' if report["affected_students"] else "")
+                    + "."
+                ),
             )
     return report

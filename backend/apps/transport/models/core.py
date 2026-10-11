@@ -60,6 +60,17 @@ class Semester(models.Model):
         return name if str(self.year) in name else f"{name} {self.year}"
 
 
+class Contractor(models.Model):
+    """A transport company (e.g. Jadoon, Nadeem) that runs its own routes, buses and drivers."""
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
+
+
 class Route(models.Model):
     STATUS_CHOICES = [
         ("draft", "Draft"),
@@ -69,6 +80,7 @@ class Route(models.Model):
 
     name = models.CharField(max_length=100, default="N/A")
     description = models.TextField(default="No description")
+    contractor = models.ForeignKey(Contractor, on_delete=models.PROTECT, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     # Cached road-following GeoJSON. Ordered RouteStop records remain the source
     # of truth, so a routing-provider outage never makes a route uneditable.
@@ -91,6 +103,8 @@ class Stop(models.Model):
     location_source = models.CharField(max_length=30, default="manual")
     location_accuracy_m = models.PositiveIntegerField(null=True, blank=True)
     provider_place_id = models.CharField(max_length=255, blank=True, default="")
+    # The campus every route ends at. It is a destination, never a pickup stop.
+    is_campus = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -120,6 +134,7 @@ class Bus(models.Model):
     capacity = models.IntegerField(default=0)
     model = models.CharField(max_length=100, default="N/A")
     tracker_token = models.CharField(max_length=50, blank=True, null=True)
+    contractor = models.ForeignKey(Contractor, on_delete=models.PROTECT, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -133,6 +148,7 @@ class Driver(models.Model):
     # Optional login, created by an admin. Null for drivers who never sign in.
     user = models.OneToOneField(User, on_delete=models.SET_NULL, null=True, blank=True, related_name="driver_profile")
     name = models.CharField(max_length=150, default="N/A")
+    contractor = models.ForeignKey(Contractor, on_delete=models.PROTECT, null=True, blank=True)
     cnic = models.CharField(max_length=15, default="N/A")
     license_no = models.CharField(max_length=30, default="N/A")
     phone = models.CharField(max_length=20, default="N/A")

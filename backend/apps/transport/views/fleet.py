@@ -111,7 +111,7 @@ from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
 class BusViewSet(viewsets.ModelViewSet):
-    queryset = Bus.objects.all()
+    queryset = Bus.objects.order_by("bus_number", "id")
     serializer_class = BusSerializer
     permission_classes = [IsAdmin] # Only Admin full access
 
@@ -130,7 +130,7 @@ class BusViewSet(viewsets.ModelViewSet):
 
 
 class DriverViewSet(viewsets.ModelViewSet):
-    queryset = Driver.objects.all()
+    queryset = Driver.objects.order_by("name", "id")
     serializer_class = DriverSerializer
     permission_classes = [IsAdmin]  # keeps admin-only for all other actions
 
@@ -165,7 +165,7 @@ class DriverViewSet(viewsets.ModelViewSet):
 
 
 class RouteAssignmentViewSet(viewsets.ModelViewSet):
-    queryset = RouteAssignment.objects.all().select_related(
+    queryset = RouteAssignment.objects.order_by("-is_active", "route__name").select_related(
         "route",
         "bus",
         "driver",

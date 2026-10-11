@@ -284,7 +284,7 @@ class MapRouteApiTests(TestCase):
 		)
 
 	@patch("apps.transport.views.req_lib.get")
-	def test_route_map_reroutes_missing_geometry(self, mock_get):
+	def test_route_map_never_waits_on_routing_and_uses_built_lines(self, mock_get):
 		mock_response = Mock()
 		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
 		mock_get.return_value = mock_response
@@ -292,8 +292,17 @@ class MapRouteApiTests(TestCase):
 		response = self.client.get("/api/routes/map/")
 		self.assertEqual(response.status_code, 200)
 		route = next(item for item in response.data["routes"] if item["id"] == self.route.id)
-		self.assertEqual(route["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
+		self.assertFalse(route["has_road_line"])  # drawn stop to stop straight away
 		self.assertEqual(route["stops"][0]["route_stop_id"], self.route_stop.id)
+		mock_get.assert_not_called()
+
+		self.client.force_authenticate(user=self.admin)
+		built = self.client.post(f"/api/routes/{self.route.id}/build-geometry/")
+		self.assertEqual((built.status_code, built.data["has_road_line"]), (200, True))
+		self.client.force_authenticate(user=self.student)
+		route = next(item for item in self.client.get("/api/routes/map/").data["routes"] if item["id"] == self.route.id)
+		self.assertEqual(route["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
+		self.assertEqual(mock_get.call_count, 1)  # saved, so later loads do not ask again
 
 	@patch("apps.transport.views.req_lib.get")
 	def test_route_map_retries_a_saved_straight_line(self, mock_get):
@@ -340,9 +349,11 @@ class MapRouteApiTests(TestCase):
 		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.student)
+		self.client.get(f"/api/routes/{self.route.id}/map-detail/")  # opening one route builds and saves its line
 		response = self.client.get(f"/api/registration/eligible-route-stops/?semester={self.semester.id}")
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.data["route_geometries"][self.route.id]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
+		self.assertEqual(mock_get.call_count, 1)
 
 	def test_registration_uses_explicit_route_stop_when_stop_is_shared(self):
 		self.client.force_authenticate(user=self.student)

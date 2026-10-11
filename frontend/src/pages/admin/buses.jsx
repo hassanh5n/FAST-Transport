@@ -5,16 +5,19 @@ import { ConfirmModal, FormModal, StatusBadge, Pill, FormCard, Field, SectionBlo
 import { inputStyle } from "../../styles/formStyles";
 import { colors, fonts, radius, btn } from "../../theme";
 import { getBuses, createBus, updateBus, deleteBus } from "../../services/transportService";
+import { useContractor, ContractorSwitch, ContractorSelect } from "../../components/ContractorSwitch";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
 
 function BusesPage() {
-  const [buses, setBuses] = useState([]);
-  const [form, setForm] = useState({ bus_number: "", capacity: "", model: "", tracker_token: "" });
+  const contractor = useContractor();
+  const [allBuses, setBuses] = useState([]);
+  const buses = allBuses.filter((b) => contractor.matches(b.contractor));
+  const [form, setForm] = useState({ bus_number: "", capacity: "", model: "", tracker_token: "", contractor: "" });
   const [pendingToggle, setPendingToggle] = useState(null);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [editingBus, setEditingBus] = useState(null);
-  const [editForm, setEditForm] = useState({ bus_number: "", capacity: "", model: "", tracker_token: "" });
+  const [editForm, setEditForm] = useState({ bus_number: "", capacity: "", model: "", tracker_token: "", contractor: "" });
   const [savingEdit, setSavingEdit] = useState(false);
 
   const fetchBuses = () =>
@@ -44,6 +47,7 @@ function BusesPage() {
       capacity: bus.capacity ?? "",
       model: bus.model || "",
       tracker_token: bus.tracker_token || "",
+      contractor: bus.contractor ?? "",
     });
   };
 
@@ -71,6 +75,7 @@ function BusesPage() {
         capacity: Number(editForm.capacity),
         model: editForm.model,
         tracker_token: editForm.tracker_token,
+        contractor: editForm.contractor || null,
       });
       setEditingBus(null);
       fetchBuses();
@@ -85,8 +90,8 @@ function BusesPage() {
     e.preventDefault();
     if (!form.bus_number || !form.capacity) { alert("Bus number and capacity are required"); return; }
     try {
-      await createBus(form);
-      setForm({ bus_number: "", capacity: "", model: "", tracker_token: "" });
+      await createBus({ ...form, contractor: form.contractor || null });
+      setForm({ bus_number: "", capacity: "", model: "", tracker_token: "", contractor: "" });
       fetchBuses();
     } catch (err) {
       alert(`Failed to add bus: ${JSON.stringify(err.response?.data || err.message)}`);
@@ -95,6 +100,7 @@ function BusesPage() {
 
   const columns = [
     { key: "bus_number", label: "Bus Number" },
+    { key: "contractor", label: "Contractor", render: (row) => contractor.nameOf(row.contractor) || "—" },
     { key: "total_seats", label: "Total Seats", render: (row) => row.total_seats ?? row.capacity },
     { key: "available_seats", label: "Available Seats", render: (row) => row.available_seats ?? row.capacity },
     { key: "model", label: "Model" },
@@ -172,10 +178,14 @@ function BusesPage() {
           <Field label="GPS Tracker Token" flex="1 1 180px">
             <input name="tracker_token" placeholder="e.g. YgIw0Z" value={editForm.tracker_token} onChange={handleEditChange} style={inputStyle} />
           </Field>
+          <Field label="Contractor" flex="1 1 160px">
+            <ContractorSelect contractors={contractor.contractors} value={editForm.contractor} onChange={handleEditChange} />
+          </Field>
         </FormModal>
       )}
 
       <PageTitle sub="Manage fleet and seat availability.">Buses</PageTitle>
+      <ContractorSwitch value={contractor} />
 
       {/* Seat summary */}
       <div className="stat-cards-row">
@@ -199,6 +209,9 @@ function BusesPage() {
         </Field>
         <Field label="GPS Tracker Token" flex="1 1 160px">
           <input name="tracker_token" placeholder="e.g. YgIw0Z" value={form.tracker_token} onChange={handleChange} style={inputStyle} />
+        </Field>
+        <Field label="Contractor" flex="1 1 140px">
+          <ContractorSelect contractors={contractor.contractors} value={form.contractor} onChange={handleChange} />
         </Field>
       </FormCard>
 

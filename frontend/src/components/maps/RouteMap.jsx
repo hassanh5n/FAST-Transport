@@ -29,6 +29,7 @@ function makeFeatures(routes) {
           routeId: route.id, routeStopId: stop.route_stop_id, name: stop.name,
           address: stop.address || "", stopOrder: stop.stop_order, color,
           morningEta: stop.morning_eta || "", eveningEta: stop.evening_eta || "",
+          isCampus: Boolean(stop.is_campus),
         },
         geometry: { type: "Point", coordinates: [Number(stop.longitude), Number(stop.latitude)] },
       });
@@ -62,6 +63,7 @@ function makeSelectedRouteFeatures(routes, selectedRouteId) {
       routeId: route.id, routeStopId: stop.route_stop_id, name: stop.name,
       address: stop.address || "", stopOrder: stop.stop_order, color,
       morningEta: stop.morning_eta || "", eveningEta: stop.evening_eta || "",
+      isCampus: Boolean(stop.is_campus),
     },
     geometry: { type: "Point", coordinates: [Number(stop.longitude), Number(stop.latitude)] },
   }));

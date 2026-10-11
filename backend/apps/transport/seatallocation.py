@@ -480,7 +480,10 @@ def promote_next_from_waitlist(route, semester):
     due_at = None
     if transport_registration:
         _, due_at = issue_challan(transport_registration)
-        transport_registration.status = "Seat Held"
+        # A student who already paid (e.g. queued again after a route plan change) is not asked to pay twice.
+        paid = payment_settled(registration)
+        due_at = None if paid else due_at
+        transport_registration.status = "Approved" if paid else "Seat Held"
         transport_registration.save(update_fields=["status"])
 
     seat = SeatAllocation.objects.filter(registration=registration).first()

@@ -8,7 +8,7 @@ import {
   clearAllNotifications,
 } from "../services/transportService";
 
-const POLL_INTERVAL_MS = 15000;
+const POLL_INTERVAL_MS = 60000; // a new notification shows within a minute; opening the bell refreshes at once
 
 function timeAgo(dateString) {
   const diffMs = Date.now() - new Date(dateString).getTime();
@@ -35,8 +35,11 @@ function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, POLL_INTERVAL_MS);
-    return () => clearInterval(interval);
+    // Skip polls while the tab is hidden; catch up as soon as it is shown again.
+    const interval = setInterval(() => { if (!document.hidden) fetchNotifications(); }, POLL_INTERVAL_MS);
+    const onShow = () => { if (!document.hidden) fetchNotifications(); };
+    document.addEventListener("visibilitychange", onShow);
+    return () => { clearInterval(interval); document.removeEventListener("visibilitychange", onShow); };
   }, []);
 
   // Close dropdown on outside click
@@ -113,7 +116,7 @@ function NotificationBell() {
   return (
     <div ref={containerRef} style={{ position: "relative" }}>
       <button
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => { if (!open) fetchNotifications(); setOpen((o) => !o); }}
         style={styles.bellBtn}
         aria-label="Notifications"
       >
