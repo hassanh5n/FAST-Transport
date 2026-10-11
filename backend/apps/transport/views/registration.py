@@ -328,7 +328,10 @@ class TransportRegistrationViewSet(viewsets.ModelViewSet):
             registration.save(update_fields=["status"])
 
 class SeatAllocationViewSet(viewsets.ModelViewSet):
-    queryset = SeatAllocation.objects.all()
+    queryset = SeatAllocation.objects.select_related(
+        "registration__student__user", "registration__semester", "registration__route", "registration__stop",
+        "route_assignment__route", "route_assignment__bus", "route_assignment__driver", "route_assignment__semester",
+    ).order_by("id")
     serializer_class = SeatAllocationSerializer
     permission_classes = [IsAdmin] # Only Admin full access
 

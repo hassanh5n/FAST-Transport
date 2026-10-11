@@ -43,6 +43,7 @@ REST_FRAMEWORK = {
 
 # ── Middleware ────────────────────────────────────────────────────────────────
 MIDDLEWARE = [
+    'django.middleware.gzip.GZipMiddleware',  # first, so it compresses the final response
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

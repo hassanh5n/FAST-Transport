@@ -1,46 +1,48 @@
+// Pages load on demand: the login page no longer downloads the map and chart libraries.
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Home from "./pages/home";
-import Login from "./pages/auth/login";
-import Signup from "./pages/auth/signup";
-import ForgotPassword from "./pages/auth/ForgotPassword";
-import ResetPassword from "./pages/auth/ResetPassword";
-import AdminDashboard from "./pages/admin/dashboard";
-import StudentsPage from "./pages/admin/students";
-import BusesPage from "./pages/admin/buses";
-import DriversPage from "./pages/admin/drivers";
-import RoutesPage from "./pages/admin/routes";
-import RoutePlansPage from "./pages/admin/RoutePlans";
-import AssignmentsPage from "./pages/admin/assignments";
-import StudentDashboard from "./pages/student/dashboard";
-import StudentTransport from "./pages/student/transport";
-import StudentComplaints from "./pages/student/complaints";
-import StopsPage from "./pages/admin/stops";
-import SemestersPage from "./pages/admin/semesters";
-import RouteStopsPage from "./pages/admin/routestops";
-import ViewRoutes from "./pages/student/ViewRoutes";
-import TransportRegistration from "./pages/student/registeration";
-import ChallanPage from "./pages/student/ChallanPage";
-import StudentChallanPage from "./pages/student/StudentChallanPage";
-import AdminFeeVerifications from "./pages/admin/AdminFeeVerifications";
-import StudentBusAssignmentsPage from "./pages/admin/StudentBusAssignments";
-import OTPVerification from "./pages/auth/OTPVerification";
-import StudentMap from "./pages/student/StudentMap";
-import AdminComplaintsPage from "./pages/admin/complaints";
-import NotFoundPage from "./pages/NotFound";
+const Home = lazy(() => import("./pages/home"));
+const Login = lazy(() => import("./pages/auth/login"));
+const Signup = lazy(() => import("./pages/auth/signup"));
+const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
+const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
+const AdminDashboard = lazy(() => import("./pages/admin/dashboard"));
+const StudentsPage = lazy(() => import("./pages/admin/students"));
+const BusesPage = lazy(() => import("./pages/admin/buses"));
+const DriversPage = lazy(() => import("./pages/admin/drivers"));
+const RoutesPage = lazy(() => import("./pages/admin/routes"));
+const RoutePlansPage = lazy(() => import("./pages/admin/RoutePlans"));
+const AssignmentsPage = lazy(() => import("./pages/admin/assignments"));
+const StudentDashboard = lazy(() => import("./pages/student/dashboard"));
+const StudentTransport = lazy(() => import("./pages/student/transport"));
+const StudentComplaints = lazy(() => import("./pages/student/complaints"));
+const StopsPage = lazy(() => import("./pages/admin/stops"));
+const SemestersPage = lazy(() => import("./pages/admin/semesters"));
+const RouteStopsPage = lazy(() => import("./pages/admin/routestops"));
+const ViewRoutes = lazy(() => import("./pages/student/ViewRoutes"));
+const TransportRegistration = lazy(() => import("./pages/student/registeration"));
+const ChallanPage = lazy(() => import("./pages/student/ChallanPage"));
+const StudentChallanPage = lazy(() => import("./pages/student/StudentChallanPage"));
+const AdminFeeVerifications = lazy(() => import("./pages/admin/AdminFeeVerifications"));
+const StudentBusAssignmentsPage = lazy(() => import("./pages/admin/StudentBusAssignments"));
+const OTPVerification = lazy(() => import("./pages/auth/OTPVerification"));
+const StudentMap = lazy(() => import("./pages/student/StudentMap"));
+const AdminComplaintsPage = lazy(() => import("./pages/admin/complaints"));
+const NotFoundPage = lazy(() => import("./pages/NotFound"));
 import AppFeedbackLayer from "./components/AppFeedbackLayer";
-import StudentRouteChange from "./pages/student/StudentRouteChange";          
-import AdminRouteChangeRequests from "./pages/admin/AdminRouteChangeRequests";
-import AdminExportPage from "./pages/admin/AdminExport";
-import StudentIncidents from "./pages/student/StudentIncidents";
-import AdminIncidents from "./pages/admin/AdminIncidents";
-import RouteBuilder from "./pages/admin/RouteBuilder";
-import AdminRouteDetail from "./pages/admin/AdminRouteDetail";
-import AdminWaitlist from "./pages/admin/AdminWaitlist";
-import AdminManagement from "./pages/admin/AdminManagement";
-import ActivityLogs from "./pages/admin/ActivityLogs";
-import DriverDashboard from "./pages/driver/DriverDashboard";
-import DriverTrip from "./pages/driver/DriverTrip";
-import DriverPassengers from "./pages/driver/DriverPassengers";
+const StudentRouteChange = lazy(() => import("./pages/student/StudentRouteChange"));
+const AdminRouteChangeRequests = lazy(() => import("./pages/admin/AdminRouteChangeRequests"));
+const AdminExportPage = lazy(() => import("./pages/admin/AdminExport"));
+const StudentIncidents = lazy(() => import("./pages/student/StudentIncidents"));
+const AdminIncidents = lazy(() => import("./pages/admin/AdminIncidents"));
+const RouteBuilder = lazy(() => import("./pages/admin/RouteBuilder"));
+const AdminRouteDetail = lazy(() => import("./pages/admin/AdminRouteDetail"));
+const AdminWaitlist = lazy(() => import("./pages/admin/AdminWaitlist"));
+const AdminManagement = lazy(() => import("./pages/admin/AdminManagement"));
+const ActivityLogs = lazy(() => import("./pages/admin/ActivityLogs"));
+const DriverDashboard = lazy(() => import("./pages/driver/DriverDashboard"));
+const DriverTrip = lazy(() => import("./pages/driver/DriverTrip"));
+const DriverPassengers = lazy(() => import("./pages/driver/DriverPassengers"));
 import { can, isSuperAdmin } from "./utils/permissions";
 
 // Where a signed-in user belongs, based on what login stored.
@@ -108,6 +110,7 @@ function App() {
   return (
     <BrowserRouter>
       <AppFeedbackLayer />
+      <Suspense fallback={null}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -163,6 +166,7 @@ function App() {
 
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </Suspense>
     </BrowserRouter>
   );
 }

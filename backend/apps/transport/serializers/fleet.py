@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.db import transaction
+from django.db.models import Count
 from django.utils import timezone
 from ..models import (
     Challan,
@@ -41,10 +42,16 @@ class BusSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
     def get_occupied_seats(self, obj):
-        return SeatAllocation.objects.filter(
-            route_assignment__bus=obj,
-            route_assignment__is_active=True,
-        ).count()
+        # Counted once for every bus and kept in the (shared) serializer context,
+        # so a list of N buses costs one query instead of 2N.
+        counts = self.context.get("_seats_by_bus")
+        if counts is None:
+            counts = dict(
+                SeatAllocation.objects.filter(route_assignment__is_active=True)
+                .values_list("route_assignment__bus").annotate(Count("id"))
+            )
+            self.context["_seats_by_bus"] = counts
+        return counts.get(obj.id, 0)
 
     def get_available_seats(self, obj):
         occupied = self.get_occupied_seats(obj)

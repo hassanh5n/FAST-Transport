@@ -132,6 +132,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return (
             Notification.objects
             .filter(user=self.request.user)
+            .select_related("user")
             .order_by("-created_at")
         )
 

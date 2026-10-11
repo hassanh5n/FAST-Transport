@@ -119,9 +119,10 @@ class StudentProfileViewSet(viewsets.ModelViewSet):
         user = self.request.user
         # Scope on staff status, not group membership: drivers and group-less
         # users must only ever see their own profile.
+        profiles = StudentProfile.objects.select_related("user")
         if user.is_staff:
-            return StudentProfile.objects.all()
-        return StudentProfile.objects.filter(user=user)
+            return profiles.all()
+        return profiles.filter(user=user)
 
 
 class SemesterViewSet(viewsets.ModelViewSet):
@@ -137,9 +138,10 @@ class SemesterRegistrationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        registrations = SemesterRegistration.objects.select_related("student__user", "semester", "route", "stop")
         if user.is_staff:
-            return SemesterRegistration.objects.all()
-        return SemesterRegistration.objects.filter(student__user=user)
+            return registrations.all()
+        return registrations.filter(student__user=user)
 
 
 @api_view(['GET'])
