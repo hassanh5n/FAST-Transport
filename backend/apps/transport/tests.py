@@ -964,3 +964,21 @@ class DriverConsoleTests(TestCase):
 		self.client.force_authenticate(user=admin)
 		self.assertEqual(self.client.delete(f"/api/drivers/{self.driver.id}/").status_code, 204)
 		self.assertFalse(User.objects.filter(pk=user_id).exists())
+
+class CompactLineTests(TestCase):
+	def test_drops_points_on_a_straight_stretch_and_rounds(self):
+		from .views.maps import _compact_line
+		line = {"type": "LineString", "coordinates": [
+			[67.0847001, 24.9215004], [67.08520001, 24.92200003], [67.0857, 24.9225],  # straight
+			[67.09, 24.93],  # real bend
+			[67.0947, 24.9315],
+		]}
+		coordinates = _compact_line(line)["coordinates"]
+		self.assertEqual(coordinates[0], [67.0847, 24.9215])
+		self.assertEqual(coordinates[-1], [67.0947, 24.9315])
+		self.assertIn([67.09, 24.93], coordinates)
+		self.assertNotIn([67.0852, 24.922], coordinates)
+
+	def test_leaves_non_lines_alone(self):
+		from .views.maps import _compact_line
+		self.assertIsNone(_compact_line(None))

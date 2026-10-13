@@ -294,6 +294,50 @@ def _is_straight_fallback(geometry, stop_coordinates):
     )
 
 
+# 5 decimals is ~1 m; the simplify tolerance (~2 m) drops points a map can't show.
+LINE_DECIMALS = 5
+LINE_TOLERANCE_DEG = 2e-5
+
+
+def _compact_line(geometry):
+    """Shrink a road line for transport: Douglas-Peucker simplify, then round.
+
+    OSRM returns every road node at 6+ decimals, which made the network map
+    payload ~440 KB. Endpoints are always kept. Non-LineStrings pass through.
+    """
+    if not _is_line_string(geometry):
+        return geometry
+    try:
+        points = [(float(p[0]), float(p[1])) for p in geometry["coordinates"]]
+    except (TypeError, ValueError, IndexError):
+        return geometry
+    keep = [False] * len(points)
+    keep[0] = keep[-1] = True
+    stack = [(0, len(points) - 1)]
+    while stack:
+        first, last = stack.pop()
+        (x1, y1), (x2, y2) = points[first], points[last]
+        dx, dy = x2 - x1, y2 - y1
+        length = (dx * dx + dy * dy) ** 0.5
+        farthest, index = 0.0, None
+        for i in range(first + 1, last):
+            px, py = points[i]
+            if length:
+                distance = abs(dy * (px - x1) - dx * (py - y1)) / length
+            else:
+                distance = ((px - x1) ** 2 + (py - y1) ** 2) ** 0.5
+            if distance > farthest:
+                farthest, index = distance, i
+        if index is not None and farthest > LINE_TOLERANCE_DEG:
+            keep[index] = True
+            stack += [(first, index), (index, last)]
+    coordinates = [
+        [round(x, LINE_DECIMALS), round(y, LINE_DECIMALS)]
+        for (x, y), kept in zip(points, keep) if kept
+    ]
+    return {"type": "LineString", "coordinates": coordinates}
+
+
 def _road_geometry(coordinates):
     """Return a road line when available; never cache a straight-line fallback."""
     fallback = {"type": "LineString", "coordinates": [[lng, lat] for lng, lat in coordinates]}
@@ -313,7 +357,7 @@ def _road_geometry(coordinates):
         )
         response.raise_for_status()
         payload = response.json()
-        routed_geometry = payload.get("routes", [{}])[0].get("geometry")
+        routed_geometry = _compact_line(payload.get("routes", [{}])[0].get("geometry"))
         if _is_line_string(routed_geometry):
             cache.set(cache_key, {"geometry": routed_geometry, "source": "provider"}, timeout=60 * 60 * 24 * 7)
             return routed_geometry, "provider"
@@ -333,7 +377,7 @@ def _display_route_geometry(route, fallback_geometry, fetch=False):
     # A previous provider outage may have persisted a rounded or interpolated
     # stop-to-stop fallback. Treat any collinear fallback as stale.
     if _is_line_string(geometry) and not _is_straight_fallback(geometry, fallback_geometry):
-        return geometry, "stored"
+        return _compact_line(geometry), "stored"
     if not fetch:
         return {"type": "LineString", "coordinates": [[lng, lat] for lng, lat in fallback_geometry]}, "fallback"
     geometry, source = _road_geometry(fallback_geometry)
