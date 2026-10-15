@@ -982,3 +982,20 @@ class CompactLineTests(TestCase):
 	def test_leaves_non_lines_alone(self):
 		from .views.maps import _compact_line
 		self.assertIsNone(_compact_line(None))
+
+class UsernameOrEmailLoginTests(TestCase):
+	def setUp(self):
+		self.client = APIClient()
+		User.objects.create_user(username="k230551", email="k230551@nu.edu.pk", password="pass12345")
+
+	def test_login_with_username(self):
+		res = self.client.post("/api/token/", {"username": "k230551", "password": "pass12345"}, format="json")
+		self.assertEqual(res.status_code, 200)
+
+	def test_login_with_email_case_insensitive(self):
+		res = self.client.post("/api/token/", {"username": "K230551@NU.EDU.PK", "password": "pass12345"}, format="json")
+		self.assertEqual(res.status_code, 200)
+
+	def test_wrong_password_rejected(self):
+		res = self.client.post("/api/token/", {"username": "k230551", "password": "wrong"}, format="json")
+		self.assertEqual(res.status_code, 401)

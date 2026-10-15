@@ -61,8 +61,9 @@ api.interceptors.response.use(
     endRequest();
     const originalRequest = error.config;
 
-    // Auto-refresh expired access token
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    // Auto-refresh expired access token (not for login itself: a bad password must reach the page)
+    const isTokenCall = /\/api\/token\//.test(originalRequest?.url || "");
+    if (error.response?.status === 401 && originalRequest && !originalRequest._retry && !isTokenCall) {
       originalRequest._retry = true;
       const refresh = localStorage.getItem("refresh");
       if (refresh) {

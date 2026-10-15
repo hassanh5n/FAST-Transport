@@ -26,7 +26,7 @@ function Login() {
       const home = { staff: "/admin/dashboard", driver: "/driver/dashboard" };
       navigate(home[localStorage.getItem("role")] || "/student/dashboard");
     } catch {
-      setError("Invalid username or password");
+      setError("Invalid username/email or password");
     } finally {
       setLoading(false);
     }
@@ -63,9 +63,9 @@ function Login() {
 
           <form onSubmit={handleLogin} style={styles.form}>
             <div style={styles.field}>
-              <label style={styles.label}>Username</label>
+              <label style={styles.label}>Username or Email</label>
               <input
-                type="text" placeholder="Enter your username"
+                type="text" placeholder="Enter your username or email"
                 value={username} onChange={(e) => setUsername(e.target.value)}
                 required style={styles.input}
                 onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
