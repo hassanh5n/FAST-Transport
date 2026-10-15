@@ -110,6 +110,8 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
+from .routes import RouteViewSet
+
 # a view — auth question first, see below
 class BusLocationPingCreateView(generics.CreateAPIView):
     queryset = BusLocationPing.objects.all()
@@ -134,22 +136,18 @@ def student_bus_tracking(request):
 
     route = registration.route
 
-    route_stops = (
-        RouteStop.objects
-        .filter(route=route)
-        .select_related('stop')
-        .order_by('stop_order')
-    )
-
+    route_map = RouteViewSet()._map_route_data(route, fetch=True)
     stops = [
         {
-            "name": rs.stop.name,
-            "lat": float(rs.stop.latitude),
-            "lng": float(rs.stop.longitude),
-            "order": rs.stop_order,
-            "morning_eta": str(rs.morning_eta) if rs.morning_eta else None,
+            "name": stop["name"],
+            "lat": stop["latitude"],
+            "lng": stop["longitude"],
+            "order": stop["stop_order"],
+            "morning_eta": stop["morning_eta"],
+            "est_morning_eta": stop["est_morning_eta"],
+            "est_evening_eta": stop["est_evening_eta"],
         }
-        for rs in route_stops
+        for stop in route_map["stops"]
     ]
 
     assignment = (
@@ -167,6 +165,7 @@ def student_bus_tracking(request):
 
     return Response({
         "route_name": route.name,
+        "geometry": route_map["geometry"],
         "stops": stops,
         "bus": bus_info,
         "student_stop_name": registration.stop.name,

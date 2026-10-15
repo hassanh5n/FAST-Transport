@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, addCampusMarker } from "./campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE, routeWidth, addRouteArrows } from "./campus";
 import { ROUTE_COLORS } from "./routeColors";
 
 const colorFor = (id) => {
@@ -28,7 +28,7 @@ function makeFeatures(routes) {
         properties: {
           routeId: route.id, routeStopId: stop.route_stop_id, name: stop.name,
           address: stop.address || "", stopOrder: stop.stop_order, color,
-          morningEta: stop.morning_eta || "", eveningEta: stop.evening_eta || "",
+          morningEta: stop.est_morning_eta || "", eveningEta: stop.est_evening_eta || "",
           isCampus: Boolean(stop.is_campus),
         },
         geometry: { type: "Point", coordinates: [Number(stop.longitude), Number(stop.latitude)] },
@@ -62,7 +62,7 @@ function makeSelectedRouteFeatures(routes, selectedRouteId) {
     properties: {
       routeId: route.id, routeStopId: stop.route_stop_id, name: stop.name,
       address: stop.address || "", stopOrder: stop.stop_order, color,
-      morningEta: stop.morning_eta || "", eveningEta: stop.evening_eta || "",
+      morningEta: stop.est_morning_eta || "", eveningEta: stop.est_evening_eta || "",
       isCampus: Boolean(stop.is_campus),
     },
     geometry: { type: "Point", coordinates: [Number(stop.longitude), Number(stop.latitude)] },
@@ -91,7 +91,7 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     if (mapRef.current) return undefined;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
+      style: MAP_STYLE,
       center: CAMPUS.center,
       zoom: CAMPUS.zoom,
     });
@@ -100,18 +100,20 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
       map.addSource("network-routes", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      map.addLayer({ id: "network-route-casing", type: "line", source: "network-routes", paint: { "line-color": "#ffffff", "line-width": 7, "line-opacity": 0.9 }, layout: { "line-join": "round", "line-cap": "round" } });
-      map.addLayer({ id: "network-routes", type: "line", source: "network-routes", paint: { "line-color": ["get", "color"], "line-width": 4, "line-opacity": 0.75 }, layout: { "line-join": "round", "line-cap": "round" } });
+      map.addLayer({ id: "network-route-casing", type: "line", source: "network-routes", paint: { "line-color": "#ffffff", "line-width": routeWidth(3), "line-opacity": 0.9 }, layout: { "line-join": "round", "line-cap": "round" } });
+      map.addLayer({ id: "network-routes", type: "line", source: "network-routes", paint: { "line-color": ["get", "color"], "line-width": routeWidth(), "line-opacity": 0.85 }, layout: { "line-join": "round", "line-cap": "round" } });
+      addRouteArrows(map, "network-route-arrows", "network-routes", 13);
       map.addSource("network-stops", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({ id: "network-stops", type: "circle", source: "network-stops", paint: { "circle-radius": 7, "circle-color": ["get", "color"], "circle-stroke-color": "#fff", "circle-stroke-width": 2 } });
-      map.addLayer({ id: "network-stop-numbers", type: "symbol", source: "network-stops", layout: { "text-field": ["get", "stopOrder"], "text-size": 10, "text-allow-overlap": true }, paint: { "text-color": "#fff", "text-halo-color": "#111827", "text-halo-width": 1.25 } });
+      map.addLayer({ id: "network-stop-numbers", type: "symbol", source: "network-stops", layout: { "text-field": ["get", "stopOrder"], "text-size": 10, "text-font": ["Noto Sans Bold"], "text-allow-overlap": true }, paint: { "text-color": "#fff", "text-halo-color": "#111827", "text-halo-width": 1.25 } });
 
       map.addSource("selected-route-lines", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      map.addLayer({ id: "selected-route-casing", type: "line", source: "selected-route-lines", paint: { "line-color": "#ffffff", "line-width": 9, "line-opacity": 1 }, layout: { "line-join": "round", "line-cap": "round" } });
-      map.addLayer({ id: "selected-route-lines", type: "line", source: "selected-route-lines", paint: { "line-color": ["get", "color"], "line-width": 6, "line-opacity": 1 }, layout: { "line-join": "round", "line-cap": "round" } });
+      map.addLayer({ id: "selected-route-casing", type: "line", source: "selected-route-lines", paint: { "line-color": "#ffffff", "line-width": routeWidth(5), "line-opacity": 1 }, layout: { "line-join": "round", "line-cap": "round" } });
+      map.addLayer({ id: "selected-route-lines", type: "line", source: "selected-route-lines", paint: { "line-color": ["get", "color"], "line-width": routeWidth(2), "line-opacity": 1 }, layout: { "line-join": "round", "line-cap": "round" } });
+      addRouteArrows(map, "selected-route-arrows", "selected-route-lines");
       map.addSource("selected-route-stops", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
       map.addLayer({ id: "selected-route-stops", type: "circle", source: "selected-route-stops", paint: { "circle-radius": 9, "circle-color": ["get", "color"], "circle-stroke-color": "#fff", "circle-stroke-width": 2 } });
-      map.addLayer({ id: "selected-route-stop-numbers", type: "symbol", source: "selected-route-stops", layout: { "text-field": ["get", "stopOrder"], "text-size": 12, "text-font": ["Open Sans Bold"], "text-allow-overlap": true }, paint: { "text-color": "#ffffff", "text-halo-color": "#0f172a", "text-halo-width": 2 } });
+      map.addLayer({ id: "selected-route-stop-numbers", type: "symbol", source: "selected-route-stops", layout: { "text-field": ["get", "stopOrder"], "text-size": 12, "text-font": ["Noto Sans Bold"], "text-allow-overlap": true }, paint: { "text-color": "#ffffff", "text-halo-color": "#0f172a", "text-halo-width": 2 } });
 
       const showStopPopup = (event) => {
         const feature = event.features?.[0];
@@ -196,11 +198,15 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     map.setLayoutProperty("selected-route-casing", "visibility", hasSelected ? "visible" : "none");
     map.setLayoutProperty("selected-route-stops", "visibility", hasSelected ? "visible" : "none");
     map.setLayoutProperty("selected-route-stop-numbers", "visibility", hasSelected ? "visible" : "none");
-    map.setPaintProperty(
-      "network-routes",
-      "line-width",
-      hasSelected ? ["case", ["==", ["get", "routeId"], selectedId], 6, 4] : 4
-    );
+    map.setLayoutProperty("selected-route-arrows", "visibility", hasSelected ? "visible" : "none");
+    // Fade every other route so the selected one reads at a glance.
+    const faded = (on, off) => (hasSelected ? ["case", ["==", ["get", "routeId"], selectedId], on, off] : on);
+    map.setPaintProperty("network-routes", "line-opacity", faded(0.85, 0.2));
+    map.setPaintProperty("network-route-casing", "line-opacity", faded(0.9, 0.3));
+    map.setPaintProperty("network-route-arrows", "text-opacity", faded(1, 0));
+    map.setPaintProperty("network-stops", "circle-opacity", faded(1, 0.3));
+    map.setPaintProperty("network-stops", "circle-stroke-opacity", faded(1, 0.3));
+    map.setPaintProperty("network-stop-numbers", "text-opacity", faded(1, 0.3));
   }, [selectedRouteId]);
 
   // Live bus position (driver pages) — one marker, moved in place.

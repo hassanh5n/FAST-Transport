@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { resolveMapLocation } from "../../services/transportService";
-import { CAMPUS, addCampusMarker } from "./campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE } from "./campus";
 
 const KARACHI_BOUNDS = {
   latitude: { min: 24.4, max: 25.4 },
@@ -65,7 +65,7 @@ export default function StopLocationPicker({ latitude, longitude, onChange, heig
 
   useEffect(() => {
     if (mapRef.current) return undefined;
-    const map = new maplibregl.Map({ container: containerRef.current, style: "https://tiles.openfreemap.org/styles/liberty", center: CAMPUS.center, zoom: CAMPUS.zoom });
+    const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.on("click", (event) => updatePosition(event.lngLat));

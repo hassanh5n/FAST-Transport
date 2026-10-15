@@ -106,8 +106,8 @@ function ViewRoutes() {
                         <div style={{ fontWeight: 600, fontSize: 13 }}>{stop.name}</div>
                         {stop.address && <div style={{ fontSize: 12, color: colors.textSecondary }}>{stop.address}</div>}
                       </div>
-                      <span style={{ fontSize: 11, color: colors.textSecondary }}>{stop.morning_eta ? `AM ${stop.morning_eta}` : "AM —"}</span>
-                      <span style={{ fontSize: 11, color: colors.textSecondary }}>{stop.evening_eta ? `PM ${stop.evening_eta}` : "PM —"}</span>
+                      <span style={{ fontSize: 11, color: colors.textSecondary }}>{stop.est_morning_eta ? `AM ${stop.est_morning_eta}` : "AM —"}</span>
+                      <span style={{ fontSize: 11, color: colors.textSecondary }}>{stop.est_evening_eta ? `PM ${stop.est_evening_eta}` : "PM —"}</span>
                     </div>
                   ))}
                 </div>

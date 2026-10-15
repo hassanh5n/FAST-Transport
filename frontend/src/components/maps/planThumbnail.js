@@ -2,7 +2,7 @@
 // localStorage under the plan's fingerprint, so a card only redraws when its routes change.
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS } from "./campus";
+import { CAMPUS, MAP_STYLE } from "./campus";
 import { ROUTE_COLORS } from "./routeColors";
 
 const WIDTH = 640;
@@ -49,7 +49,7 @@ function draw(routes) {
     document.body.appendChild(container);
     const map = new maplibregl.Map({
       container,
-      style: "https://tiles.openfreemap.org/styles/liberty",
+      style: MAP_STYLE,
       center: CAMPUS.center,
       zoom: CAMPUS.zoom,
       interactive: false,

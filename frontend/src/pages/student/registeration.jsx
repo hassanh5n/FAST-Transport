@@ -147,10 +147,10 @@ function TransportRegistration() {
               <Field label="Pickup Stop" required>
                 <select value={selectedRouteStop} onChange={(e) => setSelectedRouteStop(e.target.value)} style={selectStyle} disabled={!selectedSemester}>
                   <option value="">Select a route and stop</option>
-                  {eligibleStops.filter((stop) => !stop.is_campus).map((stop) => <option key={stop.id} value={stop.id}>{stop.route_name} — {stop.stop_name}{stop.morning_eta ? ` (${stop.morning_eta})` : ""}</option>)}
+                  {eligibleStops.filter((stop) => !stop.is_campus).map((stop) => <option key={stop.id} value={stop.id}>{stop.route_name} — {stop.stop_name}{stop.est_morning_eta ? ` (${stop.est_morning_eta})` : ""}</option>)}
                 </select>
               </Field>
-              {selectedStop && <p style={{ margin: 0, color: colors.successText, fontSize: 13 }}><strong>Selected:</strong> {selectedStop.route_name} · {selectedStop.stop_name}{selectedStop.morning_eta ? ` · AM ${selectedStop.morning_eta}` : ""}</p>}
+              {selectedStop && <p style={{ margin: 0, color: colors.successText, fontSize: 13 }}><strong>Selected:</strong> {selectedStop.route_name} · {selectedStop.stop_name}{selectedStop.est_morning_eta ? ` · AM ${selectedStop.est_morning_eta}` : ""}</p>}
               <button type="submit" disabled={loading} style={{ ...btn.primary, alignSelf: "flex-start", minWidth: "180px", opacity: loading ? 0.6 : 1 }}>
                 {loading ? "Submitting…" : "Submit Registration"}
               </button>

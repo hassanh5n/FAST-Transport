@@ -22,3 +22,26 @@ export function addCampusMarker(map) {
   element.style.zIndex = "1";
   return marker;
 }
+
+// The base map on every page: OpenFreeMap's light style, so the coloured routes stand out.
+export const MAP_STYLE = "https://tiles.openfreemap.org/styles/positron";
+
+// Route line width that grows as you zoom in; `extra` thickens a casing or a selected line.
+export const routeWidth = (extra = 0) => [
+  "interpolate", ["exponential", 1.5], ["zoom"], 10, 2.5 + extra, 14, 5 + extra, 17, 10 + extra,
+];
+
+// White chevrons along a line source, pointing the way the bus drives (stop order).
+export function addRouteArrows(map, id, source, minzoom = 12) {
+  map.addLayer({
+    id, type: "symbol", source, minzoom,
+    layout: {
+      "symbol-placement": "line", "symbol-spacing": 70,
+      "text-field": "›", "text-font": ["Noto Sans Bold"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], 12, 14, 17, 22],
+      "text-keep-upright": false, "text-rotation-alignment": "map",
+      "text-allow-overlap": true, "text-ignore-placement": true,
+    },
+    paint: { "text-color": "#ffffff" },
+  });
+}

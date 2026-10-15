@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, addCampusMarker } from "./campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE } from "./campus";
 
 const lngLatOf = (stop) => {
   const lat = Number(stop.latitude);
@@ -23,7 +23,7 @@ export default function StopsMap({ stops, height = 520, highlightId = null, onSt
   }, [onStopClick, onMapClick]);
 
   useEffect(() => {
-    const map = new maplibregl.Map({ container: containerRef.current, style: "https://tiles.openfreemap.org/styles/liberty", center: CAMPUS.center, zoom: CAMPUS.zoom });
+    const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.on("click", (event) => handlersRef.current.onMapClick?.({ latitude: event.lngLat.lat.toFixed(6), longitude: event.lngLat.lng.toFixed(6) }));

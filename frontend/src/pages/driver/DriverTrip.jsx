@@ -357,7 +357,7 @@ export default function DriverTrip() {
 }
 
 function TripStop({ stop, direction, done, isNext, eta, etaAt, onArrive, onUndo }) {
-  const scheduled = todayAt(direction === "morning" ? stop.morning_eta : stop.evening_eta);
+  const scheduled = todayAt(direction === "morning" ? stop.est_morning_eta : stop.est_evening_eta);
   const arrival = eta && etaAt ? new Date(etaAt + eta.eta_seconds * 1000) : null;
   const variance = scheduleVariance(arrival, scheduled);
   const count = stop.student_count;

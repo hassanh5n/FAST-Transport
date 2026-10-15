@@ -261,6 +261,10 @@ class PermissionRulesTests(TestCase):
 		self.assertTrue(perm.has_permission(self._req("patch", self.admin), None))
 
 
+# A Valhalla reply: one leg, 5 minutes, along [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]].
+ROUTED_TRIP = {"trip": {"legs": [{"shape": "wxapn@wxo}~BgrOgjIw|AwdH", "summary": {"time": 300.4, "length": 1.6}}]}}
+
+
 class MapRouteApiTests(TestCase):
 	def setUp(self):
 		cache.clear()
@@ -283,10 +287,10 @@ class MapRouteApiTests(TestCase):
 			driver=Driver.objects.create(name="Map Driver"), semester=self.semester
 		)
 
-	@patch("apps.transport.views.req_lib.get")
+	@patch("apps.transport.views.req_lib.post")
 	def test_route_map_never_waits_on_routing_and_uses_built_lines(self, mock_get):
 		mock_response = Mock()
-		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
+		mock_response.json.return_value = ROUTED_TRIP
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.student)
 		response = self.client.get("/api/routes/map/")
@@ -304,31 +308,31 @@ class MapRouteApiTests(TestCase):
 		self.assertEqual(route["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
 		self.assertEqual(mock_get.call_count, 1)  # saved, so later loads do not ask again
 
-	@patch("apps.transport.views.req_lib.get")
+	@patch("apps.transport.views.req_lib.post")
 	def test_route_map_retries_a_saved_straight_line(self, mock_get):
 		self.route.geometry = {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.0947, 24.9315]]}
 		self.route.save(update_fields=["geometry"])
 		mock_response = Mock()
-		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
+		mock_response.json.return_value = ROUTED_TRIP
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.student)
 		response = self.client.get(f"/api/routes/{self.route.id}/map-detail/")
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.data["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
 
-	@patch("apps.transport.views.req_lib.get")
+	@patch("apps.transport.views.req_lib.post")
 	def test_route_map_retries_a_rounded_straight_line(self, mock_get):
 		self.route.geometry = {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.0897, 24.9265], [67.0947, 24.9315]]}
 		self.route.save(update_fields=["geometry"])
 		mock_response = Mock()
-		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
+		mock_response.json.return_value = ROUTED_TRIP
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.student)
 		response = self.client.get(f"/api/routes/{self.route.id}/map-detail/")
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.data["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
 
-	@patch("apps.transport.views.req_lib.get")
+	@patch("apps.transport.views.req_lib.post")
 	def test_route_preview_retries_after_a_provider_failure(self, mock_get):
 		self.client.force_authenticate(user=self.admin)
 		mock_get.side_effect = req_lib.RequestException
@@ -336,17 +340,17 @@ class MapRouteApiTests(TestCase):
 		self.assertEqual(fallback.data["source"], "fallback")
 
 		mock_response = Mock()
-		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
+		mock_response.json.return_value = ROUTED_TRIP
 		mock_get.side_effect = None
 		mock_get.return_value = mock_response
 		routed = self.client.post("/api/admin/maps/route-preview/", {"stop_ids": [self.stop.id, self.other_stop.id]}, format="json")
 		self.assertEqual(routed.data["source"], "provider")
-		self.assertEqual(mock_get.call_count, 2)
+		self.assertEqual(mock_get.call_count, 3)  # the failure tried main roads, then tertiary
 
-	@patch("apps.transport.views.req_lib.get")
+	@patch("apps.transport.views.req_lib.post")
 	def test_eligible_route_stops_include_road_geometry(self, mock_get):
 		mock_response = Mock()
-		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
+		mock_response.json.return_value = ROUTED_TRIP
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.student)
 		self.client.get(f"/api/routes/{self.route.id}/map-detail/")  # opening one route builds and saves its line
@@ -354,6 +358,22 @@ class MapRouteApiTests(TestCase):
 		self.assertEqual(response.status_code, 200)
 		self.assertEqual(response.data["route_geometries"][self.route.id]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
 		self.assertEqual(mock_get.call_count, 1)
+
+	@patch("apps.transport.views.req_lib.post")
+	def test_route_line_keeps_to_main_roads_and_gives_stop_etas(self, mock_post):
+		self.route.geometry = {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.088, 24.925], [67.0947, 24.9315]]}
+		self.route.save(update_fields=["geometry"])  # an old street-level line, saved before main-road routing
+		RouteStop.objects.filter(route=self.route, stop=self.other_stop).update(morning_eta="07:50", evening_eta="16:10")
+		mock_post.return_value = Mock(json=Mock(return_value=ROUTED_TRIP))
+		self.client.force_authenticate(user=self.student)
+		data = self.client.get(f"/api/routes/{self.route.id}/map-detail/").data
+		self.assertEqual(data["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
+		locations = mock_post.call_args.kwargs["json"]["locations"]
+		self.assertEqual({loc["search_filter"]["min_road_class"] for loc in locations}, {"secondary"})
+		# First stop has no times: 5 min drive + 1 min at the stop before the campus run.
+		first, last = data["stops"]
+		self.assertEqual((first["est_morning_eta"], first["est_evening_eta"]), ("07:44:00", "16:16:00"))
+		self.assertEqual((last["est_morning_eta"], last["morning_eta"]), ("07:50:00", "07:50:00"))
 
 	def test_registration_uses_explicit_route_stop_when_stop_is_shared(self):
 		self.client.force_authenticate(user=self.student)
@@ -396,10 +416,10 @@ class MapRouteApiTests(TestCase):
 		self.assertEqual(response.data["results"][0]["label"], "Fleetcentric.ai, Karachi")
 		self.assertEqual(response.data["results"][0]["provider_place_id"], "node:123")
 
-	@patch("apps.transport.views.req_lib.get")
+	@patch("apps.transport.views.req_lib.post")
 	def test_admin_route_preview_returns_provider_geometry(self, mock_get):
 		mock_response = Mock()
-		mock_response.json.return_value = {"routes": [{"geometry": {"type": "LineString", "coordinates": [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]]}}]}
+		mock_response.json.return_value = ROUTED_TRIP
 		mock_get.return_value = mock_response
 		self.client.force_authenticate(user=self.admin)
 		response = self.client.post("/api/admin/maps/route-preview/", {"stop_ids": [self.stop.id, self.other_stop.id]}, format="json")
@@ -907,6 +927,7 @@ from apps.transport.serializers import DriverSerializer as _DriverSerializer
 
 
 @_mock.patch("apps.transport.signals.is_off_route", return_value=(False, 5.0))
+@_mock.patch("apps.transport.views.req_lib.post", side_effect=_requests.RequestException("offline"))
 @_mock.patch("apps.transport.views.req_lib.get", side_effect=_requests.RequestException("offline"))
 class DriverConsoleTests(TestCase):
 	def setUp(self):

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, addCampusMarker } from "./campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE, routeWidth, addRouteArrows } from "./campus";
 import { colors } from "../../theme";
 
 const ROUTE_COLORS = ["#2563EB", "#DC2626", "#16A34A", "#9333EA", "#EA580C", "#0891B2", "#BE123C"];
@@ -56,7 +56,7 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     const markers = markersRef.current;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
+      style: MAP_STYLE,
       center: CAMPUS.center,
       zoom: CAMPUS.zoom,
     });
@@ -65,8 +65,9 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
       map.addSource("fleet-routes", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      map.addLayer({ id: "fleet-route-casing", type: "line", source: "fleet-routes", paint: { "line-color": "#fff", "line-width": 7, "line-opacity": 0.9 }, layout: { "line-join": "round", "line-cap": "round" } });
-      map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": ["get", "color"], "line-width": 4, "line-opacity": 0.8 }, layout: { "line-join": "round", "line-cap": "round" } });
+      map.addLayer({ id: "fleet-route-casing", type: "line", source: "fleet-routes", paint: { "line-color": "#fff", "line-width": routeWidth(3), "line-opacity": 0.9 }, layout: { "line-join": "round", "line-cap": "round" } });
+      map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": ["get", "color"], "line-width": routeWidth(), "line-opacity": 0.85 }, layout: { "line-join": "round", "line-cap": "round" } });
+      addRouteArrows(map, "fleet-route-arrows", "fleet-routes", 13);
       mapRef.current = map;
       map.getSource("fleet-routes").setData({ type: "FeatureCollection", features: routeFeatures(initialRoutesRef.current) });
     });

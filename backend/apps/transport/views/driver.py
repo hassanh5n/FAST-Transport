@@ -110,7 +110,10 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
-from .maps import _map_cache_key
+from .maps import (
+    AVERAGE_CITY_SPEED_MPS, ROAD_DETOUR_FACTOR, STOP_DWELL_SECONDS,
+    _haversine_m, _main_road_trip, _map_cache_key,
+)
 from .routes import RouteViewSet
 
 # ── Driver console ───────────────────────────────────────────────────────────
@@ -127,11 +130,6 @@ class IsDriver(permissions.BasePermission):
             and Driver.objects.filter(user=request.user).exists()
         )
 
-AVERAGE_CITY_SPEED_MPS = 5.5   # ~20 km/h door to door in city traffic
-ROAD_DETOUR_FACTOR = 1.3       # straight line -> road distance
-STOP_DWELL_SECONDS = 60        # boarding time at each intermediate stop
-
-
 def _driver_for(user):
     return Driver.objects.filter(user=user).first()
 
@@ -144,34 +142,19 @@ def _driver_assignment(driver):
     return qs.filter(semester__is_active=True).first() or qs.order_by("-created_at").first()
 
 
-def _haversine_m(a, b):
-    (lng1, lat1), (lng2, lat2) = a, b
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    h = (math.sin((p2 - p1) / 2) ** 2
-         + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lng2 - lng1) / 2) ** 2)
-    return 2 * 6371000 * math.asin(math.sqrt(h))
-
-
 def _route_legs(coordinates):
-    """[(duration_s, distance_m)] per leg from the road router, or None."""
+    """[(duration_s, distance_m)] per leg along main roads, or None."""
     # 4 decimals (~11 m) so consecutive pings from a parked bus share a cache hit.
     path = ";".join(f"{lng:.4f},{lat:.4f}" for lng, lat in coordinates)
-    cache_key = _map_cache_key("eta", path)
+    cache_key = _map_cache_key("eta-main-road", path)
     cached = cache.get(cache_key)
     if cached is not None:
         return cached
-    try:
-        response = req_lib.get(
-            f"{settings.MAP_ROUTING_URL}/route/v1/driving/{path}",
-            params={"overview": "false"},
-            timeout=6,
-        )
-        response.raise_for_status()
-        legs = [(leg["duration"], leg["distance"]) for leg in response.json()["routes"][0]["legs"]]
-    except (req_lib.RequestException, ValueError, KeyError, IndexError, TypeError):
+    trip = _main_road_trip([(round(lng, 4), round(lat, 4)) for lng, lat in coordinates], timeout=6)
+    if trip is None:
         return None
-    cache.set(cache_key, legs, timeout=60)
-    return legs
+    cache.set(cache_key, trip[1], timeout=60)
+    return trip[1]
 
 
 def _stop_etas(origin, route_stops):
@@ -179,7 +162,7 @@ def _stop_etas(origin, route_stops):
     if not route_stops:
         return [], None
     coordinates = [origin] + [(float(rs.stop.longitude), float(rs.stop.latitude)) for rs in route_stops]
-    # ponytail: OSRM durations are free-flow; scale them if drivers report ETAs as optimistic at rush hour.
+    # ponytail: routed durations are free-flow; scale them if drivers report ETAs as optimistic at rush hour.
     legs, source = _route_legs(coordinates), "road"
     if legs is None or len(legs) != len(route_stops):
         source = "estimate"

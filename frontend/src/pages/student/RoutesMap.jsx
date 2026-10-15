@@ -60,7 +60,7 @@ export default function RoutesMap() {
                 <h3 style={{ margin: "0 0 4px" }}>{selectedRoute.name}</h3>
                 <p style={{ margin: "0 0 12px", color: colors.textSecondary, fontSize: 13 }}>{selectedRoute.description}</p>
                 <ol style={{ margin: 0, paddingLeft: 20, display: "grid", gap: 6 }}>
-                  {selectedRoute.stops.map((stop) => <li key={stop.route_stop_id} style={{ fontSize: 13 }}><strong>{stop.name}</strong>{stop.morning_eta && ` · AM ${stop.morning_eta}`}{stop.evening_eta && ` · PM ${stop.evening_eta}`}</li>)}
+                  {selectedRoute.stops.map((stop) => <li key={stop.route_stop_id} style={{ fontSize: 13 }}><strong>{stop.name}</strong>{stop.est_morning_eta && ` · AM ${stop.est_morning_eta}`}{stop.est_evening_eta && ` · PM ${stop.est_evening_eta}`}</li>)}
                 </ol>
               </ContentCard>
             )}

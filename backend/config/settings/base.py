@@ -120,7 +120,13 @@ FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
 # ── Maps providers ──────────────────────────────────────────────────────────
 # Override these in deployment to use an institution-approved or self-hosted
 # OSRM/Nominatim-compatible service. The browser never receives these URLs.
-MAP_ROUTING_URL = os.environ.get('MAP_ROUTING_URL', 'https://router.project-osrm.org').rstrip('/')
+# A Valhalla server: it can keep a route to main roads, which OSRM cannot.
+MAP_ROUTING_URL = os.environ.get('MAP_ROUTING_URL', 'https://valhalla1.openstreetmap.de').rstrip('/')
+# Smallest road a route may use: motorway, trunk, primary, secondary, tertiary, unclassified, residential.
+MAP_MAIN_ROAD_CLASS = os.environ.get('MAP_MAIN_ROAD_CLASS', 'secondary')
+# Stop ETAs count back from these when a route's campus stop has no time of its own.
+CAMPUS_MORNING_ARRIVAL = os.environ.get('CAMPUS_MORNING_ARRIVAL', '08:00')
+CAMPUS_EVENING_DEPARTURE = os.environ.get('CAMPUS_EVENING_DEPARTURE', '16:00')
 MAP_GEOCODING_URL = os.environ.get('MAP_GEOCODING_URL', 'https://nominatim.openstreetmap.org').rstrip('/')
 MAP_GEOCODING_USER_AGENT = os.environ.get('MAP_GEOCODING_USER_AGENT', 'FAST-Transport/1.0')
 

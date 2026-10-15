@@ -6,7 +6,7 @@ import { Banner, Pill } from "../../components/ui";
 import { colors, fonts, radius, btn, input, shadow } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
-import { CAMPUS, addCampusMarker } from "../../components/maps/campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE } from "../../components/maps/campus";
 import { circleRing } from "../../components/maps/incidents";
 
 const Icon = ({ name, size = 18, color = "currentColor" }) => {
@@ -78,7 +78,7 @@ export default function StudentIncidents() {
     if (mapRef.current) return;
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
+      style: MAP_STYLE,
       center: CAMPUS.center, zoom: CAMPUS.zoom,
     });
     mapRef.current = map;

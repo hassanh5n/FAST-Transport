@@ -112,7 +112,7 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
-from .maps import _display_route_geometry
+from .maps import _display_route_geometry, add_stop_etas
 from .. import audit
 from ..stop_import import import_stops, parse_file
 
@@ -153,6 +153,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         ]
         fallback_geometry = [[stop["longitude"], stop["latitude"]] for stop in stops]
         geometry, geometry_source = _display_route_geometry(route, fallback_geometry, fetch=fetch)
+        add_stop_etas(stops, geometry)
         return {
             "id": route.id,
             "name": route.name,
@@ -503,26 +504,29 @@ def eligible_route_stops(request):
         )[0]
         for route_id, stops in stops_by_route.items()
     }
+    route_stop_rows = [
+        {
+            "id": route_stop.id,
+            "route_id": route_stop.route_id,
+            "route_name": route_stop.route.name,
+            "route_description": route_stop.route.description,
+            "stop_id": route_stop.stop_id,
+            "stop_name": route_stop.stop.name,
+            "address": route_stop.stop.address,
+            "latitude": float(route_stop.stop.latitude),
+            "longitude": float(route_stop.stop.longitude),
+            "stop_order": route_stop.stop_order,
+            "is_campus": route_stop.stop.is_campus,  # drawn as the route's end, never offered as a pickup
+            "morning_eta": str(route_stop.morning_eta) if route_stop.morning_eta else None,
+            "evening_eta": str(route_stop.evening_eta) if route_stop.evening_eta else None,
+        }
+        for route_stop in route_stops
+        if not (float(route_stop.stop.latitude) == 0 and float(route_stop.stop.longitude) == 0)
+    ]
+    for route_id, geometry in route_geometries.items():
+        add_stop_etas([row for row in route_stop_rows if row["route_id"] == route_id], geometry)
     return Response({
         "semester": {"id": semester.id, "name": semester.name},
         "route_geometries": route_geometries,
-        "route_stops": [
-            {
-                "id": route_stop.id,
-                "route_id": route_stop.route_id,
-                "route_name": route_stop.route.name,
-                "route_description": route_stop.route.description,
-                "stop_id": route_stop.stop_id,
-                "stop_name": route_stop.stop.name,
-                "address": route_stop.stop.address,
-                "latitude": float(route_stop.stop.latitude),
-                "longitude": float(route_stop.stop.longitude),
-                "stop_order": route_stop.stop_order,
-                "is_campus": route_stop.stop.is_campus,  # drawn as the route's end, never offered as a pickup
-                "morning_eta": str(route_stop.morning_eta) if route_stop.morning_eta else None,
-                "evening_eta": str(route_stop.evening_eta) if route_stop.evening_eta else None,
-            }
-            for route_stop in route_stops
-            if not (float(route_stop.stop.latitude) == 0 and float(route_stop.stop.longitude) == 0)
-        ],
+        "route_stops": route_stop_rows,
     })

@@ -17,6 +17,8 @@ from datetime import timedelta
 import random
 import string as _string
 import hashlib
+import logging
+import time
 import math
 from collections import Counter
 from decimal import Decimal
@@ -109,6 +111,9 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+
+logger = logging.getLogger(__name__)
+
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -302,7 +307,7 @@ LINE_TOLERANCE_DEG = 2e-5
 def _compact_line(geometry):
     """Shrink a road line for transport: Douglas-Peucker simplify, then round.
 
-    OSRM returns every road node at 6+ decimals, which made the network map
+    The router returns every road node at 6 decimals, which made the network map
     payload ~440 KB. Endpoints are always kept. Non-LineStrings pass through.
     """
     if not _is_line_string(geometry):
@@ -335,35 +340,154 @@ def _compact_line(geometry):
         [round(x, LINE_DECIMALS), round(y, LINE_DECIMALS)]
         for (x, y), kept in zip(points, keep) if kept
     ]
-    return {"type": "LineString", "coordinates": coordinates}
+    return {**geometry, "coordinates": coordinates}  # keeps leg_seconds
+
+
+AVERAGE_CITY_SPEED_MPS = 5.5   # ~20 km/h door to door in city traffic
+ROAD_DETOUR_FACTOR = 1.3       # straight line -> road distance
+STOP_DWELL_SECONDS = 60        # boarding time at each intermediate stop
+
+
+def _haversine_m(a, b):
+    (lng1, lat1), (lng2, lat2) = a, b
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    h = (math.sin((p2 - p1) / 2) ** 2
+         + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lng2 - lng1) / 2) ** 2)
+    return 2 * 6371000 * math.asin(math.sqrt(h))
+
+
+def _decode_polyline6(encoded):
+    """[[lng, lat], ...] from a Valhalla shape (Google polyline, 6 decimals)."""
+    coordinates, index, values = [], 0, [0, 0]
+    while index < len(encoded):
+        for axis in (0, 1):
+            shift = result = 0
+            while True:
+                byte = ord(encoded[index]) - 63
+                index += 1
+                result |= (byte & 0x1F) << shift
+                shift += 5
+                if byte < 0x20:
+                    break
+            values[axis] += ~(result >> 1) if result & 1 else result >> 1
+        coordinates.append([round(values[1] / 1e6, 6), round(values[0] / 1e6, 6)])
+    return coordinates
+
+
+def _main_road_trip(coordinates, timeout=15):
+    """Drive through `coordinates` on main roads only: (line, [(seconds, metres)] per leg), or None.
+
+    Every stop is snapped to the nearest road of MAP_MAIN_ROAD_CLASS or bigger, so a stop
+    pinned inside a street shows as a point beside the main road instead of pulling the
+    line into the street. Stops in between are break_through: the bus passes them without
+    a U-turn or a lap of a roundabout to reach the pin. If the router finds no way using
+    only those roads, it tries once more allowing tertiary roads (still no streets).
+    """
+    classes = list(dict.fromkeys([settings.MAP_MAIN_ROAD_CLASS, "tertiary"]))
+    for road_class in classes:
+        trip = _routed_trip(coordinates, road_class, timeout)
+        if trip is not None:
+            return trip
+    return None
+
+
+def _routed_trip(coordinates, road_class, timeout):
+    last = len(coordinates) - 1
+    locations = [
+        {
+            "lon": lng, "lat": lat,
+            "type": "break" if index in (0, last) else "break_through",
+            "radius": 50,  # either carriageway of a divided road counts as reaching the stop
+            "search_filter": {"min_road_class": road_class},
+        }
+        for index, (lng, lat) in enumerate(coordinates)
+    ]
+    body = {
+        "locations": locations,
+        "costing": "bus",
+        "costing_options": {"bus": {"use_living_streets": 0}},
+        "directions_type": "none",
+    }
+    try:
+        for attempt in range(2):
+            response = req_lib.post(f"{settings.MAP_ROUTING_URL}/route", json=body, timeout=timeout)
+            if response.status_code != 429 or attempt:
+                break
+            time.sleep(2)  # the free server allows about one request a second
+        response.raise_for_status()
+        legs = response.json()["trip"]["legs"]
+        line = []
+        for leg in legs:
+            points = _decode_polyline6(leg["shape"])
+            line.extend(points[1:] if line else points)
+        durations = [(leg["summary"]["time"], leg["summary"]["length"] * 1000) for leg in legs]
+    except (req_lib.RequestException, ValueError, KeyError, IndexError, TypeError) as exc:
+        reply = getattr(getattr(exc, "response", None), "text", "")
+        logger.warning("Routing failed on %s roads and up: %r %s", road_class, exc, reply[:300])
+        return None
+    if len(durations) != last or len(line) < 2:
+        return None
+    return line, durations
 
 
 def _road_geometry(coordinates):
-    """Return a road line when available; never cache a straight-line fallback."""
+    """Return a main-road line when available; never cache a straight-line fallback.
+
+    A routed line also carries `leg_seconds`, the drive time of each stop-to-stop leg,
+    which the stop ETAs are worked out from.
+    """
     fallback = {"type": "LineString", "coordinates": [[lng, lat] for lng, lat in coordinates]}
     if len(coordinates) < 2:
         return fallback, "fallback"
 
-    cache_key = _map_cache_key("route", ";".join(f"{lng:.6f},{lat:.6f}" for lng, lat in coordinates))
+    cache_key = _map_cache_key("main-road", ";".join(f"{lng:.6f},{lat:.6f}" for lng, lat in coordinates))
     cached = cache.get(cache_key)
     if isinstance(cached, dict) and cached.get("source") == "provider" and _is_line_string(cached.get("geometry")):
         return cached["geometry"], "cache"
-    try:
-        coordinate_path = ";".join(f"{lng},{lat}" for lng, lat in coordinates)
-        response = req_lib.get(
-            f"{settings.MAP_ROUTING_URL}/route/v1/driving/{coordinate_path}",
-            params={"overview": "full", "geometries": "geojson"},
-            timeout=8,
-        )
-        response.raise_for_status()
-        payload = response.json()
-        routed_geometry = _compact_line(payload.get("routes", [{}])[0].get("geometry"))
-        if _is_line_string(routed_geometry):
-            cache.set(cache_key, {"geometry": routed_geometry, "source": "provider"}, timeout=60 * 60 * 24 * 7)
-            return routed_geometry, "provider"
-    except (req_lib.RequestException, ValueError, IndexError, AttributeError):
-        pass
-    return fallback, "fallback"
+    trip = _main_road_trip(coordinates)
+    if trip is None:
+        return fallback, "fallback"
+    line, legs = trip
+    geometry = _compact_line({"type": "LineString", "coordinates": line, "leg_seconds": [round(seconds) for seconds, _ in legs]})
+    cache.set(cache_key, {"geometry": geometry, "source": "provider"}, timeout=60 * 60 * 24 * 7)
+    return geometry, "provider"
+
+
+def _clock_seconds(value):
+    hours, minutes, *seconds = (int(part) for part in str(value).split(":"))
+    return hours * 3600 + minutes * 60 + (seconds[0] if seconds else 0)
+
+
+def add_stop_etas(stops, geometry):
+    """Give every stop `est_morning_eta` and `est_evening_eta` ("HH:MM:00").
+
+    A time set in the timetable is kept as is. A blank one is worked out from the
+    main-road drive time between stops: the morning run arrives at the last stop
+    (campus) and the evening run leaves it, so both are counted back from the last
+    stop, from its own time or the campus defaults. Each stop dict needs latitude,
+    longitude, morning_eta and evening_eta.
+    """
+    legs = geometry.get("leg_seconds") if isinstance(geometry, dict) else None
+    if not isinstance(legs, list) or len(legs) != len(stops) - 1:
+        # No routed line yet: straight-line distance at city speed.
+        points = [(stop["longitude"], stop["latitude"]) for stop in stops]
+        legs = [_haversine_m(a, b) * ROAD_DETOUR_FACTOR / AVERAGE_CITY_SPEED_MPS for a, b in zip(points, points[1:])]
+    runs = (
+        ("morning_eta", settings.CAMPUS_MORNING_ARRIVAL, -1),
+        ("evening_eta", settings.CAMPUS_EVENING_DEPARTURE, 1),
+    )
+    for field, campus_time, direction in runs:
+        seconds = None
+        for index in reversed(range(len(stops))):
+            if stops[index].get(field):
+                seconds = _clock_seconds(stops[index][field])
+            elif seconds is None:
+                seconds = _clock_seconds(campus_time)
+            else:
+                seconds += direction * (legs[index] + STOP_DWELL_SECONDS)
+            minutes = round(seconds / 60) % (24 * 60)
+            stops[index][f"est_{field}"] = f"{minutes // 60:02d}:{minutes % 60:02d}:00"
+    return stops
 
 
 def _display_route_geometry(route, fallback_geometry, fetch=False):
@@ -375,8 +499,10 @@ def _display_route_geometry(route, fallback_geometry, fetch=False):
     """
     geometry = route.geometry if isinstance(route.geometry, dict) else None
     # A previous provider outage may have persisted a rounded or interpolated
-    # stop-to-stop fallback. Treat any collinear fallback as stale.
-    if _is_line_string(geometry) and not _is_straight_fallback(geometry, fallback_geometry):
+    # stop-to-stop fallback. Treat any collinear fallback as stale, and any line
+    # without leg_seconds: it predates main-road routing and may run through streets.
+    if (_is_line_string(geometry) and "leg_seconds" in geometry
+            and not _is_straight_fallback(geometry, fallback_geometry)):
         return _compact_line(geometry), "stored"
     if not fetch:
         return {"type": "LineString", "coordinates": [[lng, lat] for lng, lat in fallback_geometry]}, "fallback"

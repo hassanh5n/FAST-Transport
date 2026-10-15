@@ -202,7 +202,7 @@ function StopRow({ stop, max, isMobile }) {
         <div style={{ fontWeight: 600, fontSize: 13, color: colors.textPrimary }}>{stop.name}</div>
         {isMobile ? (
           <div style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
-            AM {fmtTime(stop.morning_eta)} · PM {fmtTime(stop.evening_eta)}
+            AM {fmtTime(stop.est_morning_eta)} · PM {fmtTime(stop.est_evening_eta)}
           </div>
         ) : stop.address && stop.address !== "N/A" && (
           <div style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{stop.address}</div>
@@ -220,8 +220,8 @@ function StopRow({ stop, max, isMobile }) {
       </div>
       {!isMobile && (
         <div style={{ fontSize: 12, color: colors.textSecondary, textAlign: "right", lineHeight: 1.5, fontVariantNumeric: "tabular-nums" }}>
-          <div>AM {fmtTime(stop.morning_eta)}</div>
-          <div>PM {fmtTime(stop.evening_eta)}</div>
+          <div>AM {fmtTime(stop.est_morning_eta)}</div>
+          <div>PM {fmtTime(stop.est_evening_eta)}</div>
         </div>
       )}
     </li>

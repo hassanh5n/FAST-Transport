@@ -131,7 +131,7 @@ export default function RegistrationStatus({ registration, challan }) {
           <dl style={{ margin: 0 }}>
             <Detail label="Semester">{registration.semester_name || "—"}</Detail>
             <Detail label="Route">{registration.route_name || "Not assigned yet"}</Detail>
-            <Detail label="Pickup stop">{registration.stop_name || "—"}{myStop?.morning_eta ? ` · ${eta(myStop.morning_eta)}` : ""}</Detail>
+            <Detail label="Pickup stop">{registration.stop_name || "—"}{myStop?.est_morning_eta ? ` · ${eta(myStop.est_morning_eta)}` : ""}</Detail>
             <Detail label="Transport fee">
               PKR {Number(challan?.amount ?? registration.fee_amount).toLocaleString()}
               <span style={{ marginLeft: 8, color: paid ? colors.successText : colors.warningText }}>{paid ? "Paid" : view.step === 1 ? "Not due yet" : "Unpaid"}</span>

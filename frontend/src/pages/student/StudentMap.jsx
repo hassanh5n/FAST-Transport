@@ -6,7 +6,7 @@ import { Banner } from "../../components/ui";
 import { colors, radius } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
-import { CAMPUS, addCampusMarker } from "../../components/maps/campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE, routeWidth, addRouteArrows } from "../../components/maps/campus";
 
 const POLL_INTERVAL_MS = 8000;
 const INCIDENT_POLL_INTERVAL_MS = 30000;
@@ -14,22 +14,6 @@ const CRIME_RISK_REFRESH_MS = 15 * 60 * 1000;
 const incidentColor = (severity) => (
   severity === "high" ? "#EF4444" : severity === "medium" ? "#F97316" : "#F59E0B"
 );
-
-async function fetchRoadRoute(stops) {
-  const coords = stops.map(s => `${s.lng},${s.lat}`).join(";");
-  try {
-    const res = await fetch(
-      `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`
-    );
-    const data = await res.json();
-    if (data.code === "Ok" && data.routes.length > 0) {
-      return data.routes[0].geometry.coordinates;
-    }
-  } catch (e) {
-    console.warn("OSRM routing failed, falling back to straight lines:", e);
-  }
-  return stops.map(s => [s.lng, s.lat]);
-}
 
 function incidentGeoJSON(incidents) {
   const earthRadius = 6371000;
@@ -133,7 +117,7 @@ export default function StudentMap() {
 
     const map = new maplibregl.Map({
       container: mapContainer.current,
-      style: "https://tiles.openfreemap.org/styles/liberty",
+      style: MAP_STYLE,
       center: CAMPUS.center,
       zoom: CAMPUS.zoom,
     });
@@ -307,14 +291,14 @@ export default function StudentMap() {
 
     const map = mapRef.current;
 
-    const populateMap = async () => {
+    const populateMap = () => {
       if (!map.isStyleLoaded()) {
         map.once("load", () => populateMap());
         return;
       }
 
-      // Draw road-following route
-      const routeCoords = await fetchRoadRoute(validStops);
+      // The server's main-road line; stop to stop until it has one.
+      const routeCoords = trackingData.geometry?.coordinates || validStops.map(s => [s.lng, s.lat]);
       if (map.getSource("route")) {
         map.getSource("route").setData({
           type: "Feature",
@@ -328,11 +312,18 @@ export default function StudentMap() {
             geometry: { type: "LineString", coordinates: routeCoords },
           },
         });
+        // Same look as the route pages: white casing, zoom-scaled line, direction arrows.
         map.addLayer({
-          id: "route-line", type: "line", source: "route",
-          paint: { "line-color": "#3B82F6", "line-width": 4, "line-opacity": 0.85 },
+          id: "route-casing", type: "line", source: "route",
+          paint: { "line-color": "#ffffff", "line-width": routeWidth(3), "line-opacity": 0.95 },
           layout: { "line-join": "round", "line-cap": "round" },
         });
+        map.addLayer({
+          id: "route-line", type: "line", source: "route",
+          paint: { "line-color": "#2563EB", "line-width": routeWidth(), "line-opacity": 0.9 },
+          layout: { "line-join": "round", "line-cap": "round" },
+        });
+        addRouteArrows(map, "route-arrows", "route");
       }
 
       // Fit map to show all stops
@@ -349,14 +340,18 @@ export default function StudentMap() {
       // Add stop markers
       validStops.forEach(stop => {
         const isStudentStop = stop.name === trackingData.student_stop_name;
+        // Numbered pins like the route pages; the student's own stop is larger and amber.
         const el = document.createElement("div");
+        const size = isStudentStop ? 28 : 22;
+        el.textContent = stop.order;
         el.style.cssText = `
-          width: ${isStudentStop ? "18px" : "12px"};
-          height: ${isStudentStop ? "18px" : "12px"};
-          border-radius: 50%;
-          background: ${isStudentStop ? "#F59E0B" : "#6B7280"};
+          width: ${size}px; height: ${size}px; border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          background: ${isStudentStop ? "#F59E0B" : "#2563EB"};
+          color: ${isStudentStop ? "#0b2d42" : "#fff"};
+          font: 700 ${isStudentStop ? 13 : 11}px/1 system-ui, sans-serif;
           border: 2px solid white;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
           cursor: pointer;
         `;
         new maplibregl.Marker({ element: el })
@@ -364,7 +359,7 @@ export default function StudentMap() {
           .setPopup(
             new maplibregl.Popup({ offset: 12 }).setHTML(
               `<strong>${stop.name}</strong>
-              ${stop.morning_eta ? `<br/>🕐 Morning ETA: ${stop.morning_eta}` : ""}
+              ${stop.est_morning_eta ? `<br/>🕐 Morning ETA: ${stop.est_morning_eta}` : ""}
               ${isStudentStop ? "<br/><em style='color:#F59E0B'>📍 Your stop</em>" : ""}`
             )
           )
@@ -501,7 +496,7 @@ export default function StudentMap() {
       {crimeRiskStatus && <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>{crimeRiskStatus}</p>}
 
       <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>
-        🟡 Your stop &nbsp;·&nbsp; ⚫ Other stops &nbsp;·&nbsp; 🔵 Route &nbsp;·&nbsp; 🚌 Live bus position (updates every 8s) &nbsp;·&nbsp; Crime-risk data is aggregated and delayed
+        🟡 Your stop &nbsp;·&nbsp; 🔵 Other stops, numbered in order &nbsp;·&nbsp; Blue line: route, arrows show direction &nbsp;·&nbsp; 🚌 Live bus position (updates every 8s) &nbsp;·&nbsp; Crime-risk data is aggregated and delayed
       </p>
     </PageShell>
   );

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, addCampusMarker } from "./campus";
+import { CAMPUS, addCampusMarker, MAP_STYLE } from "./campus";
 import { circleRing, incidentColor } from "./incidents";
 
 const IF_SELECTED = (yes, no) => ["case", ["get", "selected"], yes, no];
@@ -51,7 +51,7 @@ export default function IncidentsMap({ incidents, selectedId = null, onSelect, h
   }, [incidents, onSelect]);
 
   useEffect(() => {
-    const map = new maplibregl.Map({ container: containerRef.current, style: "https://tiles.openfreemap.org/styles/liberty", center: CAMPUS.center, zoom: CAMPUS.zoom });
+    const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
     map.on("load", () => {
