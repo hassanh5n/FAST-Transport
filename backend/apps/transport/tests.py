@@ -1020,3 +1020,28 @@ class UsernameOrEmailLoginTests(TestCase):
 	def test_wrong_password_rejected(self):
 		res = self.client.post("/api/token/", {"username": "k230551", "password": "wrong"}, format="json")
 		self.assertEqual(res.status_code, 401)
+
+@patch("apps.transport.views.auth.send_mail")
+class FacultySignupTests(TestCase):
+	def setUp(self):
+		self.client = APIClient()
+
+	def test_faculty_signup_without_roll_number(self, _send_mail):
+		res = self.client.post("/api/signup/", {
+			"username": "dr_ali", "email": "ali@nu.edu.pk", "password": "pass12345",
+			"first_name": "Ali", "last_name": "Khan", "user_type": 1,
+			"department": "CS", "phone": "03001234567", "address": "Gulshan", "roll_number": "22K-9999",
+		}, format="json")
+		self.assertEqual(res.status_code, 201)
+		profile = StudentProfile.objects.get(user__username="dr_ali")
+		self.assertEqual(profile.user_type, 1)
+		self.assertIsNone(profile.roll_number)
+		self.assertEqual((profile.department, profile.phone, profile.address), ("CS", "03001234567", "Gulshan"))
+		self.assertFalse(profile.user.is_active)
+
+	def test_student_signup_requires_roll_number(self, _send_mail):
+		res = self.client.post("/api/signup/", {
+			"username": "k230552", "email": "k230552@nu.edu.pk", "password": "pass12345",
+		}, format="json")
+		self.assertEqual(res.status_code, 400)
+		self.assertIn("roll_number", res.data)

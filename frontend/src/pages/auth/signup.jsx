@@ -20,7 +20,9 @@ function Signup() {
     batch: "",
     phone: "",
     address: "",
+    user_type: 0, // 0 = student, 1 = faculty
   });
+  const isFaculty = formData.user_type === 1;
 
   const [error, setError] = useState("");
   const [errors, setErrors] = useState({});
@@ -61,35 +63,11 @@ function Signup() {
     setStep(2);
   };
 
-  const handleSignup = async (e) => {
-    e.preventDefault();
+  const submit = async (payload) => {
     setLoading(true);
     setError("");
-    setErrors({});
-
     try {
-      const step2Errors = {};
-
-      const r = validateField(formData.roll_number, [
-        { check: "required", message: "Roll number is required" },
-        { check: "roll", message: "Enter a valid roll number" },
-      ]);
-      if (r) step2Errors.roll_number = r;
-
-      const ph = formData.phone
-        ? validateField(formData.phone, [
-            { check: "phone", message: "Enter a valid phone number" },
-          ])
-        : null;
-      if (ph) step2Errors.phone = ph;
-
-      if (Object.keys(step2Errors).length) {
-        setErrors(step2Errors);
-        setLoading(false);
-        return;
-      }
-
-      await signup(formData);
+      await signup(payload);
       localStorage.setItem("otp_email", formData.email);
       navigate("/verify-otp", {
         state: {
@@ -102,6 +80,40 @@ function Signup() {
       setError(JSON.stringify(err.response?.data || "Signup failed"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSignup = (e) => {
+    e.preventDefault();
+    setErrors({});
+
+    const step2Errors = {};
+
+    if (!isFaculty) {
+      const r = validateField(formData.roll_number, [
+        { check: "required", message: "Roll number is required" },
+        { check: "roll", message: "Enter a valid roll number" },
+      ]);
+      if (r) step2Errors.roll_number = r;
+    }
+
+    const ph = formData.phone
+      ? validateField(formData.phone, [
+          { check: "phone", message: "Enter a valid phone number" },
+        ])
+      : null;
+    if (ph) step2Errors.phone = ph;
+
+    if (Object.keys(step2Errors).length) {
+      setErrors(step2Errors);
+      return;
+    }
+
+    if (isFaculty) {
+      const { roll_number, batch, ...payload } = formData; // eslint-disable-line no-unused-vars
+      submit(payload);
+    } else {
+      submit(formData);
     }
   };
 
@@ -125,13 +137,27 @@ function Signup() {
         <div style={styles.card}>
           {/* Header */}
           <div style={styles.cardHeader}>
+            {step === 1 && (
+              <div style={styles.toggle}>
+                {["Student", "Faculty"].map((label, type) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, user_type: type })}
+                    style={styles.toggleBtn(formData.user_type === type)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
             <div style={styles.stepRow}>
               <div style={styles.stepPip(step >= 1)} />
               <div style={styles.stepLine(step >= 2)} />
               <div style={styles.stepPip(step >= 2)} />
             </div>
             <h2 style={styles.cardTitle}>
-              {step === 1 ? "Create account" : "Student details"}
+              {step === 1 ? "Create account" : isFaculty ? "Faculty details" : "Student details"}
             </h2>
             <p style={styles.cardDesc}>
               {step === 1
@@ -241,11 +267,12 @@ function Signup() {
 
               <button
                 type="submit"
-                style={styles.button}
-                onMouseEnter={(e) => Object.assign(e.target.style, styles.buttonHover)}
-                onMouseLeave={(e) => Object.assign(e.target.style, styles.button)}
+                disabled={loading}
+                style={loading ? { ...styles.button, ...styles.buttonDisabled } : styles.button}
+                onMouseEnter={(e) => { if (!loading) Object.assign(e.target.style, styles.buttonHover); }}
+                onMouseLeave={(e) => { if (!loading) Object.assign(e.target.style, styles.button); }}
               >
-                Continue →
+                {loading ? <span style={styles.spinner} /> : "Continue →"}
               </button>
             </form>
           )}
@@ -254,37 +281,41 @@ function Signup() {
           {step === 2 && (
             <form onSubmit={handleSignup} style={styles.form}>
               <div style={styles.grid}>
-                <div style={styles.field}>
-                  <label style={styles.label}>
-                    Roll Number <span style={styles.req}>*</span>
-                  </label>
-                  <input
-                    name="roll_number"
-                    type="text"
-                    placeholder="22K-1234"
-                    value={formData.roll_number}
-                    onChange={handleChange}
-                    required
-                    style={styles.input}
-                    onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-                    onBlur={(e) => Object.assign(e.target.style, styles.input)}
-                  />
-                  {errors.roll_number && <ErrorText>{errors.roll_number}</ErrorText>}
-                </div>
+                {!isFaculty && (
+                  <>
+                  <div style={styles.field}>
+                    <label style={styles.label}>
+                      Roll Number <span style={styles.req}>*</span>
+                    </label>
+                    <input
+                      name="roll_number"
+                      type="text"
+                      placeholder="22K-1234"
+                      value={formData.roll_number}
+                      onChange={handleChange}
+                      required
+                      style={styles.input}
+                      onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
+                      onBlur={(e) => Object.assign(e.target.style, styles.input)}
+                    />
+                    {errors.roll_number && <ErrorText>{errors.roll_number}</ErrorText>}
+                  </div>
 
-                <div style={styles.field}>
-                  <label style={styles.label}>Batch</label>
-                  <input
-                    name="batch"
-                    type="text"
-                    placeholder="e.g. 2022"
-                    value={formData.batch}
-                    onChange={handleChange}
-                    style={styles.input}
-                    onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-                    onBlur={(e) => Object.assign(e.target.style, styles.input)}
-                  />
-                </div>
+                  <div style={styles.field}>
+                    <label style={styles.label}>Batch</label>
+                    <input
+                      name="batch"
+                      type="text"
+                      placeholder="e.g. 2022"
+                      value={formData.batch}
+                      onChange={handleChange}
+                      style={styles.input}
+                      onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
+                      onBlur={(e) => Object.assign(e.target.style, styles.input)}
+                    />
+                  </div>
+                  </>
+                )}
 
                 <div style={styles.field}>
                   <label style={styles.label}>Department</label>
@@ -434,6 +465,26 @@ const styles = refineAuthStyles({
   cardHeader: {
     marginBottom: "24px",
   },
+  toggle: {
+    display: "inline-flex",
+    gap: "2px",
+    padding: "3px",
+    marginBottom: "22px",
+    borderRadius: "999px",
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.14)",
+  },
+  toggleBtn: (active) => ({
+    padding: "5px 16px",
+    fontSize: "12.5px",
+    fontWeight: 600,
+    border: "none",
+    borderRadius: "999px",
+    cursor: "pointer",
+    background: active ? "#fff" : "transparent",
+    color: active ? "#00254D" : "rgba(255,255,255,0.7)",
+    transition: "background 0.2s ease, color 0.2s ease",
+  }),
   stepRow: {
     display: "flex",
     alignItems: "center",

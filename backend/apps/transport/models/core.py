@@ -6,8 +6,13 @@ import random
 import string
 
 class StudentProfile(models.Model):
+    STUDENT, FACULTY = 0, 1
+    USER_TYPE_CHOICES = [(STUDENT, "Student"), (FACULTY, "Faculty")]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    roll_number = models.CharField(max_length=20, unique=True)
+    user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=STUDENT)
+    # Faculty have no roll number; NULLs don't clash on the unique index.
+    roll_number = models.CharField(max_length=20, unique=True, null=True, blank=True)
     department = models.CharField(max_length=10, default="N/A")
     batch = models.CharField(max_length=10, default="N/A")
     phone = models.CharField(max_length=20, default="N/A")
@@ -17,7 +22,7 @@ class StudentProfile(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.roll_number} ({self.user.username})"
+        return f"{self.roll_number or 'Faculty'} ({self.user.username})"
 
 
 class Semester(models.Model):

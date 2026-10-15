@@ -69,8 +69,17 @@ class StudentProfileCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = StudentProfile
-        fields = ['username', 'email', 'password', 'first_name', 'last_name',
+        fields = ['username', 'email', 'password', 'first_name', 'last_name', 'user_type',
                   'roll_number', 'department', 'batch', 'phone', 'address']
+
+    def validate(self, attrs):
+        if attrs.get('user_type', StudentProfile.STUDENT) == StudentProfile.FACULTY:
+            # Faculty have no roll number or batch.
+            for field in ('roll_number', 'batch'):
+                attrs.pop(field, None)
+        elif not attrs.get('roll_number'):
+            raise serializers.ValidationError({'roll_number': 'Roll number is required.'})
+        return attrs
 
     def validate_email(self, value):
         from django.contrib.auth.models import User

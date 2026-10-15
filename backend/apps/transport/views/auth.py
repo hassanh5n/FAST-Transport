@@ -122,6 +122,7 @@ class CurrentUserView(APIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
             "is_staff": user.is_staff,
+            "user_type": getattr(getattr(user, "studentprofile", None), "user_type", None),
             "role": "staff" if user.is_staff else (
                 "driver" if Driver.objects.filter(user=user).exists() else "student"
             ),
