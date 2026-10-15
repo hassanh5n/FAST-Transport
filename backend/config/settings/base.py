@@ -181,6 +181,9 @@ LOGGING = {
     },
 }
 
+# Lets users sign in with their username or their signup email.
+AUTHENTICATION_BACKENDS = ['apps.transport.backends.UsernameOrEmailBackend']
+
 # ── JWT ───────────────────────────────────────────────────────────────────────
 from datetime import timedelta
 SIMPLE_JWT = {

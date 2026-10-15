@@ -19,3 +19,17 @@ class RollNumberBackend(ModelBackend):
         if user.check_password(password) and self.user_can_authenticate(user):
             return user
         return None
+
+class UsernameOrEmailBackend(ModelBackend):
+    def authenticate(self, request, username=None, password=None, **kwargs):
+        if not username or password is None:
+            return None
+        identifier = username.strip()
+        if "@" in identifier:
+            candidates = User.objects.filter(email__iexact=identifier)
+        else:
+            candidates = User.objects.filter(username=identifier)
+        for user in candidates:
+            if user.check_password(password) and self.user_can_authenticate(user):
+                return user
+        return None

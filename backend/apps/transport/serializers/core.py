@@ -72,6 +72,13 @@ class StudentProfileCreateSerializer(serializers.ModelSerializer):
         fields = ['username', 'email', 'password', 'first_name', 'last_name',
                   'roll_number', 'department', 'batch', 'phone', 'address']
 
+    def validate_email(self, value):
+        from django.contrib.auth.models import User
+
+        if User.objects.filter(email__iexact=value, is_active=True).exists():
+            raise serializers.ValidationError("An account with this email already exists.")
+        return value
+
     def create(self, validated_data):
         from django.contrib.auth.models import User, Group
 
