@@ -40,7 +40,9 @@ class Semester(models.Model):
     # The transport fee for this semester, set by an admin. Single source of
     # truth: challans read it from here instead of each caller hardcoding an
     # amount, which previously left 45000 in one place and 5000 in another.
-    transport_fee = models.DecimalField(max_digits=10, decimal_places=0, default=5000)
+    transport_fee = models.DecimalField(max_digits=10, decimal_places=0, default=50000)
+    # Faculty pay a separate rate; transport_fee above is the student rate.
+    faculty_transport_fee = models.DecimalField(max_digits=10, decimal_places=0, default=9000)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @property

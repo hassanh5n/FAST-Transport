@@ -27,6 +27,7 @@ from .models import (
     FeeVerification,
     Challan,
     Notification,
+    StudentProfile,
 )
 
 # A held seat is normally payable until the semester's registration deadline.
@@ -37,13 +38,17 @@ SEAT_OFFER_GRACE_DAYS = 5
 # Fallback when a semester has no deadline set at all.
 SEAT_OFFER_HOURS = SEAT_OFFER_GRACE_DAYS * 24
 
-# Last-resort fee if a semester somehow has none set. The real amount lives on
-# Semester.transport_fee, which an admin controls.
-DEFAULT_FEE_AMOUNT = 5000
+# Last-resort fees if a semester somehow has none set. The real amounts live on
+# Semester.transport_fee / faculty_transport_fee, which an admin controls.
+DEFAULT_FEE_AMOUNT = 50000
+DEFAULT_FACULTY_FEE_AMOUNT = 9000
 
 
-def fee_for_semester(semester):
-    """The transport fee an admin set for this semester."""
+def fee_for_semester(semester, profile=None):
+    """The transport fee an admin set for this semester, by user type."""
+    if profile is not None and profile.user_type == StudentProfile.FACULTY:
+        amount = getattr(semester, "faculty_transport_fee", None)
+        return amount if amount else DEFAULT_FACULTY_FEE_AMOUNT
     amount = getattr(semester, "transport_fee", None)
     return amount if amount else DEFAULT_FEE_AMOUNT
 
@@ -218,7 +223,7 @@ def issue_challan(transport_registration, amount=None):
     """
     semester = transport_registration.semester
     due_at = compute_payment_due(semester)
-    fee = amount or fee_for_semester(semester)
+    fee = amount or fee_for_semester(semester, transport_registration.student)
 
     challan, created = Challan.objects.get_or_create(
         registration=transport_registration,

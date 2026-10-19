@@ -100,6 +100,7 @@ from ..seatallocation import (
     reassign_seat_on_assignment,
     add_to_waitlist,
     issue_challan,
+    fee_for_semester,
     pick_route_for_stop,
     release_seat,
     waitlist_summary,
@@ -145,7 +146,7 @@ def get_challan(request, pk):
         registration=registration,
         student=profile,
         defaults={
-            "amount": registration.semester.fee if hasattr(registration.semester, "fee") else 0,
+            "amount": fee_for_semester(registration.semester, profile),
             "status": "unpaid"
         }
     )
