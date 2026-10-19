@@ -11,6 +11,7 @@ from .seatallocation import (
     promotion_suppressed,
 )
 from .geofencing import is_off_route
+from .road_lines import schedule_road_line_build
 from .emails import send_notification_email
 from django.utils import timezone
 
@@ -76,6 +77,7 @@ def invalidate_geometry_after_stop_change(sender, instance, created, **kwargs):
         geometry=None,
         geometry_updated_at=None,
     )
+    schedule_road_line_build()
 
 
 _bulk = threading.local()
@@ -101,6 +103,7 @@ def invalidate_geometry_after_route_stop_change(sender, instance, **kwargs):
         geometry=None,
         geometry_updated_at=None,
     )
+    schedule_road_line_build()
 
 @receiver(post_save, sender=FeeVerification)
 def handle_fee_verification(sender, instance, created, **kwargs):

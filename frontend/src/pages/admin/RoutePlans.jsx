@@ -294,7 +294,7 @@ function RoutePlansPage() {
         Route Plans
       </PageTitle>
 
-      {activations > 0 && <RoadLineBuilder key={activations} autoStart />}
+      {activations > 0 && <RoadLineBuilder key={activations} />}
 
       {notice && (
         <Banner variant={notice.variant}>

@@ -128,13 +128,16 @@ class TransportAllocationFlowTests(TestCase):
 		self._verify_fee_as_admin(profile)
 
 		seat = SeatAllocation.objects.get(registration__student=profile, registration__semester=self.semester)
-		self.assertEqual(seat.route_assignment_id, self.assignment.id)
+		# Emptiest bus first: BUS-2 (2 free seats) before BUS-1 (1 free seat).
+		self.assertEqual(seat.route_assignment_id, self.assignment_2.id)
 		self.assertEqual(seat.seat_number, 1)
 
 		registration = TransportRegistration.objects.get(student=profile, semester=self.semester)
 		self.assertEqual(registration.status, "Approved")
 
 	def test_waitlist_is_auto_created_when_bus_is_full(self):
+		# Only the one-seat bus serves the route, so the second student has to queue.
+		RouteAssignment.objects.filter(pk=self.assignment_2.pk).update(is_active=False)
 		first_user, first_profile = self._create_student_with_profile("003")
 		self._create_transport_registration(first_user)
 		self._verify_fee_as_admin(first_profile)
@@ -158,20 +161,22 @@ class TransportAllocationFlowTests(TestCase):
 		self._verify_fee_as_admin(profile)
 
 		registration = SemesterRegistration.objects.get(student=profile, semester=self.semester)
+		# Allocation put them on the emptier BUS-2; move them to BUS-1.
+		self.assertEqual(SeatAllocation.objects.get(registration=registration).route_assignment_id, self.assignment_2.id)
 
 		self.client.force_authenticate(user=self.admin)
 		response = self.client.post(
 			"/api/seat-allocations/reassign/",
 			{
 				"registration_id": registration.id,
-				"route_assignment_id": self.assignment_2.id,
+				"route_assignment_id": self.assignment.id,
 			},
 			format="json",
 		)
 
 		self.assertEqual(response.status_code, 200)
 		seat = SeatAllocation.objects.get(registration=registration)
-		self.assertEqual(seat.route_assignment_id, self.assignment_2.id)
+		self.assertEqual(seat.route_assignment_id, self.assignment.id)
 		self.assertEqual(seat.seat_number, 1)
 
 	def test_reassign_requires_verified_fee(self):
@@ -307,6 +312,23 @@ class MapRouteApiTests(TestCase):
 		route = next(item for item in self.client.get("/api/routes/map/").data["routes"] if item["id"] == self.route.id)
 		self.assertEqual(route["geometry"]["coordinates"], [[67.0847, 24.9215], [67.09, 24.93], [67.0947, 24.9315]])
 		self.assertEqual(mock_get.call_count, 1)  # saved, so later loads do not ask again
+
+	@patch("apps.transport.road_lines.time.sleep")
+	@patch("apps.transport.views.req_lib.post")
+	def test_missing_road_lines_are_built_in_the_background(self, mock_post, _sleep):
+		from .road_lines import build_missing_road_lines
+
+		mock_post.return_value = Mock(status_code=200, json=Mock(return_value=ROUTED_TRIP))
+		with self.captureOnCommitCallbacks() as callbacks:
+			self.client.force_authenticate(user=self.student)
+			self.client.get("/api/routes/map/")
+		self.assertEqual(len(callbacks), 1)  # a map load with a missing line queues the build
+
+		self.assertEqual(build_missing_road_lines(), (1, 0))  # other_route has one stop: nothing to draw
+		self.route.refresh_from_db()
+		self.assertIn("leg_seconds", self.route.geometry)
+		self.assertEqual(build_missing_road_lines(), (0, 0))  # already built, no second request
+		self.assertEqual(mock_post.call_count, 1)
 
 	@patch("apps.transport.views.req_lib.post")
 	def test_route_map_retries_a_saved_straight_line(self, mock_get):

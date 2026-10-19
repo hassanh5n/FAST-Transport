@@ -113,6 +113,7 @@ from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
 from .maps import _display_route_geometry, add_stop_etas
+from ..road_lines import schedule_road_line_build
 from .. import audit
 from ..stop_import import import_stops, parse_file
 
@@ -177,7 +178,10 @@ class RouteViewSet(viewsets.ModelViewSet):
             .select_related("stop").order_by("route_id", "stop_order")
         ):
             stops_by_route.setdefault(route_stop.route_id, []).append(route_stop)
-        return Response({"routes": [self._map_route_data(route, stops_by_route.get(route.id, [])) for route in routes]})
+        data = [self._map_route_data(route, stops_by_route.get(route.id, [])) for route in routes]
+        if any(not route["has_road_line"] and len(route["stops"]) >= 2 for route in data):
+            schedule_road_line_build(respect_cooldown=True)
+        return Response({"routes": data})
 
     @action(detail=True, methods=["get"], url_path="map-detail")
     def map_detail(self, request, pk=None):

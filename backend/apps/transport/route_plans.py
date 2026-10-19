@@ -32,6 +32,7 @@ from .models import (
 )
 from .seatallocation import suppress_promotion
 from .signals import routes_rewritten_in_bulk
+from .road_lines import schedule_road_line_build
 from .rbac import MANAGE, staff_with_module
 from .stop_import import _build_stop, _distance_m, _norm_name
 
@@ -664,6 +665,7 @@ def _apply(resolution):
         [item["route"] for item in changed],
         ["description", "status", "contractor", "geometry", "geometry_updated_at", "updated_at"],
     )
+    schedule_road_line_build()  # plan routes without a saved line get one in the background
 
 
 def _nearest(choices, lat, lng):
