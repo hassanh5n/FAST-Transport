@@ -48,6 +48,8 @@ class OTPVerification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
     is_used = models.BooleanField(default=False)
+    # Wrong guesses against this code; see apps/transport/otp.py.
+    failed_attempts = models.PositiveSmallIntegerField(default=0)
  
     def is_valid(self):
         return not self.is_used and timezone.now() < self.expires_at

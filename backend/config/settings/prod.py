@@ -30,6 +30,10 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # ── HTTPS / security headers ─────────────────────────────────────────────────
+# Render puts one proxy in front of the app. Rate limits must key on the
+# address that proxy saw, not on an X-Forwarded-For value the client can forge.
+REST_FRAMEWORK = {**REST_FRAMEWORK, 'NUM_PROXIES': 1}
+
 SECURE_PROXY_SSL_HEADER       = ('HTTP_X_FORWARDED_PROTO', 'https')
 SECURE_SSL_REDIRECT           = False  # Render handles SSL termination
 SESSION_COOKIE_SECURE         = True

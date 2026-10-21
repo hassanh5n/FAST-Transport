@@ -1,3 +1,5 @@
+from rest_framework.decorators import throttle_classes
+from apps.transport.throttles import AuthRateThrottle, OtpRateThrottle
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status
@@ -12,6 +14,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
 from apps.transport.emails import display_name, send_otp_email
+from apps.transport.otp import check_otp, generate_otp
 from django.conf import settings
 from django.core.cache import cache
 from datetime import timedelta
@@ -313,6 +316,7 @@ def list_fee_verifications(request):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+@throttle_classes([OtpRateThrottle])
 def create_payment_intent(request, pk):
     """
     POST /api/transport-registrations/<pk>/create-payment-intent/
@@ -365,6 +369,7 @@ def create_payment_intent(request, pk):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+@throttle_classes([OtpRateThrottle])
 def confirm_stripe_payment(request, pk):
     """
     POST /api/transport-registrations/<pk>/confirm-stripe-payment/
@@ -386,12 +391,12 @@ def confirm_stripe_payment(request, pk):
     if challan.status == "paid":
         return Response({"detail": "Already paid"}, status=400)
 
-    otp_code = ''.join(random.choices(_string.digits, k=6))
+    otp_code = generate_otp()
     expires = timezone.now() + timedelta(minutes=10)
 
     OTPVerification.objects.update_or_create(
         user=request.user,
-        defaults={"otp": otp_code, "expires_at": expires, "is_used": False},
+        defaults={"otp": otp_code, "expires_at": expires, "is_used": False, "failed_attempts": 0},
     )
 
     try:
@@ -411,6 +416,7 @@ def confirm_stripe_payment(request, pk):
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
+@throttle_classes([OtpRateThrottle])
 def verify_payment_otp(request, pk):
     """
     POST /api/transport-registrations/<pk>/verify-payment-otp/
@@ -441,14 +447,9 @@ def verify_payment_otp(request, pk):
     except OTPVerification.DoesNotExist:
         return Response({"detail": "No OTP found. Please request a new one."}, status=404)
 
-    if otp_record.is_used:
-        return Response({"detail": "OTP has already been used."}, status=400)
-
-    if timezone.now() > otp_record.expires_at:
-        return Response({"detail": "OTP has expired. Please request a new one."}, status=400)
-
-    if otp_record.otp != otp_input:
-        return Response({"detail": "Invalid OTP. Please try again."}, status=400)
+    error = check_otp(otp_record, otp_input)
+    if error:
+        return Response({"detail": error}, status=400)
 
     with transaction.atomic():
         otp_record.is_used = True

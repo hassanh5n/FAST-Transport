@@ -78,7 +78,10 @@ function Signup() {
         },
       });
     } catch (err) {
-      setError(JSON.stringify(err.response?.data || "Signup failed"));
+      // DRF sends { field: ["message", ...] }; show the messages, not raw JSON.
+      const data = err.response?.data;
+      const messages = data && typeof data === "object" ? Object.values(data).flat().filter((m) => typeof m === "string") : [];
+      setError(messages.join(" ") || "Signup failed. Check your details and try again.");
     } finally {
       setLoading(false);
     }

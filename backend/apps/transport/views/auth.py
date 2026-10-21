@@ -1,3 +1,5 @@
+from rest_framework.decorators import throttle_classes
+from apps.transport.throttles import AuthRateThrottle, OtpRateThrottle
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics, status
@@ -12,6 +14,9 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
 from apps.transport.emails import display_name, send_otp_email
+from apps.transport.otp import check_otp, generate_otp
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from django.conf import settings
 from django.core.cache import cache
 from datetime import timedelta
@@ -138,6 +143,7 @@ class CurrentUserView(APIView):
 
 
 class StudentSignupView(generics.CreateAPIView):
+    throttle_classes = [AuthRateThrottle]
     serializer_class = StudentProfileCreateSerializer
     permission_classes = [AllowAny]  # allow anyone to access
     def perform_create(self, serializer):
@@ -155,6 +161,7 @@ class StudentSignupView(generics.CreateAPIView):
                 "otp": otp_code,
                 "expires_at": timezone.now() + timedelta(minutes=10),
                 "is_used": False,
+                "failed_attempts": 0,
             }
         )
 
@@ -194,10 +201,9 @@ class StudentSignupView(generics.CreateAPIView):
         )
 
 
-def generate_otp():
-    return str(random.randint(100000, 999999))
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def verify_otp(request):
     """
     POST /api/verify-otp/
@@ -209,32 +215,17 @@ def verify_otp(request):
     if not email or not otp_input:
         return Response({"detail": "Email and OTP are required."}, status=400)
 
-    try:
-        users = User.objects.filter(email=email, is_active=False)
+    users = User.objects.filter(email=email, is_active=False)
+    if users.count() > 1:
+        return Response({"detail": "Multiple accounts found. Contact support."}, status=400)
+    user = users.first()
+    # Unknown email, no code, wrong code: one generic answer (see check_otp),
+    # so this endpoint does not reveal which emails have pending sign-ups.
+    otp_record = OTPVerification.objects.filter(user=user).first() if user else None
 
-        if not users.exists():
-            return Response({"detail": "No pending account found with this email."}, status=404)
-
-        if users.count() > 1:
-            return Response({"detail": "Multiple accounts found. Contact support."}, status=400)
-
-        user = users.first()
-    except User.DoesNotExist:
-        return Response({"detail": "No account found with this email."}, status=404)
-
-    try:
-        otp_record = OTPVerification.objects.get(user=user)
-    except OTPVerification.DoesNotExist:
-        return Response({"detail": "No OTP found for this account."}, status=404)
-
-    if otp_record.is_used:
-        return Response({"detail": "OTP has already been used."}, status=400)
-
-    if timezone.now() > otp_record.expires_at:
-        return Response({"detail": "OTP has expired. Please request a new one."}, status=400)
-
-    if otp_record.otp != otp_input:
-        return Response({"detail": "Invalid OTP. Please try again."}, status=400)
+    error = check_otp(otp_record, otp_input)
+    if error:
+        return Response({"detail": error}, status=400)
 
     # All good — activate user and mark OTP used
     otp_record.is_used = True
@@ -247,6 +238,7 @@ def verify_otp(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def resend_otp(request):
     email = request.data.get("email", "").lower().strip()
     if not email:
@@ -270,7 +262,7 @@ def resend_otp(request):
             )
         existing.delete()
  
-    otp_code = ''.join(random.choices(_string.digits, k=6))
+    otp_code = generate_otp()
     OTPVerification.objects.create(
         user=user,
         otp=otp_code,
@@ -296,52 +288,53 @@ def resend_otp(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def forgot_password(request):
     """
     POST /api/forgot-password/
     Body: { "email": "k220001@nu.edu.pk" }
  
     Sends a password-reset OTP to the email.
-    Returns 404 if the email is not registered.
+    Always answers the same way, whether or not the email has an account, so
+    this endpoint cannot be used to find out who is registered.
     """
+    generic = Response({"detail": "If that email has an account, a reset code is on its way."})
     email = request.data.get("email", "").lower().strip()
     if not email:
         return Response({"detail": "Email is required."}, status=400)
- 
-    try:
-        user = User.objects.get(email__iexact=email)
-    except User.DoesNotExist:
-        return Response({"detail": "No account found with this email address."}, status=404)
- 
-    # Rate limit: same 60-second window as resend_otp
+
+    user = User.objects.filter(email__iexact=email).first()
+    if user is None:
+        return generic
+
+    # One code per minute. Answer generically here too: a "please wait" reply
+    # would only ever be seen for real accounts.
     existing = OTPVerification.objects.filter(user=user).first()
     if existing:
-        seconds_since = (timezone.now() - existing.created_at).total_seconds()
-        if seconds_since < 60:
-            wait = int(60 - seconds_since)
-            return Response(
-                {"detail": f"Please wait {wait} seconds before requesting another reset OTP."},
-                status=429,
-            )
+        if (timezone.now() - existing.created_at).total_seconds() < 60:
+            return generic
         existing.delete()
- 
-    otp_code = ''.join(random.choices(_string.digits, k=6))
+
+    otp_code = generate_otp()
     OTPVerification.objects.create(
         user=user,
         otp=otp_code,
         expires_at=timezone.now() + timedelta(minutes=10),
     )
- 
-    send_otp_email(
-        email, otp_code, purpose="reset",
-        name=display_name(user),
-    )
- 
-    return Response({"detail": "A password reset OTP has been sent to your email."})
+
+    try:
+        send_otp_email(email, otp_code, purpose="reset", name=display_name(user))
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to send password reset email: {e}")
+        return Response({"detail": "We could not send the email right now. Try again later."}, status=503)
+
+    return generic
  
  
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([AuthRateThrottle])
 def reset_password(request):
     """
     POST /api/reset-password/
@@ -354,23 +347,19 @@ def reset_password(request):
     if not all([email, otp_code, new_password]):
         return Response({"detail": "email, otp, and new_password are all required."}, status=400)
  
-    if len(new_password) < 8:
-        return Response({"detail": "Password must be at least 8 characters."}, status=400)
- 
+    user = User.objects.filter(email__iexact=email).first()
+    # Same answer for an unknown email as for a wrong code, so this endpoint
+    # cannot be used to find out which emails have accounts.
+    otp_obj = OTPVerification.objects.filter(user=user).first() if user else None
+    error = check_otp(otp_obj, otp_code)
+    if error:
+        return Response({"detail": error}, status=400)
+
     try:
-        user = User.objects.get(email__iexact=email)
-    except User.DoesNotExist:
-        return Response({"detail": "Invalid credentials."}, status=400)
- 
-    try:
-        otp_obj = OTPVerification.objects.get(user=user, otp=otp_code)
-    except OTPVerification.DoesNotExist:
-        return Response({"detail": "Invalid or expired OTP."}, status=400)
- 
-    if not otp_obj.is_valid():
-        otp_obj.delete()
-        return Response({"detail": "OTP has expired. Please request a new one."}, status=400)
- 
+        validate_password(new_password, user=user)
+    except DjangoValidationError as exc:
+        return Response({"detail": " ".join(exc.messages)}, status=400)
+
     user.set_password(new_password)
     user.save()
     otp_obj.delete()

@@ -4,29 +4,26 @@ import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Spinner, DetailRow, Pill, Banner } from "../../components/ui";
 import { btn, colors, fonts, radius } from "../../theme";
 import { getDashboard } from "../../services/transportService";
+import api from "../../services/api";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import { BrandMark, BrandWordmark } from "../../components/Brand";
 import { fullName, profileMeta, isFacultyProfile } from "./transportHelpers";
 import { passengerLabel } from "../../utils/permissions";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
-
+// Uses the shared API client so production gets the deployed backend URL and
+// the signed-in user's token (a hand-built fetch here pointed at localhost).
 async function downloadTransportCard() {
-  const token = localStorage.getItem("access");
   try {
-    const res = await fetch(`${API_BASE}/api/download-transport-card/`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) { alert("Failed to download. Try again."); return; }
-    const blob = await res.blob();
-    const url = URL.createObjectURL(blob);
+    const res = await api.get("/api/download-transport-card/", { responseType: "blob" });
+    const url = URL.createObjectURL(res.data);
     const a = document.createElement("a");
     a.href = url;
     a.download = "transport-card.pdf";
     a.click();
     URL.revokeObjectURL(url);
+    return true;
   } catch {
-    alert("Download failed. Please try again.");
+    return false;
   }
 }
 
@@ -115,6 +112,7 @@ function StudentDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
   const navigate = useNavigate();
   const isMobile = useBreakpoint(768);
 
@@ -133,7 +131,8 @@ function StudentDashboard() {
 
   const handleDownload = async () => {
     setDownloading(true);
-    await downloadTransportCard();
+    setDownloadError("");
+    if (!(await downloadTransportCard())) setDownloadError("Could not download your transport card. Try again.");
     setDownloading(false);
   };
 
@@ -221,6 +220,8 @@ function StudentDashboard() {
           </button>
         )}
       </div>
+
+      {downloadError && <Banner variant="danger">{downloadError}</Banner>}
 
       {/* spin keyframe injected once */}
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

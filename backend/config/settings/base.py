@@ -39,6 +39,13 @@ REST_FRAMEWORK = {
     # Pagination — prevents timeout on large datasets
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 500,
+    # Brute-force guard for login and one-time codes (apps/transport/throttles.py).
+    # Per IP, so a whole campus behind one NAT shares the "auth" budget: keep it
+    # generous. Wrong-code guesses are capped separately in apps/transport/otp.py.
+    'DEFAULT_THROTTLE_RATES': {
+        'auth': '20/min',
+        'otp': '10/min',
+    },
 }
 
 # ── Middleware ────────────────────────────────────────────────────────────────
@@ -185,6 +192,14 @@ LOGGING = {
         },
     },
 }
+
+# Server-side password rules for signup and password reset (Django's built-ins).
+AUTH_PASSWORD_VALIDATORS = [
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', 'OPTIONS': {'min_length': 8}},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+]
 
 # Lets users sign in with their username or their signup email.
 AUTHENTICATION_BACKENDS = ['apps.transport.backends.UsernameOrEmailBackend']

@@ -1,3 +1,4 @@
+from apps.transport.throttles import AuthRateThrottle
 """
 Super-admin endpoints: manage admins, roles and read the activity log.
 
@@ -279,6 +280,8 @@ def activity_logs(request):
 # ── Login logging ───────────────────────────────────────────────────────────
 class LoggedTokenObtainPairView(TokenObtainPairView):
     """Same as SimpleJWT's login view, but records admin logins."""
+
+    throttle_classes = [AuthRateThrottle]
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

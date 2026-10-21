@@ -1,3 +1,5 @@
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework import serializers
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -64,6 +66,14 @@ class StudentProfileCreateSerializer(serializers.ModelSerializer):
     username = serializers.CharField(write_only=True)
     email = serializers.EmailField(write_only=True)
     password = serializers.CharField(write_only=True)
+
+    def validate_password(self, value):
+        # The browser checks length too, but the API must not trust it.
+        try:
+            validate_password(value)
+        except DjangoValidationError as exc:
+            raise serializers.ValidationError(list(exc.messages))
+        return value
     first_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
     last_name = serializers.CharField(write_only=True, required=False, allow_blank=True)
 
