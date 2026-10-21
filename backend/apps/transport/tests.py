@@ -940,7 +940,7 @@ class SignalHandlersTests(TestCase):
 		mock_allocate.assert_not_called()
 
 
-# ── Driver console ──────────────────────────────────────────────────────────
+# ── Driver console ──────────────────────────────────────────────────────
 import requests as _requests
 from unittest import mock as _mock
 from rest_framework.test import APIClient as _APIClient
