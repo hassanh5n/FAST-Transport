@@ -17,7 +17,7 @@ class SemesterRegistration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.student.roll_number} - {self.semester.name}"
+        return f"{self.student.display_id} - {self.semester.name}"
     
 class TransportRegistration(models.Model):
     STATUS_CHOICES = [
@@ -70,7 +70,7 @@ class SeatAllocation(models.Model):
         ]
 
     def __str__(self):
-        return f"Seat {self.seat_number} - {self.registration.student.roll_number}"
+        return f"Seat {self.seat_number} - {self.registration.student.display_id}"
 
 class Waitlist(models.Model):
     """
@@ -101,7 +101,7 @@ class Waitlist(models.Model):
         ordering = ["position", "added_at"]
 
     def __str__(self):
-        return f"{self.registration.student.roll_number} - Position {self.position}"
+        return f"{self.registration.student.display_id} - Position {self.position}"
 
 class RouteChangeRequest(models.Model):
     registration = models.ForeignKey(SemesterRegistration, on_delete=models.CASCADE)
@@ -114,4 +114,4 @@ class RouteChangeRequest(models.Model):
     resolved_at = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.registration.student.roll_number} - {self.current_route.name} -> {self.requested_route.name}"
+        return f"{self.registration.student.display_id} - {self.current_route.name} -> {self.requested_route.name}"

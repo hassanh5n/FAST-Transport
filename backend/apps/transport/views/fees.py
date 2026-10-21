@@ -218,7 +218,7 @@ def pay_challan(request, pk):
         Notification.objects.create(
             user=admin,
             title="Fee Payment Received",
-            message=f"Student {profile.roll_number} has paid transport fees for {challan.registration.semester.name}. Please verify.",
+            message=f"{profile.label} has paid transport fees for {challan.registration.semester.name}. Please verify.",
             type="info"
         )
 
@@ -481,7 +481,7 @@ def verify_payment_otp(request, pk):
                 user=admin,
                 title="Fee Payment Received (Stripe + OTP)",
                 message=(
-                    f"Student {profile.roll_number} has paid transport fees "
+                    f"{profile.label} has paid transport fees "
                     f"for {registration.semester.name} via Stripe. "
                     f"Amount: PKR {challan.amount}. Please verify."
                 ),

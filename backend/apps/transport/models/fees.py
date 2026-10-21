@@ -18,7 +18,7 @@ class FeeVerification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.student.roll_number} - {self.semester.name}"
+        return f"{self.student.display_id} - {self.semester.name}"
 
 class Challan(models.Model):
     registration = models.OneToOneField(

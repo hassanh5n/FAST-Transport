@@ -86,7 +86,7 @@ class Command(BaseCommand):
             )
 
             label = (
-                f"{student.roll_number} — "
+                f"{student.display_id} — "
                 f"{transport_registration.route.name if transport_registration.route else 'no route'} "
                 f"(due {timezone.localtime(challan.payment_due_at):%d %b %H:%M})"
             )

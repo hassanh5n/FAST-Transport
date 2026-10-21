@@ -256,7 +256,7 @@ def download_transport_card(request):
     data = [
         ["FIELD", "DETAILS"],
         ["Student Name", profile.user.get_full_name() or profile.user.username],
-        ["Roll Number", profile.roll_number],
+        ["Roll Number", profile.roll_number or "N/A (faculty)"],
         ["Department", profile.department],
         ["Batch", profile.batch],
         ["Semester", active_semester.name],
@@ -303,7 +303,7 @@ def download_transport_card(request):
     doc.build(story)
     buffer.seek(0)
 
-    filename = f"transport_card_{profile.roll_number}_{active_semester.name.replace(' ', '_')}.pdf"
+    filename = f"transport_card_{profile.display_id.replace(' ', '_')}_{active_semester.name.replace(' ', '_')}.pdf"
     response = HttpResponse(buffer, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response

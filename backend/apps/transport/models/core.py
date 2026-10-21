@@ -21,8 +21,20 @@ class StudentProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    @property
+    def display_id(self):
+        """Roll number for students; full name for faculty, who have none."""
+        if self.roll_number:
+            return self.roll_number
+        return self.user.get_full_name() or self.user.username
+
+    @property
+    def label(self):
+        """"Student 23K-0531" or "Faculty Aiman Khan", for messages to admins."""
+        return f"{self.get_user_type_display()} {self.display_id}"
+
     def __str__(self):
-        return f"{self.roll_number or 'Faculty'} ({self.user.username})"
+        return f"{self.display_id} ({self.user.username})"
 
 
 class Semester(models.Model):

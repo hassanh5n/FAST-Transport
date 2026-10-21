@@ -439,7 +439,7 @@ function RoutePlansPage() {
             <NoteList
               title="Students moved to the nearest new stop (each is notified)"
               items={report.moved_students.map((s) =>
-                `${s.far ? "⚠ " : ""}${s.roll_number} · ${s.name}: ${s.from_stop} → ${s.to_stop} on ${s.to_route} (${s.distance_m} m)` +
+                `${s.far ? "⚠ " : ""}${s.roll_number ? `${s.roll_number} · ` : ""}${s.name}: ${s.from_stop} → ${s.to_stop} on ${s.to_route} (${s.distance_m} m)` +
                 (s.seat === "kept" ? " · keeps seat" : s.seat === "queued" ? " · queued for a seat" : ""))}
             />
             {report.affected_students.length > 0 && (
@@ -447,7 +447,7 @@ function RoutePlansPage() {
                 {plural(report.affected_students.length, "registered student")} could not be given a stop on the new routes and will be listed under "Needs attention".
               </Banner>
             )}
-            <NoteList title="Students without a stop" tone={colors.warningText} items={report.affected_students.map((s) => `${s.roll_number} · ${s.name}: ${s.reason}`)} />
+            <NoteList title="Students without a stop" tone={colors.warningText} items={report.affected_students.map((s) => `${s.roll_number ? `${s.roll_number} · ` : ""}${s.name}: ${s.reason}`)} />
             <NoteList title="New routes" items={report.routes.created} />
             <NoteList title="Changed routes" items={report.routes.updated} />
             <NoteList title="Routes removed" items={report.routes.removed} />
