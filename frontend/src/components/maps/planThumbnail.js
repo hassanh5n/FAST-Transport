@@ -2,13 +2,12 @@
 // localStorage under the plan's fingerprint, so a card only redraws when its routes change.
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, MAP_STYLE } from "./campus";
-import { ROUTE_COLORS } from "./routeColors";
+import { CAMPUS, MAP_COLORS, MAP_STYLE } from "./campus";
 
 const WIDTH = 640;
 const HEIGHT = 360;
 const TIMEOUT_MS = 20000;
-const KEY = "routeplan.thumb.";
+const KEY = "routeplan.thumb2."; // bumped when the picture's style changes
 
 export function cachedThumbnail(plan) {
   try {
@@ -30,13 +29,12 @@ export function pruneThumbnails(plans) {
 function features(routes) {
   const lines = [];
   const stops = [];
-  routes.forEach((route, index) => {
-    const color = ROUTE_COLORS[index % ROUTE_COLORS.length];
+  routes.forEach((route) => {
     const points = route.stops.map((stop) => [Number(stop.longitude), Number(stop.latitude)]);
     // Imported plans may have no road geometry yet; stop-to-stop lines still show the shape.
     const coordinates = route.geometry?.coordinates?.length > 1 ? route.geometry.coordinates : points;
-    if (coordinates.length > 1) lines.push({ type: "Feature", properties: { color }, geometry: { type: "LineString", coordinates } });
-    points.forEach((point) => stops.push({ type: "Feature", properties: { color }, geometry: { type: "Point", coordinates: point } }));
+    if (coordinates.length > 1) lines.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates } });
+    points.forEach((point) => stops.push({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: point } }));
   });
   return { lines, stops };
 }
@@ -70,12 +68,10 @@ function draw(routes) {
       const collection = (list) => ({ type: "FeatureCollection", features: list });
       const round = { "line-join": "round", "line-cap": "round" };
       map.addSource("lines", { type: "geojson", data: collection(lines) });
-      map.addLayer({ id: "casing", type: "line", source: "lines", paint: { "line-color": "#fff", "line-width": 7 }, layout: round });
-      map.addLayer({ id: "lines", type: "line", source: "lines", paint: { "line-color": ["get", "color"], "line-width": 4 }, layout: round });
-      map.addSource("stops", { type: "geojson", data: collection(stops) });
-      map.addLayer({ id: "stops", type: "circle", source: "stops", paint: { "circle-radius": 5, "circle-color": ["get", "color"], "circle-stroke-color": "#fff", "circle-stroke-width": 2 } });
+      // Same language as the network map: routes in ink, overlaps darken into corridors.
+      map.addLayer({ id: "lines", type: "line", source: "lines", paint: { "line-color": MAP_COLORS.ink, "line-width": 2.2, "line-opacity": 0.45 }, layout: round });
       map.addSource("campus", { type: "geojson", data: collection([{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: CAMPUS.center } }]) });
-      map.addLayer({ id: "campus", type: "circle", source: "campus", paint: { "circle-radius": 7, "circle-color": "#f59e0b", "circle-stroke-color": "#fff", "circle-stroke-width": 2.5 } });
+      map.addLayer({ id: "campus", type: "circle", source: "campus", paint: { "circle-radius": 7, "circle-color": MAP_COLORS.pin, "circle-stroke-color": "#fff", "circle-stroke-width": 2.5 } });
 
       const points = stops.map((stop) => stop.geometry.coordinates);
       if (points.length) {

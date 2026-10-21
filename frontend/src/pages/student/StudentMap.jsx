@@ -6,7 +6,10 @@ import { Banner } from "../../components/ui";
 import { colors, radius } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
-import { CAMPUS, addCampusMarker, MAP_STYLE, routeWidth, addRouteArrows } from "../../components/maps/campus";
+import {
+  CAMPUS, MAP_COLORS, MAP_STYLE, WALK_SHOWN_FROM_M,
+  addCampusMarker, addRouteArrows, routeWidth, stopPopupHtml, walkLabel,
+} from "../../components/maps/campus";
 
 const POLL_INTERVAL_MS = 8000;
 const INCIDENT_POLL_INTERVAL_MS = 30000;
@@ -315,15 +318,29 @@ export default function StudentMap() {
         // Same look as the route pages: white casing, zoom-scaled line, direction arrows.
         map.addLayer({
           id: "route-casing", type: "line", source: "route",
-          paint: { "line-color": "#ffffff", "line-width": routeWidth(3), "line-opacity": 0.95 },
+          paint: { "line-color": MAP_COLORS.casing, "line-width": routeWidth(3.5) },
           layout: { "line-join": "round", "line-cap": "round" },
         });
         map.addLayer({
           id: "route-line", type: "line", source: "route",
-          paint: { "line-color": "#2563EB", "line-width": routeWidth(), "line-opacity": 0.9 },
+          paint: { "line-color": MAP_COLORS.accent, "line-width": routeWidth() },
           layout: { "line-join": "round", "line-cap": "round" },
         });
         addRouteArrows(map, "route-arrows", "route");
+      }
+
+      // Stops off the main road: a dashed walk from the stop to where the bus picks up.
+      const offRoad = validStops.filter(s => !s.is_campus && Array.isArray(s.boarding) && (s.walk_m || 0) >= WALK_SHOWN_FROM_M);
+      const walks = { type: "FeatureCollection", features: offRoad.map(s => ({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [[s.lng, s.lat], s.boarding] } })) };
+      const pickups = { type: "FeatureCollection", features: offRoad.map(s => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: s.boarding } })) };
+      if (map.getSource("walks")) {
+        map.getSource("walks").setData(walks);
+        map.getSource("pickups").setData(pickups);
+      } else {
+        map.addSource("walks", { type: "geojson", data: walks });
+        map.addLayer({ id: "walks", type: "line", source: "walks", layout: { "line-cap": "round" }, paint: { "line-color": MAP_COLORS.walk, "line-width": 2, "line-dasharray": [0.6, 2] } });
+        map.addSource("pickups", { type: "geojson", data: pickups });
+        map.addLayer({ id: "pickups", type: "circle", source: "pickups", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 2.5, 15, 4.5], "circle-color": "#fff", "circle-stroke-color": MAP_COLORS.accent, "circle-stroke-width": 2 } });
       }
 
       // Fit map to show all stops
@@ -337,32 +354,31 @@ export default function StudentMap() {
       bounds.extend(CAMPUS.center); // keep the campus in frame with the route
       map.fitBounds(bounds, { padding: isMobileRef.current ? 30 : 60, maxZoom: 14 });
 
-      // Add stop markers
+      // Numbered stop pins at the real stop locations; the student's own stop is amber.
+      let number = 0;
       validStops.forEach(stop => {
+        if (stop.is_campus) return; // the campus badge marks the end of the route
+        number += 1;
         const isStudentStop = stop.name === trackingData.student_stop_name;
-        // Numbered pins like the route pages; the student's own stop is larger and amber.
         const el = document.createElement("div");
-        const size = isStudentStop ? 28 : 22;
-        el.textContent = stop.order;
+        const size = isStudentStop ? 26 : 20;
+        el.textContent = number;
         el.style.cssText = `
           width: ${size}px; height: ${size}px; border-radius: 50%;
           display: flex; align-items: center; justify-content: center;
-          background: ${isStudentStop ? "#F59E0B" : "#2563EB"};
-          color: ${isStudentStop ? "#0b2d42" : "#fff"};
-          font: 700 ${isStudentStop ? 13 : 11}px/1 system-ui, sans-serif;
-          border: 2px solid white;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+          background: ${isStudentStop ? MAP_COLORS.yours : "#fff"};
+          color: ${MAP_COLORS.pin};
+          font: 700 ${isStudentStop ? 12 : 10.5}px/1 'DM Sans', system-ui, sans-serif;
+          border: ${isStudentStop ? "2.5px solid #fff" : `2px solid ${MAP_COLORS.pin}`};
+          box-shadow: 0 1px 3px rgba(11,45,66,0.35);
           cursor: pointer;
         `;
         new maplibregl.Marker({ element: el })
           .setLngLat([stop.lng, stop.lat])
-          .setPopup(
-            new maplibregl.Popup({ offset: 12 }).setHTML(
-              `<strong>${stop.name}</strong>
-              ${stop.est_morning_eta ? `<br/>🕐 Morning ETA: ${stop.est_morning_eta}` : ""}
-              ${isStudentStop ? "<br/><em style='color:#F59E0B'>📍 Your stop</em>" : ""}`
-            )
-          )
+          .setPopup(new maplibregl.Popup({ offset: 14, closeButton: false }).setHTML(stopPopupHtml({
+            name: stop.name, morningEta: stop.est_morning_eta, eveningEta: stop.est_evening_eta,
+            walkM: stop.walk_m, isYours: isStudentStop,
+          })))
           .addTo(map);
       });
     };
@@ -495,8 +511,15 @@ export default function StudentMap() {
 
       {crimeRiskStatus && <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>{crimeRiskStatus}</p>}
 
-      <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>
-        🟡 Your stop &nbsp;·&nbsp; 🔵 Other stops, numbered in order &nbsp;·&nbsp; Blue line: route, arrows show direction &nbsp;·&nbsp; 🚌 Live bus position (updates every 8s) &nbsp;·&nbsp; Crime-risk data is aggregated and delayed
+<p style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10, lineHeight: 1.5 }}>
+        {(() => {
+          const mine = trackingData?.stops?.find((stop) => stop.name === trackingData.student_stop_name);
+          const walk = mine ? walkLabel(mine.walk_m) : "";
+          if (!mine) return "Numbered pins are stops in pickup order. The bus position updates every 8 seconds.";
+          return walk
+            ? `Your stop, ${mine.name}, is marked in amber. ${walk}, shown as the dashed line.`
+            : `Your stop, ${mine.name}, is marked in amber. The bus stops right there.`;
+        })()}
       </p>
     </PageShell>
   );

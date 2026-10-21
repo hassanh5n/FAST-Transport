@@ -112,8 +112,9 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
-from .maps import _display_route_geometry, add_stop_etas
+from .maps import _display_route_geometry, add_stop_etas, attach_boarding
 from ..road_lines import schedule_road_line_build
+from ..route_order import order_check
 from .. import audit
 from ..stop_import import import_stops, parse_file
 
@@ -155,6 +156,18 @@ class RouteViewSet(viewsets.ModelViewSet):
         fallback_geometry = [[stop["longitude"], stop["latitude"]] for stop in stops]
         geometry, geometry_source = _display_route_geometry(route, fallback_geometry, fetch=fetch)
         add_stop_etas(stops, geometry)
+        turn_ins = geometry.get("turn_ins", []) if isinstance(geometry, dict) else []
+        pickups = [stop for stop in stops if not stop["is_campus"]]
+        order_warning = None
+        if len(pickups) < len(stops):  # routes ending at campus: is the pickup order sensible?
+            campus = next(stop for stop in stops if stop["is_campus"])
+            found = order_check([(stop["longitude"], stop["latitude"]) for stop in pickups], (campus["longitude"], campus["latitude"]))
+            if found:
+                order_warning = {
+                    "extra_km": found["extra_km"],
+                    "suggested_route_stop_ids": [pickups[i]["route_stop_id"] for i in found["suggested"]],
+                }
+        geometry = attach_boarding(stops, geometry)
         return {
             "id": route.id,
             "name": route.name,
@@ -165,6 +178,10 @@ class RouteViewSet(viewsets.ModelViewSet):
             "geometry": geometry,
             "geometry_is_cached": geometry_source in {"stored", "cache"},
             "has_road_line": geometry_source == "stored",
+            # stops the bus has to leave the main road for (index into stops)
+            "turn_ins": turn_ins,
+            # set when another pickup order would be much shorter (straight-line estimate)
+            "order_warning": order_warning,
             "stops": stops,
         }
 
@@ -545,8 +562,10 @@ def eligible_route_stops(request):
         for route_stop in route_stops
         if not (float(route_stop.stop.latitude) == 0 and float(route_stop.stop.longitude) == 0)
     ]
-    for route_id, geometry in route_geometries.items():
-        add_stop_etas([row for row in route_stop_rows if row["route_id"] == route_id], geometry)
+    for route_id, geometry in list(route_geometries.items()):
+        rows = [row for row in route_stop_rows if row["route_id"] == route_id]
+        add_stop_etas(rows, geometry)
+        route_geometries[route_id] = attach_boarding(rows, geometry)
     return Response({
         "semester": {"id": semester.id, "name": semester.name},
         "route_geometries": route_geometries,

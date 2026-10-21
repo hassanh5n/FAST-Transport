@@ -146,6 +146,9 @@ def student_bus_tracking(request):
             "morning_eta": stop["morning_eta"],
             "est_morning_eta": stop["est_morning_eta"],
             "est_evening_eta": stop["est_evening_eta"],
+            "is_campus": stop["is_campus"],
+            "boarding": stop["boarding"],  # where on the main road the bus picks up
+            "walk_m": stop["walk_m"],
         }
         for stop in route_map["stops"]
     ]

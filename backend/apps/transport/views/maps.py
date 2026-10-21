@@ -110,6 +110,7 @@ from ..seatallocation import (
     SEAT_OFFER_HOURS,
 )
 from ..crime_risk import _setting_bbox
+from ..corridor import ROUTE_LINE_VERSION, build_corridor, haversine_m, route_through
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
 logger = logging.getLogger(__name__)
@@ -349,108 +350,95 @@ STOP_DWELL_SECONDS = 60        # boarding time at each intermediate stop
 
 
 def _haversine_m(a, b):
-    (lng1, lat1), (lng2, lat2) = a, b
-    p1, p2 = math.radians(lat1), math.radians(lat2)
-    h = (math.sin((p2 - p1) / 2) ** 2
-         + math.cos(p1) * math.cos(p2) * math.sin(math.radians(lng2 - lng1) / 2) ** 2)
-    return 2 * 6371000 * math.asin(math.sqrt(h))
-
-
-def _decode_polyline6(encoded):
-    """[[lng, lat], ...] from a Valhalla shape (Google polyline, 6 decimals)."""
-    coordinates, index, values = [], 0, [0, 0]
-    while index < len(encoded):
-        for axis in (0, 1):
-            shift = result = 0
-            while True:
-                byte = ord(encoded[index]) - 63
-                index += 1
-                result |= (byte & 0x1F) << shift
-                shift += 5
-                if byte < 0x20:
-                    break
-            values[axis] += ~(result >> 1) if result & 1 else result >> 1
-        coordinates.append([round(values[1] / 1e6, 6), round(values[0] / 1e6, 6)])
-    return coordinates
+    return haversine_m(a, b)
 
 
 def _main_road_trip(coordinates, timeout=15):
-    """Drive through `coordinates` on main roads only: (line, [(seconds, metres)] per leg), or None.
+    """Drive through `coordinates` in order on main roads: (line, [(seconds, metres)] per leg), or None.
 
-    Every stop is snapped to the nearest road of MAP_MAIN_ROAD_CLASS or bigger, so a stop
-    pinned inside a street shows as a point beside the main road instead of pulling the
-    line into the street. Stops in between are break_through: the bus passes them without
-    a U-turn or a lap of a roundabout to reach the pin. If the router finds no way using
-    only those roads, it tries once more allowing tertiary roads (still no streets).
+    Used for live ETAs from a bus's position. Any number of points works: the
+    router is asked in chunks. Saved route lines use build_corridor instead.
     """
-    classes = list(dict.fromkeys([settings.MAP_MAIN_ROAD_CLASS, "tertiary"]))
-    for road_class in classes:
-        trip = _routed_trip(coordinates, road_class, timeout)
-        if trip is not None:
-            return trip
-    return None
-
-
-def _routed_trip(coordinates, road_class, timeout):
-    last = len(coordinates) - 1
-    locations = [
-        {
-            "lon": lng, "lat": lat,
-            "type": "break" if index in (0, last) else "break_through",
-            "radius": 50,  # either carriageway of a divided road counts as reaching the stop
-            "search_filter": {"min_road_class": road_class},
-        }
-        for index, (lng, lat) in enumerate(coordinates)
-    ]
-    body = {
-        "locations": locations,
-        "costing": "bus",
-        "costing_options": {"bus": {"use_living_streets": 0}},
-        "directions_type": "none",
-    }
-    try:
-        for attempt in range(2):
-            response = req_lib.post(f"{settings.MAP_ROUTING_URL}/route", json=body, timeout=timeout)
-            if response.status_code != 429 or attempt:
-                break
-            time.sleep(2)  # the free server allows about one request a second
-        response.raise_for_status()
-        legs = response.json()["trip"]["legs"]
-        line = []
-        for leg in legs:
-            points = _decode_polyline6(leg["shape"])
-            line.extend(points[1:] if line else points)
-        durations = [(leg["summary"]["time"], leg["summary"]["length"] * 1000) for leg in legs]
-    except (req_lib.RequestException, ValueError, KeyError, IndexError, TypeError) as exc:
-        reply = getattr(getattr(exc, "response", None), "text", "")
-        logger.warning("Routing failed on %s roads and up: %r %s", road_class, exc, reply[:300])
+    trip = route_through(coordinates, timeout=timeout)
+    if trip is None:
         return None
-    if len(durations) != last or len(line) < 2:
-        return None
-    return line, durations
+    line, _, legs = trip
+    return line, legs
 
 
 def _road_geometry(coordinates):
-    """Return a main-road line when available; never cache a straight-line fallback.
+    """The main-road line for stops in this order, as (geometry, source).
 
-    A routed line also carries `leg_seconds`, the drive time of each stop-to-stop leg,
-    which the stop ETAs are worked out from.
+    The line is routed only through the stops it must turn in for (see corridor.py);
+    every other stop is served at its boarding point, the closest point of the line.
+    The geometry carries, per stop: its pin, the boarding point, the walk to it and
+    the drive time from the first stop (`stops`), plus `leg_seconds` for the stop
+    ETAs. A straight-line fallback is never cached.
     """
     fallback = {"type": "LineString", "coordinates": [[lng, lat] for lng, lat in coordinates]}
     if len(coordinates) < 2:
         return fallback, "fallback"
 
-    cache_key = _map_cache_key("main-road", ";".join(f"{lng:.6f},{lat:.6f}" for lng, lat in coordinates))
+    cache_key = _map_cache_key(
+        f"corridor-v{ROUTE_LINE_VERSION}",
+        f"{settings.MAP_STOP_WALK_M};" + ";".join(f"{lng:.6f},{lat:.6f}" for lng, lat in coordinates),
+    )
     cached = cache.get(cache_key)
     if isinstance(cached, dict) and cached.get("source") == "provider" and _is_line_string(cached.get("geometry")):
         return cached["geometry"], "cache"
-    trip = _main_road_trip(coordinates)
-    if trip is None:
+    corridor = build_corridor(coordinates)
+    if corridor is None:
         return fallback, "fallback"
-    line, legs = trip
-    geometry = _compact_line({"type": "LineString", "coordinates": line, "leg_seconds": [round(seconds) for seconds, _ in legs]})
+    stops = [
+        {"pin": [round(lng, 5), round(lat, 5)], **stop}
+        for (lng, lat), stop in zip(coordinates, corridor["stops"])
+    ]
+    geometry = _compact_line({
+        "type": "LineString",
+        "coordinates": corridor["line"],
+        "v": ROUTE_LINE_VERSION,
+        "leg_seconds": [max(0, b["s"] - a["s"]) for a, b in zip(stops, stops[1:])],
+        "stops": stops,
+        "anchors": corridor["anchors"],
+        "turn_ins": corridor["turn_ins"],
+        "length_m": corridor["length_m"],
+    })
     cache.set(cache_key, {"geometry": geometry, "source": "provider"}, timeout=60 * 60 * 24 * 7)
     return geometry, "provider"
+
+
+def _matches_stops(geometry, stop_coordinates):
+    """A saved line belongs to these stops: same count, same pins, same order."""
+    stops = geometry.get("stops")
+    if not isinstance(stops, list) or len(stops) != len(stop_coordinates):
+        return False
+    try:
+        return all(
+            abs(float(stop["pin"][0]) - float(lng)) < 1e-5 and abs(float(stop["pin"][1]) - float(lat)) < 1e-5
+            for stop, (lng, lat) in zip(stops, stop_coordinates)
+        )
+    except (KeyError, TypeError, ValueError, IndexError):
+        return False
+
+
+def attach_boarding(stops, geometry):
+    """Give each stop dict `boarding` ([lng, lat] where the bus picks up) and `walk_m`,
+    and return the geometry as sent to the browser (just the line).
+
+    Stops with no saved line (drawn stop to stop) board at their own pin.
+    """
+    saved = geometry.get("stops") if isinstance(geometry, dict) else None
+    matched = isinstance(saved, list) and len(saved) == len(stops)
+    for index, stop in enumerate(stops):
+        if matched:
+            stop["boarding"] = saved[index]["at"]
+            stop["walk_m"] = saved[index]["walk_m"]
+        else:
+            stop["boarding"] = [stop["longitude"], stop["latitude"]]
+            stop["walk_m"] = 0
+    if not isinstance(geometry, dict):
+        return geometry
+    return {"type": geometry.get("type"), "coordinates": geometry.get("coordinates", [])}
 
 
 def _clock_seconds(value):
@@ -498,10 +486,10 @@ def _display_route_geometry(route, fallback_geometry, fetch=False):
     route. fetch=True (one route at a time) asks the service and saves the result.
     """
     geometry = route.geometry if isinstance(route.geometry, dict) else None
-    # A previous provider outage may have persisted a rounded or interpolated
-    # stop-to-stop fallback. Treat any collinear fallback as stale, and any line
-    # without leg_seconds: it predates main-road routing and may run through streets.
-    if (_is_line_string(geometry) and "leg_seconds" in geometry
+    # A line saved before the current routing (version), for other stops, or a
+    # straight stop-to-stop fallback from a provider outage is rebuilt.
+    if (_is_line_string(geometry) and geometry.get("v") == ROUTE_LINE_VERSION
+            and _matches_stops(geometry, fallback_geometry)
             and not _is_straight_fallback(geometry, fallback_geometry)):
         return _compact_line(geometry), "stored"
     if not fetch:

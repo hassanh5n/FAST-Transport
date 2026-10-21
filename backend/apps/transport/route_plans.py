@@ -33,6 +33,7 @@ from .models import (
 from .seatallocation import suppress_promotion
 from .signals import routes_rewritten_in_bulk
 from .road_lines import schedule_road_line_build
+from .route_order import shortest_order
 from .rbac import MANAGE, staff_with_module
 from .stop_import import _build_stop, _distance_m, _norm_name
 
@@ -299,7 +300,11 @@ def _raw_routes_from_json(text):
             "status": route.get("status"),
             "contractor": route.get("contractor"),
             "geometry": route.get("geometry"),
-            "stops": [{**_lower_keys(stop), "where": f"{where}, stop {n}"} for n, stop in enumerate(stops, start=1)],
+            # same column names as a spreadsheet, so "order" or "sequence" sets stop_order
+            "stops": [
+                {**{_heading(key): value for key, value in _lower_keys(stop).items()}, "where": f"{where}, stop {n}"}
+                for n, stop in enumerate(stops, start=1)
+            ],
         })
     plan = data.get("plan") if isinstance(data.get("plan"), dict) else {}
     return raw, plan
@@ -349,7 +354,12 @@ def _clean_stops(raw_stops, errors):
     elif stops and all(item["morning_eta"] for _, item in stops):
         stops.sort(key=lambda pair: pair[1]["morning_eta"])  # pickup times give the order
     else:
-        stops.sort(key=lambda pair: _far_from_campus_first(pair[1]))
+        # No order and no times: the shortest straight-line path to campus. Sorting by
+        # distance from campus alone zig-zags between stops in the same area.
+        far = [pair for pair in stops if -_far_from_campus_first(pair[1]) > CAMPUS_RADIUS_M]
+        near = [pair for pair in stops if pair not in far]
+        order = shortest_order([(item["longitude"], item["latitude"]) for _, item in far], (CAMPUS[1], CAMPUS[0]))
+        stops = [far[i] for i in order] + near
     return [{**item, "stop_order": n} for n, item in enumerate(_end_at_campus([item for _, item in stops]), start=1)]
 
 

@@ -367,7 +367,7 @@ class MapRouteApiTests(TestCase):
 		mock_get.return_value = mock_response
 		routed = self.client.post("/api/admin/maps/route-preview/", {"stop_ids": [self.stop.id, self.other_stop.id]}, format="json")
 		self.assertEqual(routed.data["source"], "provider")
-		self.assertEqual(mock_get.call_count, 3)  # the failure tried main roads, then tertiary
+		self.assertEqual(mock_get.call_count, 5)  # the failure stepped down secondary, tertiary, unclassified, residential
 
 	@patch("apps.transport.views.req_lib.post")
 	def test_eligible_route_stops_include_road_geometry(self, mock_get):

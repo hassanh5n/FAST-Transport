@@ -114,6 +114,9 @@ from .maps import (
     AVERAGE_CITY_SPEED_MPS, ROAD_DETOUR_FACTOR, STOP_DWELL_SECONDS,
     _haversine_m, _main_road_trip, _map_cache_key,
 )
+from ..corridor import ROUTE_LINE_VERSION, project
+
+ON_LINE_M = 400  # a bus this close to its saved line is timed along it, without the router
 from .routes import RouteViewSet
 
 # ── Driver console ───────────────────────────────────────────────────────────
@@ -157,10 +160,51 @@ def _route_legs(coordinates):
     return trip[1]
 
 
-def _stop_etas(origin, route_stops):
+def _line_etas(origin, route_stops, geometry):
+    """ETAs read off the route's saved main-road line, or None when it does not apply.
+
+    The bus is placed on the line; each stop's ETA is the line's drive time from
+    there to the stop's boarding point, plus boarding time at the stops between.
+    """
+    if not isinstance(geometry, dict) or geometry.get("v") != ROUTE_LINE_VERSION:
+        return None
+    saved = geometry.get("stops")
+    line = geometry.get("coordinates")
+    if not isinstance(saved, list) or not isinstance(line, list) or len(line) < 2:
+        return None
+    distance, along, *_ = project(line, origin)
+    if distance > ON_LINE_M:
+        return None
+    by_pin = {(round(float(stop["pin"][0]), 5), round(float(stop["pin"][1]), 5)): stop for stop in saved}
+    marks = sorted((stop["km"] * 1000, stop["s"]) for stop in saved)
+
+    def seconds_at(metres):
+        for (m1, s1), (m2, s2) in zip(marks, marks[1:]):
+            if m1 <= metres <= m2:
+                return s1 + (s2 - s1) * ((metres - m1) / (m2 - m1) if m2 > m1 else 0)
+        return marks[0][1] if metres < marks[0][0] else marks[-1][1]
+
+    now = seconds_at(along)
+    etas = []
+    for index, route_stop in enumerate(route_stops):
+        stop = by_pin.get((round(float(route_stop.stop.longitude), 5), round(float(route_stop.stop.latitude), 5)))
+        if stop is None:
+            return None  # the line predates a stop change
+        etas.append({
+            "route_stop_id": route_stop.id,
+            "eta_seconds": round(max(0, stop["s"] - now) + STOP_DWELL_SECONDS * index),
+            "distance_m": round(max(0, stop["km"] * 1000 - along)),
+        })
+    return etas
+
+
+def _stop_etas(origin, route_stops, geometry=None):
     """Cumulative ETA from origin (lng, lat) through route_stops, in order."""
     if not route_stops:
         return [], None
+    etas = _line_etas(origin, route_stops, geometry)
+    if etas is not None:
+        return etas, "road"
     coordinates = [origin] + [(float(rs.stop.longitude), float(rs.stop.latitude)) for rs in route_stops]
     # ponytail: routed durations are free-flow; scale them if drivers report ETAs as optimistic at rush hour.
     legs, source = _route_legs(coordinates), "road"
@@ -294,7 +338,9 @@ def driver_location(request):
     assignment.bus.refresh_from_db(fields=["is_off_route"])
 
     by_id = RouteStop.objects.filter(route=assignment.route, id__in=remaining).select_related("stop").in_bulk()
-    etas, source = _stop_etas((longitude, latitude), [by_id[i] for i in remaining if i in by_id])
+    etas, source = _stop_etas(
+        (longitude, latitude), [by_id[i] for i in remaining if i in by_id], assignment.route.geometry,
+    )
 
     return Response({
         "recorded_at": ping.recorded_at,

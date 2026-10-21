@@ -134,8 +134,13 @@ EMAIL_PORTAL_URL = os.environ.get('EMAIL_PORTAL_URL', 'https://fleetcentric-ai.v
 # OSRM/Nominatim-compatible service. The browser never receives these URLs.
 # A Valhalla server: it can keep a route to main roads, which OSRM cannot.
 MAP_ROUTING_URL = os.environ.get('MAP_ROUTING_URL', 'https://valhalla1.openstreetmap.de').rstrip('/')
-# Smallest road a route may use: motorway, trunk, primary, secondary, tertiary, unclassified, residential.
+# Smallest road the bus keeps to: motorway, trunk, primary, secondary, tertiary, unclassified, residential.
+# It turns onto smaller roads only for a stop farther than MAP_STOP_WALK_M from every main road.
 MAP_MAIN_ROAD_CLASS = os.environ.get('MAP_MAIN_ROAD_CLASS', 'secondary')
+# A stop within this walk of the main-road line is served there; the bus does not detour to its pin.
+MAP_STOP_WALK_M = int(os.environ.get('MAP_STOP_WALK_M', '500'))
+# Most locations the routing server takes in one request (the public Valhalla server allows 10).
+MAP_ROUTING_MAX_LOCATIONS = int(os.environ.get('MAP_ROUTING_MAX_LOCATIONS', '10'))
 # Stop ETAs count back from these when a route's campus stop has no time of its own.
 CAMPUS_MORNING_ARRIVAL = os.environ.get('CAMPUS_MORNING_ARRIVAL', '08:00')
 CAMPUS_EVENING_DEPARTURE = os.environ.get('CAMPUS_EVENING_DEPARTURE', '16:00')

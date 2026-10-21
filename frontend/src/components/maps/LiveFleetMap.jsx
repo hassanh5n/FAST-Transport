@@ -1,18 +1,9 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, addCampusMarker, MAP_STYLE, routeWidth, addRouteArrows } from "./campus";
+import { CAMPUS, MAP_COLORS, MAP_STYLE, addCampusMarker, escapeHtml, networkWidth } from "./campus";
 import { colors } from "../../theme";
 
-const ROUTE_COLORS = ["#2563EB", "#DC2626", "#16A34A", "#9333EA", "#EA580C", "#0891B2", "#BE123C"];
-
-const colorForRoute = (id) => ROUTE_COLORS[Math.abs(Number(id) || 0) % ROUTE_COLORS.length];
-
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (character) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-  })[character]);
-}
 
 function routeFeatures(routes) {
   return routes.flatMap((route) => {
@@ -20,7 +11,7 @@ function routeFeatures(routes) {
     if (coordinates.length < 2) return [];
     return [{
       type: "Feature",
-      properties: { color: colorForRoute(route.id), name: route.name },
+      properties: { name: route.name },
       geometry: { type: "LineString", coordinates },
     }];
   });
@@ -65,9 +56,8 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
       map.addSource("fleet-routes", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      map.addLayer({ id: "fleet-route-casing", type: "line", source: "fleet-routes", paint: { "line-color": "#fff", "line-width": routeWidth(3), "line-opacity": 0.9 }, layout: { "line-join": "round", "line-cap": "round" } });
-      map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": ["get", "color"], "line-width": routeWidth(), "line-opacity": 0.85 }, layout: { "line-join": "round", "line-cap": "round" } });
-      addRouteArrows(map, "fleet-route-arrows", "fleet-routes", 13);
+      // The network is backdrop here; the buses are the subject.
+      map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": MAP_COLORS.ink, "line-width": networkWidth(), "line-opacity": 0.35 }, layout: { "line-join": "round", "line-cap": "round" } });
       mapRef.current = map;
       map.getSource("fleet-routes").setData({ type: "FeatureCollection", features: routeFeatures(initialRoutesRef.current) });
     });
