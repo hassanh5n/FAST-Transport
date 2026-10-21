@@ -14,7 +14,14 @@ export function storeUserSession(user) {
   localStorage.setItem("permissions", JSON.stringify(user.permissions || {}));
   localStorage.setItem("username", user.username);
   localStorage.setItem("full_name", `${user.first_name || ""} ${user.last_name || ""}`.trim());
+  // StudentProfile.user_type: 0 = student, 1 = faculty. Drives "Student" vs "Faculty" labels.
+  localStorage.setItem("user_type", user.user_type === 1 ? "faculty" : "student");
   window.dispatchEvent(new Event("app:permissions-updated"));
+}
+
+// "Faculty" or "Student", for passenger-facing labels (navbar badge, sidebar, console title).
+export function passengerLabel() {
+  return localStorage.getItem("user_type") === "faculty" ? "Faculty" : "Student";
 }
 
 export function isSuperAdmin() {

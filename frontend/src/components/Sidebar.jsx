@@ -2,7 +2,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { clearQueryCache } from "../services/queryClient";
 import { NavLink, useNavigate } from "react-router-dom";
-import { can, isSuperAdmin, roleLabel } from "../utils/permissions";
+import { can, isSuperAdmin, roleLabel, passengerLabel } from "../utils/permissions";
 import { colors, fonts } from "../theme";
 import { BrandMark, BrandWordmark } from "./Brand";
 
@@ -245,7 +245,7 @@ function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
       {/* Role pill */}
       <div style={styles.rolePill}>
         <span style={styles.roleDot} />
-        {role === "staff" ? roleLabel() : role === "driver" ? "Driver Console" : "Student Portal"}
+        {role === "staff" ? roleLabel() : role === "driver" ? "Driver Console" : `${passengerLabel()} Portal`}
       </div>
 
       {/* Nav groups */}

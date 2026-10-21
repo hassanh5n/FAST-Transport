@@ -399,6 +399,51 @@ textarea:focus {
 .reg-summary__row:last-child { border-bottom: none; }
 .reg-summary__row strong { color: #0f1f2d; font-weight: 600; text-align: right; }
 
+
+/* ── Challan page ─────────────────────────────────────────────────────────── */
+.challan-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+  padding: 20px 28px; background: linear-gradient(135deg, #1a4a68 0%, #0b2d42 70%);
+}
+.challan-lines { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 14px; }
+.challan-lines th {
+  text-align: left; font-size: 12.5px; font-weight: 600; color: #8faabb;
+  padding: 0 0 8px; border-bottom: 1px solid #e2e8f0;
+}
+.challan-lines td { padding: 12px 0; color: #0f1f2d; border-bottom: 1px solid #edf2f7; }
+.challan-lines th:last-child, .challan-lines td:last-child { text-align: right; white-space: nowrap; }
+.challan-lines tfoot td {
+  border-bottom: none; padding-top: 14px; font-family: 'Outfit', 'DM Sans', sans-serif;
+  font-size: 18px; font-weight: 800;
+}
+.challan-side { position: sticky; top: 84px; }
+
+.pay-steps { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); }
+.pay-steps__item { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.pay-steps__item:not(:first-child)::before {
+  content: ""; position: absolute; top: 13px; right: calc(50% + 18px); left: calc(-50% + 18px);
+  height: 2px; background: #e2e8f0;
+}
+.pay-steps__item.is-done:not(:first-child)::before,
+.pay-steps__item.is-active:not(:first-child)::before { background: #22c55e; }
+.pay-steps__dot {
+  width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
+  font-size: 12.5px; font-weight: 700; background: #fff; color: #8faabb; border: 2px solid #cbd5e1;
+}
+.pay-steps__item.is-active .pay-steps__dot { border-color: #288dc4; color: #288dc4; box-shadow: 0 0 0 4px #e8f4fd; }
+.pay-steps__item.is-done .pay-steps__dot { background: #22c55e; border-color: #22c55e; color: #fff; }
+.pay-steps__label { font-size: 12px; font-weight: 500; color: #8faabb; }
+.pay-steps__item.is-active .pay-steps__label, .pay-steps__item.is-done .pay-steps__label { color: #0f1f2d; font-weight: 600; }
+
+.otp-box {
+  width: 100%; min-width: 0; max-width: 48px; height: 52px; text-align: center;
+  font-size: 22px; font-weight: 700; color: #0f1f2d;
+  border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; outline: none;
+}
+.otp-box:focus { border-color: #288dc4; box-shadow: 0 0 0 3px #e8f4fd; }
+
+@media (max-width: 1100px) { .challan-side { position: static; } }
+
 @media (max-width: 1100px) {
   .tp-layout, .reg-layout { grid-template-columns: 1fr; }
   .reg-layout > :last-child { position: static; }

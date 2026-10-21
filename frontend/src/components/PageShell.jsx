@@ -7,12 +7,13 @@ import { colors, fonts } from "../theme";
 import { getUser } from "../services/transportService";
 import { storeUserSession } from "../utils/permissions";
 
-// Refresh the admin's permissions once per page load so changes made by the
-// super admin apply without the admin having to log out and back in.
+// Refresh the session once per page load: admins pick up permission changes
+// made by the super admin, and passengers who signed in before user_type was
+// stored get the right Student/Faculty label, without logging out.
 let permissionsRefreshed = false;
 function useRefreshStaffPermissions(role) {
   useEffect(() => {
-    if (role !== "staff" || permissionsRefreshed) return;
+    if (role === "driver" || permissionsRefreshed) return;
     permissionsRefreshed = true;
     getUser().then((res) => storeUserSession(res.data)).catch(() => {});
   }, [role]);

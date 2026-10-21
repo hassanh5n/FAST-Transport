@@ -1,5 +1,7 @@
 // frontend/src/components/Navbar.jsx
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { passengerLabel } from "../utils/permissions";
 import { clearQueryCache } from "../services/queryClient";
 import { colors, fonts, shadow } from "../theme";
 import NotificationBell from "./NotificationBell";
@@ -10,6 +12,13 @@ import NotificationBell from "./NotificationBell";
 //   onMenuToggle  – callback to open the sidebar drawer on mobile
 function Navbar({ title = "Fleetcentric.ai", isMobile = false, onMenuToggle }) {
   const navigate = useNavigate();
+  // Re-render when the session is refreshed so the Student/Faculty badge updates.
+  const [, setSessionVersion] = useState(0);
+  useEffect(() => {
+    const bump = () => setSessionVersion((v) => v + 1);
+    window.addEventListener("app:permissions-updated", bump);
+    return () => window.removeEventListener("app:permissions-updated", bump);
+  }, []);
 
   const isStaff  = localStorage.getItem("is_staff") === "true";
   const isDriver = localStorage.getItem("role") === "driver";
@@ -56,7 +65,7 @@ function Navbar({ title = "Fleetcentric.ai", isMobile = false, onMenuToggle }) {
         {/* Role badge — hide on mobile */}
         {!isMobile && (
           <span style={isStaff ? styles.roleAdmin : styles.roleStudent}>
-            {isStaff ? "Admin" : isDriver ? "Driver" : "Student"}
+            {isStaff ? "Admin" : isDriver ? "Driver" : passengerLabel()}
           </span>
         )}
 

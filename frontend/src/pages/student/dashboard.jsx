@@ -7,6 +7,7 @@ import { getDashboard } from "../../services/transportService";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import { BrandMark, BrandWordmark } from "../../components/Brand";
 import { fullName, profileMeta, isFacultyProfile } from "./transportHelpers";
+import { passengerLabel } from "../../utils/permissions";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -136,12 +137,14 @@ function StudentDashboard() {
     setDownloading(false);
   };
 
+  const consoleTitle = `${data?.profile ? (isFacultyProfile(data.profile) ? "Faculty" : "Student") : passengerLabel()} Console`;
+
   if (error) return (
-    <PageShell role="student" title="Student Console">
+    <PageShell role="student" title={consoleTitle}>
       <Banner variant="danger">{error}</Banner>
     </PageShell>
   );
-  if (!data) return <PageShell role="student" title="Student Console"><Spinner /></PageShell>;
+  if (!data) return <PageShell role="student" title={consoleTitle}><Spinner /></PageShell>;
 
   const { profile, recent_notifications, active_registration, seat, waitlist_position } = data;
   const normStatus      = (active_registration?.status || "").toLowerCase();
@@ -154,7 +157,7 @@ function StudentDashboard() {
   const needsToPay      = isRegistered && !seat && !waitlist_position && !hasSubmittedFee && normStatus !== "rejected";
 
   return (
-    <PageShell role="student" title="Student Console">
+    <PageShell role="student" title={consoleTitle}>
 
       {/* ── Page header row: title + download button ── */}
       <div style={{
