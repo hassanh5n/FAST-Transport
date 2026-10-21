@@ -206,6 +206,7 @@ class DashboardView(APIView):
             data = {
                 "role": "student",
                 "profile": {
+                    "user_type": profile.get_user_type_display(),
                     "first_name": profile.user.first_name,
                     "last_name": profile.user.last_name,
                     "roll_number": profile.roll_number,

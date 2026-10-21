@@ -6,6 +6,7 @@ import { btn, colors, fonts, radius } from "../../theme";
 import { getDashboard } from "../../services/transportService";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import { BrandMark, BrandWordmark } from "../../components/Brand";
+import { fullName, profileMeta, isFacultyProfile } from "./transportHelpers";
 
 const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
@@ -84,10 +85,10 @@ function StudentCard({ profile, seat, active_registration, isMobile }) {
         <div style={{ minWidth: 0 }}>
           <p style={{ margin: "0 0 4px", fontSize: "9px", color: "rgba(255,255,255,0.35)", letterSpacing: "0.1em", textTransform: "uppercase" }}>Card Holder</p>
           <p style={{ margin: "0 0 4px", fontSize: isMobile ? "16px" : "20px", fontWeight: "800", color: "#fff", letterSpacing: "0.02em", fontFamily: fonts.heading, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: isMobile ? "200px" : "none" }}>
-            {(`${profile.first_name || ""} ${profile.last_name || ""}`.trim() || profile.roll_number).toUpperCase()}
+            {(fullName(profile) || profile.roll_number || "Passenger").toUpperCase()}
           </p>
           <p style={{ margin: 0, fontSize: "11px", color: "rgba(255,255,255,0.45)", letterSpacing: "0.06em" }}>
-            {profile.roll_number} · {profile.department} · Batch {profile.batch}
+            {profileMeta(profile)}
           </p>
         </div>
 
@@ -117,7 +118,7 @@ function StudentDashboard() {
   const isMobile = useBreakpoint(768);
 
   const pendingMsg = "Fees paid; Admin will assign seats shortly.";
-  const unpaidMsg  = "Registration submitted. Please pay transport fee to proceed.";
+  const unpaidMsg  = "Pay the transport fee using your challan to confirm your seat.";
 
   useEffect(() => {
     getDashboard()
@@ -148,6 +149,9 @@ function StudentDashboard() {
   const displayStatus   = (!seat && hasSubmittedFee && ["pending", "approved", "payment_submitted"].includes(normStatus))
     ? pendingMsg : active_registration?.status;
   const canRequestRouteChange = active_registration && ["approved", "confirmed"].includes(normStatus) && seat;
+  // A cancelled registration counts as no registration: the passenger can register again.
+  const isRegistered    = Boolean(active_registration) && normStatus !== "cancelled";
+  const needsToPay      = isRegistered && !seat && !waitlist_position && !hasSubmittedFee && normStatus !== "rejected";
 
   return (
     <PageShell role="student" title="Student Console">
@@ -240,13 +244,13 @@ function StudentDashboard() {
               {
                 label: "Pay Transport Fee",
                 path: "/student/challan",
-                show: !seat && !!active_registration,
+                show: needsToPay,
                 icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/><path d="M8 9h8"/><path d="M8 13h6"/><path d="M8 17h4"/></svg>,
               },
               {
                 label: "Register for Transport",
                 path: "/student/transport-registrations",
-                show: !active_registration,
+                show: !isRegistered,
                 icon: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>,
               },
               {
@@ -321,7 +325,7 @@ function StudentDashboard() {
           {/* Transport Status */}
           <ContentCard>
             <h3 style={sectionH}>Transport Status</h3>
-            {active_registration ? (
+            {isRegistered ? (
               <>
                 <DetailRow label="Semester" value={active_registration.semester} />
                 <DetailRow label="Route"    value={active_registration.route} />
@@ -359,9 +363,13 @@ function StudentDashboard() {
               </>
             ) : (
               <>
-                <Banner variant="warning">{unpaidMsg}</Banner>
-                <button onClick={() => navigate("/student/transport")} style={{ ...btn.primary, marginTop: "8px" }}>
-                  View My Transport
+                <p style={{ margin: "0 0 14px", fontSize: "13.5px", lineHeight: 1.6, color: colors.textSecondary }}>
+                  {normStatus === "cancelled"
+                    ? "Your previous registration was cancelled. Register again to get a seat this semester."
+                    : "You haven't registered for transport this semester. It takes a minute: pick your pickup stop and you're placed on its route."}
+                </p>
+                <button onClick={() => navigate("/student/transport-registrations")} style={{ ...btn.primary, padding: "10px 18px" }}>
+                  Register for transport
                 </button>
               </>
             )}
@@ -370,10 +378,12 @@ function StudentDashboard() {
           {/* Profile */}
           <ContentCard>
             <h3 style={sectionH}>My Profile</h3>
-            <DetailRow label="Roll No"    value={profile.roll_number} />
-            <DetailRow label="Full Name" value={`${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "—"} />
+            {isFacultyProfile(profile)
+              ? <DetailRow label="Account" value="Faculty" />
+              : <DetailRow label="Roll No" value={profile.roll_number} />}
+            <DetailRow label="Full Name" value={fullName(profile) || "—"} />
             <DetailRow label="Department" value={profile.department} />
-            <DetailRow label="Batch"      value={profile.batch} />
+            {!isFacultyProfile(profile) && <DetailRow label="Batch" value={profile.batch} />}
             <DetailRow label="Phone"      value={profile.phone} />
             <DetailRow label="Address"    value={profile.address} />
           </ContentCard>

@@ -327,6 +327,89 @@ textarea:focus {
   white-space: nowrap;
 }
 
+
+/* ── Passenger transport pages (My Transport, Register) ───────────────────── */
+.tp-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+  gap: 20px;
+  align-items: start;
+}
+.tp-side { display: flex; flex-direction: column; gap: 20px; }
+
+.tp-hero { display: flex; gap: 18px; align-items: flex-start; }
+.tp-hero__icon {
+  flex: 0 0 auto; width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  background: #e8f4fd; color: #288dc4;
+}
+
+.tp-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 28px;
+  margin: 18px 0 0;
+}
+.tp-facts--stack { grid-template-columns: 1fr; margin-top: 12px; }
+.tp-fact { padding: 12px 0; border-bottom: 1px solid #edf2f7; min-width: 0; }
+.tp-fact--wide { grid-column: 1 / -1; }
+.tp-facts--stack .tp-fact:last-child { border-bottom: none; padding-bottom: 0; }
+.tp-fact dt { font-size: 12.5px; font-weight: 500; color: #8faabb; margin-bottom: 3px; }
+.tp-fact dd { margin: 0; font-size: 14.5px; font-weight: 600; color: #0f1f2d; overflow-wrap: anywhere; }
+
+.tp-fees { list-style: none; margin: 10px 0 0; padding: 0; }
+.tp-fees li {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 11px 0; border-bottom: 1px solid #edf2f7;
+}
+.tp-fees li:last-child { border-bottom: none; padding-bottom: 0; }
+
+.reg-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.reg-steps--row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.reg-steps__item { display: flex; gap: 12px; align-items: flex-start; position: relative; }
+.reg-steps__num {
+  flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; color: #288dc4;
+  background: #fff; border: 2px solid rgba(40,141,196,0.35);
+}
+.reg-steps--column .reg-steps__item:not(:last-child)::after {
+  content: ""; position: absolute; left: 13px; top: 32px; bottom: -16px;
+  width: 2px; background: #e2e8f0;
+}
+
+.reg-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.reg-layout__form { display: flex; flex-direction: column; gap: 20px; }
+.reg-layout > :last-child { position: sticky; top: 84px; }
+.reg-map-empty {
+  height: 560px; border-radius: 12px; background: #f8fafc;
+  border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center;
+  text-align: center; padding: 24px; font-size: 13.5px; color: #4a6178;
+}
+.reg-summary { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 4px 14px; }
+.reg-summary__row {
+  display: flex; justify-content: space-between; gap: 12px; padding: 9px 0;
+  font-size: 13px; color: #4a6178; border-bottom: 1px solid #edf2f7;
+}
+.reg-summary__row:last-child { border-bottom: none; }
+.reg-summary__row strong { color: #0f1f2d; font-weight: 600; text-align: right; }
+
+@media (max-width: 1100px) {
+  .tp-layout, .reg-layout { grid-template-columns: 1fr; }
+  .reg-layout > :last-child { position: static; }
+  .reg-steps--row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .tp-facts, .reg-steps--row { grid-template-columns: 1fr; }
+  .tp-hero { flex-direction: column; }
+  .reg-map-empty { height: 320px; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    MOBILE  ≤ 767px
    ═══════════════════════════════════════════════════════════════════════════ */
