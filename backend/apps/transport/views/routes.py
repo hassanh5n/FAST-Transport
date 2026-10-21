@@ -334,9 +334,13 @@ class RouteViewSet(viewsets.ModelViewSet):
         reg_qs = TransportRegistration.objects.filter(route=route)
         if semester is not None:
             reg_qs = reg_qs.filter(semester=semester)
+        # Newest first, so the loop below keeps each student's latest registration.
+        # Re-registering after a cancel creates a new row; the cancelled one stays
+        # in the database as history but is not shown next to the live one.
         reg_qs = reg_qs.select_related("student__user", "stop").order_by(
-            "student__roll_number"
+            "-created_at", "-id"
         )
+        INACTIVE = ("Cancelled", "Rejected")
 
         # Seat numbers live on SeatAllocation -> SemesterRegistration, so build
         # a {student_id: seat_number} map in one query instead of per row.
@@ -368,7 +372,11 @@ class RouteViewSet(viewsets.ModelViewSet):
             )
 
         students = []
+        seen_students = set()
         for reg in reg_qs:
+            if reg.student_id in seen_students:
+                continue  # an older registration of a student already listed
+            seen_students.add(reg.student_id)
             profile = reg.student
             user = profile.user
             full_name = f"{user.first_name} {user.last_name}".strip() or user.username
@@ -390,17 +398,27 @@ class RouteViewSet(viewsets.ModelViewSet):
                 "status": reg.status,
                 "is_paid": is_paid,
                 "fee_amount": reg.fee_amount,
-                "seat_number": seat_map.get(profile.id),
+                # A cancelled/rejected registration holds no seat, whatever the
+                # student-level seat lookup says.
+                "seat_number": None if reg.status in INACTIVE else seat_map.get(profile.id),
                 "registered_at": reg.created_at,
             })
+        students.sort(key=lambda s: ((s["roll_number"] or "").lower(), s["name"].lower()))
 
         # ── Stats ───────────────────────────────────────────────────────────
         capacity = assignment_data["bus"]["capacity"] if assignment_data else None
         approved = sum(1 for s in students if s["status"] == "Approved")
+        # Everyone on the way to Approved: a held seat or a queue place is pending too.
         pending = sum(
-            1 for s in students if s["status"] in ("Pending", "payment_submitted")
+            1 for s in students
+            if s["status"] in ("Pending", "payment_submitted", "Seat Held", "Waitlisted")
         )
         rejected = sum(1 for s in students if s["status"] == "Rejected")
+        # Seats physically taken on this bus, held ones included.
+        seats_taken = (
+            SeatAllocation.objects.filter(route_assignment_id=assignment.id).count()
+            if assignment else 0
+        )
 
         return Response({
             "route": {
@@ -415,12 +433,12 @@ class RouteViewSet(viewsets.ModelViewSet):
             "students": students,
             "stats": {
                 "capacity": capacity,
-                "registered": len(students),
+                "registered": sum(1 for s in students if s["status"] != "Cancelled"),
                 "approved": approved,
                 "pending": pending,
                 "rejected": rejected,
                 "paid": sum(1 for s in students if s["is_paid"]),
-                "seats_left": (capacity - approved) if capacity is not None else None,
+                "seats_left": max(capacity - seats_taken, 0) if capacity is not None else None,
             },
         })
 
