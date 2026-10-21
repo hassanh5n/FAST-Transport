@@ -4,10 +4,18 @@ import Table from "../../components/Table";
 import { ConfirmModal, FormModal, StatusBadge, Pill, FormCard, Field, SectionBlock } from "../../components/ui";
 import { inputStyle } from "../../styles/formStyles";
 import { colors, fonts, radius, btn } from "../../theme";
-import { getBuses, createBus, updateBus, deleteBus } from "../../services/transportService";
+import { getBuses, createBus, updateBus, deleteBus, importBuses } from "../../services/transportService";
 import { useContractor, ContractorSwitch, ContractorSelect } from "../../components/ContractorSwitch";
+import FleetImport from "../../components/FleetImport";
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
+
+// Same columns the server import accepts (backend/apps/transport/fleet_import.py).
+const BUS_COLUMNS = ["bus_number", "capacity", "model", "tracker_token", "contractor", "is_active"];
+const BUS_SAMPLE_CSV =
+  "bus_number,capacity,model,tracker_token,contractor,is_active\n" +
+  "JDN-101,50,Hino AK 2019,,Jadoon,true\n" +
+  "NDM-201,45,Isuzu NQR 2021,,Nadeem,true\n";
 
 function BusesPage() {
   const contractor = useContractor();
@@ -196,6 +204,24 @@ function BusesPage() {
           </div>
         ))}
       </div>
+
+      <FleetImport
+        kind="bus"
+        records={buses}
+        columns={BUS_COLUMNS}
+        toRow={(b) => ({
+          bus_number: b.bus_number,
+          capacity: b.capacity,
+          model: b.model === "N/A" ? "" : b.model,
+          tracker_token: b.tracker_token || "",
+          contractor: contractor.nameOf(b.contractor),
+          is_active: b.is_active,
+        })}
+        sampleCsv={BUS_SAMPLE_CSV}
+        importFile={importBuses}
+        duplicateNote="Buses with the same bus number or GPS tracker token as an existing bus (or an earlier row) are skipped."
+        onChanged={fetchBuses}
+      />
 
       <FormCard title="Add New Bus" onSubmit={handleSubmit} submitLabel="Add Bus">
         <Field label="Bus Number" required flex="1 1 140px">

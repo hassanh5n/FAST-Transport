@@ -21,6 +21,14 @@ export const createDriver = (data) => api.post("/api/drivers/", data);
 export const updateDriver = (id, data) => api.patch(`/api/drivers/${id}/`, data);
 export const deleteDriver = (id) => api.delete(`/api/drivers/${id}/`);
 
+const uploadCsv = (url) => (file) => {
+  const form = new FormData();
+  form.append("file", file);
+  return api.post(url, form, { headers: { "Content-Type": "multipart/form-data" } });
+};
+export const importBuses = uploadCsv("/api/buses/import/");
+export const importDrivers = uploadCsv("/api/drivers/import/");
+
 export const getContractors = () => api.get("/api/contractors/");
 export const getRoutes = () => api.get("/api/routes/");
 export const getRoutesMap = (config) => api.get("/api/routes/map/", config);

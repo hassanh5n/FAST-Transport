@@ -1,10 +1,31 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { colors, fonts, radius, btn } from "../theme";
 import { validateField } from "../utils/validation";
+
+// ── Modal layer ──────────────────────────────────────────────────────────────
+// Every modal renders straight into <body>. Page content sits inside an animated
+// wrapper whose leftover `transform` turns `position: fixed` into "fixed to the
+// page", so a modal rendered in place stretched over the whole page and scrolled
+// away with it. The page behind is locked while any modal is open.
+let openModals = 0;
+function ModalLayer({ children }) {
+  useEffect(() => {
+    openModals += 1;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      openModals -= 1;
+      if (openModals === 0) document.body.style.overflow = previous;
+    };
+  }, []);
+  return createPortal(children, document.body);
+}
 
 // ── Confirm Modal ─────────────────────────────────────────────────────────────
 export function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Confirm", danger = true }) {
   return (
+    <ModalLayer>
     <div style={modalStyles.overlay}>
       <div style={modalStyles.box}>
         <div style={modalStyles.iconWrap}>
@@ -23,12 +44,14 @@ export function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel
         </div>
       </div>
     </div>
+    </ModalLayer>
   );
 }
 
 // ── Form Modal ────────────────────────────────────────────────────────────────
 export function FormModal({ title, sub, children, onSubmit, onClose, submitLabel = "Save", loading = false, width = "560px" }) {
   return (
+    <ModalLayer>
     <div style={modalStyles.overlay} onMouseDown={onClose}>
       <div style={{ ...modalStyles.box, maxWidth: width }} onMouseDown={(e) => e.stopPropagation()}>
         <div style={modalStyles.header}>
@@ -54,6 +77,7 @@ export function FormModal({ title, sub, children, onSubmit, onClose, submitLabel
         </form>
       </div>
     </div>
+    </ModalLayer>
   );
 }
 

@@ -157,7 +157,9 @@ class StudentSignupView(generics.CreateAPIView):
             }
         )
 
-        # Send OTP email — if this fails we still want the user created
+        # Send OTP email. If this fails the user is still created (they can resend),
+        # but the response must say so instead of claiming the email went out.
+        self.otp_email_sent = True
         try:
             send_mail(
                 subject="Your Fleetcentric.ai OTP Code",
@@ -175,14 +177,26 @@ class StudentSignupView(generics.CreateAPIView):
             import logging
             logger = logging.getLogger(__name__)
             logger.error(f"Failed to send OTP email to {user.email}: {e}")
-            # Don't raise — user is created, they can request a resend
+            self.otp_email_sent = False
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
+        if not self.otp_email_sent:
+            return Response(
+                {
+                    "detail": "Account created, but we could not send the OTP email. "
+                              "Use Resend OTP on the next page, or contact the transport office.",
+                    "otp_email_sent": False,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         return Response(
-            {"detail": "Account created. Please check your email for the OTP verification code."},
+            {
+                "detail": "Account created. Please check your email for the OTP verification code.",
+                "otp_email_sent": True,
+            },
             status=status.HTTP_201_CREATED
         )
 
@@ -270,14 +284,23 @@ def resend_otp(request):
         expires_at=timezone.now() + timedelta(minutes=10),
     )
  
-    send_mail(
-        subject="Your Fleetcentric.ai OTP",
-        message=f"Your OTP is: {otp_code}\nIt expires in 10 minutes.",
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
-    )
- 
+    try:
+        send_mail(
+            subject="Your Fleetcentric.ai OTP",
+            message=f"Your OTP is: {otp_code}\nIt expires in 10 minutes.",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        import logging
+        logging.getLogger(__name__).error(f"Failed to resend OTP email to {email}: {e}")
+        return Response(
+            {"detail": "We could not send the OTP email right now. Please try again later "
+                       "or contact the transport office."},
+            status=503,
+        )
+
     return Response({"detail": "If that email is registered, a new OTP has been sent."})
     
 

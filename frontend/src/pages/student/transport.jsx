@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Spinner, Pill, Banner, DetailRow, ConfirmModal } from "../../components/ui";
 import { btn, colors, fonts } from "../../theme";
@@ -25,6 +26,7 @@ function formatCountdown(deadline, now) {
 }
 
 function StudentTransport() {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [queue, setQueue] = useState(null);
   const [cancelling, setCancelling] = useState(false);
@@ -207,7 +209,17 @@ function StudentTransport() {
             )}
           </>
         ) : (
-          <p style={{ margin: 0, color: colors.textSecondary, fontSize: "13.5px" }}>{unpaidMsg}</p>
+          <>
+            <p style={{ margin: "0 0 12px", color: colors.textSecondary, fontSize: "13.5px" }}>
+              You are not registered for transport this semester.
+            </p>
+            <button
+              onClick={() => navigate("/student/transport-registrations")}
+              style={{ ...btn.primary, padding: "8px 16px", fontSize: 13 }}
+            >
+              Register for transport
+            </button>
+          </>
         )}
       </ContentCard>
 

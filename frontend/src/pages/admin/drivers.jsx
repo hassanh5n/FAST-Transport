@@ -4,8 +4,18 @@ import Table from "../../components/Table";
 import { ConfirmModal, FormModal, StatusBadge, Pill, FormCard, Field, SectionBlock } from "../../components/ui";
 import { inputStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
-import { getDrivers, createDriver, updateDriver, deleteDriver } from "../../services/transportService";
+import { getDrivers, createDriver, updateDriver, deleteDriver, importDrivers } from "../../services/transportService";
 import { useContractor, ContractorSwitch, ContractorSelect } from "../../components/ContractorSwitch";
+import FleetImport from "../../components/FleetImport";
+
+// Same columns the server import accepts (backend/apps/transport/fleet_import.py).
+// Logins are not part of the file; add them afterwards with Edit.
+const DRIVER_COLUMNS = ["name", "cnic", "license_no", "phone", "address", "contractor", "is_available"];
+const DRIVER_SAMPLE_CSV =
+  "name,cnic,license_no,phone,address,contractor,is_available\n" +
+  "Ahmed Khan,42101-1234567-1,KHI-LTV-10001,0300 1234567,Gulshan-e-Iqbal,Jadoon,true\n" +
+  "Bilal Ahmed,42201-7654321-3,KHI-HTV-20001,0321 7654321,North Nazimabad,Nadeem,true\n";
+const blankNA = (value) => (value === "N/A" ? "" : value ?? "");
 
 const actionBtn = { ...btn.ghost, padding: "7px 12px", fontSize: "12px" };
 const EMPTY_FORM = { name: "", cnic: "", license_no: "", phone: "", address: "", username: "", password: "", contractor: "" };
@@ -206,6 +216,25 @@ function DriversPage() {
 
       <PageTitle sub="Manage bus drivers, their availability and their sign-in accounts.">Drivers</PageTitle>
       <ContractorSwitch value={contractor} />
+
+      <FleetImport
+        kind="driver"
+        records={drivers}
+        columns={DRIVER_COLUMNS}
+        toRow={(d) => ({
+          name: d.name,
+          cnic: d.cnic,
+          license_no: blankNA(d.license_no),
+          phone: blankNA(d.phone),
+          address: blankNA(d.address),
+          contractor: contractor.nameOf(d.contractor),
+          is_available: d.is_available,
+        })}
+        sampleCsv={DRIVER_SAMPLE_CSV}
+        importFile={importDrivers}
+        duplicateNote="Drivers with the same CNIC or license number as an existing driver (or an earlier row) are skipped. Logins are added afterwards with Edit."
+        onChanged={fetchDrivers}
+      />
 
       <FormCard title="Add New Driver" sub="Username and password are optional — fill both to let the driver sign in and see their route." onSubmit={handleSubmit} submitLabel="Add Driver">
         <Field label="Full Name" required flex="1 1 160px">

@@ -109,11 +109,45 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from .. import audit
+from ..fleet_import import import_buses, import_drivers, parse_csv
+
+
+def _import_csv(request, importer, model_name):
+    """Shared upload handling for the bus and driver CSV imports."""
+    upload = request.FILES.get("file")
+    if not upload:
+        raise ValidationError({"file": "Choose a CSV file."})
+    if not upload.name.lower().endswith(".csv"):
+        raise ValidationError({"file": "Only .csv files are supported."})
+    if upload.size > 2 * 1024 * 1024:
+        raise ValidationError({"file": "The file must be smaller than 2 MB."})
+    try:
+        report = importer(parse_csv(upload.read()))
+    except ValueError as exc:
+        raise ValidationError({"file": str(exc)})
+
+    audit.write_log(
+        action="create",
+        module="fleet",
+        model_name=model_name,
+        description=(
+            f"Imported {model_name}s from {upload.name}: {len(report['created'])} created, "
+            f"{len(report['skipped'])} skipped, {len(report['invalid'])} invalid."
+        ),
+    )
+    return Response(report, status=status.HTTP_201_CREATED)
+
 
 class BusViewSet(viewsets.ModelViewSet):
     queryset = Bus.objects.order_by("bus_number", "id")
     serializer_class = BusSerializer
     permission_classes = [IsAdmin] # Only Admin full access
+
+    @action(detail=False, methods=["post"], url_path="import")
+    def import_file(self, request):
+        """Bulk-create buses from a CSV; duplicates (bus number / tracker token) are skipped."""
+        return _import_csv(request, import_buses, "bus")
 
     @action(detail=False, methods=["get"])
     def available(self, request):
@@ -133,6 +167,11 @@ class DriverViewSet(viewsets.ModelViewSet):
     queryset = Driver.objects.order_by("name", "id")
     serializer_class = DriverSerializer
     permission_classes = [IsAdmin]  # keeps admin-only for all other actions
+
+    @action(detail=False, methods=["post"], url_path="import")
+    def import_file(self, request):
+        """Bulk-create drivers from a CSV; duplicates (CNIC / license number) are skipped."""
+        return _import_csv(request, import_drivers, "driver")
 
     def perform_destroy(self, instance):
         # Never leave an orphan account that can still sign in.

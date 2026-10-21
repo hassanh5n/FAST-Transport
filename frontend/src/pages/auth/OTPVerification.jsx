@@ -19,7 +19,11 @@ function OTPVerification() {
 
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(
+    location.state?.emailFailed
+      ? "We could not send your OTP email. Tap Resend OTP to try again."
+      : ""
+  );
   const [success, setSuccess] = useState("");
   const [fieldError, setFieldError] = useState("");
 

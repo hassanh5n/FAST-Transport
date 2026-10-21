@@ -67,10 +67,11 @@ function Signup() {
     setLoading(true);
     setError("");
     try {
-      await signup(payload);
+      const res = await signup(payload);
       localStorage.setItem("otp_email", formData.email);
       navigate("/verify-otp", {
         state: {
+          emailFailed: res?.data?.otp_email_sent === false,
           email: formData.email,
           username: formData.username,
           password: formData.password,
