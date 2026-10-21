@@ -248,7 +248,7 @@ function TransportRegistration() {
               ) : stopsLoading ? (
                 <div className="reg-map-empty"><Spinner /></div>
               ) : mapRoutes.length ? (
-                <RouteMap routes={mapRoutes} height={560} onStopSelect={(stop) => { if (!stop.isCampus) setSelectedRouteStop(String(stop.routeStopId)); }} />
+                <RouteMap routes={mapRoutes} selectedRouteId={selectedStop?.route_id} height={560} onStopSelect={(stop) => { if (!stop.isCampus) setSelectedRouteStop(String(stop.routeStopId)); }} />
               ) : (
                 <div className="reg-map-empty">No routes with mapped stops are available for this semester yet.</div>
               )}
