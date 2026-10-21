@@ -11,6 +11,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
+from apps.transport.emails import display_name, send_otp_email
 from django.conf import settings
 from django.core.cache import cache
 from datetime import timedelta
@@ -161,17 +162,9 @@ class StudentSignupView(generics.CreateAPIView):
         # but the response must say so instead of claiming the email went out.
         self.otp_email_sent = True
         try:
-            send_mail(
-                subject="Your Fleetcentric.ai OTP Code",
-                message=(
-                    f"Hello {user.username},\n\n"
-                    f"Your OTP verification code is: {otp_code}\n\n"
-                    f"This code expires in 10 minutes.\n\n"
-                    f"If you did not request this, please ignore this email."
-                ),
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
+            send_otp_email(
+                user.email, otp_code, purpose="verify",
+                name=display_name(user),
             )
         except Exception as e:
             import logging
@@ -285,12 +278,9 @@ def resend_otp(request):
     )
  
     try:
-        send_mail(
-            subject="Your Fleetcentric.ai OTP",
-            message=f"Your OTP is: {otp_code}\nIt expires in 10 minutes.",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False,
+        send_otp_email(
+            email, otp_code, purpose="verify",
+            name=display_name(user),
         )
     except Exception as e:
         import logging
@@ -342,16 +332,9 @@ def forgot_password(request):
         expires_at=timezone.now() + timedelta(minutes=10),
     )
  
-    send_mail(
-        subject="Reset your Fleetcentric.ai password",
-        message=(
-            f"Your password reset OTP is: {otp_code}\n"
-            "It expires in 10 minutes.\n\n"
-            "If you did not request this, ignore this email."
-        ),
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
+    send_otp_email(
+        email, otp_code, purpose="reset",
+        name=display_name(user),
     )
  
     return Response({"detail": "A password reset OTP has been sent to your email."})

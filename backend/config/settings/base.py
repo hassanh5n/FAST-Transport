@@ -117,6 +117,11 @@ NOTIFICATION_EMAILS_SKIP_STAFF = True
 # Link target in the email body. Overridden per environment.
 FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
 
+# Target of the "Open Fleetcentric.ai" button in every email. Always the live
+# site, even from local runs, so emails look identical everywhere.
+# Override with the EMAIL_PORTAL_URL env var if the deployment URL changes.
+EMAIL_PORTAL_URL = os.environ.get('EMAIL_PORTAL_URL', 'https://fleetcentric-ai.vercel.app/')
+
 # ── Maps providers ──────────────────────────────────────────────────────────
 # Override these in deployment to use an institution-approved or self-hosted
 # OSRM/Nominatim-compatible service. The browser never receives these URLs.

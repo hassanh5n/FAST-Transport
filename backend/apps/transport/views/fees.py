@@ -11,6 +11,7 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
+from apps.transport.emails import display_name, send_otp_email
 from django.conf import settings
 from django.core.cache import cache
 from datetime import timedelta
@@ -394,18 +395,10 @@ def confirm_stripe_payment(request, pk):
     )
 
     try:
-        send_mail(
-            subject="Fleetcentric.ai — Payment OTP",
-            message=(
-                f"Hello {request.user.username},\n\n"
-                f"Your payment verification OTP is: {otp_code}\n\n"
-                f"This code expires in 10 minutes.\n\n"
-                f"Amount: PKR {challan.amount}\n"
-                f"If you did not initiate this payment, please ignore this email."
-            ),
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[request.user.email],
-            fail_silently=False,
+        send_otp_email(
+            request.user.email, otp_code, purpose="payment",
+            name=display_name(request.user),
+            details=[("Amount", f"PKR {challan.amount}")],
         )
     except Exception:
         pass  # Don't block if email sending fails in dev

@@ -1043,7 +1043,7 @@ class UsernameOrEmailLoginTests(TestCase):
 		res = self.client.post("/api/token/", {"username": "k230551", "password": "wrong"}, format="json")
 		self.assertEqual(res.status_code, 401)
 
-@patch("apps.transport.views.auth.send_mail")
+@patch("apps.transport.views.auth.send_otp_email")
 class FacultySignupTests(TestCase):
 	def setUp(self):
 		self.client = APIClient()
