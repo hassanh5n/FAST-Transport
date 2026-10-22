@@ -1,7 +1,7 @@
 // The route network and one route in detail.
 //
-// Network: every route as a thin ink line (lines only at city zoom; small stop dots
-// once zoomed in). Hovering a line names it. Selected route: the accent line with
+// Network: every route as a thin line in its own colour (lines only at city zoom;
+// small stop dots once zoomed in). Hovering a line names it. Selected route: a bold line with
 // numbered stop pins at the real stop locations and, where a stop is off the main
 // road, a dashed walk to the pickup point on the line.
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -11,6 +11,7 @@ import {
   CAMPUS, MAP_COLORS, MAP_STYLE, STOPS_MIN_ZOOM, WALK_SHOWN_FROM_M,
   addCampusMarker, addRouteArrows, escapeHtml, networkWidth, routeWidth, stopPopupHtml,
 } from "./campus";
+import { routeColors } from "./routeColors";
 
 const EMPTY = { type: "FeatureCollection", features: [] };
 const collection = (features) => ({ type: "FeatureCollection", features });
@@ -31,13 +32,13 @@ const lineOf = (route) => (route.geometry?.coordinates?.length > 1
   ? route.geometry.coordinates
   : route.stops.map(pinOf));
 
-function networkFeatures(routes) {
+function networkFeatures(routes, colors) {
   const lines = [];
   const stops = [];
   routes.forEach((route) => {
     const coordinates = lineOf(route);
     if (coordinates.length > 1) {
-      lines.push({ type: "Feature", properties: { routeId: route.id, name: route.name }, geometry: { type: "LineString", coordinates } });
+      lines.push({ type: "Feature", properties: { routeId: route.id, name: route.name, color: colors.get(route.id) }, geometry: { type: "LineString", coordinates } });
     }
     route.stops.forEach((stop, index) => {
       if (stop.is_campus) return;
@@ -46,7 +47,7 @@ function networkFeatures(routes) {
         properties: {
           routeId: route.id, routeStopId: stop.route_stop_id, name: stop.name, stopOrder: stop.stop_order,
           morningEta: stop.est_morning_eta || "", eveningEta: stop.est_evening_eta || "",
-          walkM: boardingOf(route, stop, index).walk, isCampus: false,
+          walkM: boardingOf(route, stop, index).walk, isCampus: false, color: colors.get(route.id),
         },
         geometry: { type: "Point", coordinates: pinOf(stop) },
       });
@@ -55,7 +56,7 @@ function networkFeatures(routes) {
   return { lines: collection(lines), stops: collection(stops) };
 }
 
-function selectedFeatures(route) {
+function selectedFeatures(route, color) {
   if (!route) return { line: EMPTY, stops: EMPTY, walks: EMPTY, pickups: EMPTY };
   const coordinates = lineOf(route);
   const stops = [];
@@ -76,11 +77,11 @@ function selectedFeatures(route) {
     });
     if (walk >= WALK_SHOWN_FROM_M) {
       walks.push({ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [pinOf(stop), at] } });
-      pickups.push({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: at } });
+      pickups.push({ type: "Feature", properties: { color }, geometry: { type: "Point", coordinates: at } });
     }
   });
   return {
-    line: coordinates.length > 1 ? collection([{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates } }]) : EMPTY,
+    line: coordinates.length > 1 ? collection([{ type: "Feature", properties: { color }, geometry: { type: "LineString", coordinates } }]) : EMPTY,
     stops: collection(stops),
     walks: collection(walks),
     pickups: collection(pickups),
@@ -97,7 +98,7 @@ function boundsOf(points) {
 // White chip with a bus glyph for the live-position marker (driver pages).
 const BUS_SVG = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6v6"/><path d="M16 6v6"/><path d="M2 12h20"/><path d="M18 18h2a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/><circle cx="8" cy="18" r="2"/><circle cx="16" cy="18" r="2"/></svg>';
 
-function Legend({ showWalk }) {
+function Legend({ showWalk, color }) {
   const item = { display: "flex", alignItems: "center", gap: 7 };
   return (
     <div style={{
@@ -106,7 +107,7 @@ function Legend({ showWalk }) {
       font: "500 11.5px/1.2 'DM Sans', system-ui, sans-serif", color: "#4a6178", maxWidth: "calc(100% - 20px)",
     }}>
       <span style={item}>
-        <svg width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" stroke={MAP_COLORS.accent} strokeWidth="4" strokeLinecap="round" /></svg>
+        <svg width="22" height="8" aria-hidden="true"><line x1="1" y1="4" x2="21" y2="4" stroke={color} strokeWidth="4" strokeLinecap="round" /></svg>
         Bus route
       </span>
       <span style={item}>
@@ -117,7 +118,7 @@ function Legend({ showWalk }) {
         <span style={item}>
           <svg width="30" height="10" aria-hidden="true">
             <line x1="1" y1="5" x2="22" y2="5" stroke={MAP_COLORS.walk} strokeWidth="2" strokeDasharray="2 3" strokeLinecap="round" />
-            <circle cx="25" cy="5" r="3.2" fill="#fff" stroke={MAP_COLORS.accent} strokeWidth="2" />
+            <circle cx="25" cy="5" r="3.2" fill="#fff" stroke={color} strokeWidth="2" />
           </svg>
           Walk to pickup
         </span>
@@ -159,28 +160,28 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     map.on("load", () => {
       const line = { "line-join": "round", "line-cap": "round" };
       map.addSource("network-routes", { type: "geojson", data: EMPTY });
-      map.addLayer({ id: "network-routes", type: "line", source: "network-routes", layout: line, paint: { "line-color": MAP_COLORS.ink, "line-width": networkWidth(), "line-opacity": 0.4 } });
+      map.addLayer({ id: "network-routes", type: "line", source: "network-routes", layout: line, paint: { "line-color": ["get", "color"], "line-width": networkWidth(0.6), "line-opacity": 0.9 } });
       map.addLayer({ id: "network-hit", type: "line", source: "network-routes", layout: line, paint: { "line-color": "#000", "line-width": 12, "line-opacity": 0 } });
-      map.addLayer({ id: "network-hover", type: "line", source: "network-routes", layout: line, filter: ["==", ["get", "routeId"], -1], paint: { "line-color": MAP_COLORS.inkHover, "line-width": networkWidth(1.5), "line-opacity": 0.95 } });
+      map.addLayer({ id: "network-hover", type: "line", source: "network-routes", layout: line, filter: ["==", ["get", "routeId"], -1], paint: { "line-color": ["get", "color"], "line-width": networkWidth(3), "line-opacity": 1 } });
       map.addSource("network-stops", { type: "geojson", data: EMPTY });
       map.addLayer({
         id: "network-stops", type: "circle", source: "network-stops", minzoom: STOPS_MIN_ZOOM,
         paint: {
           "circle-radius": ["interpolate", ["linear"], ["zoom"], STOPS_MIN_ZOOM, 1.8, 14, 4, 16, 5.5],
-          "circle-color": "#fff", "circle-stroke-color": MAP_COLORS.ink, "circle-stroke-width": 1.4,
+          "circle-color": "#fff", "circle-stroke-color": ["get", "color"], "circle-stroke-width": 1.6,
           "circle-opacity": ["interpolate", ["linear"], ["zoom"], STOPS_MIN_ZOOM, 0, STOPS_MIN_ZOOM + 0.5, 1],
           "circle-stroke-opacity": ["interpolate", ["linear"], ["zoom"], STOPS_MIN_ZOOM, 0, STOPS_MIN_ZOOM + 0.5, 1],
         },
       });
 
       map.addSource("selected-line", { type: "geojson", data: EMPTY });
-      map.addLayer({ id: "selected-casing", type: "line", source: "selected-line", layout: line, paint: { "line-color": MAP_COLORS.casing, "line-width": routeWidth(3.5) } });
-      map.addLayer({ id: "selected-line", type: "line", source: "selected-line", layout: line, paint: { "line-color": MAP_COLORS.accent, "line-width": routeWidth() } });
+      map.addLayer({ id: "selected-casing", type: "line", source: "selected-line", layout: line, paint: { "line-color": MAP_COLORS.pin, "line-opacity": 0.28, "line-width": routeWidth(2.5) } });
+      map.addLayer({ id: "selected-line", type: "line", source: "selected-line", layout: line, paint: { "line-color": ["get", "color"], "line-width": routeWidth() } });
       addRouteArrows(map, "selected-arrows", "selected-line");
       map.addSource("selected-walks", { type: "geojson", data: EMPTY });
       map.addLayer({ id: "selected-walks", type: "line", source: "selected-walks", layout: { "line-cap": "round" }, paint: { "line-color": MAP_COLORS.walk, "line-width": 2, "line-dasharray": [0.6, 2] } });
       map.addSource("selected-pickups", { type: "geojson", data: EMPTY });
-      map.addLayer({ id: "selected-pickups", type: "circle", source: "selected-pickups", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 2.5, 15, 4.5], "circle-color": "#fff", "circle-stroke-color": MAP_COLORS.accent, "circle-stroke-width": 2 } });
+      map.addLayer({ id: "selected-pickups", type: "circle", source: "selected-pickups", paint: { "circle-radius": ["interpolate", ["linear"], ["zoom"], 10, 2.5, 15, 4.5], "circle-color": "#fff", "circle-stroke-color": ["get", "color"], "circle-stroke-width": 2 } });
       map.addSource("selected-stops", { type: "geojson", data: EMPTY });
       map.addLayer({
         id: "selected-stops", type: "circle", source: "selected-stops",
@@ -265,8 +266,9 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     const map = mapRef.current;
     if (!map || !ready) return;
     const others = selected && routes.length > 1 ? routes.filter((route) => route.id !== selected.id) : routes;
-    const network = networkFeatures(selected && routes.length === 1 ? [] : others);
-    const detail = selectedFeatures(selected);
+    const colors = routeColors(routes);
+    const network = networkFeatures(selected && routes.length === 1 ? [] : others, colors);
+    const detail = selectedFeatures(selected, selected ? colors.get(selected.id) : MAP_COLORS.accent);
     map.getSource("network-routes").setData(network.lines);
     map.getSource("network-stops").setData(network.stops);
     map.getSource("selected-line").setData(detail.line);
@@ -274,7 +276,7 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     map.getSource("selected-pickups").setData(detail.pickups);
     map.getSource("selected-stops").setData(detail.stops);
     // With a route selected the rest of the network steps back.
-    map.setPaintProperty("network-routes", "line-opacity", selected ? 0.16 : 0.4);
+    map.setPaintProperty("network-routes", "line-opacity", selected ? 0.22 : 0.9);
     map.setLayoutProperty("network-stops", "visibility", selected ? "none" : "visible");
 
     // Fit when what is shown changes, not on every refresh of the same data.
@@ -320,7 +322,7 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
   return (
     <div style={{ position: "relative", height, width: "100%", borderRadius: 12, overflow: "hidden" }}>
       <div ref={containerRef} style={{ position: "absolute", inset: 0 }} aria-label="Transport route map" />
-      {selected && <Legend showWalk={showWalk} />}
+      {selected && <Legend showWalk={showWalk} color={routeColors(routes).get(selected.id) || MAP_COLORS.accent} />}
     </div>
   );
 }

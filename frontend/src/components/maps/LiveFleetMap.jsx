@@ -1,17 +1,19 @@
 import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { CAMPUS, MAP_COLORS, MAP_STYLE, addCampusMarker, escapeHtml, networkWidth } from "./campus";
+import { CAMPUS, MAP_STYLE, addCampusMarker, escapeHtml, networkWidth } from "./campus";
+import { routeColors } from "./routeColors";
 import { colors } from "../../theme";
 
 
 function routeFeatures(routes) {
+  const colors = routeColors(routes);
   return routes.flatMap((route) => {
     const coordinates = route.geometry?.coordinates || (route.stops || []).map((stop) => [stop.longitude, stop.latitude]);
     if (coordinates.length < 2) return [];
     return [{
       type: "Feature",
-      properties: { name: route.name },
+      properties: { name: route.name, color: colors.get(route.id) },
       geometry: { type: "LineString", coordinates },
     }];
   });
@@ -56,8 +58,8 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
       map.addSource("fleet-routes", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
-      // The network is backdrop here; the buses are the subject.
-      map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": MAP_COLORS.ink, "line-width": networkWidth(), "line-opacity": 0.35 }, layout: { "line-join": "round", "line-cap": "round" } });
+      // Thin and a little faded: the buses are the subject here.
+      map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": ["get", "color"], "line-width": networkWidth(0.4), "line-opacity": 0.6 }, layout: { "line-join": "round", "line-cap": "round" } });
       mapRef.current = map;
       map.getSource("fleet-routes").setData({ type: "FeatureCollection", features: routeFeatures(initialRoutesRef.current) });
     });
