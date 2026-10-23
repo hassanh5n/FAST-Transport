@@ -10,6 +10,9 @@ import {
   CAMPUS, MAP_COLORS, MAP_STYLE, WALK_SHOWN_FROM_M,
   addCampusMarker, addRouteArrows, routeWidth, stopPopupHtml, walkLabel,
 } from "../../components/maps/campus";
+import { showTrafficAlerts, useTrafficAlerts } from "../../components/maps/trafficAlerts";
+import { rememberMapboxTraffic, savedMapboxTraffic, setMapboxTraffic } from "../../components/maps/mapboxTraffic";
+import { LiveTrafficDialog, TrafficLegend } from "../../components/maps/TrafficControls";
 
 const POLL_INTERVAL_MS = 8000;
 const INCIDENT_POLL_INTERVAL_MS = 30000;
@@ -55,6 +58,22 @@ export default function StudentMap() {
   const [crimeRiskZones, setCrimeRiskZones] = useState([]);
   const [crimeRiskEnabled, setCrimeRiskEnabled] = useState(true);
   const [crimeRiskStatus, setCrimeRiskStatus] = useState("");
+  const [mapReady, setMapReady] = useState(false);  // the map's "load" has fired
+  const traffic = useTrafficAlerts();
+  const [trafficShown, setTrafficShown] = useState(true);
+  const [liveTrafficOpen, setLiveTrafficOpen] = useState(false);
+
+  const [mapboxOn, setMapboxOn] = useState(savedMapboxTraffic);
+
+  // Shared traffic incidents, redrawn whenever the server's copy changes or they are toggled.
+  useEffect(() => {
+    if (mapReady && mapRef.current) showTrafficAlerts(mapRef.current, traffic.alerts, trafficShown);
+  }, [mapReady, traffic.alerts, trafficShown]);
+
+  // Optional Mapbox traffic lines (off unless this browser turned them on).
+  useEffect(() => {
+    if (mapReady && mapRef.current) setMapboxTraffic(mapRef.current, mapboxOn);
+  }, [mapReady, mapboxOn]);
 
   useEffect(() => {
     isMobileRef.current = isMobile;
@@ -131,6 +150,7 @@ export default function StudentMap() {
     map.addControl(new maplibregl.NavigationControl(), "top-right");
 
     map.on("load", () => {
+      setMapReady(true);
       const busEl = document.createElement("div");
       busEl.style.cssText = `width: 36px; height: 36px;
       background: #c42828; border-radius: 50%;
@@ -285,9 +305,11 @@ export default function StudentMap() {
     };
   }, [fetchCrimeRiskZones]);
 
-  // 4. Populate route + stops when trackingData loads
+  // 4. Populate route + stops when trackingData loads. Waits on mapReady, not
+  // isStyleLoaded(): that is also false while any source (traffic, crime risk) is still
+  // loading, and waiting for a "load" that already fired left the route undrawn.
   useEffect(() => {
-    if (!trackingData || !mapRef.current) return;
+    if (!trackingData || !mapRef.current || !mapReady) return;
 
     const validStops = (trackingData.stops || []).filter(s => s.lat && s.lng);
     if (!validStops.length) return;
@@ -295,10 +317,6 @@ export default function StudentMap() {
     const map = mapRef.current;
 
     const populateMap = () => {
-      if (!map.isStyleLoaded()) {
-        map.once("load", () => populateMap());
-        return;
-      }
 
       // The server's main-road line; stop to stop until it has one.
       const routeCoords = trackingData.geometry?.coordinates || validStops.map(s => [s.lng, s.lat]);
@@ -384,7 +402,7 @@ export default function StudentMap() {
     };
 
     populateMap();
-  }, [trackingData]);
+  }, [trackingData, mapReady]);
 
   // 5. Move bus marker on every GPS update
   useEffect(() => {
@@ -497,6 +515,8 @@ export default function StudentMap() {
             <span><i style={{ display: "inline-block", width: 9, height: 9, background: "#DC2626", marginRight: 3 }} />High</span>
           </div>}
         </div>
+        <TrafficLegend traffic={traffic} visible={trafficShown} onToggle={setTrafficShown} onOpenLive={() => setLiveTrafficOpen(true)} style={{ bottom: 30 }}
+          mapbox={{ on: mapboxOn, onChange: (on) => { setMapboxOn(on); rememberMapboxTraffic(on); } }} />
         {!trackingData && (
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.8)", borderRadius: 12, zIndex: 10 }}>
             <div style={{
@@ -510,6 +530,20 @@ export default function StudentMap() {
       </div>
 
       {crimeRiskStatus && <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>{crimeRiskStatus}</p>}
+
+      {liveTrafficOpen && (
+        <LiveTrafficDialog
+          title={`Live traffic on ${trackingData?.route_name || "your route"}`}
+          routes={trackingData ? [{ id: "mine", geometry: trackingData.geometry, stops: (trackingData.stops || []).map((s) => ({ longitude: s.lng, latitude: s.lat })) }] : []}
+          buses={liveData?.lat && liveData?.lng ? [{
+            bus_id: "mine", bus_number: liveData.bus_number || trackingData?.bus?.bus_number || "Your bus",
+            latitude: liveData.lat, longitude: liveData.lng, status: isStale ? "stale" : "live",
+            route: { name: trackingData?.route_name }, driver: { name: liveData.driver_name || trackingData?.bus?.driver_name },
+            position_timestamp: lastUpdated,
+          }] : []}
+          onClose={() => setLiveTrafficOpen(false)}
+        />
+      )}
 
 <p style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10, lineHeight: 1.5 }}>
         {(() => {

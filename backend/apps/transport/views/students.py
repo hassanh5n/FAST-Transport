@@ -138,7 +138,9 @@ class SemesterRegistrationViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        registrations = SemesterRegistration.objects.select_related("student__user", "semester", "route", "stop")
+        registrations = SemesterRegistration.objects.select_related(
+            "student__user", "semester", "route", "stop",
+        ).defer("route__geometry")  # never returned (RouteSerializer)
         if user.is_staff:
             return registrations.all()
         return registrations.filter(student__user=user)

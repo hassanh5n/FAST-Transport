@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Spinner, DetailRow, Pill, Banner } from "../../components/ui";
 import { btn, colors, fonts, radius } from "../../theme";
-import { getDashboard } from "../../services/transportService";
+import { watchDashboard } from "../../services/transportService";
 import api from "../../services/api";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import { BrandMark, BrandWordmark } from "../../components/Brand";
@@ -120,13 +120,13 @@ function StudentDashboard() {
   const unpaidMsg  = "Pay the transport fee using your challan to confirm your seat.";
 
   useEffect(() => {
-    getDashboard()
-      .then((res) => {
-        const d = res.data;
-        if (d.role === "staff") { navigate("/admin/dashboard", { replace: true }); return; }
-        setData(d);
-      })
-      .catch(() => setError("Failed to load console data."));
+    // The saved summary shows at once; a failed refresh keeps it on screen.
+    let shown = false;
+    watchDashboard((d) => {
+      if (d.role === "staff") { navigate("/admin/dashboard", { replace: true }); return; }
+      shown = true;
+      setData(d);
+    }).catch(() => { if (!shown) setError("Failed to load console data."); });
   }, [navigate]);
 
   const handleDownload = async () => {

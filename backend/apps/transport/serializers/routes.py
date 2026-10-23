@@ -51,6 +51,10 @@ class RouteSerializer(serializers.ModelSerializer):
         model = Route
         fields = '__all__'
         read_only_fields = ['created_at', 'updated_at']
+        # The road line (~4 KB a route) is drawn from /routes/map/ and /map-detail/; leaving
+        # it out here keeps route lists, assignments and registrations small, and lets their
+        # queries skip loading it with .defer("route__geometry").
+        extra_kwargs = {"geometry": {"write_only": True}}
 
 
 class StopSerializer(serializers.ModelSerializer):
@@ -135,20 +139,23 @@ class RouteStopSerializer(serializers.ModelSerializer):
             "driver_id",
         ]
 
-    def get_bus_number(self, obj):
-        assignment = obj.route.routeassignment_set.filter(is_active=True).first()
-        if assignment and assignment.bus:
-            return assignment.bus.bus_number
-        return None
+    @staticmethod
+    def _assignment(obj):
+        """The route's first active assignment. RouteStopViewSet prefetches these, so a
+        list costs no query per row; a lone route stop falls back to one query."""
+        route = obj.route
+        if hasattr(route, "active_assignments"):
+            return route.active_assignments[0] if route.active_assignments else None
+        return route.routeassignment_set.filter(is_active=True).select_related("bus", "driver").order_by("id").first()
 
+    def get_bus_number(self, obj):
+        assignment = self._assignment(obj)
+        return assignment.bus.bus_number if assignment and assignment.bus else None
 
     def get_driver_name(self, obj):
-        assignment = obj.route.routeassignment_set.filter(is_active=True).first()
-        if assignment and assignment.driver:
-            return assignment.driver.name
-        return None
-    def get_driver_id(self, obj):                      # ← add this method
-        assignment = obj.route.routeassignment_set.filter(is_active=True).first()
-        if assignment and assignment.driver:
-            return assignment.driver.id
-        return None
+        assignment = self._assignment(obj)
+        return assignment.driver.name if assignment and assignment.driver else None
+
+    def get_driver_id(self, obj):
+        assignment = self._assignment(obj)
+        return assignment.driver.id if assignment and assignment.driver else None

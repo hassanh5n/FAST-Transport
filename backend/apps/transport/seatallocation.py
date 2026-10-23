@@ -16,6 +16,7 @@ import threading
 from datetime import timedelta
 
 from django.db import transaction
+from django.db.models import Count
 from django.utils import timezone
 
 from .models import (
@@ -150,12 +151,23 @@ def seats_free_on_assignment(assignment):
     return max(assignment.bus.capacity - taken, 0)
 
 
+def _buses_emptiest_first(route, semester):
+    """The route's active assignments with `seats_free` set, emptiest first. One query:
+    each bus's seats are counted in it, not with a COUNT per bus."""
+    assignments = list(
+        RouteAssignment.objects.filter(
+            route=route, semester=semester, is_active=True, bus__is_active=True
+        ).select_related("bus").annotate(seats_taken=Count("seatallocation"))
+    )
+    for assignment in assignments:
+        assignment.seats_free = max(assignment.bus.capacity - assignment.seats_taken, 0)
+    assignments.sort(key=lambda a: a.seats_free, reverse=True)
+    return assignments
+
+
 def free_seats_on_route(route, semester):
     """Seats still free across every active assignment for this route."""
-    assignments = RouteAssignment.objects.filter(
-        route=route, semester=semester, is_active=True, bus__is_active=True
-    ).select_related("bus")
-    return sum(seats_free_on_assignment(assignment) for assignment in assignments)
+    return sum(assignment.seats_free for assignment in _buses_emptiest_first(route, semester))
 
 
 def pick_route_for_stop(stop, semester):
@@ -463,14 +475,9 @@ def promote_next_from_waitlist(route, semester):
     if not entry:
         return None
 
-    assignments = list(
-        RouteAssignment.objects.filter(
-            route=route, semester=semester, is_active=True, bus__is_active=True
-        ).select_related("bus")
-    )
+    assignments = _buses_emptiest_first(route, semester)
     if not assignments:
         return None
-    assignments.sort(key=lambda a: seats_free_on_assignment(a), reverse=True)
 
     registration = entry.registration
     result = "Bus is full"
@@ -542,16 +549,10 @@ def allocate_seat_for_student(registration):
     # queued students behind a full bus while a second bus on the same route
     # still had room - and free_seats_on_route(), which the registration flow
     # uses to decide whether a seat exists at all, counts every bus.
-    assignments = list(
-        RouteAssignment.objects.filter(
-            route=route, semester=semester, is_active=True, bus__is_active=True
-        ).select_related("bus")
-    )
+    assignments = _buses_emptiest_first(route, semester)
 
     if not assignments:
         return "No active bus assignment"
-
-    assignments.sort(key=lambda a: seats_free_on_assignment(a), reverse=True)
 
     last_result = "Bus is full"
     for assignment in assignments:

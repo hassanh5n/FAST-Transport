@@ -10,7 +10,7 @@ from .views import download_transport_card
 from .views import BusLocationPingCreateView, IncidentViewSet, approved_incidents
 from .views import eligible_route_stops
 from .views import resolve_map_location, preview_route_geometry
-from .views import crime_risk_zones
+from .views import crime_risk_zones, traffic_alerts
 from .admin_views import (
     AdminRoleViewSet, AdminUserViewSet, LoggedTokenObtainPairView,
     activity_logs, modules_meta,
@@ -72,6 +72,7 @@ urlpatterns = [
     path("admin/maps/location/", resolve_map_location, name="resolve-map-location"),
     path("admin/maps/route-preview/", preview_route_geometry, name="preview-route-geometry"),
     path("crime-risk/zones/", crime_risk_zones, name="crime-risk-zones"),
+    path("traffic/alerts/", traffic_alerts, name="traffic-alerts"),
     path("admin-management/modules/", modules_meta, name="admin-modules"),
     path("admin-management/activity-logs/", activity_logs, name="admin-activity-logs"),
     path("driver/overview/", driver_overview, name="driver-overview"),

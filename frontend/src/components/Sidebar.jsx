@@ -1,8 +1,8 @@
 // frontend/src/components/Sidebar.jsx
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { clearQueryCache } from "../services/queryClient";
-import { NavLink, useNavigate } from "react-router-dom";
-import { can, isSuperAdmin, roleLabel, passengerLabel } from "../utils/permissions";
+import { Link, NavLink, useNavigate } from "react-router-dom";
+import { can, homePath, isSuperAdmin, roleLabel, passengerLabel } from "../utils/permissions";
 import { colors, fonts } from "../theme";
 import { BrandMark, BrandWordmark } from "./Brand";
 
@@ -227,10 +227,13 @@ function SidebarContent({ groups, role, handleLogout, isMobile, onClose }) {
     <>
       {/* Brand */}
       <div style={styles.brand}>
-        <BrandMark size={25} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <BrandWordmark height={15} style={{ maxWidth: "100%" }} />
-        </div>
+        {/* The logo opens this user's own dashboard (admin, driver or student console). */}
+        <Link to={homePath()} onClick={isMobile ? onClose : undefined} style={styles.brandLink}>
+          <BrandMark size={25} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <BrandWordmark height={15} style={{ maxWidth: "100%" }} />
+          </div>
+        </Link>
 
         {/* Close button — only inside mobile drawer */}
         {isMobile && (
@@ -312,6 +315,7 @@ const styles = {
     padding:      "22px 20px 16px",
     borderBottom: "1px solid rgba(255,255,255,0.06)",
   },
+  brandLink: { display: "flex", alignItems: "center", gap: "12px", flex: 1, minWidth: 0, textDecoration: "none", borderRadius: "8px" },
   closeBtn: {
     background:   "transparent",
     border:       "none",

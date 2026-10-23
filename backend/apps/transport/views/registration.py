@@ -122,7 +122,11 @@ class TransportRegistrationViewSet(viewsets.ModelViewSet):
         if not profile:
             return TransportRegistration.objects.none()
 
-        return TransportRegistration.objects.filter(student=profile)
+        # route_name, stop_name and semester_name, joined instead of three queries a row
+        return (
+            TransportRegistration.objects.filter(student=profile)
+            .select_related("semester", "stop", "route").defer("route__geometry")
+        )
     
     @action(detail=False, methods=["get"], permission_classes=[IsAuthenticated])
     def my_registration(self, request):
@@ -331,7 +335,7 @@ class SeatAllocationViewSet(viewsets.ModelViewSet):
     queryset = SeatAllocation.objects.select_related(
         "registration__student__user", "registration__semester", "registration__route", "registration__stop",
         "route_assignment__route", "route_assignment__bus", "route_assignment__driver", "route_assignment__semester",
-    ).order_by("id")
+    ).defer("registration__route__geometry", "route_assignment__route__geometry").order_by("id")
     serializer_class = SeatAllocationSerializer
     permission_classes = [IsAdmin] # Only Admin full access
 
@@ -364,7 +368,7 @@ class SeatAllocationViewSet(viewsets.ModelViewSet):
                 route__is_active=True,
                 bus__is_active=True,
                 semester__is_active=True,
-            ).select_related("route", "semester", "bus", "driver")
+            ).select_related("route", "semester", "bus", "driver").defer("route__geometry")
         )
 
         seat_counts = {
@@ -657,6 +661,7 @@ class WaitlistViewSet(viewsets.ModelViewSet):
                 "registration__route",
                 "registration__stop",
             )
+            .defer("registration__route__geometry")
             .order_by("registration__route__name", "position", "added_at")
         )
 
@@ -669,25 +674,28 @@ class WaitlistViewSet(viewsets.ModelViewSet):
             grouped.setdefault(route.id, {"route": route, "entries": []})
             grouped[route.id]["entries"].append(entry)
 
-        # Include routes with free seats but nobody queued, so an admin can see
-        # capacity sitting idle.
-        for assignment in RouteAssignment.objects.filter(
-            semester=semester, is_active=True
-        ).select_related("route"):
+        # Every active assignment with its seat count, in one query instead of two per
+        # route. Routes with free seats but nobody queued are included, so an admin can
+        # see capacity sitting idle.
+        assignments_by_route = {}
+        for assignment in (
+            RouteAssignment.objects.filter(semester=semester, is_active=True)
+            .select_related("route", "bus", "driver")
+            .defer("route__geometry")
+            .annotate(seats_taken=Count("seatallocation"))
+            .order_by("id")
+        ):
+            assignments_by_route.setdefault(assignment.route_id, []).append(assignment)
             grouped.setdefault(assignment.route_id,
                                {"route": assignment.route, "entries": []})
 
         routes = []
         for data in grouped.values():
             route = data["route"]
-            assignments = RouteAssignment.objects.filter(
-                route=route, semester=semester, is_active=True
-            ).select_related("bus", "driver")
+            assignments = assignments_by_route.get(route.id, [])
 
             capacity = sum(a.bus.capacity for a in assignments)
-            occupied = SeatAllocation.objects.filter(
-                route_assignment__in=assignments
-            ).count()
+            occupied = sum(a.seats_taken for a in assignments)
             free = max(capacity - occupied, 0)
 
             routes.append({
@@ -770,26 +778,38 @@ class RouteChangeRequestViewSet(viewsets.ModelViewSet):
  
     def get_queryset(self):
         user = self.request.user
+        # Everything the serializer nests, joined instead of fetched per request; the
+        # routes' road lines are never returned.
+        requests = RouteChangeRequest.objects.select_related(
+            "registration__student__user",
+            "registration__semester",
+            "registration__route",
+            "registration__stop",
+            "current_route",
+            "requested_route",
+            "requested_stop",
+        ).defer("registration__route__geometry", "current_route__geometry", "requested_route__geometry")
         if user.is_staff:
-            return RouteChangeRequest.objects.select_related(
-                "registration__student__user",
-                "registration__semester",
-                "current_route",
-                "requested_route",
-                "requested_stop",
-            ).order_by("status", "-requested_at")
+            return requests.order_by("status", "-requested_at")
         # Student sees only their own requests
         profile = StudentProfile.objects.filter(user=user).first()
         if not profile:
             return RouteChangeRequest.objects.none()
-        return RouteChangeRequest.objects.filter(
-            registration__student=profile
-        ).select_related(
-            "registration__semester",
-            "current_route",
-            "requested_route",
-            "requested_stop",
-        ).order_by("-requested_at")
+        return requests.filter(registration__student=profile).order_by("-requested_at")
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        if self.action == "list":
+            # Seats left on every route, counted once for the whole list (available_seats)
+            free = {}
+            for assignment in (
+                RouteAssignment.objects.filter(is_active=True).select_related("bus")
+                .annotate(taken=Count("seatallocation")).order_by("id")
+            ):
+                free.setdefault((assignment.route_id, assignment.semester_id),
+                                max(assignment.bus.capacity - assignment.taken, 0))
+            context["free_seats"] = free
+        return context
  
     def perform_create(self, serializer):
         user = self.request.user

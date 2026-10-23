@@ -175,6 +175,9 @@ class RouteChangeRequestSerializer(serializers.ModelSerializer):
             return None
         if not obj.requested_route:
             return 0
+        free = self.context.get("free_seats")  # counted once for a whole list
+        if free is not None:
+            return free.get((obj.requested_route_id, registration.semester_id), 0)
         assignment = RouteAssignment.objects.filter(
             route=obj.requested_route,
             semester=registration.semester,

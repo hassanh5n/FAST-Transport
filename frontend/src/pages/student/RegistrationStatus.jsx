@@ -6,7 +6,7 @@ import { ContentCard } from "../../components/PageShell";
 import Icon from "../../components/Icon";
 import RouteMap from "../../components/maps/RouteMap";
 import { btn, colors, fonts } from "../../theme";
-import { getRoutesMap } from "../../services/transportService";
+import { watchRoutesMap } from "../../services/transportService";
 
 const STEPS = ["Registered", "Seat reserved", "Fee paid", "Confirmed"];
 const TONES = {
@@ -95,9 +95,12 @@ export default function RegistrationStatus({ registration, challan }) {
 
   useEffect(() => {
     let live = true;
-    getRoutesMap()
-      .then((res) => { if (live) setRoute((res.data?.routes || []).find((item) => sameName(item.name, registration.route_name)) || null); })
-      .catch(() => { if (live) setRoute(null); });
+    let shown = false;
+    watchRoutesMap((data) => {
+      if (!live) return;
+      shown = true;
+      setRoute((data?.routes || []).find((item) => sameName(item.name, registration.route_name)) || null);
+    }).catch(() => { if (live && !shown) setRoute(null); });
     return () => { live = false; };
   }, [registration.route_name]);
 

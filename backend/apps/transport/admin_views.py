@@ -10,7 +10,7 @@ from datetime import datetime, time
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils import timezone
 from rest_framework import serializers, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
@@ -56,7 +56,8 @@ class AdminRoleSerializer(serializers.ModelSerializer):
         read_only_fields = ["is_system", "created_at", "updated_at"]
 
     def get_admin_count(self, obj):
-        return obj.admins.count()
+        # Counted in the list query (AdminRoleViewSet); a single saved role counts here.
+        return obj.admin_total if hasattr(obj, "admin_total") else obj.admins.count()
 
     def validate_permissions(self, value):
         return clean_permissions(value, allow_none=False)
@@ -195,7 +196,7 @@ def modules_meta(request):
 
 
 class AdminRoleViewSet(viewsets.ModelViewSet):
-    queryset = AdminRole.objects.all()
+    queryset = AdminRole.objects.annotate(admin_total=Count("admins"))
     serializer_class = AdminRoleSerializer
     permission_classes = [IsSuperAdmin]
     pagination_class = None
@@ -303,4 +304,8 @@ class LoggedTokenObtainPairView(TokenObtainPairView):
                 )
             finally:
                 audit.end(token)
-        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+        from .views.auth import current_user_payload
+        data = dict(serializer.validated_data)
+        if user is not None:
+            data["user"] = current_user_payload(user)  # saves the login page a /api/user/ request
+        return Response(data, status=status.HTTP_200_OK)

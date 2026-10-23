@@ -117,9 +117,13 @@ class ComplaintViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        # The serializer nests these; joined here instead of one query each per complaint.
+        complaints = Complaint.objects.select_related(
+            "submitted_by", "semester", "route", "resolved_by",
+        ).defer("route__geometry")
         if user.is_staff:
-            return Complaint.objects.all()
-        return Complaint.objects.filter(submitted_by=user)
+            return complaints
+        return complaints.filter(submitted_by=user)
 
     def perform_create(self, serializer):
         serializer.save(submitted_by=self.request.user)

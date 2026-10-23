@@ -1,11 +1,8 @@
 // Shared look for every map: the campus badge, base style, line widths and colours.
 import maplibregl from "maplibre-gl";
+import { CAMPUS } from "./campusLocation";
 
-export const CAMPUS = {
-  name: "FAST NUCES Karachi Main Campus",
-  center: [67.2646384, 24.8569128], // [lng, lat], from OpenStreetMap
-  zoom: 11,
-};
+export { CAMPUS };
 
 // One accent for the route being looked at; every other route is drawn in ink, so
 // the network reads as coverage and shared corridors darken where routes overlap.

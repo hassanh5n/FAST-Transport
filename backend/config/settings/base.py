@@ -31,13 +31,13 @@ INSTALLED_APPS = [
 # ── REST Framework ────────────────────────────────────────────────────────────
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'apps.transport.authentication.SharedJWTAuthentication',  # one user lookup per request
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
     # Pagination — prevents timeout on large datasets
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'apps.transport.pagination.OnePageNumberPagination',  # skips COUNT(*) for one-page lists
     'PAGE_SIZE': 500,
     # Brute-force guard for login and one-time codes (apps/transport/throttles.py).
     # Per IP, so a whole campus behind one NAT shares the "auth" budget: keep it
@@ -134,6 +134,11 @@ EMAIL_PORTAL_URL = os.environ.get('EMAIL_PORTAL_URL', 'https://fleetcentric-ai.v
 # OSRM/Nominatim-compatible service. The browser never receives these URLs.
 # A Valhalla server: it can keep a route to main roads, which OSRM cannot.
 MAP_ROUTING_URL = os.environ.get('MAP_ROUTING_URL', 'https://valhalla1.openstreetmap.de').rstrip('/')
+# Traffic incidents (accidents, closures, construction) from Google Maps via OpenWeb Ninja.
+# Fetched by the server at most once per TRAFFIC_ALERTS_REFRESH_SECONDS and shared by
+# every user, so the request count does not grow with the number of people online.
+OPENWEBNINJA_API_KEY = os.environ.get('OPENWEBNINJA_API_KEY', '')
+TRAFFIC_ALERTS_REFRESH_SECONDS = int(os.environ.get('TRAFFIC_ALERTS_REFRESH_SECONDS', '300'))
 # Smallest road the bus keeps to: motorway, trunk, primary, secondary, tertiary, unclassified, residential.
 # It turns onto smaller roads only for a stop farther than MAP_STOP_WALK_M from every main road.
 MAP_MAIN_ROAD_CLASS = os.environ.get('MAP_MAIN_ROAD_CLASS', 'secondary')

@@ -1,47 +1,79 @@
 # =====================
-# Backend - Django
+# Secrets and local config
+# =====================
+# Every .env variant (root .env, frontend/.env.local, .env.production, ...) holds keys:
+# DATABASE_*, DJANGO_SECRET_KEY, OPENWEBNINJA_API_KEY, MAPBOX_ACCESS_TOKEN,
+# VITE_GOOGLE_MAPS_API_KEY, VITE_MAPBOX_TOKEN. A committed example is fine.
+.env
+.env.*
+*.local
+!.env.example
+!**/.env.example
+
+# =====================
+# Backend - Django / Python
 # =====================
 backend/venv/
 backend/.venv/
+venv/
+.venv/
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
-*.log
+*.py[cod]
+*$py.class
+*.egg-info/
 *.sqlite3
-.env
-.env.*
+*.log
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
 backend/staticfiles/
+backend/media/
+
+# Database dumps and backups: they contain student, staff and driver records.
+# (backups/db_backup_2026-10-12_before_fall2026.json and fasttransport_dump.dump were
+# committed before this rule; ignoring does not untrack them - see `git rm --cached`.)
+backups/
+*.dump
+*.sql
+*.sql.gz
 
 # =====================
-# Frontend - Vite/React
+# Frontend - Vite / React
 # =====================
 frontend/node_modules/
+node_modules/
 frontend/dist/
 frontend/dist-ssr/
+frontend/dev-dist/
 frontend/.cache/
+*.tsbuildinfo
+.eslintcache
 coverage/
-
-# =====================
-# General
-# =====================
-.DS_Store
-.idea/
-.vscode/
-Thumbs.db
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-Claudeoutputs
 .vercel
-.env*
+
+# =====================
+# Editors and OS
+# =====================
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+
+# =====================
+# Local tools and scratch output
+# =====================
 .testing
+Claudeoutputs
 Claude outputs
+.claude/settings.local.json

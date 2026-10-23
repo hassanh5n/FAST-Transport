@@ -43,17 +43,18 @@ const ActivityLogs = lazy(() => import("./pages/admin/ActivityLogs"));
 const DriverDashboard = lazy(() => import("./pages/driver/DriverDashboard"));
 const DriverTrip = lazy(() => import("./pages/driver/DriverTrip"));
 const DriverPassengers = lazy(() => import("./pages/driver/DriverPassengers"));
-import { can, isSuperAdmin } from "./utils/permissions";
-
-// Where a signed-in user belongs, based on what login stored.
-function homePath() {
-  if (localStorage.getItem("is_staff") === "true") return "/admin/dashboard";
-  return localStorage.getItem("role") === "driver" ? "/driver/dashboard" : "/student/dashboard";
-}
+import { can, homePath, isSuperAdmin } from "./utils/permissions";
 
 // Redirect /dashboard based on stored role
 function DashboardRedirect() {
   return <Navigate to={homePath()} replace />;
+}
+
+// The login page: someone already signed in goes straight to their console.
+// An expired session still lands there, and the API's 401 handling sends it to /login
+// with the session cleared, so this cannot loop.
+function GuestRoute({ children }) {
+  return localStorage.getItem("access") ? <Navigate to={homePath()} replace /> : children;
 }
 
 // Protect any route that requires authentication
@@ -113,7 +114,7 @@ function App() {
       <Suspense fallback={null}>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />

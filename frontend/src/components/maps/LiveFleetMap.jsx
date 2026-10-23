@@ -1,8 +1,13 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { CAMPUS, MAP_STYLE, addCampusMarker, escapeHtml, networkWidth } from "./campus";
 import { routeColors } from "./routeColors";
+import { formatUpdated, statusColor, statusLabel } from "./fleetStatus";
+import { rememberMapboxTraffic, savedMapboxTraffic, setMapboxTraffic } from "./mapboxTraffic";
+import { MapboxTrafficToggle } from "./TrafficControls";
+import Icon from "../Icon";
+import "./LiveFleetMap.css";
 import { colors } from "../../theme";
 
 
@@ -19,31 +24,14 @@ function routeFeatures(routes) {
   });
 }
 
-function statusColor(status) {
-  if (status === "live") return "#16a34a";
-  if (status === "stale" || status === "ping") return "#d97706";
-  if (status === "no_tracker") return "#64748b";
-  return "#dc2626";
-}
-
-function statusLabel(bus) {
-  if (bus.status === "live") return "Live";
-  if (bus.status === "stale") return "Stale";
-  if (bus.status === "no_tracker") return "No tracker";
-  if (bus.status === "ping") return "Last known";
-  return "Offline";
-}
-
-function formatUpdated(value) {
-  return value ? new Date(value).toLocaleTimeString() : "No position";
-}
-
 export default function LiveFleetMap({ routes = [], buses = [], height = 520, onBusSelect }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const markersRef = useRef(new Map());
   const fittedRef = useRef(false);
   const initialRoutesRef = useRef(routes);
+  const [ready, setReady] = useState(false);
+  const [mapboxOn, setMapboxOn] = useState(savedMapboxTraffic);
 
   useEffect(() => {
     const markers = markersRef.current;
@@ -62,6 +50,7 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
       map.addLayer({ id: "fleet-routes", type: "line", source: "fleet-routes", paint: { "line-color": ["get", "color"], "line-width": networkWidth(0.4), "line-opacity": 0.6 }, layout: { "line-join": "round", "line-cap": "round" } });
       mapRef.current = map;
       map.getSource("fleet-routes").setData({ type: "FeatureCollection", features: routeFeatures(initialRoutesRef.current) });
+      setReady(true);
     });
     mapRef.current = map;
     return () => {
@@ -132,20 +121,96 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     }
   }, [buses, onBusSelect]);
 
+  useEffect(() => {
+    if (ready && mapRef.current) setMapboxTraffic(mapRef.current, mapboxOn);
+  }, [ready, mapboxOn]);
+
+  // A bus picked in the list: fly to it and open its popup.
+  const pickBus = (bus) => {
+    const map = mapRef.current;
+    const marker = markersRef.current.get(bus.bus_id);
+    if (map && marker) {
+      map.flyTo({ center: marker.getLngLat(), zoom: Math.max(map.getZoom(), 13.5), duration: 700 });
+      if (!marker.getPopup()?.isOpen()) marker.togglePopup();
+    }
+    onBusSelect?.(bus.bus_id);
+  };
+
   return (
     <div>
-      <div ref={containerRef} style={{ height, width: "100%", borderRadius: 10, overflow: "hidden" }} aria-label="Live fleet map" />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 8, marginTop: 12 }}>
-        {buses.map((bus) => (
-          <button key={bus.bus_id} type="button" onClick={() => onBusSelect?.(bus.bus_id)} style={{ textAlign: "left", border: `1px solid ${colors.borderLight}`, borderLeft: `4px solid ${statusColor(bus.status)}`, borderRadius: 8, padding: "9px 10px", background: "#fff", cursor: "pointer", color: colors.textPrimary }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: 13, fontWeight: 700 }}>
-              <span>{bus.bus_number}</span><span style={{ color: statusColor(bus.status), fontSize: 11 }}>{statusLabel(bus)}</span>
-            </div>
-            <div style={{ marginTop: 4, fontSize: 12, color: colors.textSecondary }}>{bus.route?.name || "Unassigned"} · {bus.driver?.name || "No driver"}</div>
-            <div style={{ marginTop: 3, fontSize: 11, color: colors.textMuted }}>{formatUpdated(bus.position_timestamp)}{bus.is_off_route ? " · Off route" : ""}</div>
-          </button>
-        ))}
+      <div style={{ position: "relative" }}>
+        <div ref={containerRef} style={{ height, width: "100%", borderRadius: 10, overflow: "hidden" }} aria-label="Live fleet map" />
+        <div style={{ position: "absolute", top: 10, left: 10, zIndex: 2, background: "rgba(255,255,255,0.97)", borderRadius: 8, padding: "7px 10px", boxShadow: "0 1px 5px rgba(11,45,66,0.2)", fontSize: 12 }}>
+          <MapboxTrafficToggle on={mapboxOn} onChange={(on) => { setMapboxOn(on); rememberMapboxTraffic(on); }} />
+        </div>
       </div>
+      <BusList buses={buses} onPick={pickBus} />
+    </div>
+  );
+}
+
+// Live first, then last known, stale, offline, and buses with no tracker at all.
+const STATUS_ORDER = ["live", "ping", "stale", "offline", "no_tracker"];
+const FILTERS = [["all", "All"], ["live", "Live"], ["ping", "Last known"], ["stale", "Stale"], ["offline", "Offline"], ["no_tracker", "No tracker"]];
+const rank = (status) => { const i = STATUS_ORDER.indexOf(status); return i === -1 ? STATUS_ORDER.length : i; };
+
+function BusList({ buses, onPick }) {
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const counts = buses.reduce((all, bus) => ({ ...all, [bus.status]: (all[bus.status] || 0) + 1 }), { all: buses.length });
+  const query = search.trim().toLowerCase();
+  const shown = buses
+    .filter((bus) => filter === "all" || bus.status === filter)
+    .filter((bus) => !query || [bus.bus_number, bus.route?.name, bus.driver?.name].some((text) => text?.toLowerCase().includes(query)))
+    .sort((a, b) => rank(a.status) - rank(b.status) || String(a.bus_number).localeCompare(String(b.bus_number), undefined, { numeric: true }));
+
+  return (
+    <div className="fleet-list">
+      <div className="fleet-list-head">
+        <div role="group" aria-label="Show buses" style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+          {FILTERS.map(([key, label]) => (
+            <button
+              key={key} type="button" className="fleet-chip" aria-pressed={filter === key}
+              onClick={() => setFilter(key)} disabled={key !== "all" && !counts[key]}
+            >
+              {key !== "all" && <i className="fleet-dot" style={{ background: statusColor(key) }} />}
+              {label} <span className="fleet-chip-n">{counts[key] || 0}</span>
+            </button>
+          ))}
+        </div>
+        <label className="fleet-search">
+          <Icon name="search" size={13} color={colors.textMuted} />
+          <input type="search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Bus, route or driver" aria-label="Search buses" />
+        </label>
+      </div>
+      {shown.length ? (
+        <ul className="fleet-rows">
+          {shown.map((bus) => {
+            const located = bus.latitude != null && bus.longitude != null;
+            return (
+              <li key={bus.bus_id}>
+                <button
+                  type="button" className="fleet-row" disabled={!located} onClick={() => onPick(bus)}
+                  title={located ? `Show ${bus.bus_number} on the map` : `${bus.bus_number} has no position to show`}
+                >
+                  <i className="fleet-dot" style={{ background: statusColor(bus.status) }} aria-hidden="true" />
+                  <span className="fleet-bus">{bus.bus_number}</span>
+                  <span className="fleet-who">
+                    {bus.route?.name || "Unassigned"} · {bus.driver?.name || "No driver"}
+                    {bus.is_off_route && <span style={{ color: colors.dangerText, fontWeight: 600 }}> · Off route</span>}
+                  </span>
+                  <span className="fleet-when">
+                    <span style={{ color: statusColor(bus.status), fontWeight: 600 }}>{statusLabel(bus)}</span>
+                    {located && <span style={{ color: colors.textMuted }}> · {formatUpdated(bus.position_timestamp)}</span>}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="fleet-empty">{query ? `No bus, route or driver matches “${search}”.` : "No buses in this view."}</p>
+      )}
     </div>
   );
 }

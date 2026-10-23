@@ -1,9 +1,11 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MeshGradient } from "@paper-design/shaders-react";
 import { BrandMark, BrandWordmark } from "../components/Brand";
+import { homePath } from "../utils/permissions";
 
 function Home() {
   const navigate = useNavigate();
+  const signedIn = Boolean(localStorage.getItem("access"));
 
   return (
     <div style={styles.root}>
@@ -20,10 +22,10 @@ function Home() {
       <div style={styles.veil} />
 
       <main className="fc-hero" style={styles.container}>
-        <div style={styles.brand} translate="no">
+        <Link to="/" style={{ ...styles.brand, textDecoration: "none" }} translate="no">
           <BrandMark size={76} />
           <BrandWordmark height={36} />
-        </div>
+        </Link>
 
         <h1 style={styles.headline}>
           <span style={styles.headlineGlow}>AI-Enabled Transport</span><br />
@@ -35,12 +37,20 @@ function Home() {
         </p>
 
         <div style={styles.actions}>
-          <button className="fc-btn fc-btn--primary" onClick={() => navigate("/login")}>
-            Sign In
-          </button>
-          <button className="fc-btn fc-btn--glass" onClick={() => navigate("/signup")}>
-            Create Account
-          </button>
+          {signedIn ? (
+            <button className="fc-btn fc-btn--primary" onClick={() => navigate(homePath())}>
+              Go to Dashboard
+            </button>
+          ) : (
+            <>
+              <button className="fc-btn fc-btn--primary" onClick={() => navigate("/login")}>
+                Sign In
+              </button>
+              <button className="fc-btn fc-btn--glass" onClick={() => navigate("/signup")}>
+                Create Account
+              </button>
+            </>
+          )}
         </div>
       </main>
 

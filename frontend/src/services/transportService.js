@@ -32,6 +32,9 @@ export const importDrivers = uploadCsv("/api/drivers/import/");
 export const getContractors = () => api.get("/api/contractors/");
 export const getRoutes = () => api.get("/api/routes/");
 export const getRoutesMap = (config) => api.get("/api/routes/map/", config);
+// Saved copy first, then fresh data (see api.getSWR).
+export const watchRoutesMap = (onData) => api.getSWR("/api/routes/map/", onData);
+export const watchDashboard = (onData) => api.getSWR("/api/dashboard/", onData);
 export const buildRouteGeometry = (id) => api.post(`/api/routes/${id}/build-geometry/`);
 export const createRoute = (data) => api.post("/api/routes/", data);
 export const updateRoute = (id, data) => api.patch(`/api/routes/${id}/`, data);
@@ -63,6 +66,12 @@ export const getAssignments = () => api.get("/api/route-assignments/");
 export const createAssignment = (data) => api.post("/api/route-assignments/", data);
 export const updateAssignment = (id, data) => api.patch(`/api/route-assignments/${id}/`, data);
 export const deleteAssignment = (id) => api.delete(`/api/route-assignments/${id}/`);
+// Karachi traffic incidents. The server fetches them once per refresh period and shares
+// the copy with everyone, so asking here never costs a provider request per user.
+export const getTrafficAlerts = () => api.get("/api/traffic/alerts/");
+// One-click assignment for the active semester: a preview, then the rows the admin kept.
+export const getAutoAssignPlan = () => api.get("/api/route-assignments/auto-plan/", { noCache: true });
+export const applyAutoAssign = (assignments) => api.post("/api/route-assignments/auto-assign/", { assignments });
 
 export const getSemesters = () => api.get("/api/semesters/");
 export const createSemester = (data) => api.post("/api/semesters/", data);

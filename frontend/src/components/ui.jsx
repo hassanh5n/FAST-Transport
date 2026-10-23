@@ -9,7 +9,7 @@ import { validateField } from "../utils/validation";
 // page", so a modal rendered in place stretched over the whole page and scrolled
 // away with it. The page behind is locked while any modal is open.
 let openModals = 0;
-function ModalLayer({ children }) {
+export function ModalLayer({ children }) {
   useEffect(() => {
     openModals += 1;
     const previous = document.body.style.overflow;

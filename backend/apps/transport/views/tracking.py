@@ -292,13 +292,14 @@ def _serialize_fleet_bus(bus, now):
 @permission_classes([IsAuthenticated])
 def admin_live_fleet(request):
     """Return one normalized snapshot for every active bus in the fleet."""
-    active_semester = Semester.objects.filter(is_active=True).first()
+    # Filtering on the semester inside the prefetch saves a round trip to the database
+    # on every poll, and the dashboard polls every 8 s.
     assignments = RouteAssignment.objects.filter(
         is_active=True,
-        semester=active_semester,
-    ).select_related("route", "driver").annotate(
+        semester__is_active=True,
+    ).select_related("route", "driver").defer("route__geometry").annotate(
         allocated_seats=Count("seatallocation", distinct=True),
-    ) if active_semester else RouteAssignment.objects.none()
+    )
     buses = list(
         Bus.objects.filter(is_active=True)
         .prefetch_related(

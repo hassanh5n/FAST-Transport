@@ -1,5 +1,5 @@
 import axios from "axios";
-import { queryClient, clearQueryCache } from "./queryClient";
+import { queryClient, clearQueryCache, cacheRestored, isPersistedUrl, PERSISTED_GC_TIME } from "./queryClient";
 
 const LOADING_EVENT = "app:network-loading";
 let pendingRequestCount = 0;
@@ -96,21 +96,38 @@ api.interceptors.response.use(
 const NO_CACHE = [
   /\/api\/user\/?$/, /\/api\/notifications\//, /\/api\/student\/(live-location|bus-tracking)\//,
   /\/api\/incidents\/approved\//, /\/api\/crime-risk\//, /\/challan\/?$/,
-  /\/api\/admin\/live-fleet\//, /\/api\/driver\//,
+  /\/api\/admin\/live-fleet\//, /\/api\/driver\//, /\/api\/traffic\//,
 ];
 // Writes that don't change admin/student data (pings, read receipts).
 const NO_INVALIDATE = [/\/api\/notifications\//, /\/api\/driver\/location\//, /\/api\/bus-location\//];
 
 const rawGet = api.get.bind(api);
+const queryKeyFor = (url, cfg) => ["api", url, cfg.params ?? null, cfg.responseType ?? null];
 api.get = (url, config = {}) => {
   const { noCache, ...cfg } = config;
   if (noCache || NO_CACHE.some((rx) => rx.test(url))) return rawGet(url, cfg);
   return queryClient
     .fetchQuery({
-      queryKey: ["api", url, cfg.params ?? null, cfg.responseType ?? null],
-      queryFn: () => rawGet(url, cfg).then(({ data, status, headers }) => ({ data, status, headers })),
+      queryKey: queryKeyFor(url, cfg),
+      queryFn: () => rawGet(url, cfg).then(({ data, status }) => ({ data, status })),
+      ...(isPersistedUrl(url) && { gcTime: PERSISTED_GC_TIME }),
     })
     .then((res) => ({ ...res, data: structuredClone(res.data) })); // pages can't mutate the cache
+};
+
+/**
+ * Stale-while-revalidate GET: `onData` gets the saved copy straight away (even an old
+ * one from an earlier visit), then the fresh data once it arrives if the copy was old.
+ * Resolves like api.get, with the fresh response.
+ */
+api.getSWR = async (url, onData, config = {}) => {
+  await cacheRestored;
+  const key = queryKeyFor(url, config);
+  const before = queryClient.getQueryState(key);
+  if (before?.data) onData(structuredClone(before.data.data));
+  const response = await api.get(url, config);
+  if (queryClient.getQueryState(key)?.dataUpdatedAt !== before?.dataUpdatedAt) onData(response.data);
+  return response;
 };
 
 api.interceptors.response.use((response) => {

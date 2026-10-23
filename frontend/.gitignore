@@ -10,8 +10,13 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+# vite-plugin-pwa's service worker output when run with dev options
+dev-dist
 *.local
 .env
+.env.*
+!.env.example
+.eslintcache
 
 # Editor directories and files
 .vscode/*

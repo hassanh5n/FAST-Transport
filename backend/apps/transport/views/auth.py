@@ -116,30 +116,34 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
+def current_user_payload(user):
+    """Who is signed in and what they may open. Also sent with the login tokens, so the
+    login page does not need a second request for it."""
+    return {
+        "id": user.id,
+        "username": user.username,
+        "email": user.email,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "is_staff": user.is_staff,
+        "user_type": getattr(getattr(user, "studentprofile", None), "user_type", None),
+        # driver_profile comes with the user (SharedJWTAuthentication), so no extra query
+        "role": "staff" if user.is_staff else ("driver" if hasattr(user, "driver_profile") else "student"),
+        "is_super_admin": is_super_admin(user),
+        "admin_role": (
+            user.admin_profile.role.name
+            if user.is_staff and hasattr(user, "admin_profile") and user.admin_profile.role
+            else None
+        ),
+        "permissions": get_effective_permissions(user) if user.is_staff else {},
+    }
+
+
 class CurrentUserView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        user = request.user
-        return Response({
-            "id": user.id,
-            "username": user.username,
-            "email": user.email,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
-            "is_staff": user.is_staff,
-            "user_type": getattr(getattr(user, "studentprofile", None), "user_type", None),
-            "role": "staff" if user.is_staff else (
-                "driver" if Driver.objects.filter(user=user).exists() else "student"
-            ),
-            "is_super_admin": is_super_admin(user),
-            "admin_role": (
-                user.admin_profile.role.name
-                if user.is_staff and hasattr(user, "admin_profile") and user.admin_profile.role
-                else None
-            ),
-            "permissions": get_effective_permissions(user) if user.is_staff else {},
-        })
+        return Response(current_user_payload(request.user))
 
 
 class StudentSignupView(generics.CreateAPIView):

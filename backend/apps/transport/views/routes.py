@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.db.models import Count, Exists, OuterRef, Q, Prefetch
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
@@ -113,6 +113,7 @@ from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
 from .maps import _display_route_geometry, add_stop_etas, attach_boarding
+from ..corridor import ROUTE_LINE_VERSION
 from ..road_lines import schedule_road_line_build
 from ..route_order import order_check
 from .. import audit
@@ -125,8 +126,41 @@ class ContractorViewSet(viewsets.ModelViewSet):
     pagination_class = None
 
 
+# Hashes every column the network map draws, in the database, so a map load costs one
+# small query while nothing changed. It reads the rows themselves, so bulk updates and
+# management commands that skip model signals still change it. ROW(...)::text keeps
+# an empty slot for a NULL, so moving a value between columns changes the hash too.
+NETWORK_FINGERPRINT_SQL = """
+SELECT md5(coalesce(string_agg(network.line, '|' ORDER BY network.line), ''))
+FROM (
+    SELECT ROW(r.id, r.name, r.description, r.contractor_id, r.status, md5(r.geometry::text))::text AS line
+    FROM {route} r
+    WHERE r.is_active AND r.status = 'published'
+    UNION ALL
+    SELECT ROW(rs.id, rs.route_id, rs.stop_order, rs.morning_eta, rs.evening_eta,
+               s.id, s.name, s.address, s.latitude, s.longitude, s.is_campus)::text
+    FROM {route_stop} rs
+    JOIN {stop} s ON s.id = rs.stop_id AND s.is_active
+    JOIN {route} r ON r.id = rs.route_id AND r.is_active AND r.status = 'published'
+) AS network
+""".format(route=Route._meta.db_table, route_stop=RouteStop._meta.db_table, stop=Stop._meta.db_table)
+
+NETWORK_MAP_CACHE_SECONDS = 24 * 60 * 60
+
+
+def _etag_matches(request, etag):
+    # GZipMiddleware weakens the ETag (W/"..."), and browsers send that form back.
+    sent = request.headers.get("If-None-Match", "")
+    return any(tag.strip().removeprefix("W/") == etag for tag in sent.split(","))
+
+
 class RouteViewSet(viewsets.ModelViewSet):
+    # RouteSerializer never returns the road line; the map actions read it themselves.
     queryset = Route.objects.order_by("name", "id")
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.defer("geometry") if self.action == "list" else queryset
     serializer_class = RouteSerializer
     permission_classes = [IsAdminOrReadOnly] # Admin full access, Students read only
 
@@ -187,18 +221,41 @@ class RouteViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"], url_path="map")
     def map(self, request):
-        """Compact network payload consumed by the student and admin map views."""
-        routes = list(Route.objects.filter(is_active=True, status="published").order_by("name", "id"))
-        stops_by_route = {}
-        for route_stop in (
-            RouteStop.objects.filter(route__in=routes, stop__is_active=True)
-            .select_related("stop").order_by("route_id", "stop_order")
-        ):
-            stops_by_route.setdefault(route_stop.route_id, []).append(route_stop)
-        data = [self._map_route_data(route, stops_by_route.get(route.id, [])) for route in routes]
-        if any(not route["has_road_line"] and len(route["stops"]) >= 2 for route in data):
+        """Compact network payload consumed by the student and admin map views.
+
+        Built once per version of the network and cached under its fingerprint, which
+        is also the ETag: a browser that already has this version gets a bodyless 304.
+        """
+        with connection.cursor() as cursor:
+            cursor.execute(NETWORK_FINGERPRINT_SQL)
+            fingerprint = cursor.fetchone()[0]
+        cache_key = f"routes-map:v{ROUTE_LINE_VERSION}:{fingerprint}"
+        network = cache.get(cache_key)
+        if network is None:
+            routes = list(Route.objects.filter(is_active=True, status="published").order_by("name", "id"))
+            stops_by_route = {}
+            for route_stop in (
+                RouteStop.objects.filter(route__in=routes, stop__is_active=True)
+                .select_related("stop").order_by("route_id", "stop_order")
+            ):
+                stops_by_route.setdefault(route_stop.route_id, []).append(route_stop)
+            data = [self._map_route_data(route, stops_by_route.get(route.id, [])) for route in routes]
+            network = {
+                "routes": data,
+                "missing_lines": any(not route["has_road_line"] and len(route["stops"]) >= 2 for route in data),
+            }
+            cache.set(cache_key, network, NETWORK_MAP_CACHE_SECONDS)
+        if network["missing_lines"]:
             schedule_road_line_build(respect_cooldown=True)
-        return Response({"routes": data})
+
+        etag = f'"{ROUTE_LINE_VERSION}-{fingerprint}"'
+        response = (
+            Response(status=status.HTTP_304_NOT_MODIFIED) if _etag_matches(request, etag)
+            else Response({"routes": network["routes"]})
+        )
+        response["ETag"] = etag
+        response["Cache-Control"] = "private, no-cache"  # keep a copy, but ask before using it
+        return response
 
     @action(detail=True, methods=["get"], url_path="map-detail")
     def map_detail(self, request, pk=None):
@@ -498,6 +555,16 @@ class RouteStopViewSet(viewsets.ModelViewSet):
     serializer_class = RouteStopSerializer
     permission_classes = [IsAdminOrReadOnly] # Admin full access, Students read only
 
+    def get_queryset(self):
+        # Route, stop and each route's active assignment come with the rows (3 queries in
+        # all) instead of 7 per row; the route's road line is never shown here.
+        active = RouteAssignment.objects.filter(is_active=True).select_related("bus", "driver").order_by("id")
+        return (
+            RouteStop.objects.select_related("route", "stop")
+            .defer("route__geometry")
+            .prefetch_related(Prefetch("route__routeassignment_set", queryset=active, to_attr="active_assignments"))
+        )
+
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
@@ -530,12 +597,18 @@ def eligible_route_stops(request):
             stop__is_active=True,
         )
         .select_related("route", "stop")
+        # Joined, each route's road line would arrive once per stop (~1.4 MB); it is
+        # fetched once per route below instead.
+        .defer("route__geometry")
         .order_by("route__name", "stop_order")
     )
     stops_by_route = {}
     for route_stop in route_stops:
         if float(route_stop.stop.latitude) != 0 or float(route_stop.stop.longitude) != 0:
             stops_by_route.setdefault(route_stop.route_id, []).append(route_stop)
+    lines = dict(Route.objects.filter(id__in=stops_by_route).values_list("id", "geometry"))
+    for route_id, stops in stops_by_route.items():
+        stops[0].route.geometry = lines.get(route_id)
     route_geometries = {
         route_id: _display_route_geometry(
             stops[0].route,

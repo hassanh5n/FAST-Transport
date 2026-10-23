@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.models import User
 from django.db.models import Count, Exists, OuterRef, Q, Prefetch
-from django.db import transaction
+from django.db import connection, transaction
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.core.mail import send_mail
@@ -110,6 +110,18 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 
+def _counts(**querysets):
+    """COUNT(*) of several querysets in one round trip instead of one each."""
+    columns, params = [], []
+    for name, queryset in querysets.items():
+        sql, query_params = queryset.values("pk").query.sql_with_params()
+        columns.append(f"(SELECT COUNT(*) FROM ({sql}) AS rows_{name}) AS {name}")
+        params.extend(query_params)
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT " + ", ".join(columns), params)
+        return dict(zip(querysets, cursor.fetchone()))
+
+
 class DashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -119,34 +131,34 @@ class DashboardView(APIView):
         if user.is_staff:
             data = {
                 "role": "staff",
-                "stats": {
-                    "total_students": StudentProfile.objects.count(),
-                    "active_buses": Bus.objects.filter(is_active=True).count(),
-                    "active_routes": Route.objects.filter(is_active=True).count(),
-                    "active_route_assignments": RouteAssignment.objects.filter(is_active=True).count(),
-                    "pending_complaints": Complaint.objects.filter(status="Pending").count(),
-                    "open_route_change_requests": RouteChangeRequest.objects.filter(status="Pending").count(),
-                    "unverified_fees": FeeVerification.objects.filter(is_verified=False).count(),
-                    "pending_maintenance": MaintenanceSchedule.objects.filter(status="Pending").count(),
-                },
+                "stats": _counts(
+                    total_students=StudentProfile.objects.all(),
+                    active_buses=Bus.objects.filter(is_active=True),
+                    active_routes=Route.objects.filter(is_active=True),
+                    active_route_assignments=RouteAssignment.objects.filter(is_active=True),
+                    pending_complaints=Complaint.objects.filter(status="Pending"),
+                    open_route_change_requests=RouteChangeRequest.objects.filter(status="Pending"),
+                    unverified_fees=FeeVerification.objects.filter(is_verified=False),
+                    pending_maintenance=MaintenanceSchedule.objects.filter(status="Pending"),
+                ),
             }
         else:
             try:
-                profile = StudentProfile.objects.get(user=user)
+                profile = StudentProfile.objects.select_related("user").get(user=user)
             except StudentProfile.DoesNotExist:
                 return Response({"detail": "Student profile not found."}, status=status.HTTP_404_NOT_FOUND)
 
-            active_semester = Semester.objects.filter(is_active=True).first()
-
-            registrations = SemesterRegistration.objects.filter(student=profile).select_related("semester", "route", "stop")
-            active_registration = registrations.filter(semester__is_active=True).first()
-
-            transport_registration = None
-            if active_semester:
-                transport_registration = TransportRegistration.objects.filter(
-                    student=profile,
-                    semester=active_semester,
-                ).select_related("semester", "route", "stop").first()
+            # Each query below is a round trip to the database (~170 ms to Supabase), so
+            # the active semester is filtered on rather than looked up first, and fee
+            # status comes from the fee list this page shows anyway.
+            active_registration = (
+                SemesterRegistration.objects.filter(student=profile, semester__is_active=True)
+                .select_related("semester", "route", "stop").defer("route__geometry").first()
+            )
+            transport_registration = (
+                TransportRegistration.objects.filter(student=profile, semester__is_active=True)
+                .select_related("semester", "route", "stop").defer("route__geometry").first()
+            )
 
             registration_semester = None
             if active_registration:
@@ -154,18 +166,10 @@ class DashboardView(APIView):
             elif transport_registration:
                 registration_semester = transport_registration.semester
 
-            fee_submitted_for_registration = False
-            fee_verified_for_registration = False
-            if registration_semester:
-                fee_submitted_for_registration = FeeVerification.objects.filter(
-                    student=profile,
-                    semester=registration_semester,
-                ).exists()
-                fee_verified_for_registration = FeeVerification.objects.filter(
-                    student=profile,
-                    semester=registration_semester,
-                    is_verified=True,
-                ).exists()
+            fees = list(FeeVerification.objects.filter(student=profile).select_related("semester"))
+            semester_fees = [f for f in fees if registration_semester and f.semester_id == registration_semester.id]
+            fee_submitted_for_registration = bool(semester_fees)
+            fee_verified_for_registration = any(f.is_verified for f in semester_fees)
 
             bus_number = None
 
@@ -199,7 +203,6 @@ class DashboardView(APIView):
                 if assignment:
                     bus_number = assignment.bus.bus_number
 
-            fees = FeeVerification.objects.filter(student=profile).select_related("semester")
             complaints = Complaint.objects.filter(submitted_by=user).order_by("-created_at")[:5]
             notifications = Notification.objects.filter(user=user).order_by("-created_at")[:5]
 

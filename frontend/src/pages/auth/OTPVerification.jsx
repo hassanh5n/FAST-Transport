@@ -50,9 +50,9 @@ function OTPVerification() {
       const tokenRes = await getToken({ username, password });
       localStorage.setItem("access", tokenRes.data.access);
       localStorage.setItem("refresh", tokenRes.data.refresh);
-      const userRes = await getUser();
-      storeUserSession(userRes.data);
-      navigate(userRes.data.is_staff ? "/admin/dashboard" : "/student/dashboard");
+      const user = tokenRes.data.user ?? (await getUser()).data; // sent with the tokens
+      storeUserSession(user);
+      navigate(user.is_staff ? "/admin/dashboard" : "/student/dashboard");
     } catch {
       // Auto-login failed (e.g. credentials not in state) — graceful fallback
       navigate("/login", { state: { message: "Account verified! Please log in." } });

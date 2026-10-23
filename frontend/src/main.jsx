@@ -3,9 +3,11 @@ import './index.css'
 import App from './App.jsx'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClient } from './services/queryClient'
+import UpdatePrompt from './components/UpdatePrompt'
 
 createRoot(document.getElementById('root')).render(
   <QueryClientProvider client={queryClient}>
     <App />
+    <UpdatePrompt />
   </QueryClientProvider>
 )

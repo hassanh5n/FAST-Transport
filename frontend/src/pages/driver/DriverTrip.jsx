@@ -5,6 +5,9 @@ import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Spinner, Banner, Pill } from "../../components/ui";
 import { btn, colors, fonts } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
+import { useTrafficAlerts } from "../../components/maps/trafficAlerts";
+import { rememberMapboxTraffic, savedMapboxTraffic } from "../../components/maps/mapboxTraffic";
+import { LiveTrafficDialog, TrafficLegend } from "../../components/maps/TrafficControls";
 import { getDriverOverview, sendDriverLocation } from "../../services/transportService";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 
@@ -74,6 +77,10 @@ export default function DriverTrip() {
   const [live, setLive] = useState(null);       // last server reply + when it arrived
   const [sendError, setSendError] = useState("");
   const [, setTick] = useState(0);              // re-render "x s ago" labels
+  const traffic = useTrafficAlerts();           // shared server copy, not a provider call per driver
+  const [trafficShown, setTrafficShown] = useState(true);
+  const [liveTrafficOpen, setLiveTrafficOpen] = useState(false);
+  const [mapboxOn, setMapboxOn] = useState(savedMapboxTraffic);
 
   useEffect(() => {
     getDriverOverview()
@@ -304,14 +311,37 @@ export default function DriverTrip() {
 
       {/* ── Map + stop list ── */}
       <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0, 1fr)" : "minmax(0, 1fr) 380px", gap: 16, alignItems: "start" }}>
-        <ContentCard style={{ marginBottom: 0, padding: 12 }}>
+        <ContentCard style={{ marginBottom: 0, padding: 12, position: "relative" }}>
           <RouteMap
             routes={routeMap ? [routeMap] : []}
             selectedRouteId={assignment.route.id}
             height={isMobile ? 300 : 540}
             livePosition={markerPosition}
+            trafficAlerts={trafficShown ? traffic.alerts : null}
+            mapboxTraffic={mapboxOn}
+          />
+          {/* top-left: the map's scale bar sits bottom-left */}
+          <TrafficLegend
+            traffic={traffic} visible={trafficShown} onToggle={setTrafficShown}
+            onOpenLive={() => setLiveTrafficOpen(true)}
+            style={{ top: 24, left: 24, bottom: "auto" }}
+            compact
+            mapbox={{ on: mapboxOn, onChange: (on) => { setMapboxOn(on); rememberMapboxTraffic(on); } }}
           />
         </ContentCard>
+        {liveTrafficOpen && (
+          <LiveTrafficDialog
+            title={`Live traffic on ${assignment.route.name}`}
+            routes={routeMap ? [routeMap] : []}
+            buses={markerPosition ? [{
+              bus_id: assignment.bus.id, bus_number: assignment.bus.bus_number,
+              latitude: markerPosition.lat, longitude: markerPosition.lng, status: position ? "live" : "stale",
+              route: { name: assignment.route.name }, driver: { name: assignment.driver?.name },
+              position_timestamp: position ? new Date().toISOString() : lastPing?.recorded_at,
+            }] : []}
+            onClose={() => setLiveTrafficOpen(false)}
+          />
+        )}
 
         <ContentCard style={{ marginBottom: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 12 }}>

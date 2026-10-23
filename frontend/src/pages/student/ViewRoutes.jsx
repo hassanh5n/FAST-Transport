@@ -3,7 +3,7 @@ import PageShell, { PageTitle, ContentCard } from "../../components/PageShell";
 import { Banner, Spinner } from "../../components/ui";
 import { colors } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
-import { getRoutesMap } from "../../services/transportService";
+import { watchRoutesMap } from "../../services/transportService";
 
 function ViewRoutes() {
   const [routes, setRoutes] = useState([]);
@@ -13,13 +13,16 @@ function ViewRoutes() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    getRoutesMap()
-      .then((response) => {
-        const nextRoutes = response.data?.routes || [];
-        setRoutes(nextRoutes);
-        setSelectedRouteId(nextRoutes[0]?.id ?? null);
-      })
-      .catch(() => setError("Routes could not be loaded. Please try again."))
+    // The saved network shows at once and is swapped for the fresh one when it arrives.
+    let shown = false;
+    watchRoutesMap((data) => {
+      const nextRoutes = data?.routes || [];
+      shown = true;
+      setRoutes(nextRoutes);
+      setSelectedRouteId((current) => (nextRoutes.some((route) => route.id === current) ? current : nextRoutes[0]?.id ?? null));
+      setLoading(false);
+    })
+      .catch(() => { if (!shown) setError("Routes could not be loaded. Please try again."); })
       .finally(() => setLoading(false));
   }, []);
 

@@ -12,6 +12,8 @@ import {
   addCampusMarker, addRouteArrows, escapeHtml, networkWidth, routeWidth, stopPopupHtml,
 } from "./campus";
 import { routeColors } from "./routeColors";
+import { showTrafficAlerts } from "./trafficAlerts";
+import { setMapboxTraffic } from "./mapboxTraffic";
 
 const EMPTY = { type: "FeatureCollection", features: [] };
 const collection = (features) => ({ type: "FeatureCollection", features });
@@ -127,7 +129,9 @@ function Legend({ showWalk, color }) {
   );
 }
 
-export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, onStopSelect, height = 480, livePosition = null }) {
+// trafficAlerts: shared traffic incidents to draw (see trafficAlerts.js); null leaves them off.
+// mapboxTraffic: show the optional Mapbox traffic lines (see mapboxTraffic.js).
+export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, onStopSelect, height = 480, livePosition = null, trafficAlerts = null, mapboxTraffic = false }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const popupRef = useRef(null);
@@ -260,6 +264,15 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
       liveMarkerRef.current = null;
     };
   }, []);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current || (trafficAlerts == null && !mapRef.current.getSource("traffic-alerts"))) return;
+    showTrafficAlerts(mapRef.current, trafficAlerts || [], trafficAlerts != null);
+  }, [ready, trafficAlerts]);
+
+  useEffect(() => {
+    if (ready && mapRef.current) setMapboxTraffic(mapRef.current, mapboxTraffic);
+  }, [ready, mapboxTraffic]);
 
   // Data. The network is everything except the selected route, which is drawn on top.
   useEffect(() => {

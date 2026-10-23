@@ -6,7 +6,7 @@ import { ConfirmModal, FormModal, StatusBadge, FormCard, Field, SectionBlock } f
 import { inputStyle } from "../../styles/formStyles";
 import { btn, colors } from "../../theme";
 import RouteMap from "../../components/maps/RouteMap";
-import { getRoutes, createRoute, updateRoute, deleteRoute, getRoutesMap, getRoutePlans } from "../../services/transportService";
+import { getRoutes, createRoute, updateRoute, deleteRoute, getRoutesMap, watchRoutesMap, getRoutePlans } from "../../services/transportService";
 import { useContractor, ContractorSwitch, ContractorSelect } from "../../components/ContractorSwitch";
 import RoadLineBuilder from "../../components/RoadLineBuilder";
 
@@ -48,18 +48,17 @@ function RoutesPage() {
   const fetchRoutes = () =>
     getRoutes().then((res) => setRoutes(res.data)).catch(() => alert("Failed to fetch routes."));
 
-  const loadMap = (config) =>
-    getRoutesMap(config)
-      .then((res) => {
-        const nextRoutes = res.data?.routes || [];
-        setMapRoutes(nextRoutes);
-        setSelectedRouteId((current) => current ?? nextRoutes[0]?.id ?? null);
-      })
-      .catch(() => setMapRoutes([]));
+  const showMap = (data) => {
+    const nextRoutes = data?.routes || [];
+    setMapRoutes(nextRoutes);
+    setSelectedRouteId((current) => current ?? nextRoutes[0]?.id ?? null);
+  };
 
   useEffect(() => {
     getRoutePlans().then((res) => setActivePlan(res.data.find((plan) => plan.is_active) || null)).catch(() => {});
-    loadMap();
+    // The saved network shows at once; a failed refresh keeps it on screen.
+    let shown = false;
+    watchRoutesMap((data) => { shown = true; showMap(data); }).catch(() => { if (!shown) setMapRoutes([]); });
   }, []);
 
   const handleToggle = (id, currentValue) => {
@@ -165,7 +164,7 @@ function RoutesPage() {
 
       <PageTitle sub="Manage transport routes. Use the map to browse route coverage, then open a route for full administration.">Routes</PageTitle>
       <ContractorSwitch value={contractor} />
-      <RoadLineBuilder onDone={() => loadMap({ noCache: true })} />
+      <RoadLineBuilder onDone={() => getRoutesMap({ noCache: true }).then((res) => showMap(res.data)).catch(() => {})} />
       {activePlan && (
         <p style={{ margin: "-8px 0 16px", fontSize: 13, color: colors.textSecondary }}>
           Active route plan: <strong>{activePlan.name}</strong>. Changes here go live for everyone.{" "}

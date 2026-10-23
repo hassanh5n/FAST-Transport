@@ -1,0 +1,198 @@
+{
+  "run_at": "2026-10-23T17:03+05:00",
+  "corridors": [
+    {
+      "name": "Saddar -> FAST NUCES",
+      "city": "Karachi",
+      "now": {
+        "minutes": 57.20726666666667,
+        "km": 28.752807,
+        "typical_minutes": 52.379083333333334,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "night_0300": {
+        "minutes": 39.6098,
+        "km": 26.516219,
+        "typical_minutes": 39.029916666666665,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "rush_0830": {
+        "minutes": 37.04971666666667,
+        "km": 26.516219,
+        "typical_minutes": 35.55498333333333,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "mapbox_driving": {
+        "minutes": 53.36566666666667,
+        "km": 28.752807
+      },
+      "valhalla_minutes": 55.394666666666666
+    },
+    {
+      "name": "Shahrah-e-Faisal: Karsaz -> FTC",
+      "city": "Karachi",
+      "now": {
+        "minutes": 14.784583333333334,
+        "km": 5.589853,
+        "typical_minutes": 13.611683333333334,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "night_0300": {
+        "minutes": 11.366266666666666,
+        "km": 5.589853,
+        "typical_minutes": 11.3833,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "rush_0830": {
+        "minutes": 12.121066666666668,
+        "km": 5.589853,
+        "typical_minutes": 11.537666666666667,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "mapbox_driving": {
+        "minutes": 15.246783333333333,
+        "km": 5.589853
+      },
+      "valhalla_minutes": 17.561866666666667
+    },
+    {
+      "name": "University Rd: Hasan Sq -> NIPA",
+      "city": "Karachi",
+      "now": {
+        "minutes": 14.79775,
+        "km": 4.240343,
+        "typical_minutes": 13.823933333333335,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "night_0300": {
+        "minutes": 11.083683333333333,
+        "km": 4.240343,
+        "typical_minutes": 10.979899999999999,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "rush_0830": {
+        "minutes": 11.032,
+        "km": 4.240343,
+        "typical_minutes": 10.513466666666666,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "mapbox_driving": {
+        "minutes": 14.010416666666666,
+        "km": 3.871757
+      },
+      "valhalla_minutes": 18.000999999999998
+    },
+    {
+      "name": "Control: Sheikh Zayed Rd, Dubai",
+      "city": "Dubai",
+      "now": {
+        "minutes": 21.242283333333333,
+        "km": 21.872923999999998,
+        "typical_minutes": 17.9649,
+        "congestion_mix": {
+          "low": 99,
+          "unknown": 1
+        },
+        "known_pct": 99
+      },
+      "night_0300": {
+        "minutes": 16.38815,
+        "km": 21.872923999999998,
+        "typical_minutes": 16.269316666666665,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "rush_0830": {
+        "minutes": 17.38565,
+        "km": 21.872923999999998,
+        "typical_minutes": 16.46245,
+        "congestion_mix": {
+          "unknown": 100
+        },
+        "known_pct": 0
+      },
+      "mapbox_driving": {
+        "minutes": 19.406916666666667,
+        "km": 21.872923999999998
+      },
+      "valhalla_minutes": null
+    }
+  ],
+  "tiles": [
+    {
+      "label": "Saddar",
+      "counts": {
+        "low": 15
+      },
+      "bytes": 6351
+    },
+    {
+      "label": "Shahrah-e-Faisal",
+      "counts": {
+        "low": 15
+      },
+      "bytes": 4453
+    },
+    {
+      "label": "Gulshan / University Rd",
+      "counts": {
+        "low": 14
+      },
+      "bytes": 3683
+    },
+    {
+      "label": "FAST NUCES",
+      "counts": {
+        "low": 5,
+        "moderate": 1
+      },
+      "bytes": 1208
+    },
+    {
+      "label": "Control: Dubai",
+      "counts": {
+        "heavy": 2,
+        "low": 16,
+        "moderate": 7
+      },
+      "bytes": 6141
+    }
+  ],
+  "verdict": {
+    "karachi_known_pct": 0,
+    "karachi_rush_swing_pct": [
+      -6,
+      7
+    ],
+    "karachi_tiles_with_lines": 4
+  }
+}

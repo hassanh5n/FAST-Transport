@@ -1,0 +1,3152 @@
+{
+ "run_at": "2026-10-23T20:10+05:00",
+ "results": [
+  {
+   "name": "Saddar -> FAST NUCES",
+   "http": 200,
+   "body": {
+    "status": "OK",
+    "request_id": "82a260d6-d6b4-4adb-854e-4344b483089f",
+    "data": {
+     "best_routes": [
+      {
+       "route_name": "Malir Expy/Shahrah-e-Bhutto and Karachi Thatta Dual Carriageway/N-5/AH2",
+       "distance_meters": 31732,
+       "distance_label": "19.7 miles",
+       "duration_seconds": 2791,
+       "duration_label": "47 min",
+       "min_duration_seconds": 2757,
+       "max_duration_seconds": 4366,
+       "highlights": [
+        "Fastest route now, avoids slowdown on Shahra-e-Faisal."
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "8": 6,
+        "62": 39,
+        "122": 81,
+        "163": 130,
+        "181": 136,
+        "220": 164,
+        "306": 199,
+        "361": 231,
+        "482": 273,
+        "541": 291,
+        "577": 301,
+        "621": 313,
+        "711": 339,
+        "784": 359,
+        "794": 366,
+        "828": 371,
+        "835": 372,
+        "863": 377,
+        "1098": 415,
+        "1223": 432,
+        "1267": 439,
+        "1284": 442,
+        "1396": 463,
+        "1508": 484,
+        "1533": 488,
+        "1632": 505,
+        "1681": 513,
+        "1795": 532,
+        "1808": 534,
+        "1848": 541,
+        "1877": 545,
+        "2018": 563,
+        "2028": 565,
+        "2153": 581,
+        "2177": 584,
+        "2263": 594,
+        "2369": 607,
+        "2466": 619,
+        "2556": 628,
+        "2569": 629,
+        "2591": 631,
+        "2771": 648,
+        "3002": 671,
+        "3104": 680,
+        "3264": 694,
+        "3309": 699,
+        "3360": 704,
+        "3433": 710,
+        "3462": 713,
+        "3563": 722,
+        "3694": 736,
+        "3761": 741,
+        "4234": 795,
+        "4736": 847,
+        "5151": 881,
+        "5208": 886,
+        "5268": 890,
+        "5498": 914,
+        "5638": 929,
+        "5671": 933,
+        "5682": 934,
+        "5736": 940,
+        "5760": 943,
+        "5781": 945,
+        "5851": 952,
+        "5978": 965,
+        "6025": 972,
+        "6053": 976,
+        "6094": 983,
+        "6115": 986,
+        "6316": 1016,
+        "6330": 1019,
+        "6347": 1022,
+        "6467": 1044,
+        "6690": 1081,
+        "6728": 1091,
+        "6752": 1102,
+        "6761": 1103,
+        "6845": 1112,
+        "6933": 1120,
+        "7004": 1127,
+        "7047": 1135,
+        "7096": 1148,
+        "7126": 1160,
+        "7129": 1160,
+        "7160": 1169,
+        "7244": 1193,
+        "7276": 1198,
+        "7415": 1212,
+        "7456": 1216,
+        "7624": 1234,
+        "7636": 1236,
+        "7643": 1236,
+        "7690": 1242,
+        "7843": 1259,
+        "7855": 1261,
+        "7890": 1267,
+        "7931": 1275,
+        "8028": 1283,
+        "8071": 1291,
+        "8138": 1302,
+        "8382": 1329,
+        "8696": 1357,
+        "8936": 1372,
+        "9503": 1398,
+        "10107": 1424,
+        "10220": 1429,
+        "11067": 1465,
+        "11219": 1472,
+        "11909": 1501,
+        "11933": 1502,
+        "12360": 1520,
+        "12731": 1538,
+        "12750": 1539,
+        "13206": 1651,
+        "13994": 1693,
+        "14336": 1708,
+        "14544": 1717,
+        "14614": 1720,
+        "14631": 1721,
+        "14713": 1725,
+        "14788": 1728,
+        "14998": 1737,
+        "15273": 1748,
+        "15564": 1761,
+        "16297": 1791,
+        "16612": 1804,
+        "18052": 1863,
+        "18777": 1893,
+        "18809": 1894,
+        "18830": 1895,
+        "19439": 1921,
+        "19608": 1930,
+        "19843": 1940,
+        "19871": 1952,
+        "20115": 1971,
+        "20270": 1982,
+        "20319": 1986,
+        "20709": 2023,
+        "20998": 2050,
+        "21024": 2053,
+        "21176": 2078,
+        "21236": 2086,
+        "21296": 2092,
+        "21353": 2097,
+        "21467": 2111,
+        "21604": 2124,
+        "21710": 2133,
+        "21898": 2150,
+        "21930": 2165,
+        "21998": 2179,
+        "22008": 2181,
+        "22019": 2189,
+        "22066": 2196,
+        "22261": 2214,
+        "22317": 2219,
+        "22401": 2226,
+        "22432": 2228,
+        "22530": 2237,
+        "22641": 2247,
+        "22704": 2253,
+        "22818": 2266,
+        "22864": 2273,
+        "22969": 2284,
+        "22987": 2287,
+        "23366": 2322,
+        "23505": 2335,
+        "23824": 2364,
+        "24216": 2407,
+        "24306": 2420,
+        "24345": 2425,
+        "24427": 2434,
+        "24476": 2439,
+        "24491": 2441,
+        "24496": 2442,
+        "24706": 2461,
+        "24755": 2465,
+        "24760": 2466,
+        "24763": 2466,
+        "24785": 2468,
+        "24918": 2478,
+        "24976": 2483,
+        "25292": 2510,
+        "25311": 2514,
+        "25343": 2519,
+        "25414": 2527,
+        "25717": 2550,
+        "25842": 2560,
+        "26310": 2596,
+        "26318": 2597,
+        "26335": 2598,
+        "26380": 2602,
+        "26420": 2605,
+        "26556": 2617,
+        "26571": 2619,
+        "26601": 2622,
+        "26660": 2634,
+        "26692": 2649,
+        "26704": 2652,
+        "26723": 2656,
+        "26809": 2667,
+        "26868": 2672,
+        "27376": 2713,
+        "27699": 2737,
+        "27820": 2747,
+        "27963": 2762,
+        "28290": 2789,
+        "28726": 2821,
+        "28997": 2841,
+        "29194": 2866,
+        "29251": 2875,
+        "29260": 2876,
+        "29564": 2914,
+        "29644": 2921,
+        "29749": 2935,
+        "29755": 2935,
+        "29812": 2942,
+        "29870": 2948,
+        "29938": 2955,
+        "29987": 2960,
+        "30020": 2964,
+        "30042": 2969,
+        "30075": 2973,
+        "30203": 2984,
+        "30244": 2987,
+        "30290": 2991,
+        "30400": 3000,
+        "30444": 3003,
+        "30511": 3008,
+        "30605": 3015,
+        "30812": 3031,
+        "30823": 3032,
+        "30899": 3039,
+        "30978": 3045,
+        "30997": 3048,
+        "31009": 3067,
+        "31028": 3070,
+        "31182": 3087,
+        "31195": 3089,
+        "31496": 3113,
+        "31514": 3117,
+        "31600": 3128,
+        "31702": 3145,
+        "31715": 3147,
+        "31732": 3152
+       },
+       "notes": [
+        "This route has tolls."
+       ],
+       "departure_timestamp": 1792768196,
+       "departure_datetime_utc": "2026-10-23T15:09:56.000Z",
+       "arrival_timestamp": 1792770987,
+       "arrival_datetime_utc": "2026-10-23T15:56:27.000Z",
+       "route_parts": [
+        {
+         "summary": "Get on Malir Expy/Shahrah-e-Bhutto in Korangi from Shahra-e-Faisal and Shaheed-e-Millat Rd",
+         "distance_meters": 8934,
+         "distance_label": "5.6 mi",
+         "duration_seconds": 1040,
+         "duration_label": "17 min",
+         "instructions": [
+          {
+           "summary": "Head toward Imam Bara St",
+           "distance_meters": 122,
+           "distance_label": "400 ft",
+           "duration_seconds": 43,
+           "duration_label": "43 sec",
+           "notes": [
+            "Pass by SUDAIS GEMS (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at ALI JEWELLERS onto Clarke St/Shahrah-e-Iraq",
+           "distance_meters": 185,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 59,
+           "duration_label": "59 sec",
+           "notes": [
+            "Pass by Niazi Libas House (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at lucky optics onto Mir Karam Ali Talpur Rd",
+           "distance_meters": 404,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 120,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Badri haveli (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Lucky Star Pan Shop onto Sir Ghulam Hussain Hidayatallah Rd",
+           "distance_meters": 387,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 71,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Jehangir and Roshan Khan Squash Complex (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp to Shahra-e-Faisal",
+           "distance_meters": 169,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 26,
+           "duration_label": "26 sec",
+           "notes": [
+            "Pass by Navy Masjid (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Kabootar Chowk, Iqbal Lines onto Shahra-e-Faisal",
+           "distance_meters": 5062,
+           "distance_label": "3.1 mi",
+           "duration_seconds": 409,
+           "duration_label": "7 min",
+           "notes": [
+            "Pass by Regent Plaza (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left onto Burhani Ave Rd",
+           "distance_meters": 422,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 74,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Bank AL Habib (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left onto Shaheed-e-Millat Rd",
+           "distance_meters": 890,
+           "distance_label": "0.6 mi",
+           "duration_seconds": 96,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by FIo hospital (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp to \u202bBaloch Colony Road\u202c\u200e",
+           "distance_meters": 212,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 26,
+           "duration_label": "26 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto \u202bBaloch Colony Road\u202c\u200e",
+           "distance_meters": 76,
+           "distance_label": "249 ft",
+           "duration_seconds": 13,
+           "duration_label": "13 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto EBM Causeway",
+           "distance_meters": 207,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 35,
+           "duration_label": "35 sec",
+           "notes": [
+            "Pass by Techno Gen Apparel Machinery Co. (Service Center) (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto EBM Cswy/Surgeon Faiz Muhammad Khan Rd",
+           "distance_meters": 244,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 26,
+           "duration_label": "26 sec",
+           "notes": [
+            "Pass by King Enterprises (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Slight left to merge onto Malir Expy/Shahrah-e-Bhutto",
+           "distance_meters": 554,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 42,
+           "duration_label": "42 sec",
+           "notes": [
+            "Toll road"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Follow Malir Expy/Shahrah-e-Bhutto and Karachi Thatta Dual Carriageway/N-5/AH2 to Bin Qasim Town",
+         "distance_meters": 22556,
+         "distance_label": "14.0 mi",
+         "duration_seconds": 1707,
+         "duration_label": "28 min",
+         "instructions": [
+          {
+           "summary": "Merge onto Malir Expy/Shahrah-e-Bhutto",
+           "distance_meters": 10906,
+           "distance_label": "6.8 mi",
+           "duration_seconds": 562,
+           "duration_label": "9 min",
+           "notes": [
+            "Toll road"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Slight left",
+           "distance_meters": 867,
+           "distance_label": "0.5 mi",
+           "duration_seconds": 85,
+           "duration_label": "1 min",
+           "notes": [
+            "Toll road",
+            "Pass by Aiwan-e-siddiqu (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Merge onto Karachi Thatta Dual Carriageway/Shahra-e-Faisal/N-5/AH2",
+           "distance_meters": 1189,
+           "distance_label": "0.7 mi",
+           "duration_seconds": 129,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Hyder (on the left in 0.5 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left onto Korangi Rd Link",
+           "distance_meters": 32,
+           "distance_label": "105 ft",
+           "duration_seconds": 10,
+           "duration_label": "10 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Anwar Ali Tyre Shop to stay on Korangi Rd Link",
+           "distance_meters": 78,
+           "distance_label": "256 ft",
+           "duration_seconds": 21,
+           "duration_label": "21 sec",
+           "notes": [
+            "Pass by Cari Radiants (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Sharp right onto Karachi Thatta Dual Carriageway/Shahra-e-Faisal/Shahrah e Faisal Rd/N-5/AH2",
+           "distance_meters": 8985,
+           "distance_label": "5.6 mi",
+           "duration_seconds": 843,
+           "duration_label": "14 min",
+           "notes": [
+            "Continue to follow Karachi Thatta Dual Carriageway/N-5/AH2",
+            "Pass by Hashmat Auto's (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn",
+           "distance_meters": 499,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 57,
+           "duration_label": "57 sec",
+           "notes": [
+            "Pass by the gas station (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Drive to your destination",
+         "distance_meters": 242,
+         "distance_label": "0.2 mi",
+         "duration_seconds": 44,
+         "duration_label": "44 sec",
+         "instructions": [
+          {
+           "summary": "Turn left",
+           "distance_meters": 18,
+           "distance_label": "59 ft",
+           "duration_seconds": 7,
+           "duration_label": "7 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right",
+           "distance_meters": 189,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 28,
+           "duration_label": "28 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left",
+           "distance_meters": 35,
+           "distance_label": "115 ft",
+           "duration_seconds": 9,
+           "duration_label": "9 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "route_name": "Shahra-e-Faisal/Shahrah e Faisal Rd and Karachi Thatta Dual Carriageway/N-5/AH2",
+       "distance_meters": 27842,
+       "distance_label": "17.3 miles",
+       "duration_seconds": 2620,
+       "duration_label": "44 min",
+       "min_duration_seconds": 2912,
+       "max_duration_seconds": 4420,
+       "highlights": [
+        "Heavy traffic, as usual"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "8": 6,
+        "62": 39,
+        "122": 81,
+        "163": 130,
+        "181": 136,
+        "220": 164,
+        "306": 199,
+        "361": 231,
+        "482": 273,
+        "541": 291,
+        "577": 301,
+        "621": 313,
+        "711": 339,
+        "784": 359,
+        "794": 366,
+        "828": 371,
+        "835": 372,
+        "863": 377,
+        "1098": 415,
+        "1223": 432,
+        "1267": 439,
+        "1284": 442,
+        "1396": 463,
+        "1508": 484,
+        "1533": 488,
+        "1632": 505,
+        "1681": 513,
+        "1795": 532,
+        "1808": 534,
+        "1848": 541,
+        "1877": 545,
+        "2018": 563,
+        "2029": 565,
+        "2153": 581,
+        "2177": 584,
+        "2263": 594,
+        "2370": 607,
+        "2466": 619,
+        "2556": 628,
+        "2569": 629,
+        "2591": 631,
+        "2771": 648,
+        "3002": 671,
+        "3104": 680,
+        "3264": 694,
+        "3309": 699,
+        "3360": 704,
+        "3433": 710,
+        "3462": 713,
+        "3563": 722,
+        "3694": 736,
+        "3761": 741,
+        "4234": 795,
+        "4736": 847,
+        "5152": 881,
+        "5208": 886,
+        "5268": 890,
+        "5498": 914,
+        "5638": 929,
+        "5672": 933,
+        "5683": 934,
+        "5736": 940,
+        "5760": 943,
+        "5781": 945,
+        "5851": 952,
+        "5978": 965,
+        "6026": 972,
+        "6053": 976,
+        "6094": 983,
+        "6116": 986,
+        "6317": 1016,
+        "6331": 1019,
+        "6347": 1022,
+        "6381": 1032,
+        "6590": 1068,
+        "6816": 1109,
+        "6971": 1137,
+        "6982": 1139,
+        "7007": 1142,
+        "7553": 1206,
+        "7614": 1215,
+        "7701": 1224,
+        "7818": 1235,
+        "8169": 1269,
+        "8358": 1303,
+        "8400": 1309,
+        "8444": 1315,
+        "8479": 1319,
+        "8494": 1320,
+        "8610": 1331,
+        "8749": 1344,
+        "8822": 1350,
+        "9043": 1370,
+        "9105": 1376,
+        "9156": 1382,
+        "9287": 1394,
+        "9480": 1416,
+        "9693": 1445,
+        "9859": 1468,
+        "9902": 1475,
+        "9911": 1477,
+        "9926": 1479,
+        "10035": 1502,
+        "10073": 1513,
+        "10115": 1526,
+        "10132": 1531,
+        "10142": 1533,
+        "10464": 1616,
+        "10518": 1630,
+        "10564": 1638,
+        "10617": 1645,
+        "10664": 1654,
+        "10876": 1677,
+        "10975": 1685,
+        "11017": 1689,
+        "11076": 1695,
+        "11155": 1706,
+        "11171": 1710,
+        "11287": 1723,
+        "11328": 1727,
+        "11462": 1738,
+        "11842": 1768,
+        "12105": 1790,
+        "12181": 1797,
+        "12520": 1827,
+        "12616": 1835,
+        "12705": 1844,
+        "12775": 1852,
+        "12829": 1857,
+        "12889": 1862,
+        "12902": 1864,
+        "12927": 1866,
+        "12962": 1869,
+        "13032": 1875,
+        "13220": 1891,
+        "13472": 1915,
+        "13604": 1928,
+        "13641": 1933,
+        "13804": 1957,
+        "13877": 1976,
+        "13913": 1983,
+        "13926": 1985,
+        "13991": 1992,
+        "14007": 1993,
+        "14062": 1999,
+        "14139": 2007,
+        "14218": 2017,
+        "14227": 2019,
+        "14327": 2035,
+        "14425": 2047,
+        "14487": 2055,
+        "14621": 2078,
+        "14636": 2081,
+        "14712": 2092,
+        "14950": 2115,
+        "14963": 2116,
+        "15388": 2154,
+        "15529": 2167,
+        "15697": 2182,
+        "15741": 2186,
+        "16045": 2213,
+        "16128": 2220,
+        "16237": 2230,
+        "16294": 2234,
+        "16323": 2237,
+        "16489": 2251,
+        "16526": 2254,
+        "16600": 2261,
+        "16674": 2270,
+        "16765": 2285,
+        "16834": 2295,
+        "16909": 2303,
+        "17015": 2314,
+        "17089": 2322,
+        "17178": 2333,
+        "17220": 2338,
+        "17480": 2363,
+        "17779": 2404,
+        "17830": 2420,
+        "17853": 2425,
+        "17907": 2440,
+        "17971": 2450,
+        "18044": 2461,
+        "18130": 2476,
+        "18178": 2483,
+        "18372": 2501,
+        "18428": 2505,
+        "18513": 2512,
+        "18543": 2515,
+        "18641": 2523,
+        "18752": 2533,
+        "18816": 2539,
+        "18929": 2553,
+        "18975": 2559,
+        "19080": 2571,
+        "19098": 2573,
+        "19477": 2608,
+        "19616": 2621,
+        "19935": 2650,
+        "20327": 2692,
+        "20417": 2706,
+        "20456": 2711,
+        "20538": 2719,
+        "20587": 2725,
+        "20602": 2727,
+        "20607": 2727,
+        "20817": 2747,
+        "20866": 2751,
+        "20871": 2751,
+        "20874": 2752,
+        "20896": 2753,
+        "21029": 2764,
+        "21087": 2768,
+        "21403": 2795,
+        "21422": 2799,
+        "21454": 2804,
+        "21525": 2812,
+        "21828": 2835,
+        "21953": 2845,
+        "22421": 2881,
+        "22429": 2882,
+        "22446": 2883,
+        "22491": 2887,
+        "22530": 2890,
+        "22667": 2902,
+        "22682": 2903,
+        "22712": 2906,
+        "22771": 2918,
+        "22803": 2932,
+        "22815": 2935,
+        "22834": 2939,
+        "22920": 2950,
+        "22978": 2955,
+        "23486": 2996,
+        "23810": 3019,
+        "23931": 3029,
+        "24074": 3044,
+        "24401": 3071,
+        "24836": 3103,
+        "25107": 3123,
+        "25305": 3148,
+        "25361": 3157,
+        "25370": 3158,
+        "25674": 3196,
+        "25754": 3203,
+        "25860": 3216,
+        "25865": 3217,
+        "25922": 3224,
+        "25980": 3230,
+        "26048": 3236,
+        "26098": 3242,
+        "26131": 3246,
+        "26152": 3251,
+        "26185": 3254,
+        "26314": 3266,
+        "26354": 3269,
+        "26401": 3273,
+        "26510": 3281,
+        "26554": 3285,
+        "26621": 3290,
+        "26715": 3297,
+        "26922": 3313,
+        "26933": 3314,
+        "27009": 3320,
+        "27088": 3327,
+        "27107": 3330,
+        "27119": 3348,
+        "27138": 3351,
+        "27292": 3368,
+        "27305": 3369,
+        "27606": 3394,
+        "27624": 3398,
+        "27710": 3409,
+        "27812": 3425,
+        "27825": 3428,
+        "27842": 3433
+       },
+       "notes": [],
+       "departure_timestamp": 1792768196,
+       "departure_datetime_utc": "2026-10-23T15:09:56.000Z",
+       "arrival_timestamp": 1792770816,
+       "arrival_datetime_utc": "2026-10-23T15:53:36.000Z",
+       "route_parts": [
+        {
+         "summary": "Get on Shahra-e-Faisal/Shahrah e Faisal Rd in Fowler Lines from Mir Karam Ali Talpur Rd and Sir Ghulam Hussain Hidayatallah Rd",
+         "distance_meters": 1267,
+         "distance_label": "0.8 mi",
+         "duration_seconds": 319,
+         "duration_label": "5 min",
+         "instructions": [
+          {
+           "summary": "Head toward Imam Bara St",
+           "distance_meters": 122,
+           "distance_label": "400 ft",
+           "duration_seconds": 43,
+           "duration_label": "43 sec",
+           "notes": [
+            "Pass by SUDAIS GEMS (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at ALI JEWELLERS onto Clarke St/Shahrah-e-Iraq",
+           "distance_meters": 185,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 59,
+           "duration_label": "59 sec",
+           "notes": [
+            "Pass by Niazi Libas House (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at lucky optics onto Mir Karam Ali Talpur Rd",
+           "distance_meters": 404,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 120,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Badri haveli (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Lucky Star Pan Shop onto Sir Ghulam Hussain Hidayatallah Rd",
+           "distance_meters": 387,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 71,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Jehangir and Roshan Khan Squash Complex (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp to Shahra-e-Faisal/Shahrah e Faisal Rd",
+           "distance_meters": 169,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 26,
+           "duration_label": "26 sec",
+           "notes": [
+            "Pass by Navy Masjid (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on Shahra-e-Faisal/Shahrah e Faisal Rd to Bin Qasim Town",
+         "distance_meters": 26333,
+         "distance_label": "16.4 mi",
+         "duration_seconds": 2258,
+         "duration_label": "38 min",
+         "instructions": [
+          {
+           "summary": "Turn left at Kabootar Chowk, Iqbal Lines onto Shahra-e-Faisal/Shahrah e Faisal Rd",
+           "distance_meters": 19335,
+           "distance_label": "12.0 mi",
+           "duration_seconds": 1611,
+           "duration_label": "27 min",
+           "notes": [
+            "Pass by Regent Plaza (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "At Ex Caltex Pump, continue onto Karachi Thatta Dual Carriageway/N-5/AH2",
+           "distance_meters": 6499,
+           "distance_label": "4.0 mi",
+           "duration_seconds": 590,
+           "duration_label": "10 min",
+           "notes": [
+            "Pass by Umar Marvi Goth Bus Stop (on the right in 0.8 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn",
+           "distance_meters": 499,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 57,
+           "duration_label": "57 sec",
+           "notes": [
+            "Pass by the gas station (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Drive to your destination",
+         "distance_meters": 242,
+         "distance_label": "0.2 mi",
+         "duration_seconds": 44,
+         "duration_label": "44 sec",
+         "instructions": [
+          {
+           "summary": "Turn left",
+           "distance_meters": 18,
+           "distance_label": "59 ft",
+           "duration_seconds": 7,
+           "duration_label": "7 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right",
+           "distance_meters": 189,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 28,
+           "duration_label": "28 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left",
+           "distance_meters": 35,
+           "distance_label": "115 ft",
+           "duration_seconds": 9,
+           "duration_label": "9 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "route_name": "Shaheed-e-Millat Rd, Malir Expy/Shahrah-e-Bhutto and Karachi Thatta Dual Carriageway/N-5/AH2",
+       "distance_meters": 33578,
+       "distance_label": "20.9 miles",
+       "duration_seconds": 3087,
+       "duration_label": "51 min",
+       "min_duration_seconds": 2944,
+       "max_duration_seconds": 4910,
+       "highlights": [
+        "Avoids slowdown on Shahra-e-Faisal"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "8": 6,
+        "62": 39,
+        "122": 81,
+        "163": 130,
+        "181": 136,
+        "220": 164,
+        "278": 180,
+        "311": 188,
+        "313": 188,
+        "369": 202,
+        "417": 241,
+        "429": 252,
+        "614": 304,
+        "625": 311,
+        "733": 339,
+        "809": 357,
+        "850": 369,
+        "860": 371,
+        "1017": 396,
+        "1069": 449,
+        "1138": 469,
+        "1194": 478,
+        "1346": 502,
+        "1609": 527,
+        "2002": 559,
+        "2089": 567,
+        "2179": 577,
+        "2322": 591,
+        "2349": 593,
+        "2497": 605,
+        "2664": 618,
+        "2724": 622,
+        "2771": 626,
+        "2860": 640,
+        "2996": 670,
+        "3129": 689,
+        "3156": 691,
+        "3167": 692,
+        "3185": 695,
+        "3223": 698,
+        "3291": 707,
+        "3356": 714,
+        "3455": 729,
+        "3472": 732,
+        "3513": 738,
+        "3528": 741,
+        "3565": 749,
+        "3597": 754,
+        "3698": 768,
+        "3835": 786,
+        "3885": 791,
+        "3908": 795,
+        "3922": 797,
+        "3939": 799,
+        "4141": 825,
+        "4188": 831,
+        "4255": 838,
+        "4337": 849,
+        "4414": 862,
+        "4490": 878,
+        "4568": 891,
+        "4606": 901,
+        "4644": 907,
+        "4714": 924,
+        "4770": 933,
+        "4826": 941,
+        "4930": 957,
+        "4965": 962,
+        "4992": 965,
+        "5007": 967,
+        "5068": 991,
+        "5077": 995,
+        "5121": 1006,
+        "5163": 1012,
+        "5398": 1040,
+        "5436": 1044,
+        "5543": 1054,
+        "5572": 1056,
+        "5710": 1067,
+        "5771": 1072,
+        "5856": 1079,
+        "6182": 1108,
+        "6237": 1113,
+        "6306": 1123,
+        "6486": 1138,
+        "6601": 1147,
+        "6819": 1166,
+        "6844": 1168,
+        "6878": 1172,
+        "6895": 1174,
+        "6978": 1183,
+        "7007": 1187,
+        "7055": 1192,
+        "7229": 1208,
+        "7304": 1215,
+        "7337": 1219,
+        "7415": 1226,
+        "7667": 1246,
+        "7885": 1263,
+        "7915": 1266,
+        "7950": 1269,
+        "8207": 1290,
+        "8225": 1292,
+        "8257": 1294,
+        "8292": 1298,
+        "8310": 1299,
+        "8528": 1319,
+        "8545": 1321,
+        "8557": 1323,
+        "8608": 1329,
+        "8692": 1337,
+        "8781": 1345,
+        "8851": 1352,
+        "8894": 1359,
+        "8943": 1372,
+        "8973": 1382,
+        "8976": 1383,
+        "9007": 1391,
+        "9091": 1413,
+        "9123": 1418,
+        "9262": 1432,
+        "9303": 1436,
+        "9471": 1454,
+        "9483": 1455,
+        "9490": 1456,
+        "9537": 1461,
+        "9690": 1479,
+        "9702": 1481,
+        "9737": 1487,
+        "9778": 1495,
+        "9875": 1502,
+        "9918": 1510,
+        "9985": 1522,
+        "10229": 1548,
+        "10543": 1577,
+        "10783": 1591,
+        "11350": 1617,
+        "11954": 1643,
+        "12067": 1648,
+        "12914": 1684,
+        "13066": 1691,
+        "13756": 1720,
+        "13780": 1721,
+        "14207": 1739,
+        "14578": 1757,
+        "14597": 1758,
+        "15053": 1868,
+        "15841": 1909,
+        "16183": 1924,
+        "16391": 1933,
+        "16461": 1937,
+        "16478": 1938,
+        "16560": 1942,
+        "16635": 1945,
+        "16845": 1954,
+        "17120": 1965,
+        "17411": 1977,
+        "18144": 2007,
+        "18459": 2020,
+        "19899": 2079,
+        "20624": 2109,
+        "20656": 2111,
+        "20677": 2112,
+        "21286": 2138,
+        "21455": 2146,
+        "21690": 2156,
+        "21718": 2170,
+        "21962": 2189,
+        "22117": 2200,
+        "22166": 2204,
+        "22556": 2240,
+        "22845": 2268,
+        "22871": 2271,
+        "23023": 2295,
+        "23083": 2303,
+        "23143": 2309,
+        "23200": 2314,
+        "23314": 2328,
+        "23451": 2341,
+        "23557": 2350,
+        "23745": 2367,
+        "23777": 2381,
+        "23845": 2396,
+        "23855": 2397,
+        "23866": 2406,
+        "23913": 2413,
+        "24108": 2431,
+        "24164": 2435,
+        "24248": 2442,
+        "24279": 2445,
+        "24377": 2453,
+        "24488": 2463,
+        "24551": 2469,
+        "24665": 2483,
+        "24711": 2489,
+        "24816": 2501,
+        "24834": 2503,
+        "25213": 2538,
+        "25352": 2551,
+        "25671": 2580,
+        "26063": 2623,
+        "26153": 2636,
+        "26192": 2641,
+        "26274": 2650,
+        "26323": 2655,
+        "26338": 2657,
+        "26343": 2658,
+        "26553": 2677,
+        "26602": 2681,
+        "26607": 2682,
+        "26610": 2682,
+        "26632": 2684,
+        "26765": 2694,
+        "26823": 2698,
+        "27139": 2726,
+        "27158": 2729,
+        "27190": 2735,
+        "27261": 2742,
+        "27564": 2766,
+        "27689": 2775,
+        "28157": 2811,
+        "28165": 2812,
+        "28182": 2813,
+        "28227": 2817,
+        "28267": 2820,
+        "28403": 2832,
+        "28418": 2834,
+        "28448": 2837,
+        "28507": 2849,
+        "28539": 2863,
+        "28551": 2866,
+        "28570": 2870,
+        "28656": 2881,
+        "28715": 2886,
+        "29223": 2927,
+        "29546": 2950,
+        "29667": 2960,
+        "29810": 2975,
+        "30137": 3002,
+        "30573": 3034,
+        "30844": 3054,
+        "31041": 3079,
+        "31098": 3088,
+        "31107": 3090,
+        "31411": 3127,
+        "31491": 3134,
+        "31596": 3148,
+        "31602": 3148,
+        "31659": 3155,
+        "31717": 3161,
+        "31785": 3168,
+        "31834": 3173,
+        "31867": 3177,
+        "31889": 3182,
+        "31922": 3185,
+        "32050": 3197,
+        "32091": 3200,
+        "32137": 3204,
+        "32247": 3212,
+        "32291": 3216,
+        "32358": 3221,
+        "32452": 3228,
+        "32659": 3244,
+        "32670": 3245,
+        "32746": 3251,
+        "32825": 3258,
+        "32844": 3261,
+        "32856": 3280,
+        "32875": 3282,
+        "33029": 3300,
+        "33042": 3301,
+        "33343": 3325,
+        "33361": 3329,
+        "33447": 3340,
+        "33549": 3357,
+        "33562": 3359,
+        "33578": 3364
+       },
+       "notes": [
+        "This route has tolls."
+       ],
+       "departure_timestamp": 1792768196,
+       "departure_datetime_utc": "2026-10-23T15:09:56.000Z",
+       "arrival_timestamp": 1792771283,
+       "arrival_datetime_utc": "2026-10-23T16:01:23.000Z",
+       "route_parts": [
+        {
+         "summary": "Get on Malir Expy/Shahrah-e-Bhutto in Korangi from New MA Jinnah Rd, M. A. Jinnah Rd, New M. A. Jinnah Rd and Shaheed-e-Millat Rd",
+         "distance_meters": 10780,
+         "distance_label": "6.7 mi",
+         "duration_seconds": 1339,
+         "duration_label": "22 min",
+         "instructions": [
+          {
+           "summary": "Head toward Imam Bara St",
+           "distance_meters": 122,
+           "distance_label": "400 ft",
+           "duration_seconds": 43,
+           "duration_label": "43 sec",
+           "notes": [
+            "Pass by SUDAIS GEMS (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at ALI JEWELLERS onto Clarke St/Shahrah-e-Iraq",
+           "distance_meters": 99,
+           "distance_label": "325 ft",
+           "duration_seconds": 32,
+           "duration_label": "32 sec",
+           "notes": [
+            "Pass by Niazi Libas House (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Saddar city centre onto Dr Daud Pota Rd",
+           "distance_meters": 197,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 48,
+           "duration_label": "48 sec",
+           "notes": [
+            "Pass by HZ BEDDING (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Mnable. onto Shahrah-e-Liaquat",
+           "distance_meters": 198,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 47,
+           "duration_label": "47 sec",
+           "notes": [
+            "Pass by Unique toys sadder (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "At marium games f 80, continue onto New MA Jinnah Rd",
+           "distance_meters": 2246,
+           "distance_label": "1.4 mi",
+           "duration_seconds": 266,
+           "duration_label": "4 min",
+           "notes": [
+            "Pass by Al Qaswa Online Store (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left onto M. A. Jinnah Rd",
+           "distance_meters": 307,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 41,
+           "duration_label": "41 sec",
+           "notes": [
+            "Pass by People's Chowrangi (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn",
+           "distance_meters": 398,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 58,
+           "duration_label": "58 sec",
+           "notes": [
+            "Pass by chief engineer (south) pak pwd (on the right in 0.2 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Slight left at Tyre Exchange onto New M. A. Jinnah Rd",
+           "distance_meters": 1441,
+           "distance_label": "0.9 mi",
+           "duration_seconds": 206,
+           "duration_label": "3 min",
+           "notes": [
+            "Pass by Usman Housing (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Jahanzaib Motors to stay on New M. A. Jinnah Rd",
+           "distance_meters": 70,
+           "distance_label": "230 ft",
+           "duration_seconds": 18,
+           "duration_label": "18 sec",
+           "notes": [
+            "Pass by Abdullah Steel (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Perfect Aluminium",
+           "distance_meters": 777,
+           "distance_label": "0.5 mi",
+           "duration_seconds": 96,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by PIB (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto Shaheed-e-Millat Rd",
+           "distance_meters": 3632,
+           "distance_label": "2.3 mi",
+           "duration_seconds": 342,
+           "duration_label": "6 min",
+           "notes": [
+            "Pass by Bill Blass Golden (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp to \u202bBaloch Colony Road\u202c\u200e",
+           "distance_meters": 212,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 26,
+           "duration_label": "26 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto \u202bBaloch Colony Road\u202c\u200e",
+           "distance_meters": 76,
+           "distance_label": "249 ft",
+           "duration_seconds": 13,
+           "duration_label": "13 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto EBM Causeway",
+           "distance_meters": 207,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 35,
+           "duration_label": "35 sec",
+           "notes": [
+            "Pass by Techno Gen Apparel Machinery Co. (Service Center) (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto EBM Cswy/Surgeon Faiz Muhammad Khan Rd",
+           "distance_meters": 244,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 26,
+           "duration_label": "26 sec",
+           "notes": [
+            "Pass by King Enterprises (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Slight left to merge onto Malir Expy/Shahrah-e-Bhutto",
+           "distance_meters": 554,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 42,
+           "duration_label": "42 sec",
+           "notes": [
+            "Toll road"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Follow Malir Expy/Shahrah-e-Bhutto and Karachi Thatta Dual Carriageway/N-5/AH2 to Bin Qasim Town",
+         "distance_meters": 22556,
+         "distance_label": "14.0 mi",
+         "duration_seconds": 1707,
+         "duration_label": "28 min",
+         "instructions": [
+          {
+           "summary": "Merge onto Malir Expy/Shahrah-e-Bhutto",
+           "distance_meters": 10906,
+           "distance_label": "6.8 mi",
+           "duration_seconds": 562,
+           "duration_label": "9 min",
+           "notes": [
+            "Toll road"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Slight left",
+           "distance_meters": 867,
+           "distance_label": "0.5 mi",
+           "duration_seconds": 85,
+           "duration_label": "1 min",
+           "notes": [
+            "Toll road",
+            "Pass by Aiwan-e-siddiqu (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Merge onto Karachi Thatta Dual Carriageway/Shahra-e-Faisal/N-5/AH2",
+           "distance_meters": 1189,
+           "distance_label": "0.7 mi",
+           "duration_seconds": 129,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Hyder (on the left in 0.5 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left onto Korangi Rd Link",
+           "distance_meters": 32,
+           "distance_label": "105 ft",
+           "duration_seconds": 10,
+           "duration_label": "10 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Anwar Ali Tyre Shop to stay on Korangi Rd Link",
+           "distance_meters": 78,
+           "distance_label": "256 ft",
+           "duration_seconds": 21,
+           "duration_label": "21 sec",
+           "notes": [
+            "Pass by Cari Radiants (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Sharp right onto Karachi Thatta Dual Carriageway/Shahra-e-Faisal/Shahrah e Faisal Rd/N-5/AH2",
+           "distance_meters": 8985,
+           "distance_label": "5.6 mi",
+           "duration_seconds": 843,
+           "duration_label": "14 min",
+           "notes": [
+            "Continue to follow Karachi Thatta Dual Carriageway/N-5/AH2",
+            "Pass by Hashmat Auto's (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn",
+           "distance_meters": 499,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 57,
+           "duration_label": "57 sec",
+           "notes": [
+            "Pass by the gas station (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Drive to your destination",
+         "distance_meters": 242,
+         "distance_label": "0.2 mi",
+         "duration_seconds": 44,
+         "duration_label": "44 sec",
+         "instructions": [
+          {
+           "summary": "Turn left",
+           "distance_meters": 18,
+           "distance_label": "59 ft",
+           "duration_seconds": 7,
+           "duration_label": "7 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right",
+           "distance_meters": 189,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 28,
+           "duration_label": "28 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left",
+           "distance_meters": 35,
+           "distance_label": "115 ft",
+           "duration_seconds": 9,
+           "duration_label": "9 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "origin": {
+      "latitude": 24.8586,
+      "longitude": 67.0295
+     },
+     "destination": {
+      "latitude": 24.8569,
+      "longitude": 67.2646
+     },
+     "directions_link": "https://www.google.com/maps/dir/24.8586,67.0295/24.8569,67.2646/data=!4m6!4m5!1m1!4e1!1m1!4e1!3e0"
+    }
+   }
+  },
+  {
+   "name": "Shahrah-e-Faisal: Karsaz -> FTC",
+   "http": 200,
+   "body": {
+    "status": "OK",
+    "request_id": "6f4db305-e9f8-4c33-9f4c-ee61b140407e",
+    "data": {
+     "best_routes": [
+      {
+       "route_name": "Tipu Sultan Rd and Shahra-e-Faisal",
+       "distance_meters": 5354,
+       "distance_label": "3.3 miles",
+       "duration_seconds": 741,
+       "duration_label": "12 min",
+       "min_duration_seconds": 650,
+       "max_duration_seconds": 1241,
+       "highlights": [
+        "Fastest route, despite the usual traffic"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "79": 24,
+        "88": 27,
+        "137": 32,
+        "229": 43,
+        "244": 46,
+        "253": 47,
+        "258": 50,
+        "465": 74,
+        "481": 81,
+        "495": 84,
+        "501": 88,
+        "597": 105,
+        "735": 121,
+        "759": 125,
+        "805": 130,
+        "897": 139,
+        "964": 145,
+        "1001": 149,
+        "1108": 159,
+        "1201": 173,
+        "1211": 183,
+        "1234": 237,
+        "1257": 251,
+        "1291": 258,
+        "1307": 261,
+        "1398": 282,
+        "1466": 298,
+        "1663": 326,
+        "1709": 332,
+        "1828": 353,
+        "1900": 412,
+        "1939": 432,
+        "1952": 436,
+        "2049": 450,
+        "2253": 467,
+        "2346": 474,
+        "2482": 484,
+        "2607": 494,
+        "2999": 524,
+        "3141": 534,
+        "3202": 538,
+        "3335": 548,
+        "3428": 555,
+        "3518": 562,
+        "3588": 567,
+        "3721": 577,
+        "3881": 590,
+        "3905": 593,
+        "4141": 621,
+        "4338": 643,
+        "4408": 649,
+        "4438": 652,
+        "4470": 655,
+        "4676": 672,
+        "4715": 676,
+        "4860": 687,
+        "4881": 697,
+        "4931": 709,
+        "5006": 721,
+        "5068": 742,
+        "5132": 762,
+        "5261": 807,
+        "5282": 815,
+        "5337": 828,
+        "5354": 834
+       },
+       "notes": [],
+       "departure_timestamp": 1792768198,
+       "departure_datetime_utc": "2026-10-23T15:09:58.000Z",
+       "arrival_timestamp": 1792768939,
+       "arrival_datetime_utc": "2026-10-23T15:22:19.000Z",
+       "route_parts": [
+        {
+         "summary": null,
+         "distance_meters": 79,
+         "distance_label": "259 ft",
+         "duration_seconds": 14,
+         "duration_label": "14 sec",
+         "instructions": [
+          {
+           "summary": "Head toward Tipu Sultan Rd",
+           "distance_meters": 79,
+           "distance_label": "259 ft",
+           "duration_seconds": 14,
+           "duration_label": "14 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on Tipu Sultan Rd. Drive from Shahra-e-Faisal to Block 2",
+         "distance_meters": 4782,
+         "distance_label": "3.0 mi",
+         "duration_seconds": 615,
+         "duration_label": "10 min",
+         "instructions": [
+          {
+           "summary": "Turn right at Varitron (Smith & Nephew) onto Tipu Sultan Rd",
+           "distance_meters": 1830,
+           "distance_label": "1.1 mi",
+           "duration_seconds": 332,
+           "duration_label": "6 min",
+           "notes": [
+            "Go through 2 roundabouts",
+            "Pass by KoderLabs (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue straight past Matrix Trackers Pvt Ltd onto \u202bShaheed-e-Millat Road\u202c\u200e",
+           "distance_meters": 142,
+           "distance_label": "466 ft",
+           "duration_seconds": 27,
+           "duration_label": "27 sec",
+           "notes": [
+            "Pass by the bridge (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Merge onto Shahra-e-Faisal",
+           "distance_meters": 1856,
+           "distance_label": "1.2 mi",
+           "duration_seconds": 159,
+           "duration_label": "3 min",
+           "notes": [
+            "Pass by The Mr Auto Cars (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit toward Shahrah-e-Qaideen",
+           "distance_meters": 770,
+           "distance_label": "0.5 mi",
+           "duration_seconds": 81,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Prestige Workspaces (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue onto Shahrah-e-Qaideen",
+           "distance_meters": 184,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 16,
+           "duration_label": "16 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Take \u202bNursery Flyover\u202c\u200e to your destination in Block A",
+         "distance_meters": 493,
+         "distance_label": "0.3 mi",
+         "duration_seconds": 112,
+         "duration_label": "2 min",
+         "instructions": [
+          {
+           "summary": "Turn left",
+           "distance_meters": 21,
+           "distance_label": "69 ft",
+           "duration_seconds": 7,
+           "duration_label": "7 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Tigerline Golf toward \u202bNursery Flyover\u202c\u200e",
+           "distance_meters": 187,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 35,
+           "duration_label": "35 sec",
+           "notes": [
+            "Pass by SAFA AUTOMOBILE (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "At AB Cars, continue onto \u202bNursery Flyover\u202c\u200e",
+           "distance_meters": 192,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 39,
+           "duration_label": "39 sec",
+           "notes": [
+            "Pass by Ultramed Consultant Clinics (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right",
+           "distance_meters": 93,
+           "distance_label": "305 ft",
+           "duration_seconds": 31,
+           "duration_label": "31 sec",
+           "notes": [
+            "Destination will be on the left"
+           ],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "route_name": "Shahra-e-Faisal",
+       "distance_meters": 7791,
+       "distance_label": "4.8 miles",
+       "duration_seconds": 857,
+       "duration_label": "14 min",
+       "min_duration_seconds": 770,
+       "max_duration_seconds": 1247,
+       "highlights": [
+        "Some traffic, as usual"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "79": 27,
+        "154": 35,
+        "198": 48,
+        "235": 59,
+        "320": 77,
+        "353": 83,
+        "383": 87,
+        "438": 94,
+        "533": 105,
+        "620": 117,
+        "682": 137,
+        "693": 143,
+        "707": 152,
+        "809": 173,
+        "981": 193,
+        "1066": 204,
+        "1150": 222,
+        "1171": 243,
+        "1216": 249,
+        "1238": 291,
+        "1263": 294,
+        "1571": 324,
+        "1619": 327,
+        "1967": 355,
+        "2239": 386,
+        "2400": 406,
+        "2417": 408,
+        "2978": 453,
+        "3058": 459,
+        "3085": 461,
+        "3223": 474,
+        "3424": 493,
+        "3559": 507,
+        "3792": 523,
+        "4149": 549,
+        "4164": 550,
+        "4179": 552,
+        "4222": 555,
+        "4323": 563,
+        "4424": 572,
+        "4490": 578,
+        "4694": 595,
+        "4787": 602,
+        "4923": 612,
+        "5048": 622,
+        "5440": 651,
+        "5582": 662,
+        "5643": 666,
+        "5776": 675,
+        "5869": 682,
+        "5960": 689,
+        "6029": 694,
+        "6162": 704,
+        "6322": 718,
+        "6346": 720,
+        "6582": 749,
+        "6779": 770,
+        "6849": 777,
+        "6879": 780,
+        "6911": 783,
+        "7117": 800,
+        "7156": 803,
+        "7301": 815,
+        "7322": 824,
+        "7372": 836,
+        "7447": 848,
+        "7509": 869,
+        "7573": 889,
+        "7702": 933,
+        "7723": 942,
+        "7778": 955,
+        "7792": 961
+       },
+       "notes": [],
+       "departure_timestamp": 1792768198,
+       "departure_datetime_utc": "2026-10-23T15:09:58.000Z",
+       "arrival_timestamp": 1792769055,
+       "arrival_datetime_utc": "2026-10-23T15:24:15.000Z",
+       "route_parts": [
+        {
+         "summary": "Take Tipu Sultan Rd and Karsaz Service Rd W to Karsaz Rd in KDA Scheme 1",
+         "distance_meters": 1169,
+         "distance_label": "0.7 mi",
+         "duration_seconds": 183,
+         "duration_label": "3 min",
+         "instructions": [
+          {
+           "summary": "Head toward Tipu Sultan Rd",
+           "distance_meters": 79,
+           "distance_label": "259 ft",
+           "duration_seconds": 14,
+           "duration_label": "14 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Varitron (Smith & Nephew) onto Tipu Sultan Rd",
+           "distance_meters": 601,
+           "distance_label": "0.4 mi",
+           "duration_seconds": 96,
+           "duration_label": "2 min",
+           "notes": [
+            "Go through 1 roundabout",
+            "Pass by Eocean Karsaz office (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Traffic cam toward Karsaz Service Rd W",
+           "distance_meters": 127,
+           "distance_label": "417 ft",
+           "duration_seconds": 21,
+           "duration_label": "21 sec",
+           "notes": [
+            "Pass by NTS Karachi Office (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "At Bokhari Horticulture and Gardening Services, continue onto Karsaz Service Rd W",
+           "distance_meters": 341,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 48,
+           "duration_label": "48 sec",
+           "notes": [
+            "Pass by Flowers and trees (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Water cooler toward Karsaz Rd",
+           "distance_meters": 21,
+           "distance_label": "69 ft",
+           "duration_seconds": 4,
+           "duration_label": "4 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on Karsaz Rd. Take Shahra-e-Faisal to Shahrah-e-Qaideen in Block 2. Exit from Shahra-e-Faisal",
+         "distance_meters": 5945,
+         "distance_label": "3.7 mi",
+         "duration_seconds": 546,
+         "duration_label": "9 min",
+         "instructions": [
+          {
+           "summary": "Turn left onto Karsaz Rd",
+           "distance_meters": 45,
+           "distance_label": "148 ft",
+           "duration_seconds": 6,
+           "duration_label": "6 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn",
+           "distance_meters": 1147,
+           "distance_label": "0.7 mi",
+           "duration_seconds": 128,
+           "duration_label": "2 min",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp onto Shahra-e-Faisal",
+           "distance_meters": 3983,
+           "distance_label": "2.5 mi",
+           "duration_seconds": 331,
+           "duration_label": "6 min",
+           "notes": [
+            "Pass by Shahrah faisal darwesh colony ziyan genral store (on the left in 0.3 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit toward Shahrah-e-Qaideen",
+           "distance_meters": 770,
+           "distance_label": "0.5 mi",
+           "duration_seconds": 81,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Prestige Workspaces (on the right)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on Shahrah-e-Qaideen to your destination in Block A",
+         "distance_meters": 677,
+         "distance_label": "0.4 mi",
+         "duration_seconds": 128,
+         "duration_label": "2 min",
+         "instructions": [
+          {
+           "summary": "Continue onto Shahrah-e-Qaideen",
+           "distance_meters": 184,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 16,
+           "duration_label": "16 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left",
+           "distance_meters": 21,
+           "distance_label": "69 ft",
+           "duration_seconds": 7,
+           "duration_label": "7 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Tigerline Golf toward \u202bNursery Flyover\u202c\u200e",
+           "distance_meters": 187,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 35,
+           "duration_label": "35 sec",
+           "notes": [
+            "Pass by SAFA AUTOMOBILE (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "At AB Cars, continue onto \u202bNursery Flyover\u202c\u200e",
+           "distance_meters": 192,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 39,
+           "duration_label": "39 sec",
+           "notes": [
+            "Pass by Ultramed Consultant Clinics (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right",
+           "distance_meters": 93,
+           "distance_label": "305 ft",
+           "duration_seconds": 31,
+           "duration_label": "31 sec",
+           "notes": [
+            "Destination will be on the left"
+           ],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "route_name": "Tipu Sultan Rd, Main Korangi Rd and Shahra-e-Faisal",
+       "distance_meters": 7290,
+       "distance_label": "4.5 miles",
+       "duration_seconds": 899,
+       "duration_label": "15 min",
+       "min_duration_seconds": 790,
+       "max_duration_seconds": 1463,
+       "highlights": [
+        "Some traffic, as usual"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "79": 24,
+        "88": 27,
+        "137": 32,
+        "229": 43,
+        "244": 46,
+        "253": 47,
+        "258": 50,
+        "465": 74,
+        "481": 81,
+        "495": 84,
+        "501": 88,
+        "597": 105,
+        "735": 121,
+        "759": 125,
+        "805": 130,
+        "897": 139,
+        "964": 145,
+        "1001": 149,
+        "1108": 159,
+        "1201": 173,
+        "1211": 183,
+        "1234": 237,
+        "1257": 251,
+        "1291": 258,
+        "1307": 261,
+        "1398": 282,
+        "1466": 298,
+        "1663": 326,
+        "1709": 332,
+        "1828": 353,
+        "1900": 412,
+        "1939": 432,
+        "1952": 436,
+        "2049": 450,
+        "2253": 467,
+        "2346": 474,
+        "2482": 484,
+        "2607": 494,
+        "2999": 524,
+        "3141": 534,
+        "3202": 538,
+        "3335": 548,
+        "3428": 555,
+        "3518": 562,
+        "3588": 567,
+        "3721": 577,
+        "3881": 590,
+        "3905": 593,
+        "3947": 596,
+        "4011": 602,
+        "4214": 619,
+        "4419": 636,
+        "4533": 647,
+        "4619": 654,
+        "4632": 655,
+        "4754": 665,
+        "4916": 683,
+        "5053": 697,
+        "5099": 702,
+        "5235": 715,
+        "5414": 733,
+        "5453": 743,
+        "5468": 766,
+        "5526": 774,
+        "5626": 785,
+        "5669": 789,
+        "5791": 801,
+        "5909": 811,
+        "6055": 825,
+        "6073": 827,
+        "6089": 828,
+        "6112": 830,
+        "6128": 832,
+        "6154": 835,
+        "6176": 837,
+        "6447": 873,
+        "6678": 896,
+        "6780": 906,
+        "6940": 920,
+        "6985": 925,
+        "7036": 930,
+        "7185": 948,
+        "7196": 959,
+        "7217": 968,
+        "7272": 981,
+        "7288": 987
+       },
+       "notes": [],
+       "departure_timestamp": 1792768198,
+       "departure_datetime_utc": "2026-10-23T15:09:58.000Z",
+       "arrival_timestamp": 1792769097,
+       "arrival_datetime_utc": "2026-10-23T15:24:57.000Z",
+       "route_parts": [
+        {
+         "summary": null,
+         "distance_meters": 79,
+         "distance_label": "259 ft",
+         "duration_seconds": 14,
+         "duration_label": "14 sec",
+         "instructions": [
+          {
+           "summary": "Head toward Tipu Sultan Rd",
+           "distance_meters": 79,
+           "distance_label": "259 ft",
+           "duration_seconds": 14,
+           "duration_label": "14 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on Tipu Sultan Rd to your destination. Exit from Shahra-e-Faisal",
+         "distance_meters": 7107,
+         "distance_label": "4.4 mi",
+         "duration_seconds": 848,
+         "duration_label": "14 min",
+         "instructions": [
+          {
+           "summary": "Turn right at Varitron (Smith & Nephew) onto Tipu Sultan Rd",
+           "distance_meters": 1830,
+           "distance_label": "1.1 mi",
+           "duration_seconds": 332,
+           "duration_label": "6 min",
+           "notes": [
+            "Go through 2 roundabouts",
+            "Pass by KoderLabs (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Continue straight past Matrix Trackers Pvt Ltd onto \u202bShaheed-e-Millat Road\u202c\u200e",
+           "distance_meters": 142,
+           "distance_label": "466 ft",
+           "duration_seconds": 27,
+           "duration_label": "27 sec",
+           "notes": [
+            "Pass by the bridge (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Merge onto Shahra-e-Faisal",
+           "distance_meters": 2705,
+           "distance_label": "1.7 mi",
+           "duration_seconds": 238,
+           "duration_label": "4 min",
+           "notes": [
+            "Pass by The Mr Auto Cars (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit toward Main Korangi Rd",
+           "distance_meters": 299,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 33,
+           "duration_label": "33 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp to Main Korangi Rd",
+           "distance_meters": 400,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 42,
+           "duration_label": "42 sec",
+           "notes": [
+            "Pass by NICL Bldg (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn at PSO Petrol Pump \u067e\u06cc \u0627\u06cc\u0633 \u0627\u0648 \u067e\u0679\u0631\u0648\u0644 \u067e\u0645\u067e",
+           "distance_meters": 337,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 41,
+           "duration_label": "41 sec",
+           "notes": [
+            "Pass by EasyCuisine (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Keep right to continue on FTC Flyover",
+           "distance_meters": 321,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 28,
+           "duration_label": "28 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the ramp onto Shahra-e-Faisal",
+           "distance_meters": 924,
+           "distance_label": "0.6 mi",
+           "duration_seconds": 89,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Peoples Law Firm (on the right in 0.5 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit",
+           "distance_meters": 149,
+           "distance_label": "489 ft",
+           "duration_seconds": 18,
+           "duration_label": "18 sec",
+           "notes": [],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": null,
+         "distance_meters": 104,
+         "distance_label": "341 ft",
+         "duration_seconds": 36,
+         "duration_label": "36 sec",
+         "instructions": [
+          {
+           "summary": "Turn left at Masjid Abdul Rehman",
+           "distance_meters": 104,
+           "distance_label": "341 ft",
+           "duration_seconds": 36,
+           "duration_label": "36 sec",
+           "notes": [
+            "Destination will be on the left"
+           ],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "origin": {
+      "latitude": 24.8795,
+      "longitude": 67.0865
+     },
+     "destination": {
+      "latitude": 24.8603,
+      "longitude": 67.0578
+     },
+     "directions_link": "https://www.google.com/maps/dir/24.8795,67.0865/24.8603,67.0578/data=!4m6!4m5!1m1!4e1!1m1!4e1!3e0"
+    }
+   }
+  },
+  {
+   "name": "University Rd: Hasan Sq -> NIPA",
+   "http": 200,
+   "body": {
+    "status": "OK",
+    "request_id": "0e36eeb7-2622-457e-a845-d77b7406de42",
+    "data": {
+     "best_routes": [
+      {
+       "route_name": "Ansari Saab Rd",
+       "distance_meters": 3939,
+       "distance_label": "2.4 miles",
+       "duration_seconds": 929,
+       "duration_label": "15 min",
+       "min_duration_seconds": 852,
+       "max_duration_seconds": 1117,
+       "highlights": [
+        "Fastest route now due to traffic conditions"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "55": 26,
+        "114": 53,
+        "130": 55,
+        "142": 59,
+        "159": 62,
+        "176": 64,
+        "196": 67,
+        "278": 91,
+        "348": 117,
+        "417": 144,
+        "485": 162,
+        "504": 169,
+        "531": 175,
+        "554": 181,
+        "589": 191,
+        "608": 196,
+        "650": 212,
+        "653": 214,
+        "696": 227,
+        "704": 236,
+        "732": 244,
+        "839": 258,
+        "945": 284,
+        "1042": 306,
+        "1131": 323,
+        "1179": 333,
+        "1392": 383,
+        "1489": 416,
+        "1514": 425,
+        "1569": 435,
+        "1621": 443,
+        "1648": 448,
+        "1680": 453,
+        "1749": 470,
+        "1818": 483,
+        "1851": 489,
+        "1884": 496,
+        "1921": 506,
+        "1953": 515,
+        "1991": 522,
+        "2023": 529,
+        "2092": 565,
+        "2162": 599,
+        "2179": 606,
+        "2434": 654,
+        "2591": 699,
+        "2599": 704,
+        "2624": 712,
+        "2653": 719,
+        "2766": 756,
+        "2776": 760,
+        "2786": 763,
+        "2920": 796,
+        "2981": 812,
+        "3040": 825,
+        "3059": 830,
+        "3129": 842,
+        "3188": 851,
+        "3294": 888,
+        "3311": 895,
+        "3572": 921,
+        "3646": 928,
+        "3667": 930,
+        "3681": 931,
+        "3701": 933,
+        "3720": 935,
+        "3742": 938,
+        "3762": 939,
+        "3769": 940,
+        "3794": 943,
+        "3808": 944,
+        "3869": 949,
+        "3939": 958
+       },
+       "notes": [],
+       "departure_timestamp": 1792768199,
+       "departure_datetime_utc": "2026-10-23T15:09:59.000Z",
+       "arrival_timestamp": 1792769128,
+       "arrival_datetime_utc": "2026-10-23T15:25:28.000Z",
+       "route_parts": [
+        {
+         "summary": "Take Ansari Saab Rd, Haji Bashir Ahmed Ghazi Abadi Rd, Ahmed Pasha Rd and \u202b\u0633\u0639\u06cc\u062f \u0627\u062d\u0645\u062f \u0634\u06c1\u06cc\u062f \u0631\u0648\u0688\u202c\u200e to NIPA Flyover/Rashid Minhas Rd in Block 10",
+         "distance_meters": 3306,
+         "distance_label": "2.1 mi",
+         "duration_seconds": 860,
+         "duration_label": "14 min",
+         "instructions": [
+          {
+           "summary": "Head toward Rae Ave",
+           "distance_meters": 114,
+           "distance_label": "374 ft",
+           "duration_seconds": 42,
+           "duration_label": "42 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Hot n Roll Bait Ul Mukkaram onto Rae Ave",
+           "distance_meters": 16,
+           "distance_label": "52 ft",
+           "duration_seconds": 14,
+           "duration_label": "14 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Make a U-turn at Shoeggers",
+           "distance_meters": 218,
+           "distance_label": "0.1 mi",
+           "duration_seconds": 76,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by SQ International (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Digital Marketer Mart",
+           "distance_meters": 348,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 130,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Ghazal Beauty Parlor (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Fillet n Frizzle",
+           "distance_meters": 36,
+           "distance_label": "118 ft",
+           "duration_seconds": 14,
+           "duration_label": "14 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Optimum Engineering Services (OES)",
+           "distance_meters": 660,
+           "distance_label": "0.4 mi",
+           "duration_seconds": 139,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by highdesirey shopping (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Aitchison Model School onto KE DNA Rd",
+           "distance_meters": 97,
+           "distance_label": "318 ft",
+           "duration_seconds": 23,
+           "duration_label": "23 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right onto Ansari Saab Rd",
+           "distance_meters": 672,
+           "distance_label": "0.4 mi",
+           "duration_seconds": 144,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Bilal Hijama Clinic - Hijama Center in Karachi (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Masjid-al-Quds \u0645\u0633\u062c\u062f \u0627\u0644\u0642\u062f\u0633 onto Haji Bashir Ahmed Ghazi Abadi Rd",
+           "distance_meters": 17,
+           "distance_label": "56 ft",
+           "duration_seconds": 4,
+           "duration_label": "4 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left to stay on Haji Bashir Ahmed Ghazi Abadi Rd",
+           "distance_meters": 411,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 84,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by the playground (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at \u0646\u06cc\u0648 \u06a9\u0648\u0626\u0679\u06c1 \u06a9\u06cc\u0641\u06d2 \u0646\u0635\u06cc\u0631 \u06c1\u0648\u0679\u0644 onto Ahmed Pasha Rd",
+           "distance_meters": 327,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 83,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by HostHub Guest House Gulshan iqbal - Double Room (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Adv. Iftekhar Ahmed \u2077.Block-10, Gulshan-e-Iqbal. onto \u202b\u0633\u0639\u06cc\u062f \u0627\u062d\u0645\u062f \u0634\u06c1\u06cc\u062f \u0631\u0648\u0688\u202c\u200e",
+           "distance_meters": 390,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 107,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Dastyab Solution (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on NIPA Flyover/Rashid Minhas Rd to your destination",
+         "distance_meters": 633,
+         "distance_label": "0.4 mi",
+         "duration_seconds": 69,
+         "duration_label": "1 min",
+         "instructions": [
+          {
+           "summary": "Turn left at Ciggrate Gutka Stall onto NIPA Flyover/Rashid Minhas Rd",
+           "distance_meters": 370,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 38,
+           "duration_label": "38 sec",
+           "notes": [
+            "Pass by United Sanitary (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit",
+           "distance_meters": 263,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 31,
+           "duration_label": "31 sec",
+           "notes": [
+            "Pass by Sindbad's Wonderland Amusement Park (on the left)",
+            "Destination will be on the right"
+           ],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "route_name": "Ansari Saab Rd and Haji Bashir Ahmed Ghazi Abadi Rd",
+       "distance_meters": 3900,
+       "distance_label": "2.4 miles",
+       "duration_seconds": 881,
+       "duration_label": "15 min",
+       "min_duration_seconds": 795,
+       "max_duration_seconds": 1175,
+       "highlights": [
+        "Some traffic, as usual"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "55": 26,
+        "114": 53,
+        "130": 55,
+        "173": 62,
+        "231": 75,
+        "243": 85,
+        "306": 111,
+        "312": 113,
+        "339": 121,
+        "387": 138,
+        "416": 145,
+        "443": 154,
+        "526": 177,
+        "559": 189,
+        "590": 200,
+        "598": 213,
+        "730": 241,
+        "776": 253,
+        "782": 254,
+        "833": 264,
+        "864": 272,
+        "900": 279,
+        "948": 289,
+        "1039": 315,
+        "1075": 328,
+        "1134": 342,
+        "1162": 349,
+        "1215": 368,
+        "1248": 377,
+        "1285": 388,
+        "1335": 400,
+        "1352": 405,
+        "1423": 434,
+        "1451": 447,
+        "1476": 456,
+        "1531": 466,
+        "1583": 474,
+        "1610": 479,
+        "1642": 484,
+        "1711": 501,
+        "1780": 514,
+        "1813": 520,
+        "1846": 527,
+        "1883": 537,
+        "1915": 546,
+        "1953": 553,
+        "1985": 560,
+        "2054": 595,
+        "2124": 630,
+        "2141": 636,
+        "2396": 685,
+        "2553": 730,
+        "2561": 735,
+        "2586": 742,
+        "2615": 749,
+        "2728": 786,
+        "2738": 790,
+        "2748": 794,
+        "2882": 827,
+        "2943": 843,
+        "3002": 856,
+        "3021": 860,
+        "3091": 873,
+        "3150": 882,
+        "3256": 919,
+        "3273": 926,
+        "3534": 952,
+        "3608": 959,
+        "3629": 961,
+        "3643": 962,
+        "3663": 964,
+        "3682": 966,
+        "3704": 968,
+        "3724": 970,
+        "3731": 971,
+        "3756": 973,
+        "3770": 975,
+        "3831": 980,
+        "3900": 989
+       },
+       "notes": [],
+       "departure_timestamp": 1792768199,
+       "departure_datetime_utc": "2026-10-23T15:09:59.000Z",
+       "arrival_timestamp": 1792769080,
+       "arrival_datetime_utc": "2026-10-23T15:24:40.000Z",
+       "route_parts": [
+        {
+         "summary": "Take Mehmood Ave, Faqeer Muhammad Rd, Ansari Saab Rd/Gaziani Rd, Haji Bashir Ahmed Ghazi Abadi Rd, ... and \u202b\u0633\u0639\u06cc\u062f \u0627\u062d\u0645\u062f \u0634\u06c1\u06cc\u062f \u0631\u0648\u0688\u202c\u200e to NIPA Flyover/Rashid Minhas Rd in Block 10",
+         "distance_meters": 3267,
+         "distance_label": "2.0 mi",
+         "duration_seconds": 814,
+         "duration_label": "14 min",
+         "instructions": [
+          {
+           "summary": "Head toward Rae Ave",
+           "distance_meters": 114,
+           "distance_label": "374 ft",
+           "duration_seconds": 42,
+           "duration_label": "42 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Hot n Roll Bait Ul Mukkaram onto Rae Ave",
+           "distance_meters": 117,
+           "distance_label": "384 ft",
+           "duration_seconds": 37,
+           "duration_label": "37 sec",
+           "notes": [
+            "Pass by 15 block (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Voice of Nation onto Mehmood Ave",
+           "distance_meters": 358,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 109,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Entire Apt Elegant 3BRs 3BAs near Natl Stadium - Three-Bedroom Apartment (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Bait ul Mukarram Meat Shop toward Faqeer Muhammad Rd",
+           "distance_meters": 140,
+           "distance_label": "459 ft",
+           "duration_seconds": 36,
+           "duration_label": "36 sec",
+           "notes": [
+            "Pass by ABA Enterprise (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at The Physio Healing Clinic onto Faqeer Muhammad Rd",
+           "distance_meters": 309,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 65,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Maha Sheikh makeup (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Warsi General Store\u06d4 \u0648\u0627\u0631\u062b\u06cc \u062c\u0646\u0631\u0644 \u0627\u0633\u0679\u0648\u0631 toward Ansari Saab Rd/Gaziani Rd",
+           "distance_meters": 36,
+           "distance_label": "118 ft",
+           "duration_seconds": 9,
+           "duration_label": "9 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Emaan Cool Point onto Ansari Saab Rd/Gaziani Rd",
+           "distance_meters": 348,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 87,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Al-Safia apartment (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Wakeel Enterprises onto KE DNA Rd",
+           "distance_meters": 28,
+           "distance_label": "92 ft",
+           "duration_seconds": 7,
+           "duration_label": "7 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left onto Ansari Saab Rd",
+           "distance_meters": 672,
+           "distance_label": "0.4 mi",
+           "duration_seconds": 144,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Bilal Hijama Clinic - Hijama Center in Karachi (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at Masjid-al-Quds \u0645\u0633\u062c\u062f \u0627\u0644\u0642\u062f\u0633 onto Haji Bashir Ahmed Ghazi Abadi Rd",
+           "distance_meters": 17,
+           "distance_label": "56 ft",
+           "duration_seconds": 4,
+           "duration_label": "4 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left to stay on Haji Bashir Ahmed Ghazi Abadi Rd",
+           "distance_meters": 411,
+           "distance_label": "0.3 mi",
+           "duration_seconds": 84,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by the playground (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at \u0646\u06cc\u0648 \u06a9\u0648\u0626\u0679\u06c1 \u06a9\u06cc\u0641\u06d2 \u0646\u0635\u06cc\u0631 \u06c1\u0648\u0679\u0644 onto Ahmed Pasha Rd",
+           "distance_meters": 327,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 83,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by HostHub Guest House Gulshan iqbal - Double Room (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Adv. Iftekhar Ahmed \u2077.Block-10, Gulshan-e-Iqbal. onto \u202b\u0633\u0639\u06cc\u062f \u0627\u062d\u0645\u062f \u0634\u06c1\u06cc\u062f \u0631\u0648\u0688\u202c\u200e",
+           "distance_meters": 390,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 107,
+           "duration_label": "2 min",
+           "notes": [
+            "Pass by Dastyab Solution (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Continue on NIPA Flyover/Rashid Minhas Rd to your destination",
+         "distance_meters": 633,
+         "distance_label": "0.4 mi",
+         "duration_seconds": 69,
+         "duration_label": "1 min",
+         "instructions": [
+          {
+           "summary": "Turn left at Ciggrate Gutka Stall onto NIPA Flyover/Rashid Minhas Rd",
+           "distance_meters": 370,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 38,
+           "duration_label": "38 sec",
+           "notes": [
+            "Pass by United Sanitary (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit",
+           "distance_meters": 263,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 31,
+           "duration_label": "31 sec",
+           "notes": [
+            "Pass by Sindbad's Wonderland Amusement Park (on the left)",
+            "Destination will be on the right"
+           ],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "route_name": "National Stadium Rd/Shaheed Sibghatullah Shah Pagara Rd and Rashid Minhas Rd",
+       "distance_meters": 7192,
+       "distance_label": "4.5 miles",
+       "duration_seconds": 871,
+       "duration_label": "15 min",
+       "min_duration_seconds": 1044,
+       "max_duration_seconds": 1780,
+       "highlights": [
+        "Lighter traffic than usual"
+       ],
+       "distance_timing_meters_seconds": {
+        "0": 0,
+        "230": 55,
+        "233": 59,
+        "393": 102,
+        "432": 110,
+        "540": 134,
+        "573": 141,
+        "746": 166,
+        "753": 167,
+        "838": 176,
+        "904": 184,
+        "924": 188,
+        "931": 189,
+        "1044": 202,
+        "1056": 203,
+        "1143": 212,
+        "1185": 221,
+        "1335": 234,
+        "1689": 263,
+        "1757": 269,
+        "1769": 270,
+        "2023": 290,
+        "2136": 298,
+        "2186": 302,
+        "2217": 304,
+        "2234": 305,
+        "2304": 309,
+        "2571": 352,
+        "2664": 360,
+        "2764": 370,
+        "2871": 380,
+        "3059": 402,
+        "3125": 419,
+        "3159": 432,
+        "3214": 460,
+        "3232": 473,
+        "3274": 497,
+        "3297": 507,
+        "3323": 521,
+        "3375": 543,
+        "3432": 576,
+        "3461": 609,
+        "3486": 621,
+        "3504": 625,
+        "3529": 631,
+        "3625": 645,
+        "3740": 660,
+        "3750": 662,
+        "3757": 663,
+        "4039": 698,
+        "4073": 702,
+        "4094": 705,
+        "4144": 710,
+        "4155": 711,
+        "4203": 716,
+        "4255": 722,
+        "4270": 724,
+        "4289": 728,
+        "4295": 730,
+        "4301": 731,
+        "4306": 732,
+        "4336": 739,
+        "4390": 748,
+        "4548": 776,
+        "4571": 785,
+        "4874": 838,
+        "4881": 839,
+        "4954": 871,
+        "5009": 885,
+        "5015": 887,
+        "5021": 888,
+        "5088": 901,
+        "5155": 911,
+        "5202": 919,
+        "5232": 926,
+        "5376": 946,
+        "5405": 950,
+        "5576": 969,
+        "5627": 974,
+        "5928": 1008,
+        "6021": 1018,
+        "6112": 1028,
+        "6182": 1036,
+        "6197": 1038,
+        "6311": 1052,
+        "6541": 1077,
+        "6551": 1078,
+        "6559": 1080,
+        "6819": 1105,
+        "6893": 1112,
+        "6914": 1114,
+        "6928": 1115,
+        "6948": 1117,
+        "6967": 1119,
+        "6989": 1122,
+        "7009": 1124,
+        "7016": 1124,
+        "7041": 1127,
+        "7055": 1128,
+        "7116": 1133,
+        "7191": 1142
+       },
+       "notes": [],
+       "departure_timestamp": 1792768199,
+       "departure_datetime_utc": "2026-10-23T15:09:59.000Z",
+       "arrival_timestamp": 1792769070,
+       "arrival_datetime_utc": "2026-10-23T15:24:30.000Z",
+       "route_parts": [
+        {
+         "summary": "Continue to National Stadium Colony",
+         "distance_meters": 1185,
+         "distance_label": "0.7 mi",
+         "duration_seconds": 220,
+         "duration_label": "4 min",
+         "instructions": [
+          {
+           "summary": "Head southeast",
+           "distance_meters": 393,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 98,
+           "duration_label": "2 min",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right at International Academy of Cortical Implantology Pakistan",
+           "distance_meters": 39,
+           "distance_label": "128 ft",
+           "duration_seconds": 12,
+           "duration_label": "12 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at Aku Undergraduate boys hostel 2",
+           "distance_meters": 108,
+           "distance_label": "354 ft",
+           "duration_seconds": 24,
+           "duration_label": "24 sec",
+           "notes": [
+            "Pass by Awan house (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn left at THE HILLS",
+           "distance_meters": 33,
+           "distance_label": "108 ft",
+           "duration_seconds": 6,
+           "duration_label": "6 sec",
+           "notes": [],
+           "photo_url": null
+          },
+          {
+           "summary": "Turn right",
+           "distance_meters": 612,
+           "distance_label": "0.4 mi",
+           "duration_seconds": 80,
+           "duration_label": "1 min",
+           "notes": [
+            "Pass by Dietarian (on the left)"
+           ],
+           "photo_url": null
+          }
+         ]
+        },
+        {
+         "summary": "Follow National Stadium Rd/Shaheed Sibghatullah Shah Pagara Rd and Rashid Minhas Rd to your destination in Block 10",
+         "distance_meters": 6007,
+         "distance_label": "3.7 mi",
+         "duration_seconds": 652,
+         "duration_label": "11 min",
+         "instructions": [
+          {
+           "summary": "Turn left onto National Stadium Rd/Shaheed Sibghatullah Shah Pagara Rd",
+           "distance_meters": 3386,
+           "distance_label": "2.1 mi",
+           "duration_seconds": 360,
+           "duration_label": "6 min",
+           "notes": [
+            "Pass by De Graphics Global (on the right in 0.3 mi)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "At mehmood linkers PET Strap PP strap Manufacturer, continue onto \u202bAskari Flyover\u202c\u200e",
+           "distance_meters": 303,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 41,
+           "duration_label": "41 sec",
+           "notes": [
+            "Pass by thewhitewoodwedding (on the left)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Merge onto Rashid Minhas Rd",
+           "distance_meters": 2055,
+           "distance_label": "1.3 mi",
+           "duration_seconds": 220,
+           "duration_label": "4 min",
+           "notes": [
+            "Pass by Furniture Shop.PK (on the right)"
+           ],
+           "photo_url": null
+          },
+          {
+           "summary": "Take the exit",
+           "distance_meters": 263,
+           "distance_label": "0.2 mi",
+           "duration_seconds": 31,
+           "duration_label": "31 sec",
+           "notes": [
+            "Pass by Sindbad's Wonderland Amusement Park (on the left)",
+            "Destination will be on the right"
+           ],
+           "photo_url": null
+          }
+         ]
+        }
+       ]
+      }
+     ],
+     "origin": {
+      "latitude": 24.901699999999998,
+      "longitude": 67.079
+     },
+     "destination": {
+      "latitude": 24.917199999999998,
+      "longitude": 67.0975
+     },
+     "directions_link": "https://www.google.com/maps/dir/24.9017,67.079/24.9172,67.0975/data=!4m6!4m5!1m1!4e1!1m1!4e1!3e0"
+    }
+   }
+  }
+ ]
+}

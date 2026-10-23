@@ -110,6 +110,7 @@ from ..seatallocation import (
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
 from .. import audit
+from .. import auto_assign
 from ..fleet_import import import_buses, import_drivers, parse_csv
 
 
@@ -164,7 +165,7 @@ class BusViewSet(viewsets.ModelViewSet):
 
 
 class DriverViewSet(viewsets.ModelViewSet):
-    queryset = Driver.objects.order_by("name", "id")
+    queryset = Driver.objects.select_related("user").order_by("name", "id")  # login_username, without a query per driver
     serializer_class = DriverSerializer
     permission_classes = [IsAdmin]  # keeps admin-only for all other actions
 
@@ -209,10 +210,31 @@ class RouteAssignmentViewSet(viewsets.ModelViewSet):
         "bus",
         "driver",
         "semester"
-    )
+    ).defer("route__geometry")  # never returned (RouteSerializer); ~4 KB a row from Supabase
     serializer_class = RouteAssignmentSerializer
     permission_classes = [IsAdmin] # Only Admin full access
- 
+
+    @action(detail=False, methods=["get"], url_path="auto-plan")
+    def auto_plan(self, request):
+        """What one-click assignment would do this semester, without saving anything."""
+        try:
+            return Response(auto_assign.plan())
+        except auto_assign.AutoAssignError as exc:
+            return Response({"detail": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=["post"], url_path="auto-assign")
+    def auto_assign(self, request):
+        """Save the proposals the admin kept: [{route_id, bus_id, driver_id}, ...]."""
+        try:
+            saved = auto_assign.apply(request.data.get("assignments") or [], RouteAssignmentSerializer)
+        except auto_assign.AutoAssignError as exc:
+            detail = exc.args[0]
+            return Response(
+                {"detail": detail} if isinstance(detail, str) else {"detail": "Some assignments could not be saved.", "rows": detail},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(self.get_serializer(saved, many=True).data, status=status.HTTP_201_CREATED)
+
 
 
 class MaintenanceScheduleViewSet(viewsets.ModelViewSet):

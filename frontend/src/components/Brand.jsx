@@ -1,5 +1,6 @@
 // Brand marks for dark/gradient surfaces: original-colour mark (background
 // removed) with a soft glow so the navy stroke stays visible; white wordmark.
+import { Link } from "react-router-dom";
 
 export function BrandMark({ size = 52, style }) {
   return (
@@ -28,15 +29,16 @@ export function BrandWordmark({ height = 22, style }) {
   );
 }
 
-// Mark + wordmark, with an optional caption under the wordmark (auth pages).
+// Mark + wordmark, with an optional caption under the wordmark (auth pages). It links
+// back to the main page.
 export function BrandLockup({ tile = 48, wordHeight = 22, caption }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+    <Link to="/" style={{ display: "flex", alignItems: "center", gap: 14, textDecoration: "none", width: "fit-content" }}>
       <BrandMark size={tile} />
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         <BrandWordmark height={wordHeight} />
         {caption && <h1 className="fc-brand-caption">{caption}</h1>}
       </div>
-    </div>
+    </Link>
   );
 }

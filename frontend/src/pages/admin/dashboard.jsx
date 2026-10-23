@@ -4,12 +4,16 @@ import { lazy, Suspense } from "react";
 import { useNavigate } from "react-router-dom";
 import PageShell from "../../components/PageShell";
 import { Spinner } from "../../components/ui";
-import { getActivityLogs, getAdminLiveFleet, getDashboard, getRoutesMap } from "../../services/transportService";
+import { getActivityLogs, getAdminLiveFleet, watchDashboard, watchRoutesMap } from "../../services/transportService";
+import { cacheRestored, FLEET_SNAPSHOT_KEY, queryClient } from "../../services/queryClient";
 import { can, isSuperAdmin } from "../../utils/permissions";
-import { colors, fonts } from "../../theme";
+import { btn, colors, fonts } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
-import LiveFleetMap from "../../components/maps/LiveFleetMap";
+import { GOOGLE_MAPS_API_KEY, loadGoogleMaps } from "../../components/maps/googleMaps";
 const DashboardCharts = lazy(() => import("../../components/DashboardCharts"));
+// Loaded on demand, so the stats show before either map library has downloaded.
+const LiveFleetMap = lazy(() => import("../../components/maps/LiveFleetMap"));
+const TrafficMap = lazy(() => import("../../components/maps/TrafficMap"));
 
 // SVG icon components
 const Icons = {
@@ -145,6 +149,21 @@ function StatCard({ label, value, icon, path, variant }) {
   );
 }
 
+// "fleet" or "traffic", remembered per browser. Traffic needs a Google Maps key.
+const FLEET_VIEW_KEY = "admin-dashboard-fleet-view";
+function savedFleetView() {
+  try {
+    return GOOGLE_MAPS_API_KEY && localStorage.getItem(FLEET_VIEW_KEY) === "traffic" ? "traffic" : "fleet";
+  } catch {
+    return "fleet";
+  }
+}
+
+function lastSeenFleet(snapshot) {
+  const buses = (snapshot.buses || []).map((bus) => (bus.latitude == null ? bus : { ...bus, status: "stale" }));
+  return { ...snapshot, buses, saved: true };
+}
+
 function AdminDashboard() {
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
@@ -152,20 +171,31 @@ function AdminDashboard() {
   const [fleetRoutes, setFleetRoutes] = useState([]);
   const [fleetError, setFleetError] = useState("");
   const [fleetUpdatedAt, setFleetUpdatedAt] = useState(null);
+  const [fleetView, setFleetView] = useState(savedFleetView);
+  // Each map stays mounted once opened: switching back is instant, and every new
+  // Google map is a billed map load.
+  const [openedViews, setOpenedViews] = useState(() => [fleetView]);
   const isMobile = useBreakpoint(768);
 
   useEffect(() => {
-    getDashboard()
-      .then((res) => setData(res.data))
-      .catch(() => setError("Failed to load console data."));
+    // Saved copies show at once and are swapped for fresh data when it arrives.
+    let shown = false;
+    watchDashboard((next) => { shown = true; setData(next); })
+      .catch(() => { if (!shown) setError("Failed to load console data."); });
   }, []);
 
   useEffect(() => {
     if (!can("fleet")) return undefined;
     let cancelled = false;
-    getRoutesMap()
-      .then((response) => { if (!cancelled) setFleetRoutes(response.data?.routes || []); })
-      .catch(() => {});
+    watchRoutesMap((next) => { if (!cancelled) setFleetRoutes(next?.routes || []); }).catch(() => {});
+    // The last fleet seen in this browser, until the first poll answers. Its positions
+    // are old by definition, so every bus on it is shown as stale, never as live.
+    cacheRestored.then(() => {
+      const saved = queryClient.getQueryState(FLEET_SNAPSHOT_KEY);
+      if (cancelled || !saved?.data) return;
+      setFleetData((current) => current ?? lastSeenFleet(saved.data));
+      setFleetUpdatedAt((current) => current ?? new Date(saved.dataUpdatedAt));
+    });
     return () => { cancelled = true; };
   }, []);
 
@@ -184,6 +214,7 @@ function AdminDashboard() {
           setFleetData(response.data);
           setFleetUpdatedAt(new Date());
           setFleetError("");
+          queryClient.setQueryData(FLEET_SNAPSHOT_KEY, response.data);
         }
       } catch {
         if (!cancelled) setFleetError("Live fleet data is temporarily unavailable.");
@@ -220,6 +251,18 @@ function AdminDashboard() {
       <Spinner />
     </PageShell>
   );
+
+  const chooseFleetView = (view) => {
+    setFleetView(view);
+    setOpenedViews((opened) => (opened.includes(view) ? opened : [...opened, view]));
+    try { localStorage.setItem(FLEET_VIEW_KEY, view); } catch { /* storage is a convenience only */ }
+  };
+
+  const warmUpTraffic = () => {
+    import("../../components/maps/TrafficMap");
+    loadGoogleMaps().catch(() => {});
+  };
+  const mapHeight = isMobile ? 320 : 420;
 
   const { stats } = data;
   const fullName = localStorage.getItem("full_name") || localStorage.getItem("username") || "Admin";
@@ -273,20 +316,52 @@ function AdminDashboard() {
                 <h3 style={{ ...styles.sectionHeading, margin: 0 }}>Live Fleet</h3>
                 <div style={styles.fleetSummary}>
                   {fleetData ? `${fleetData.buses?.length || 0} active buses · ${fleetData.buses?.filter((bus) => bus.status === "live").length || 0} live` : "Loading active bus locations..."}
-                  {fleetUpdatedAt && ` · Updated ${fleetUpdatedAt.toLocaleTimeString()}`}
+                  {fleetUpdatedAt && (fleetData?.saved
+                    ? ` · Saved ${fleetUpdatedAt.toLocaleTimeString()}, refreshing…`
+                    : ` · Updated ${fleetUpdatedAt.toLocaleTimeString()}`)}
                 </div>
               </div>
-              {fleetError && <span style={{ color: colors.warningText, fontSize: 12 }}>{fleetError}</span>}
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                {fleetError && <span style={{ color: colors.warningText, fontSize: 12 }}>{fleetError}</span>}
+                {GOOGLE_MAPS_API_KEY && (
+                  <div role="group" aria-label="Map view" style={{ display: "flex", gap: 4 }}>
+                    {[["fleet", "Fleet"], ["traffic", "Live traffic"]].map(([key, label]) => (
+                      <button
+                        key={key} type="button" aria-pressed={fleetView === key} onClick={() => chooseFleetView(key)}
+                        // Start fetching Google's script on hover or focus; it is free until a map is made.
+                        onPointerEnter={key === "traffic" ? warmUpTraffic : undefined}
+                        onFocus={key === "traffic" ? warmUpTraffic : undefined}
+                        style={{ ...(fleetView === key ? btn.primary : btn.ghost), ...styles.viewButton }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            {fleetData ? (
-              fleetData.buses?.length ? (
-                <LiveFleetMap routes={fleetRoutes} buses={fleetData.buses} height={isMobile ? 320 : 420} />
-              ) : (
-                <div style={{ padding: "32px 0", textAlign: "center", color: colors.textMuted, fontSize: 13 }}>No active buses are configured.</div>
-              )
-            ) : fleetError ? (
-              <div style={{ padding: "32px 0", textAlign: "center", color: colors.warningText, fontSize: 13 }}>{fleetError}</div>
-            ) : <Spinner />}
+            {openedViews.includes("traffic") && (
+              <div style={{ display: fleetView === "traffic" ? "block" : "none" }}>
+                <Suspense fallback={<Spinner />}>
+                  <TrafficMap routes={fleetRoutes} buses={fleetData?.buses || []} height={mapHeight} />
+                </Suspense>
+              </div>
+            )}
+            {openedViews.includes("fleet") && (
+              <div style={{ display: fleetView === "fleet" ? "block" : "none" }}>
+                {fleetData ? (
+                  fleetData.buses?.length ? (
+                    <Suspense fallback={<Spinner />}>
+                      <LiveFleetMap routes={fleetRoutes} buses={fleetData.buses} height={mapHeight} />
+                    </Suspense>
+                  ) : (
+                    <div style={{ padding: "32px 0", textAlign: "center", color: colors.textMuted, fontSize: 13 }}>No active buses are configured.</div>
+                  )
+                ) : fleetError ? (
+                  <div style={{ padding: "32px 0", textAlign: "center", color: colors.warningText, fontSize: 13 }}>{fleetError}</div>
+                ) : <Spinner />}
+              </div>
+            )}
           </div>
           {isSuperAdmin() && <RecentAdminActivity />}
         </div>
@@ -402,6 +477,7 @@ const styles = {
     gap: "12px", flexWrap: "wrap", marginBottom: "12px",
   },
   fleetSummary: { marginTop: "4px", fontSize: "12px", color: colors.textSecondary },
+  viewButton: { padding: "6px 12px", fontSize: "12px" },
   grid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fill, minmax(160px, 1fr))",

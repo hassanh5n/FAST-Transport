@@ -6,6 +6,12 @@
 const RANK = { none: 0, view: 1, manage: 2 };
 
 // Save the /api/user/ response after login (or a refresh).
+// Where a signed-in user belongs, based on what login stored.
+export function homePath() {
+  if (localStorage.getItem("is_staff") === "true") return "/admin/dashboard";
+  return localStorage.getItem("role") === "driver" ? "/driver/dashboard" : "/student/dashboard";
+}
+
 export function storeUserSession(user) {
   localStorage.setItem("role", user.role || (user.is_staff ? "staff" : "student"));
   localStorage.setItem("is_staff", user.is_staff ? "true" : "false");

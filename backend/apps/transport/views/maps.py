@@ -175,6 +175,23 @@ def _map_cache_key(prefix, value):
     return f"map:{prefix}:{digest}"
 
 
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def traffic_alerts(request):
+    """Accidents, closures and construction across Karachi, from one shared server-side
+    fetch (see traffic.py). Every user gets the same copy, so the provider is called
+    once per refresh period however many people have a map open."""
+    from .. import traffic
+
+    try:
+        data = traffic.snapshot()
+    except traffic.TrafficUnavailable as exc:
+        return Response({"detail": str(exc), "alerts": []}, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+    response = Response(data)
+    response["Cache-Control"] = "private, max-age=60"
+    return response
+
+
 @api_view(["POST"])
 @permission_classes([IsAdmin])
 def resolve_map_location(request):

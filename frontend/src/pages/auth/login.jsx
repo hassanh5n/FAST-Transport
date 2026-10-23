@@ -21,8 +21,8 @@ function Login() {
       const tokenRes = await getToken({ username, password });
       localStorage.setItem("access",  tokenRes.data.access);
       localStorage.setItem("refresh", tokenRes.data.refresh);
-      const userRes = await getUser();
-      storeUserSession(userRes.data);
+      // The login response carries the user; older servers need the extra request.
+      storeUserSession(tokenRes.data.user ?? (await getUser()).data);
       const home = { staff: "/admin/dashboard", driver: "/driver/dashboard" };
       navigate(home[localStorage.getItem("role")] || "/student/dashboard");
     } catch {

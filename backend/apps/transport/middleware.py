@@ -9,14 +9,14 @@ For every /api/ request made by a staff user this middleware:
 Students and anonymous requests pass straight through untouched.
 """
 from django.http import JsonResponse
-from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from . import audit
+from .authentication import SharedJWTAuthentication
 from .rbac import MODULES, SUPER, check_path_access
 
 API_PREFIX = "/api/"
 WRITE_METHODS = {"POST", "PUT", "PATCH", "DELETE"}
-_jwt = JWTAuthentication()
+_jwt = SharedJWTAuthentication()  # DRF reuses this lookup instead of repeating it
 
 
 def _resolve_user(request):
