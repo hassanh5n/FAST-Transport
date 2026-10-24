@@ -6,6 +6,7 @@ import { validateField } from "../../utils/validation";
 import { ErrorText } from "../../components/ui";
 
 import { BrandLockup } from "../../components/Brand";
+import PasswordInput from "../../components/PasswordInput";
 import { refineAuthStyles } from "../../styles/authRefine";
 function Signup() {
   const [step, setStep] = useState(1);
@@ -255,16 +256,15 @@ function Signup() {
                 <label style={styles.label}>
                   Password <span style={styles.req}>*</span>
                 </label>
-                <input
+                <PasswordInput
                   name="password"
-                  type="password"
                   placeholder="Min. 8 characters"
+                  autoComplete="new-password"
                   value={formData.password}
                   onChange={handleChange}
                   required
                   style={styles.input}
-                  onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-                  onBlur={(e) => Object.assign(e.target.style, styles.input)}
+                  focusStyle={styles.inputFocus}
                 />
                 {errors.password && <ErrorText>{errors.password}</ErrorText>}
               </div>

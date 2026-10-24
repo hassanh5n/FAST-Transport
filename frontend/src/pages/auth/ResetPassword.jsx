@@ -4,6 +4,7 @@ import { MeshGradient } from "@paper-design/shaders-react";
 import api from "../../services/api";
 
 import { BrandLockup } from "../../components/Brand";
+import PasswordInput from "../../components/PasswordInput";
 import { refineAuthStyles } from "../../styles/authRefine";
 function ResetPassword() {
   const location = useLocation();
@@ -127,24 +128,20 @@ function ResetPassword() {
                 {/* New password */}
                 <div style={styles.field}>
                   <label style={styles.label}>New Password</label>
-                  <input
-                    type="password" placeholder="Min. 8 characters"
+                  <PasswordInput
+                    placeholder="Min. 8 characters" autoComplete="new-password"
                     value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
-                    required style={styles.input}
-                    onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-                    onBlur={(e)  => Object.assign(e.target.style, styles.input)}
+                    required style={styles.input} focusStyle={styles.inputFocus}
                   />
                 </div>
 
                 {/* Confirm password */}
                 <div style={styles.field}>
                   <label style={styles.label}>Confirm Password</label>
-                  <input
-                    type="password" placeholder="Repeat your new password"
+                  <PasswordInput
+                    placeholder="Repeat your new password" autoComplete="new-password"
                     value={confirm} onChange={(e) => setConfirm(e.target.value)}
-                    required style={styles.input}
-                    onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-                    onBlur={(e)  => Object.assign(e.target.style, styles.input)}
+                    required style={styles.input} focusStyle={styles.inputFocus}
                   />
                 </div>
 

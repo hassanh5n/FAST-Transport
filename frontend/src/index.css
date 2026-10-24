@@ -525,3 +525,6 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 }
+/* PasswordInput has its own show/hide button; hide Edge's built-in one so there are not two. */
+input::-ms-reveal,
+input::-ms-clear { display: none; }

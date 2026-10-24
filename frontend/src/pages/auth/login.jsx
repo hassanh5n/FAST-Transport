@@ -5,6 +5,7 @@ import { getToken, getUser } from "../../services/transportService";
 import { storeUserSession } from "../../utils/permissions";
 
 import { BrandLockup } from "../../components/Brand";
+import PasswordInput from "../../components/PasswordInput";
 import { refineAuthStyles } from "../../styles/authRefine";
 function Login() {
   const [username, setUsername] = useState("");
@@ -81,12 +82,10 @@ function Login() {
                   Forgot password?
                 </Link>
               </div>
-              <input
-                type="password" placeholder="Enter your password"
+              <PasswordInput
+                placeholder="Enter your password" autoComplete="current-password"
                 value={password} onChange={(e) => setPassword(e.target.value)}
-                required style={styles.input}
-                onFocus={(e) => Object.assign(e.target.style, styles.inputFocus)}
-                onBlur={(e)  => Object.assign(e.target.style, styles.input)}
+                required style={styles.input} focusStyle={styles.inputFocus}
               />
             </div>
 
