@@ -14,9 +14,6 @@ import io
 import os
 from dataclasses import dataclass
 
-from reportlab.graphics import renderPDF
-from reportlab.graphics.barcode.qr import QrCodeWidget
-from reportlab.graphics.shapes import Drawing
 from reportlab.lib.colors import Color, HexColor, white
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import mm
@@ -206,14 +203,6 @@ def _pill(c, x, y, text, fill, fill_alpha, text_color, size=5.2):
     return width
 
 
-def _qr(c, value, x, y, size, color):
-    widget = QrCodeWidget(value, barLevel="M", barFillColor=color, barBorder=0)
-    left, bottom, right, top = widget.getBounds()
-    drawing = Drawing(size, size, transform=[size / (right - left), 0, 0, size / (top - bottom), 0, 0])
-    drawing.add(widget)
-    renderPDF.draw(drawing, c, x, y)
-
-
 # ── Card data ────────────────────────────────────────────────────────────────
 
 @dataclass
@@ -355,39 +344,40 @@ def _back(c, x, y, data):
         _text(c, x + W - 4.6 * mm, y + H - 5.9 * mm, f"Valid until {data.valid_until}", "medium", 5.6, white, align="right")
         c.restoreState()
 
-    # QR: the card's details as plain text, readable by any phone camera.
-    qr_size = 23 * mm
-    qr_x, qr_y = x + 4.2 * mm, y + 9.2 * mm
-    _qr(c, _qr_payload(data), qr_x, qr_y, qr_size, NAVY)
-    _text(c, qr_x + qr_size / 2, y + 6.2 * mm, "SCAN FOR DETAILS", "bold", 3.9, FAINT, align="center", spacing=0.5)
+    left = x + 4.6 * mm
+    inner = W - 9.2 * mm
 
-    # Details grid.
-    gx = x + 31.5 * mm
-    col = 25 * mm
-    rows = (
-        (("BUS", data.bus or "Not assigned"), ("STATUS", None)),
-        (("MORNING PICKUP", data.morning_eta or "Not set"), ("EVENING DROP-OFF", data.evening_eta or "Not set")),
-    )
-    top = y + H - band - 7.2 * mm
-    for index, pair in enumerate(rows):
-        ry = top - index * 10.6 * mm
-        for j, (label, value) in enumerate(pair):
-            cx = gx + j * col
-            _text(c, cx, ry, label, "bold", 4.2, FAINT, spacing=0.55)
-            if label == "STATUS":
-                dot = GREEN if data.status_ok else AMBER
-                c.setFillColor(dot)
-                c.circle(cx + 0.9 * mm, ry - 3.55 * mm, 0.85 * mm, stroke=0, fill=1)
-                _text(c, cx + 2.6 * mm, ry - 4.6 * mm, data.status, "bold", 7.2, INK, max_width=col - 4 * mm, min_size=5)
-            else:
-                _text(c, cx, ry - 4.6 * mm, value, "bold", 7.2, INK, max_width=col - 2 * mm, min_size=5)
+    # Row 1, the rider's two times, set large: the thing they check most.
+    top = y + H - band - 6.4 * mm
+    half = inner / 2
+    for j, (label, value) in enumerate((("MORNING PICKUP", data.morning_eta), ("EVENING DROP-OFF", data.evening_eta))):
+        cx = left + j * half
+        _text(c, cx, top, label, "bold", 4.4, FAINT, spacing=0.6)
+        _text(c, cx, top - 6 * mm, value or "Not set", "black", 12, INK, max_width=half - 2 * mm, min_size=7)
 
-    # Footer.
     c.setStrokeColor(LINE)
     c.setLineWidth(0.5)
-    c.line(gx, y + 9.6 * mm, x + W - 4.6 * mm, y + 9.6 * mm)
-    _text(c, gx, y + 5.6 * mm, "CARD NO.", "bold", 3.9, FAINT, spacing=0.5)
-    _text(c, gx, y + 2.6 * mm, data.card_number, "bold", 5.6, MUTED, spacing=0.3)
+    c.line(left, top - 9.4 * mm, left + inner, top - 9.4 * mm)
+
+    # Row 2: bus, status, card number.
+    row = top - 13.6 * mm
+    third = inner / 3
+    _text(c, left, row, "BUS", "bold", 4.2, FAINT, spacing=0.55)
+    _text(c, left, row - 4.4 * mm, data.bus or "Not assigned", "bold", 7.2, INK, max_width=third - 2 * mm, min_size=5)
+
+    sx = left + third
+    _text(c, sx, row, "STATUS", "bold", 4.2, FAINT, spacing=0.55)
+    c.setFillColor(GREEN if data.status_ok else AMBER)
+    c.circle(sx + 0.9 * mm, row - 3.35 * mm, 0.85 * mm, stroke=0, fill=1)
+    _text(c, sx + 2.6 * mm, row - 4.4 * mm, data.status, "bold", 7.2, INK, max_width=third - 4.6 * mm, min_size=5)
+
+    nx = left + 2 * third
+    _text(c, nx, row, "CARD NO.", "bold", 4.2, FAINT, spacing=0.55)
+    _text(c, nx, row - 4.4 * mm, data.card_number, "bold", 6.4, INK, max_width=third, min_size=5)
+
+    # Footer.
+    _text(c, left, y + 4.2 * mm, "If found, please return it to the university transport office.",
+          "medium", 4.6, MUTED, max_width=inner - 9 * mm, min_size=3.8)
     _draw_mark(c, x + W - 10 * mm, y + 2.4 * mm, 5.4 * mm, NAVY, TEAL)
 
     c.restoreState()
@@ -398,17 +388,6 @@ def _back(c, x, y, data):
     c.setLineWidth(0.6)
     c.drawPath(shape, stroke=1, fill=0)
     c.restoreState()
-
-
-def _qr_payload(data):
-    """Kept short: a smaller code has bigger modules, which cheap phone cameras read reliably."""
-    who = f"{data.name} ({data.id_value})" if data.id_value else f"{data.name} ({data.user_type})"
-    return "\n".join([
-        f"Fleetcentric.ai {data.card_number}",
-        who,
-        f"{data.semester} | {data.route or 'No route'}",
-        f"Bus {data.bus or '-'} | Seat {data.seat or '-'} | {data.status}",
-    ])
 
 
 # ── Page ─────────────────────────────────────────────────────────────────────
