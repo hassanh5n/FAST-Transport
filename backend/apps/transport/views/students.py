@@ -201,13 +201,8 @@ def download_transport_card(request):
     seat_number = seat_obj.seat_number
     bus_number = seat_obj.route_assignment.bus.bus_number
 
-    # Pickup and drop-off times at this rider's own stop.
-    morning_eta = evening_eta = ""
-    if route and stop:
-        route_stop = RouteStop.objects.filter(route=route, stop=stop).first()
-        if route_stop:
-            morning_eta = _clock(route_stop.morning_eta)
-            evening_eta = _clock(route_stop.evening_eta)
+    # Pickup and drop-off times at this rider's own stop, as the route map shows them.
+    morning_eta, evening_eta = _stop_times(route, stop)
 
     valid_until = ""
     if active_semester.end_date and active_semester.end_date > active_semester.start_date:
@@ -243,6 +238,39 @@ def download_transport_card(request):
     return response
 
 
+def _stop_times(route, stop):
+    """(morning, evening) at `stop`, e.g. ("7:12 AM", "4:48 PM").
+
+    Uses the same rule as the route map (maps.add_stop_etas): a time set in the
+    timetable is kept, a blank one is worked out from the drive time to campus. The
+    stop list is built exactly as RouteViewSet._map_route_data builds it, so the
+    card and the map can never disagree. ("", "") if the stop is not on the route.
+    """
+    from .maps import _display_route_geometry, add_stop_etas
+
+    stops = [
+        {
+            "id": rs.stop_id,
+            "latitude": float(rs.stop.latitude),
+            "longitude": float(rs.stop.longitude),
+            "morning_eta": str(rs.morning_eta) if rs.morning_eta else None,
+            "evening_eta": str(rs.evening_eta) if rs.evening_eta else None,
+        }
+        for rs in RouteStop.objects.filter(route=route, stop__is_active=True)
+        .select_related("stop").order_by("stop_order")
+        if not (float(rs.stop.latitude) == 0 and float(rs.stop.longitude) == 0)
+    ]
+    if not any(item["id"] == stop.id for item in stops):
+        return "", ""
+    geometry, _ = _display_route_geometry(route, [[i["longitude"], i["latitude"]] for i in stops], fetch=False)
+    add_stop_etas(stops, geometry)
+    mine = next(item for item in stops if item["id"] == stop.id)
+    return _clock(mine.get("est_morning_eta")), _clock(mine.get("est_evening_eta"))
+
+
 def _clock(value):
-    """datetime.time -> "7:35 AM"; "" when unset."""
-    return value.strftime("%I:%M %p").lstrip("0") if value else ""
+    """"07:12:00" -> "7:12 AM"; "" when unset."""
+    if not value:
+        return ""
+    hours, minutes = (int(part) for part in str(value).split(":")[:2])
+    return f"{(hours % 12) or 12}:{minutes:02d} {'AM' if hours < 12 else 'PM'}"

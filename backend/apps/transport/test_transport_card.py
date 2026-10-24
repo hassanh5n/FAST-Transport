@@ -96,3 +96,20 @@ class TransportCardContentTests(TestCase):
         self.user.first_name, self.user.last_name = "حسن", "Ali"
         self.user.save()
         self._card()
+
+    def test_blank_timetable_uses_the_same_estimate_as_the_route_map(self):
+        Challan.objects.create(registration=self.transport_reg, student=self.profile, amount=50000, status="paid")
+        campus = Stop.objects.create(name="FAST Campus", latitude=24.8569, longitude=67.2646, is_campus=True)
+        RouteStop.objects.filter(route=self.route).update(morning_eta=None, evening_eta=None)
+        RouteStop.objects.create(route=self.route, stop=campus, stop_order=2)
+        card = self._card()
+        from apps.transport.views.routes import RouteViewSet
+        self.route.refresh_from_db()
+        stops = RouteViewSet()._map_route_data(self.route)["stops"]  # what /api/routes/map/ sends
+        mine = next(s for s in stops if s["id"] == self.stop.pk)
+        self.assertTrue(card.morning_eta and card.evening_eta)
+        def clock(v):
+            h, m = (int(x) for x in v.split(":")[:2])
+            return f"{(h % 12) or 12}:{m:02d} {'AM' if h < 12 else 'PM'}"
+        self.assertEqual(card.morning_eta, clock(mine["est_morning_eta"]))
+        self.assertEqual(card.evening_eta, clock(mine["est_evening_eta"]))
