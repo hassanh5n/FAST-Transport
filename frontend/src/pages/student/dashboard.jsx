@@ -12,18 +12,23 @@ import { passengerLabel } from "../../utils/permissions";
 
 // Uses the shared API client so production gets the deployed backend URL and
 // the signed-in user's token (a hand-built fetch here pointed at localhost).
+// Resolves to null on success, or the message to show.
 async function downloadTransportCard() {
   try {
-    const res = await api.get("/api/download-transport-card/", { responseType: "blob" });
+    const res = await api.get("/api/download-transport-card/", { responseType: "blob", noCache: true });
     const url = URL.createObjectURL(res.data);
     const a = document.createElement("a");
     a.href = url;
     a.download = "transport-card.pdf";
     a.click();
     URL.revokeObjectURL(url);
-    return true;
-  } catch {
-    return false;
+    return null;
+  } catch (err) {
+    // A refusal (fee not paid) comes back as a JSON blob; show its reason.
+    if (err.response?.status === 403) {
+      try { return JSON.parse(await err.response.data.text()).detail; } catch { /* fall through */ }
+    }
+    return "Could not download your transport card. Try again.";
   }
 }
 
@@ -132,7 +137,8 @@ function StudentDashboard() {
   const handleDownload = async () => {
     setDownloading(true);
     setDownloadError("");
-    if (!(await downloadTransportCard())) setDownloadError("Could not download your transport card. Try again.");
+    const problem = await downloadTransportCard();
+    if (problem) setDownloadError(problem);
     setDownloading(false);
   };
 
@@ -145,7 +151,7 @@ function StudentDashboard() {
   );
   if (!data) return <PageShell role="student" title={consoleTitle}><Spinner /></PageShell>;
 
-  const { profile, recent_notifications, active_registration, seat, waitlist_position } = data;
+  const { profile, recent_notifications, active_registration, seat, waitlist_position, card_available } = data;
   const normStatus      = (active_registration?.status || "").toLowerCase();
   const hasSubmittedFee = Boolean(active_registration?.fee_submitted);
   const displayStatus   = (!seat && hasSubmittedFee && ["pending", "approved", "payment_submitted"].includes(normStatus))
@@ -169,7 +175,28 @@ function StudentDashboard() {
       }}>
         <div /> {/* spacer — PageShell already renders the title */}
 
-        {seat && (
+        {seat && !card_available && (
+          <span
+            title="Pay your transport fee to unlock your card"
+            style={{
+              display: "inline-flex", alignItems: "center", gap: "7px",
+              padding: "9px 18px", borderRadius: "10px",
+              background: colors.neutralBg, color: colors.textSecondary,
+              border: `1px solid ${colors.borderLight}`,
+              fontSize: "13px", fontWeight: "600", fontFamily: fonts.body,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.2"
+              strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <rect x="4" y="11" width="16" height="10" rx="2"/>
+              <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            </svg>
+            Transport card unlocks once your fee is paid
+          </span>
+        )}
+
+        {card_available && (
           <button
             onClick={handleDownload}
             disabled={downloading}

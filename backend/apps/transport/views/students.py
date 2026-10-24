@@ -169,7 +169,11 @@ def students_list(request):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def download_transport_card(request):
-    profile = StudentProfile.objects.filter(user=request.user).first()
+    """The rider's printable transport card for the active semester (see transport_card.py)."""
+    from ..seatallocation import payment_settled
+    from ..transport_card import CardData, build_transport_card_pdf
+
+    profile = StudentProfile.objects.select_related("user").filter(user=request.user).first()
     if not profile:
         return Response({"detail": "Student profile not found"}, status=404)
 
@@ -177,135 +181,68 @@ def download_transport_card(request):
     if not active_semester:
         return Response({"detail": "No active semester"}, status=404)
 
-    # Get registration info
     registration = SemesterRegistration.objects.filter(
-        student=profile,
-        semester=active_semester,
+        student=profile, semester=active_semester,
     ).select_related("route", "stop").first()
-
-    transport_reg = TransportRegistration.objects.filter(
-        student=profile,
-        semester=active_semester,
-    ).select_related("route", "stop").first()
-
-    # Get seat & bus info
-    seat_number = None
-    bus_number = None
-    route_name = None
-    stop_name = None
-
+    seat_obj = None
     if registration:
-        seat_obj = SeatAllocation.objects.select_related(
-            "route_assignment__bus"
-        ).filter(registration=registration).first()
-        if seat_obj:
-            seat_number = seat_obj.seat_number
-            bus_number = seat_obj.route_assignment.bus.bus_number
-        route_name = registration.route.name if registration.route else None
-        stop_name = registration.stop.name if registration.stop else None
-    elif transport_reg:
-        assignment = RouteAssignment.objects.select_related("bus").filter(
-            route=transport_reg.route,
-            semester=active_semester,
-            is_active=True,
+        seat_obj = SeatAllocation.objects.select_related("route_assignment__bus").filter(
+            registration=registration
         ).first()
-        if assignment:
-            bus_number = assignment.bus.bus_number
-        route_name = transport_reg.route.name if transport_reg.route else None
-        stop_name = transport_reg.stop.name if transport_reg.stop else None
 
-    # Build PDF in memory
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=A4,
-        rightMargin=2*cm,
-        leftMargin=2*cm,
-        topMargin=2*cm,
-        bottomMargin=2*cm,
+    # The card is proof of a paid seat, so it is only issued for one.
+    if not (seat_obj and payment_settled(registration)):
+        return Response(
+            {"detail": "Your transport card is available once your seat is allocated and your fee is paid."},
+            status=403,
+        )
+
+    route, stop = registration.route, registration.stop
+    seat_number = seat_obj.seat_number
+    bus_number = seat_obj.route_assignment.bus.bus_number
+
+    # Pickup and drop-off times at this rider's own stop.
+    morning_eta = evening_eta = ""
+    if route and stop:
+        route_stop = RouteStop.objects.filter(route=route, stop=stop).first()
+        if route_stop:
+            morning_eta = _clock(route_stop.morning_eta)
+            evening_eta = _clock(route_stop.evening_eta)
+
+    valid_until = ""
+    if active_semester.end_date and active_semester.end_date > active_semester.start_date:
+        valid_until = active_semester.end_date.strftime("%d %b %Y").lstrip("0")
+
+    portal = (getattr(settings, "EMAIL_PORTAL_URL", "") or "").replace("https://", "").replace("http://", "").rstrip("/")
+    now = timezone.localtime()
+    data = CardData(
+        name=profile.user.get_full_name() or profile.user.username,
+        user_type=profile.get_user_type_display(),
+        id_value=profile.roll_number or "",
+        department=profile.department,
+        batch=profile.batch,
+        semester=str(active_semester),
+        valid_until=valid_until,
+        route=route.name if route else "",
+        stop=stop.name if stop else "",
+        bus=bus_number or "",
+        seat=str(seat_number) if seat_number else "",
+        morning_eta=morning_eta,
+        evening_eta=evening_eta,
+        status="Active",
+        status_ok=True,
+        card_number=f"FC-{active_semester.year}-{profile.pk:05d}",
+        portal_url=portal,
+        generated_at=now.strftime("%d %b %Y, %I:%M %p").lstrip("0").replace(", 0", ", "),
     )
-
-    styles = getSampleStyleSheet()
-    center_style = ParagraphStyle("center", parent=styles["Normal"], alignment=TA_CENTER)
-    title_style = ParagraphStyle("title", parent=styles["Title"], alignment=TA_CENTER, fontSize=20)
-    subtitle_style = ParagraphStyle("subtitle", parent=styles["Normal"], alignment=TA_CENTER, fontSize=12, textColor=colors.grey)
-
-    story = []
-
-    # Header — brand logo, then the issuing institution.
-    # A missing asset must never 500 the download, so fall back to text only.
-    logo_path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                             "assets", "fleetcentric_logo.png")
-    if os.path.exists(logo_path):
-        logo_width = 6.5 * cm
-        # Source artwork is 1024x358, so keep that ratio rather than hardcoding
-        # a height that would distort the mark.
-        logo = RLImage(logo_path, width=logo_width, height=logo_width * 358 / 1024)
-        logo.hAlign = "CENTER"
-        story.append(logo)
-        story.append(Spacer(1, 0.45 * cm))
-
-    story.append(Paragraph("Fleetcentric.ai", title_style))
-    story.append(Paragraph("Transport Management System", subtitle_style))
-    story.append(Spacer(1, 0.5*cm))
-    story.append(Paragraph("STUDENT TRANSPORT CARD", ParagraphStyle(
-        "cardtitle", parent=styles["Heading1"], alignment=TA_CENTER,
-        fontSize=16, textColor=colors.HexColor("#00254D")
-    )))
-    story.append(Spacer(1, 0.8*cm))
-
-    # Info table
-    data = [
-        ["FIELD", "DETAILS"],
-        ["Student Name", profile.user.get_full_name() or profile.user.username],
-        ["Roll Number", profile.roll_number or "N/A (faculty)"],
-        ["Department", profile.department],
-        ["Batch", profile.batch],
-        ["Semester", active_semester.name],
-        ["Route", route_name or "N/A"],
-        ["Stop", stop_name or "N/A"],
-        ["Bus Number", bus_number or "N/A"],
-        ["Seat Number", str(seat_number) if seat_number else "Not Allocated"],
-        ["Status", "APPROVED" if (registration or transport_reg) else "N/A"],
-    ]
-
-    table = Table(data, colWidths=[6*cm, 10*cm])
-    table.setStyle(TableStyle([
-        # Header row
-        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#00254D")),
-        ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 0), (-1, 0), 12),
-        ("ALIGN", (0, 0), (-1, 0), "CENTER"),
-
-        # Data rows
-        ("FONTNAME", (0, 1), (0, -1), "Helvetica-Bold"),
-        ("FONTSIZE", (0, 1), (-1, -1), 11),
-        ("BACKGROUND", (0, 1), (-1, -1), colors.HexColor("#f5f8fc")),
-        ("ROWBACKGROUNDS", (0, 1), (-1, -1), [colors.white, colors.HexColor("#eef3fa")]),
-        ("ALIGN", (0, 0), (-1, -1), "LEFT"),
-        ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
-        ("PADDING", (0, 0), (-1, -1), 10),
-
-        # Border
-        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#cccccc")),
-        ("BOX", (0, 0), (-1, -1), 1.5, colors.HexColor("#00254D")),
-    ]))
-
-    story.append(table)
-    story.append(Spacer(1, 1*cm))
-
-    # Footer note
-    story.append(Paragraph(
-        "This card is valid for the current semester only. Please carry it while using university transport.",
-        ParagraphStyle("footer", parent=styles["Normal"], alignment=TA_CENTER,
-                       fontSize=9, textColor=colors.grey)
-    ))
-
-    doc.build(story)
-    buffer.seek(0)
+    pdf = build_transport_card_pdf(data)
 
     filename = f"transport_card_{profile.display_id.replace(' ', '_')}_{active_semester.name.replace(' ', '_')}.pdf"
-    response = HttpResponse(buffer, content_type="application/pdf")
+    response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
     return response
+
+
+def _clock(value):
+    """datetime.time -> "7:35 AM"; "" when unset."""
+    return value.strftime("%I:%M %p").lstrip("0") if value else ""

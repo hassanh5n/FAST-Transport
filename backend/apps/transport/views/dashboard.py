@@ -203,6 +203,18 @@ class DashboardView(APIView):
                 if assignment:
                     bus_number = assignment.bus.bus_number
 
+            # The transport card unlocks only for a paid seat: a verified fee, or a paid
+            # challan for this semester. Same rule as download_transport_card. One query at
+            # most, and only for riders who hold a seat without a verified fee.
+            card_available = bool(seat) and (
+                fee_verified_for_registration
+                or Challan.objects.filter(
+                    registration__student=profile,
+                    registration__semester=active_registration.semester,
+                    status="paid",
+                ).exists()
+            )
+
             complaints = Complaint.objects.filter(submitted_by=user).order_by("-created_at")[:5]
             notifications = Notification.objects.filter(user=user).order_by("-created_at")[:5]
 
@@ -244,6 +256,7 @@ class DashboardView(APIView):
                     "fee_verified": fee_verified_for_registration,
                 } if (active_registration or transport_registration) else None,
                 "seat": seat,
+                "card_available": card_available,
                 "waitlist_position": waitlist_position,
                 "waitlist": waitlist_detail,
                 "fee_summary": [
