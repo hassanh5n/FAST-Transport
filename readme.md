@@ -1,6 +1,6 @@
 # FleetCentric.ai — Transport Management System
 
-> **A full stack web application for digitizing and streamlining university transport operations.**
+> **A full stack web application for digitizing and streamlining university transport operations**
 
 ![Project Status](https://img.shields.io/badge/status-active-success.svg)
 ![Django](https://img.shields.io/badge/Django-6.0-092E20?logo=django)
