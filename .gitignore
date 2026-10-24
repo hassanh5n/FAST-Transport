@@ -77,3 +77,6 @@ desktop.ini
 Claudeoutputs
 Claude outputs
 .claude/settings.local.json
+
+# Graphify knowledge graph (generated)
+graphify-out/
