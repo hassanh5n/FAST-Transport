@@ -9,6 +9,7 @@ import {
   getChallan, createPaymentIntent, confirmStripePayment, verifyPaymentOtp,
 } from "../../services/transportService";
 import { formatPKR, formatDate } from "./transportHelpers";
+import { refreshTransportStatus } from "../../utils/transportStatus";
 
 const sectionH = { margin: 0, fontSize: 15, fontWeight: 700, color: colors.textPrimary, fontFamily: fonts.heading };
 const labelSt = { fontSize: 12.5, fontWeight: 600, color: colors.textSecondary, display: "block", marginBottom: 5 };
@@ -223,6 +224,7 @@ export function ChallanView({ id }) {
 
   const handleOTPVerify = async (otp) => {
     await verifyPaymentOtp(id, otp);
+    refreshTransportStatus(); // paid: now a transport user, so the map and route change unlock
     setShowSuccess(true);
   };
 

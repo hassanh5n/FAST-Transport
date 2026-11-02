@@ -6,14 +6,31 @@ database (~170 ms to the hosted Supabase), and the permission check and most
 views then fetch the user's admin, student or driver profile one by one.
 """
 from django.contrib.auth.models import User
+from django.db.models import OuterRef
 from rest_framework_simplejwt.authentication import JWTAuthentication
+
+from .transport_status import registration_status_subquery
 
 
 class _UsersWithProfiles:
     """Stands in for the user model in JWTAuthentication.get_user, so the user comes
-    back with every profile the request may need, in the same query."""
+    back with every profile the request may need, in the same query. The passenger's
+    current registration status rides along too (an indexed subquery, no extra round
+    trip), for current_user_payload's transport_status."""
     DoesNotExist = User.DoesNotExist
-    objects = User.objects.select_related("admin_profile__role", "studentprofile", "driver_profile")
+
+    class _Manager:
+        # A property, not a class attribute: the subquery compares against today's
+        # date, which must be read per request, not once at import.
+        def __getattr__(self, name):
+            qs = User.objects.select_related(
+                "admin_profile__role", "studentprofile", "driver_profile"
+            ).annotate(
+                current_registration_status=registration_status_subquery(student__user_id=OuterRef("pk"))
+            )
+            return getattr(qs, name)
+
+    objects = _Manager()
 
 
 class SharedJWTAuthentication(JWTAuthentication):

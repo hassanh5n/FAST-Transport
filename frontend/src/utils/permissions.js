@@ -22,6 +22,8 @@ export function storeUserSession(user) {
   localStorage.setItem("full_name", `${user.first_name || ""} ${user.last_name || ""}`.trim());
   // StudentProfile.user_type: 0 = student, 1 = faculty. Drives "Student" vs "Faculty" labels.
   localStorage.setItem("user_type", user.user_type === 1 ? "faculty" : "student");
+  // Site user vs transport user this semester (see utils/transportStatus.js).
+  localStorage.setItem("transport_status", user.transport_status?.status || "none");
   window.dispatchEvent(new Event("app:permissions-updated"));
 }
 

@@ -9,6 +9,7 @@ import { useBreakpoint } from "../../utils/useBreakpoint";
 import { BrandMark, BrandWordmark } from "../../components/Brand";
 import { fullName, profileMeta, isFacultyProfile } from "./transportHelpers";
 import { passengerLabel } from "../../utils/permissions";
+import { refreshTransportStatus, transportStatus, transportStatusMeta } from "../../utils/transportStatus";
 
 // Uses the shared API client so production gets the deployed backend URL and
 // the signed-in user's token (a hand-built fetch here pointed at localhost).
@@ -131,6 +132,9 @@ function StudentDashboard() {
       if (d.role === "staff") { navigate("/admin/dashboard", { replace: true }); return; }
       shown = true;
       setData(d);
+      // The console is the first page after a fee approval or a semester ending;
+      // bring the stored status (and so the menu) in line with it.
+      if (d.transport_status && d.transport_status !== transportStatus()) refreshTransportStatus();
     }).catch(() => { if (!shown) setError("Failed to load console data."); });
   }, [navigate]);
 
@@ -160,6 +164,7 @@ function StudentDashboard() {
   // A cancelled registration counts as no registration: the passenger can register again.
   const isRegistered    = Boolean(active_registration) && normStatus !== "cancelled";
   const needsToPay      = isRegistered && !seat && !waitlist_position && !hasSubmittedFee && normStatus !== "rejected";
+  const statusMeta      = transportStatusMeta(data.transport_status ?? transportStatus()); // a summary cached before this field existed has none
 
   return (
     <PageShell role="student" title={consoleTitle}>
@@ -173,7 +178,11 @@ function StudentDashboard() {
         gap: "12px",
         marginBottom: "24px",
       }}>
-        <div /> {/* spacer — PageShell already renders the title */}
+        {/* Site user vs transport user this semester (PageShell already renders the title) */}
+        <div style={{ display: "inline-flex", alignItems: "center", gap: "8px", fontSize: "13px", color: colors.textSecondary, fontFamily: fonts.body }}>
+          Transport status
+          <Pill label={statusMeta.label} variant={statusMeta.variant} />
+        </div>
 
         {seat && !card_available && (
           <span

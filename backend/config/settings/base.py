@@ -59,6 +59,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # Ends transport registrations of semesters whose end date passed (before the audit log)
+    'apps.transport.middleware.SemesterRolloverMiddleware',
     # Admin role permissions + activity log (keep last, after CORS/auth)
     'apps.transport.middleware.AdminAccessMiddleware',
 ]

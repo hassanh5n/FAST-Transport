@@ -55,6 +55,22 @@ class StudentProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['created_at', 'updated_at']
 
 
+class StudentProfileWithStatusSerializer(StudentProfileSerializer):
+    """The /api/students/ shape. Kept apart from StudentProfileSerializer, which is
+    nested in fee and registration rows where this field would cost a query each."""
+
+    # "none" (site account only), "applying" or "registered" this semester.
+    transport_status = serializers.SerializerMethodField()
+
+    def get_transport_status(self, obj):
+        from ..transport_status import classify, transport_status_for
+        # StudentProfileViewSet annotates the status onto each row (no extra query);
+        # a profile from anywhere else costs one query.
+        if hasattr(obj, "current_registration_status"):
+            return classify(obj.current_registration_status)
+        return transport_status_for(obj)["status"]
+
+
 class SemesterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Semester

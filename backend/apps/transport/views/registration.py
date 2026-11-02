@@ -109,6 +109,7 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from ..transport_status import current_semester_q
 
 class TransportRegistrationViewSet(viewsets.ModelViewSet):
     queryset = TransportRegistration.objects.all()
@@ -139,7 +140,10 @@ class TransportRegistrationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        registration = TransportRegistration.objects.filter(student=profile).first()
+        # Only this semester's registration: an ended semester's no longer counts.
+        registration = TransportRegistration.objects.filter(
+            current_semester_q(), student=profile
+        ).order_by("-created_at").first()
 
         if not registration:
             return Response(

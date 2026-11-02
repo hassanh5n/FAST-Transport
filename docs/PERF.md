@@ -36,6 +36,9 @@ before proposing a performance change, so an idea that already failed is not tri
 | Service worker: app shell + OpenFreeMap tiles | map tile 309 ms → 4 ms on repeat; app opens offline | `vite.config.js` |
 | Dashboard maps lazy-loaded; traffic map no longer pulls MapLibre | ~285 KB gzipped off the dashboard's first load | `dashboard.jsx`, `campusLocation.js` |
 | Google Fonts linked from `index.html` instead of a CSS `@import` | removes a three-step download chain before text shows | `index.html` |
+| Transport status (site user / applying / transport user) annotated as a subquery instead of looked up | `/api/user/` stays at 1 query (a separate lookup made it 2); `/api/students/` 4 → 3 and `/api/students-list/` 2 → 1, and the status is computed only for rows returned, not every registration (at 20k students) | `SharedJWTAuthentication`, `StudentProfileViewSet`, `transport_status.registration_status_subquery` |
+| Students list filtered by transport status on the server | the filter covers every student instead of the first 500 loaded | `/api/students/?transport_status=` |
+| Semester close: set-based updates, notifications inserted 1,000 at a time | 20k students: one 1.1 M-character `IN (…)` list and 1.7 s → no id list, 0.8 s (SQLite); a row lock stops two workers notifying twice | `semester_lifecycle.close_semester` |
 | Index on location pings `(bus, -recorded_at)` | latest-ping lookup stops scanning every ping (table empty today) | migration `0031`, **not yet applied to Supabase** |
 
 ## Considered and not done
@@ -48,6 +51,9 @@ before proposing a performance change, so an idea that already failed is not tri
 | Rewrite plan preview/activation (54–57 queries) | Already set-based; the count does not grow with data, and admins run it rarely. |
 | Merge the remaining checks in registration and fee verification | Each is a separate business rule; merging risks behaviour changes for ~0.5 s. |
 | Cache Google's traffic tiles | Google's terms forbid it, and live traffic must be fresh. |
+| Composite index for the transport-status lookup | The existing foreign-key indexes on `student_id` and `semester_id` already narrow it to a student's few rows; no Postgres query plan was available to justify another index and its write cost. Revisit with `EXPLAIN ANALYZE` on Supabase if the status query shows up slow. |
+| Store transport status as a column on the profile | Would drop the subquery, but must be kept in sync by every registration, payment and semester change; a missed path makes the status wrong. Deriving it cannot drift. |
+| Check for ended semesters on every request | Throttled to once per 15 minutes per worker instead; the status itself is already correct the moment a semester's end date passes. |
 
 ## Outside the code
 

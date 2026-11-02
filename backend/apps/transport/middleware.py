@@ -73,3 +73,22 @@ class AdminAccessMiddleware:
             return response
         finally:
             audit.end(token)
+
+
+class SemesterRolloverMiddleware:
+    """Close ended semesters as API traffic arrives (the project has no scheduler).
+
+    Throttled inside close_ended_semesters_if_due(), so almost every request only
+    pays a clock read. Listed before AdminAccessMiddleware so the tidy-up is never
+    written to an admin's activity log.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.path.startswith(API_PREFIX):
+            from .semester_lifecycle import close_ended_semesters_if_due
+
+            close_ended_semesters_if_due()
+        return self.get_response(request)

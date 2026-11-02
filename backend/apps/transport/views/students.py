@@ -72,6 +72,7 @@ from ..serializers import (
     ChallanSerializer,
     UserSerializer,
     StudentProfileSerializer,
+    StudentProfileWithStatusSerializer,
     SemesterSerializer,
     RouteSerializer,
     StopSerializer,
@@ -109,19 +110,28 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from ..transport_status import classify, filter_by_transport_status, registration_status_subquery
 
 class StudentProfileViewSet(viewsets.ModelViewSet):
     queryset = StudentProfile.objects.all()
-    serializer_class = StudentProfileSerializer
+    serializer_class = StudentProfileWithStatusSerializer
     permission_classes = [IsStudentCreateOnly] #Students create, Admin full accces
 
     def get_queryset(self):
         user = self.request.user
         # Scope on staff status, not group membership: drivers and group-less
         # users must only ever see their own profile.
-        profiles = StudentProfile.objects.select_related("user")
+        # transport_status rides along as a subquery, evaluated only for the rows on
+        # the page; ordered so pages are stable.
+        profiles = StudentProfile.objects.select_related("user").annotate(
+            current_registration_status=registration_status_subquery(student_id=OuterRef("pk"))
+        ).order_by("id")
         if user.is_staff:
-            return profiles.all()
+            # ?transport_status=none|applying|registered, filtered in the database so
+            # it covers every student, not just the first page.
+            return filter_by_transport_status(
+                profiles, self.request.query_params.get("transport_status"), "current_registration_status"
+            )
         return profiles.filter(user=user)
 
 
@@ -149,7 +159,9 @@ class SemesterRegistrationViewSet(viewsets.ModelViewSet):
 @api_view(['GET'])
 @permission_classes([IsAdmin])
 def students_list(request):
-    students = StudentProfile.objects.select_related("user").all()
+    students = StudentProfile.objects.select_related("user").annotate(
+        current_registration_status=registration_status_subquery(student_id=OuterRef("pk"))
+    )
 
     data = []
     for s in students:
@@ -160,7 +172,8 @@ def students_list(request):
             "roll_number": s.roll_number,
             "department": s.department,
             "batch": s.batch,
-            "phone": s.phone
+            "phone": s.phone,
+            "transport_status": classify(s.current_registration_status),
         })
 
     return Response(data)

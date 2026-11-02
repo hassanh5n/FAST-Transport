@@ -9,6 +9,7 @@ import RegistrationStatus from "./RegistrationStatus";
 import RegistrationSteps from "./RegistrationSteps";
 import { getSemesters, createRegistration, getRegistration, getChallan, getEligibleRouteStops, getDashboard } from "../../services/transportService";
 import { openSemesters, feeFor, formatPKR, formatDate } from "./transportHelpers";
+import { refreshTransportStatus } from "../../utils/transportStatus";
 
 // A passenger accumulates one row per attempt. The live registration is
 // whichever is not cancelled; if every row is cancelled we keep the newest so
@@ -89,6 +90,7 @@ function TransportRegistration() {
     setLoading(true); setMessage("");
     try {
       await createRegistration({ route_stop_id: selectedRouteStop, semester_id: selectedSemester });
+      refreshTransportStatus(); // now "applying": unlocks My Transport and the challan
 
       // Re-read and pick the live row. Taking data[0] here would grab the
       // previous cancelled registration and leave the page showing the form

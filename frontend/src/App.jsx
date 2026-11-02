@@ -1,6 +1,7 @@
 // Pages load on demand: the login page no longer downloads the map and chart libraries.
-import { lazy, Suspense } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { canOpenPassengerPage, refreshTransportStatus } from "./utils/transportStatus";
 const Home = lazy(() => import("./pages/home"));
 const Login = lazy(() => import("./pages/auth/login"));
 const Signup = lazy(() => import("./pages/auth/signup"));
@@ -96,7 +97,23 @@ function StudentRoute({ children }) {
   const token = localStorage.getItem("access");
   if (!token) return <Navigate to="/login" replace />;
   if (homePath() !== "/student/dashboard") return <Navigate to={homePath()} replace />;
-  return children;
+  return <TransportStatusGate>{children}</TransportStatusGate>;
+}
+
+// Transport-only pages (live map, route change…) are for passengers registered
+// this semester; a site user is sent to their console. The stored status can lag
+// behind the server (an admin just approved a fee), so it is re-read once before
+// anyone is turned away. The API still refuses them either way.
+function TransportStatusGate({ children }) {
+  const { pathname } = useLocation();
+  const [rechecked, setRechecked] = useState(false);
+  const allowed = canOpenPassengerPage(pathname);
+  useEffect(() => {
+    if (!allowed && !rechecked) refreshTransportStatus().finally(() => setRechecked(true));
+  }, [allowed, rechecked]);
+  if (allowed) return children;
+  if (!rechecked) return null;
+  return <Navigate to="/student/dashboard" replace />;
 }
 
 // Protect driver-only routes

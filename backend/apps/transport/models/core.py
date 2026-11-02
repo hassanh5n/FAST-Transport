@@ -66,8 +66,15 @@ class Semester(models.Model):
 
     @property
     def accepts_registrations(self):
-        """Open for new registrations: the flag is on AND the date has not passed."""
-        return self.is_active and self.registration_open and not self.deadline_passed
+        """Open for new registrations: the flag is on AND neither the deadline nor the semester has passed."""
+        return self.is_active and self.registration_open and not self.deadline_passed and not self.has_ended
+
+    @property
+    def has_ended(self):
+        """Past its end date. An end date not after the start date is the untouched
+        default (end_date defaults to the creation day), so it counts as not set and
+        the semester never ends by itself. Mirrored in transport_status.current_semester_q."""
+        return self.start_date < self.end_date < timezone.localdate()
 
     def __str__(self):
         # Semester names are entered by hand and often already contain the year

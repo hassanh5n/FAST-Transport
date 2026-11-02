@@ -31,6 +31,9 @@ class TransportRegistration(models.Model):
         ("Waitlisted", "Waitlisted"),
         ("Cancelled", "Cancelled"),
         ("Rejected", "Rejected"),
+        # The semester ended while this registration was still open (see
+        # semester_lifecycle.py). The student is a plain site user again.
+        ("Ended", "Semester Ended"),
     ]
 
     student = models.ForeignKey(StudentProfile, on_delete=models.CASCADE)

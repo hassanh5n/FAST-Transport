@@ -11,6 +11,7 @@ import {
 } from "../../services/transportService";
 import RegistrationSteps from "./RegistrationSteps";
 import { openSemesters, feeFor, formatPKR, formatDate, fullName, profileMeta } from "./transportHelpers";
+import { refreshTransportStatus } from "../../utils/transportStatus";
 
 // Time left on a seat-offer deadline. A held seat is not open-ended, so the
 // passenger needs to see the clock, not just a status word.
@@ -173,6 +174,7 @@ function StudentTransport() {
     try {
       await cancelRegistration(queue?.registration_id ?? data?.active_registration?.id);
       setConfirmCancel(false);
+      refreshTransportStatus(); // back to a site user
       load();
     } catch (err) {
       setError(err.response?.data?.detail || "Could not cancel your registration.");

@@ -1,27 +1,34 @@
 import { useEffect, useMemo, useState } from "react";
 import PageShell, { PageTitle } from "../../components/PageShell";
 import Table from "../../components/Table";
+import { Pill } from "../../components/ui";
 import { getStudents } from "../../services/transportService";
 import { colors, input as inputStyle } from "../../theme";
+import { TRANSPORT_STATUS, transportStatusMeta } from "../../utils/transportStatus";
 
 function StudentsPage() {
   const [students, setStudents] = useState([]);
   const [query, setQuery] = useState("");
+  // "" = everyone; otherwise one of the transport statuses.
+  const [statusFilter, setStatusFilter] = useState("");
 
+  // The status filter runs on the server, so it covers every student and not only
+  // the rows already loaded; the text search below filters what came back.
   useEffect(() => {
-    getStudents()
-      .then((res) => setStudents(res.data))
+    let current = true;
+    getStudents(statusFilter)
+      .then((res) => { if (current) setStudents(res.data); })
       .catch(() => alert("Failed to fetch students."));
-  }, []);
+    return () => { current = false; };
+  }, [statusFilter]);
 
   const fullName = (row) =>
     `${row.user?.first_name || ""} ${row.user?.last_name || ""}`.trim();
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return students;
     return students.filter((row) =>
-      [
+      (!q || [
         fullName(row),
         row.user?.username,
         row.user?.email,
@@ -30,7 +37,7 @@ function StudentsPage() {
         row.department,
       ]
         .filter(Boolean)
-        .some((field) => String(field).toLowerCase().includes(q))
+        .some((field) => String(field).toLowerCase().includes(q)))
     );
   }, [students, query]);
 
@@ -46,11 +53,23 @@ function StudentsPage() {
     { key: "roll_number", label: "Roll Number" },
     { key: "batch", label: "Batch" },
     { key: "department", label: "Department" },
+    {
+      key: "transport_status",
+      label: "Transport",
+      render: (row) => {
+        const meta = transportStatusMeta(row.transport_status);
+        return <Pill label={meta.label} variant={meta.variant} />;
+      },
+    },
   ];
+
+  const filtering = query.trim() || statusFilter;
 
   return (
     <PageShell role="staff" title="Admin — Students">
-      <PageTitle sub="Registered students in the transport system.">All Students</PageTitle>
+      <PageTitle sub="Everyone with an account. Transport users are registered for the current semester; site users are not.">
+        All Students
+      </PageTitle>
 
       <div style={styles.toolbar}>
         <div style={styles.searchWrap}>
@@ -78,8 +97,23 @@ function StudentsPage() {
             style={styles.searchInput}
           />
         </div>
-        {query.trim() && (
-          <button type="button" onClick={() => setQuery("")} style={styles.clearBtn}>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+          aria-label="Filter by transport status"
+          style={styles.select}
+        >
+          <option value="">Everyone</option>
+          {Object.entries(TRANSPORT_STATUS).map(([key, meta]) => (
+            <option key={key} value={key}>{meta.label}s</option>
+          ))}
+        </select>
+        {filtering && (
+          <button
+            type="button"
+            onClick={() => { setQuery(""); setStatusFilter(""); }}
+            style={styles.clearBtn}
+          >
             Clear
           </button>
         )}
@@ -89,8 +123,8 @@ function StudentsPage() {
         columns={columns}
         rows={filtered}
         emptyMessage={
-          query.trim()
-            ? `No students match “${query.trim()}”.`
+          filtering
+            ? "No students match these filters."
             : "No students registered yet."
         }
       />
@@ -102,6 +136,7 @@ const styles = {
   toolbar: {
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
     gap: "10px",
     marginBottom: "14px",
   },
@@ -121,6 +156,11 @@ const styles = {
   searchInput: {
     ...inputStyle,
     paddingLeft: "34px",
+  },
+  select: {
+    ...inputStyle,
+    width: "auto",
+    cursor: "pointer",
   },
   clearBtn: {
     background: "transparent",

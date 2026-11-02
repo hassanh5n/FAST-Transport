@@ -3,6 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { clearQueryCache } from "../services/queryClient";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { can, homePath, isSuperAdmin, roleLabel, passengerLabel } from "../utils/permissions";
+import { canOpenPassengerPage } from "../utils/transportStatus";
 import { colors, fonts } from "../theme";
 import { BrandMark, BrandWordmark } from "./Brand";
 
@@ -125,6 +126,14 @@ const studentGroups = [
   },
 ];
 
+// A site user sees only what they can use before registering for transport;
+// the rest appears once they apply or are confirmed (utils/transportStatus.js).
+function visibleStudentGroups() {
+  return studentGroups
+    .map((g) => ({ ...g, links: g.links.filter((l) => canOpenPassengerPage(l.to)) }))
+    .filter((g) => g.links.length > 0);
+}
+
 const driverGroups = [
   {
     label: "My Duty",
@@ -151,7 +160,7 @@ function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }
     window.addEventListener("app:permissions-updated", bump);
     return () => window.removeEventListener("app:permissions-updated", bump);
   }, []);
-  const groups = role === "staff" ? visibleAdminGroups() : role === "driver" ? driverGroups : studentGroups;
+  const groups = role === "staff" ? visibleAdminGroups() : role === "driver" ? driverGroups : visibleStudentGroups();
 
   const handleLogout = () => {
     localStorage.clear();

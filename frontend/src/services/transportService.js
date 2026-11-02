@@ -9,7 +9,9 @@ export const resetPassword = (data) => api.post("/api/reset-password/", data);
 export const getDashboard = () => api.get("/api/dashboard/");
 export const getAdminLiveFleet = () => api.get("/api/admin/live-fleet/");
 
-export const getStudents = () => api.get("/api/students/");
+// transportStatus: "none" | "applying" | "registered", filtered on the server.
+export const getStudents = (transportStatus) =>
+  api.get("/api/students/", { params: transportStatus ? { transport_status: transportStatus } : {} });
 
 export const getBuses = () => api.get("/api/buses/");
 export const createBus = (data) => api.post("/api/buses/", data);

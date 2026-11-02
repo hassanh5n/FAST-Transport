@@ -114,6 +114,7 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from ..transport_status import CLOSED_STATUSES
 
 class FeeVerificationViewSet(viewsets.ModelViewSet):
     queryset = FeeVerification.objects.all()
@@ -177,13 +178,23 @@ def _mark_seat_confirmed(profile, semester):
 
     TransportRegistration.objects.filter(
         student=profile, semester=semester
-    ).exclude(status="Cancelled").update(status="Approved")
+    ).exclude(status__in=CLOSED_STATUSES).update(status="Approved")
 
     Challan.objects.filter(
         registration__student=profile,
         registration__semester=semester,
         status="paid",
     ).update(payment_due_at=None)
+
+
+def _semester_ended_response(registration):
+    """A 400 when the registration's semester is over, else None: nothing is left to pay for."""
+    if registration.status == "Ended" or registration.semester.has_ended:
+        return Response(
+            {"detail": f"{registration.semester.name} has ended, so this challan can no longer be paid."},
+            status=400,
+        )
+    return None
 
 
 @api_view(["POST"])
@@ -200,6 +211,9 @@ def pay_challan(request, pk):
 
     if challan.status == "paid":
         return Response({"detail": "Already paid"}, status=400)
+    ended = _semester_ended_response(challan.registration)
+    if ended:
+        return ended
 
     challan.status = "paid"
     challan.save()
@@ -330,6 +344,9 @@ def create_payment_intent(request, pk):
     registration = TransportRegistration.objects.filter(pk=pk, student=profile).first()
     if not registration:
         return Response({"detail": "Registration not found"}, status=404)
+    ended = _semester_ended_response(registration)
+    if ended:
+        return ended
 
     challan = Challan.objects.filter(registration=registration).first()
     if not challan:
@@ -383,6 +400,9 @@ def confirm_stripe_payment(request, pk):
     registration = TransportRegistration.objects.filter(pk=pk, student=profile).first()
     if not registration:
         return Response({"detail": "Registration not found"}, status=404)
+    ended = _semester_ended_response(registration)
+    if ended:
+        return ended
 
     challan = Challan.objects.filter(registration=registration).first()
     if not challan:
@@ -434,6 +454,9 @@ def verify_payment_otp(request, pk):
     registration = TransportRegistration.objects.filter(pk=pk, student=profile).first()
     if not registration:
         return Response({"detail": "Registration not found"}, status=404)
+    ended = _semester_ended_response(registration)
+    if ended:
+        return ended
 
     challan = Challan.objects.filter(registration=registration).first()
     if not challan:

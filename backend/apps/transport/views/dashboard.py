@@ -109,6 +109,7 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from ..transport_status import classify, current_semester_q
 
 def _counts(**querysets):
     """COUNT(*) of several querysets in one round trip instead of one each."""
@@ -151,12 +152,14 @@ class DashboardView(APIView):
             # Each query below is a round trip to the database (~170 ms to Supabase), so
             # the active semester is filtered on rather than looked up first, and fee
             # status comes from the fee list this page shows anyway.
+            # current_semester_q also checks the end date, so a semester that ended
+            # before close_ended_semesters() ran no longer shows here.
             active_registration = (
-                SemesterRegistration.objects.filter(student=profile, semester__is_active=True)
+                SemesterRegistration.objects.filter(current_semester_q(), student=profile)
                 .select_related("semester", "route", "stop").defer("route__geometry").first()
             )
             transport_registration = (
-                TransportRegistration.objects.filter(student=profile, semester__is_active=True)
+                TransportRegistration.objects.filter(current_semester_q(), student=profile)
                 .select_related("semester", "route", "stop").defer("route__geometry").first()
             )
 
@@ -220,6 +223,11 @@ class DashboardView(APIView):
 
             data = {
                 "role": "student",
+                # "none" (site account only), "applying" or "registered"; same rule as
+                # transport_status.transport_status_for, without another query.
+                "transport_status": (
+                    classify(transport_registration.status) if transport_registration else "none"
+                ),
                 "profile": {
                     "user_type": profile.get_user_type_display(),
                     "first_name": profile.user.first_name,

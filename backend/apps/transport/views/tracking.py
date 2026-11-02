@@ -109,6 +109,7 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from ..transport_status import CLOSED_STATUSES, current_semester_q
 
 from .routes import RouteViewSet
 
@@ -126,10 +127,13 @@ def student_bus_tracking(request):
     if not profile:
         return Response({"detail": "Profile not found"}, status=404)
 
+    # Only an open registration in the current semester: a past semester's
+    # route is not this student's bus any more.
     registration = TransportRegistration.objects.filter(
+        current_semester_q(),
         student=profile,
         route__isnull=False
-    ).select_related('route', 'stop').first()
+    ).exclude(status__in=CLOSED_STATUSES).select_related('route', 'stop').order_by("-created_at").first()
 
     if not registration:
         return Response({"detail": "No active registration found"}, status=404)

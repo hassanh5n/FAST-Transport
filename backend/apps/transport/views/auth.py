@@ -115,10 +115,23 @@ from ..seatallocation import (
 )
 from ..crime_risk import _setting_bbox
 from ..rbac import get_effective_permissions, is_super_admin, staff_with_module
+from ..transport_status import current_registration, payload as transport_payload
+
+
+def _transport_status(user, profile):
+    # SharedJWTAuthentication annotates the status onto the user; the login view's
+    # user is not annotated, so it costs one query there.
+    if hasattr(user, "current_registration_status"):
+        return transport_payload(user.current_registration_status)
+    registration = current_registration(profile)
+    return transport_payload(registration.status if registration else None)
+
 
 def current_user_payload(user):
     """Who is signed in and what they may open. Also sent with the login tokens, so the
     login page does not need a second request for it."""
+    profile = getattr(user, "studentprofile", None)
+    is_passenger = not user.is_staff and not hasattr(user, "driver_profile") and profile is not None
     return {
         "id": user.id,
         "username": user.username,
@@ -136,6 +149,9 @@ def current_user_payload(user):
             else None
         ),
         "permissions": get_effective_permissions(user) if user.is_staff else {},
+        # Site account only, applying, or a confirmed transport user this semester
+        # (see transport_status.py). None for admins and drivers.
+        "transport_status": _transport_status(user, profile) if is_passenger else None,
     }
 
 
