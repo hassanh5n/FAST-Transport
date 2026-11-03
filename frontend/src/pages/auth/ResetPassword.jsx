@@ -95,8 +95,9 @@ function ResetPassword() {
                 {/* Email — editable in case they land here directly */}
                 {!prefillEmail && (
                   <div style={styles.field}>
-                    <label style={styles.label}>Email</label>
+                    <label htmlFor="auth-email" style={styles.label}>Email</label>
                     <input
+                      id="auth-email"
                       type="email" placeholder="k220001@nu.edu.pk"
                       value={email} onChange={(e) => setEmail(e.target.value)}
                       required style={styles.input}
@@ -108,8 +109,8 @@ function ResetPassword() {
 
                 {/* OTP boxes */}
                 <div style={styles.field}>
-                  <label style={styles.label}>6-Digit OTP</label>
-                  <div style={{ display:"flex", gap:"8px" }}>
+                  <span id="auth-otp-label" style={styles.label}>6-Digit OTP</span>
+                  <div role="group" aria-labelledby="auth-otp-label" style={{ display:"flex", gap:"8px" }}>
                     {otp.map((digit, i) => (
                       <input
                         key={i}
@@ -119,6 +120,7 @@ function ResetPassword() {
                         onKeyDown={(e) => handleOtpKeyDown(i, e)}
                         maxLength={1}
                         inputMode="numeric"
+                        aria-label={`Digit ${i + 1} of 6`}
                         style={styles.otpBox}
                       />
                     ))}
@@ -127,8 +129,9 @@ function ResetPassword() {
 
                 {/* New password */}
                 <div style={styles.field}>
-                  <label style={styles.label}>New Password</label>
+                  <label htmlFor="auth-new-password" style={styles.label}>New Password</label>
                   <PasswordInput
+                    id="auth-new-password"
                     placeholder="Min. 8 characters" autoComplete="new-password"
                     value={newPassword} onChange={(e) => setNewPassword(e.target.value)}
                     required style={styles.input} focusStyle={styles.inputFocus}
@@ -137,8 +140,9 @@ function ResetPassword() {
 
                 {/* Confirm password */}
                 <div style={styles.field}>
-                  <label style={styles.label}>Confirm Password</label>
+                  <label htmlFor="auth-confirm-password" style={styles.label}>Confirm Password</label>
                   <PasswordInput
+                    id="auth-confirm-password"
                     placeholder="Repeat your new password" autoComplete="new-password"
                     value={confirm} onChange={(e) => setConfirm(e.target.value)}
                     required style={styles.input} focusStyle={styles.inputFocus}

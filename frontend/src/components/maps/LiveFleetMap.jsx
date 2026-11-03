@@ -9,6 +9,7 @@ import { MapboxTrafficToggle } from "./TrafficControls";
 import Icon from "../Icon";
 import "./LiveFleetMap.css";
 import { colors } from "../../theme";
+import { addMyLocationControl } from "./myLocation";
 
 
 function routeFeatures(routes) {
@@ -43,6 +44,7 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
     });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
+    addMyLocationControl(map); // "show my location" button
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }));
     map.on("load", () => {
       map.addSource("fleet-routes", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
@@ -82,7 +84,10 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
         element.setAttribute("aria-label", `Bus ${bus.bus_number}`);
         element.style.cssText = "width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;cursor:pointer;padding:0";
         element.addEventListener("click", () => onBusSelect?.(bus.bus_id));
-        marker = new maplibregl.Marker({ element, anchor: "center" }).addTo(map);
+        // A marker needs its position before addTo(); without it MapLibre throws and the map goes blank.
+        marker = new maplibregl.Marker({ element, anchor: "center" })
+          .setLngLat([Number(bus.longitude), Number(bus.latitude)])
+          .addTo(map);
         markersRef.current.set(bus.bus_id, marker);
       }
       const element = marker.getElement();
@@ -149,9 +154,10 @@ export default function LiveFleetMap({ routes = [], buses = [], height = 520, on
   );
 }
 
-// Live first, then last known, stale, offline, and buses with no tracker at all.
-const STATUS_ORDER = ["live", "ping", "stale", "offline", "no_tracker"];
-const FILTERS = [["all", "All"], ["live", "Live"], ["ping", "Last known"], ["stale", "Stale"], ["offline", "Offline"], ["no_tracker", "No tracker"]];
+// Live first (tracker, then driver's phone), then last known, stale, offline, and buses with no tracker.
+// "last_known": the bus went quiet over a minute ago; it stays on the map, with its age, for 12 hours.
+const STATUS_ORDER = ["live", "ping", "last_known", "stale", "offline", "no_tracker"];
+const FILTERS = [["all", "All"], ["live", "Live"], ["ping", "Driver's phone"], ["last_known", "Last known"], ["stale", "Stale"], ["offline", "Offline"], ["no_tracker", "No tracker"]];
 const rank = (status) => { const i = STATUS_ORDER.indexOf(status); return i === -1 ? STATUS_ORDER.length : i; };
 
 function BusList({ buses, onPick }) {

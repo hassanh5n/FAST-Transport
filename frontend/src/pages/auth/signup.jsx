@@ -187,10 +187,10 @@ function Signup() {
           {step === 1 && (
             <form onSubmit={handleNext} style={styles.form}>
               <div style={styles.field}>
-                <label style={styles.label}>
+                <label htmlFor="auth-username" style={styles.label}>
                   Username <span style={styles.req}>*</span>
                 </label>
-                <input
+                <input id="auth-username"
                   name="username"
                   type="text"
                   placeholder="e.g. shayan_22k"
@@ -207,8 +207,8 @@ function Signup() {
               {/* First Name + Last Name */}
               <div style={styles.grid}>
                 <div style={styles.field}>
-                  <label style={styles.label}>First Name</label>
-                  <input
+                  <label htmlFor="auth-first_name" style={styles.label}>First Name</label>
+                  <input id="auth-first_name"
                     name="first_name"
                     type="text"
                     placeholder="e.g. Shayan"
@@ -220,8 +220,8 @@ function Signup() {
                   />
                 </div>
                 <div style={styles.field}>
-                  <label style={styles.label}>Last Name</label>
-                  <input
+                  <label htmlFor="auth-last_name" style={styles.label}>Last Name</label>
+                  <input id="auth-last_name"
                     name="last_name"
                     type="text"
                     placeholder="e.g. Khan"
@@ -235,10 +235,10 @@ function Signup() {
               </div>
 
               <div style={styles.field}>
-                <label style={styles.label}>
+                <label htmlFor="auth-email" style={styles.label}>
                   Email <span style={styles.req}>*</span>
                 </label>
-                <input
+                <input id="auth-email"
                   name="email"
                   type="email"
                   placeholder="you@nu.edu.pk"
@@ -253,10 +253,10 @@ function Signup() {
               </div>
 
               <div style={styles.field}>
-                <label style={styles.label}>
+                <label htmlFor="auth-password" style={styles.label}>
                   Password <span style={styles.req}>*</span>
                 </label>
-                <PasswordInput
+                <PasswordInput id="auth-password"
                   name="password"
                   placeholder="Min. 8 characters"
                   autoComplete="new-password"
@@ -288,10 +288,10 @@ function Signup() {
                 {!isFaculty && (
                   <>
                   <div style={styles.field}>
-                    <label style={styles.label}>
+                    <label htmlFor="auth-roll_number" style={styles.label}>
                       Roll Number <span style={styles.req}>*</span>
                     </label>
-                    <input
+                    <input id="auth-roll_number"
                       name="roll_number"
                       type="text"
                       placeholder="22K-1234"
@@ -306,8 +306,8 @@ function Signup() {
                   </div>
 
                   <div style={styles.field}>
-                    <label style={styles.label}>Batch</label>
-                    <input
+                    <label htmlFor="auth-batch" style={styles.label}>Batch</label>
+                    <input id="auth-batch"
                       name="batch"
                       type="text"
                       placeholder="e.g. 2022"
@@ -322,8 +322,8 @@ function Signup() {
                 )}
 
                 <div style={styles.field}>
-                  <label style={styles.label}>Department</label>
-                  <input
+                  <label htmlFor="auth-department" style={styles.label}>Department</label>
+                  <input id="auth-department"
                     name="department"
                     type="text"
                     placeholder="e.g. CS, SE"
@@ -336,8 +336,8 @@ function Signup() {
                 </div>
 
                 <div style={styles.field}>
-                  <label style={styles.label}>Phone</label>
-                  <input
+                  <label htmlFor="auth-phone" style={styles.label}>Phone</label>
+                  <input id="auth-phone"
                     name="phone"
                     type="text"
                     placeholder="+92 300 0000000"
@@ -352,8 +352,8 @@ function Signup() {
               </div>
 
               <div style={styles.field}>
-                <label style={styles.label}>Home Address</label>
-                <input
+                <label htmlFor="auth-address" style={styles.label}>Home Address</label>
+                <input id="auth-address"
                   name="address"
                   type="text"
                   placeholder="Your pickup area"
@@ -541,7 +541,7 @@ const styles = refineAuthStyles({
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "1fr 1fr",
+    gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 140px), 1fr))",
     gap: "12px",
   },
   field: {

@@ -64,8 +64,9 @@ function Login() {
 
           <form onSubmit={handleLogin} style={styles.form}>
             <div style={styles.field}>
-              <label style={styles.label}>Username or Email</label>
+              <label htmlFor="auth-username" style={styles.label}>Username or Email</label>
               <input
+                id="auth-username" autoComplete="username"
                 type="text" placeholder="Enter your username or email"
                 value={username} onChange={(e) => setUsername(e.target.value)}
                 required style={styles.input}
@@ -76,13 +77,14 @@ function Login() {
 
             <div style={styles.field}>
               <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-                <label style={styles.label}>Password</label>
+                <label htmlFor="auth-password" style={styles.label}>Password</label>
                 {/* ── Forgot password link ── */}
-                <Link to="/forgot-password" style={styles.forgotLink} tabIndex={-1}>
+                <Link to="/forgot-password" style={styles.forgotLink}>
                   Forgot password?
                 </Link>
               </div>
               <PasswordInput
+                id="auth-password"
                 placeholder="Enter your password" autoComplete="current-password"
                 value={password} onChange={(e) => setPassword(e.target.value)}
                 required style={styles.input} focusStyle={styles.inputFocus}

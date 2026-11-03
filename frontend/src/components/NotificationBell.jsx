@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { colors, fonts, radius, shadow } from "../theme";
+import { useBreakpoint } from "../utils/useBreakpoint";
 import {
   getNotifications,
   markNotificationRead,
@@ -25,6 +26,7 @@ function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const containerRef = useRef(null);
+  const isPhone = useBreakpoint(640);
 
   // The API is owner-scoped server-side, so whatever comes back already
   // belongs to this user — no client-side username filtering needed.
@@ -49,8 +51,15 @@ function NotificationBell() {
         setOpen(false);
       }
     }
+    function handleKey(e) {
+      if (e.key === "Escape") setOpen(false);
+    }
     document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
   }, []);
 
   const sorted = [...notifications].sort(
@@ -118,7 +127,9 @@ function NotificationBell() {
       <button
         onClick={() => { if (!open) fetchNotifications(); setOpen((o) => !o); }}
         style={styles.bellBtn}
-        aria-label="Notifications"
+        aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : "Notifications"}
+        aria-expanded={open}
+        aria-haspopup="true"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -130,7 +141,8 @@ function NotificationBell() {
       </button>
 
       {open && (
-        <div style={styles.dropdown}>
+        // On phones the panel spans the screen under the header instead of hanging off the bell.
+        <div style={isPhone ? { ...styles.dropdown, ...styles.dropdownPhone } : styles.dropdown}>
           <div style={styles.dropdownHeader}>
             <span style={styles.headerTitle}>
               Notifications
@@ -217,7 +229,9 @@ const styles = {
     background: "transparent",
     border: `1px solid ${colors.borderLight}`,
     borderRadius: "9px",
-    padding: "7px",
+    padding: 0,
+    width: "40px",
+    height: "40px",
     cursor: "pointer",
     display: "flex",
     alignItems: "center",
@@ -255,6 +269,14 @@ const styles = {
     overflow: "hidden",
     fontFamily: fonts.body,
   },
+  dropdownPhone: {
+    position: "fixed",
+    top: "64px",
+    left: "8px",
+    right: "8px",
+    width: "auto",
+    maxWidth: "none",
+  },
   dropdownHeader: {
     padding: "11px 14px",
     borderBottom: `1px solid ${colors.borderLight}`,
@@ -274,7 +296,7 @@ const styles = {
     gap: "7px",
   },
   headerCount: {
-    background: colors.accent,
+    background: colors.accentStrong,
     color: "#fff",
     fontSize: "10px",
     fontWeight: "700",

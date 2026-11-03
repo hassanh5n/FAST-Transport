@@ -645,7 +645,7 @@ const styles = {
   trackFill: { height: "100%", background: colors.accent, transformOrigin: "left", transition: "transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)" },
   facts: { display: "flex", gap: 26, margin: 0, flexWrap: "wrap" },
   fact: { margin: 0 },
-  factLabel: { fontSize: 11.5, fontWeight: 600, color: colors.textSecondary, marginBottom: 2 },
+  factLabel: { fontSize: 11.5, fontWeight: 600, color: colors.textSecondary, marginBottom: 2, whiteSpace: "nowrap" },
   factValue: { margin: 0, fontFamily: fonts.heading, fontSize: 22, fontWeight: 700, letterSpacing: "-0.01em" },
 
   boardCard: { background: colors.cardBg, border: `1px solid ${colors.borderLight}`, borderRadius: radius.lg, boxShadow: shadow.card, overflow: "hidden", minWidth: 0 },

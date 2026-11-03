@@ -1,5 +1,5 @@
 // frontend/src/components/PageShell.jsx
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar  from "./Navbar";
 import { useBreakpoint } from "../utils/useBreakpoint";
@@ -22,6 +22,7 @@ function useRefreshStaffPermissions(role) {
 function PageShell({ role = "student", title, children, maxWidth }) {
   const isMobile = useBreakpoint(768);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
   useRefreshStaffPermissions(role);
 
   return (
@@ -30,7 +31,7 @@ function PageShell({ role = "student", title, children, maxWidth }) {
         role={role}
         isMobile={isMobile}
         isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+        onClose={closeSidebar}
       />
 
       <div style={styles.main}>

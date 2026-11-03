@@ -14,6 +14,7 @@ import {
 import { routeColors } from "./routeColors";
 import { showTrafficAlerts } from "./trafficAlerts";
 import { setMapboxTraffic } from "./mapboxTraffic";
+import { addMyLocationControl } from "./myLocation";
 
 const EMPTY = { type: "FeatureCollection", features: [] };
 const collection = (features) => ({ type: "FeatureCollection", features });
@@ -160,6 +161,7 @@ export default function RouteMap({ routes = [], selectedRouteId, onRouteSelect, 
     const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    addMyLocationControl(map); // "show my location" button
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit: "metric" }));
     map.on("load", () => {
       const line = { "line-join": "round", "line-cap": "round" };

@@ -97,7 +97,7 @@ export function stopPopupHtml({ name, morningEta, eveningEta, walkM, isYours = f
     <div style="font:13px/1.45 'DM Sans',system-ui,sans-serif;color:#0f1f2d;min-width:190px;max-width:240px;">
       <div style="font-weight:700;font-size:14px;margin-bottom:3px;">${escapeHtml(name || "Stop")}</div>
       ${isYours ? `<div style="color:#92650a;font-weight:600;margin-bottom:3px;">Your stop</div>` : ""}
-      ${rows || '<div style="color:#8faabb;">No time set</div>'}
+      ${rows || '<div style="color:#5b7489;">No time set</div>'}
       ${walk ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e2e8f0;color:#4a6178;">${escapeHtml(walk)}</div>` : ""}
     </div>`;
 }

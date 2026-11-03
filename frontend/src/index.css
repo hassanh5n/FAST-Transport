@@ -64,6 +64,53 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(40, 141, 196, 0.12);
 }
 
+/* ── Keyboard focus: one visible ring for every control ───────────────────
+   Inline styles cannot target :focus-visible, so it lives here. Mouse clicks
+   do not show it; Tab does. */
+button:focus-visible,
+a:focus-visible,
+summary:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:not([tabindex="-1"]):focus-visible {
+  outline: 2px solid #288dc4;
+  outline-offset: 2px;
+}
+input[type="checkbox"]:focus-visible,
+input[type="radio"]:focus-visible,
+input[type="range"]:focus-visible {
+  outline: 2px solid #288dc4;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+/* The sidebar is navy, so its ring is white */
+.app-sidebar a:focus-visible,
+.app-sidebar button:focus-visible {
+  outline-color: #fff;
+}
+
+/* Long words, URLs and IDs wrap instead of pushing the page sideways */
+.page-content { overflow-wrap: break-word; }
+.page-content img, .page-content svg, .page-content video, .page-content canvas { max-width: 100%; }
+.page-content .maplibregl-canvas { max-width: none; }
+
+/* Touch screens and phones: buttons and selects are at least 40px tall, so row
+   actions ("Edit", "Delete", filter chips) are easy to hit. Desktop sizes are unchanged. */
+@media (pointer: coarse), (max-width: 767px) {
+  .page-content button,
+  .page-content select,
+  .page-content [role="button"]:not(.maplibregl-marker) {
+    min-height: 40px;
+  }
+  /* Row actions are sometimes links styled as buttons ("View Details", "Edit Route") */
+  .page-content .table-actions a {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+  }
+  /* Map zoom/compass buttons stay square, just bigger */
+  .page-content .maplibregl-ctrl-group button { width: 40px; height: 40px; min-height: 0; }
+}
+
 /* ── Sidebar scrollbar: slim and light, so it reads on the navy background ── */
 /* Chrome, Edge and Safari: a styled scrollbar is always drawn, never an auto-hiding overlay. */
 .sidebar-nav::-webkit-scrollbar { width: 8px; }
@@ -236,6 +283,17 @@ textarea:focus {
    RESPONSIVE UTILITY CLASSES
    ═══════════════════════════════════════════════════════════════════════════ */
 
+/* ── List + map split (route network, published routes): side by side from 1024px ── */
+.split-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 340px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 1023px) {
+  .split-layout { grid-template-columns: minmax(0, 1fr); }
+}
+
 /* ── Two-column auto grid ────────────────────────────────────────────────── */
 .grid-2col {
   display: grid;
@@ -303,7 +361,7 @@ textarea:focus {
 .detail-row-label {
   font-size: 12px;
   font-weight: 600;
-  color: #8faabb;
+  color: #5b7489;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -318,7 +376,7 @@ textarea:focus {
 .welcome-row-date {
   font-size: 12px;
   font-weight: 500;
-  color: #8faabb;
+  color: #5b7489;
   background: #fff;
   border: 1px solid #e2e8f0;
   border-radius: 999px;
@@ -353,7 +411,7 @@ textarea:focus {
 .tp-fact { padding: 12px 0; border-bottom: 1px solid #edf2f7; min-width: 0; }
 .tp-fact--wide { grid-column: 1 / -1; }
 .tp-facts--stack .tp-fact:last-child { border-bottom: none; padding-bottom: 0; }
-.tp-fact dt { font-size: 12.5px; font-weight: 500; color: #8faabb; margin-bottom: 3px; }
+.tp-fact dt { font-size: 12.5px; font-weight: 500; color: #5b7489; margin-bottom: 3px; }
 .tp-fact dd { margin: 0; font-size: 14.5px; font-weight: 600; color: #0f1f2d; overflow-wrap: anywhere; }
 
 .tp-fees { list-style: none; margin: 10px 0 0; padding: 0; }
@@ -406,7 +464,7 @@ textarea:focus {
 }
 .challan-lines { width: 100%; border-collapse: collapse; margin-top: 22px; font-size: 14px; }
 .challan-lines th {
-  text-align: left; font-size: 12.5px; font-weight: 600; color: #8faabb;
+  text-align: left; font-size: 12.5px; font-weight: 600; color: #5b7489;
   padding: 0 0 8px; border-bottom: 1px solid #e2e8f0;
 }
 .challan-lines td { padding: 12px 0; color: #0f1f2d; border-bottom: 1px solid #edf2f7; }
@@ -427,11 +485,11 @@ textarea:focus {
 .pay-steps__item.is-active:not(:first-child)::before { background: #22c55e; }
 .pay-steps__dot {
   width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center;
-  font-size: 12.5px; font-weight: 700; background: #fff; color: #8faabb; border: 2px solid #cbd5e1;
+  font-size: 12.5px; font-weight: 700; background: #fff; color: #5b7489; border: 2px solid #cbd5e1;
 }
 .pay-steps__item.is-active .pay-steps__dot { border-color: #288dc4; color: #288dc4; box-shadow: 0 0 0 4px #e8f4fd; }
 .pay-steps__item.is-done .pay-steps__dot { background: #22c55e; border-color: #22c55e; color: #fff; }
-.pay-steps__label { font-size: 12px; font-weight: 500; color: #8faabb; }
+.pay-steps__label { font-size: 12px; font-weight: 500; color: #5b7489; }
 .pay-steps__item.is-active .pay-steps__label, .pay-steps__item.is-done .pay-steps__label { color: #0f1f2d; font-weight: 600; }
 
 .otp-box {
@@ -452,6 +510,19 @@ textarea:focus {
   .tp-facts, .reg-steps--row { grid-template-columns: 1fr; }
   .tp-hero { flex-direction: column; }
   .reg-map-empty { height: 320px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   TABLET  ≤ 1099px: the sidebar takes 236px, so side columns stack under the main one
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1099px) {
+  .dashboard-main-grid,
+  .transport-card-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 899px) {
+  .grid-2col { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

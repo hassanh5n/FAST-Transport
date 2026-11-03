@@ -40,7 +40,7 @@
 .fleet-who { font-size: 12.5px; color: #4a6178; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fleet-when { font-size: 11.5px; text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
 
-.fleet-empty { margin: 0; padding: 20px 12px; text-align: center; font-size: 12.5px; color: #8faabb; }
+.fleet-empty { margin: 0; padding: 20px 12px; text-align: center; font-size: 12.5px; color: #5b7489; }
 
 .fleet-list :focus-visible { outline: 2px solid #288dc4; outline-offset: -2px; }
 

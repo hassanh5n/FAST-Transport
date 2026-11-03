@@ -43,7 +43,7 @@ export default function RoutesMap() {
       {loading && <Spinner />}
       {!loading && !routes.length && error === "" && <Banner variant="info">No published routes are available yet.</Banner>}
       {!!routes.length && (
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(240px, 340px) minmax(0, 1fr)", gap: 16, alignItems: "start" }}>
+        <div className="split-layout">
           <ContentCard style={{ marginBottom: 0 }}>
             <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search route or stop…" style={searchStyle} aria-label="Search routes and stops" />
             <div style={{ display: "grid", gap: 8, marginTop: 14, maxHeight: 420, overflowY: "auto" }}>

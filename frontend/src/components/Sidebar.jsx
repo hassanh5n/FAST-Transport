@@ -168,27 +168,55 @@ function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }
     navigate("/login");
   };
 
+  // Mobile drawer: Escape closes it, focus moves into it, and the page behind stops scrolling.
+  const drawerRef = useRef(null);
+  const drawerOpen = isMobile && isOpen;
+  useEffect(() => {
+    if (!drawerOpen) return undefined;
+    const onKey = (e) => { if (e.key === "Escape") onClose?.(); };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const opener = document.activeElement; // the menu button: focus goes back there on close
+    document.addEventListener("keydown", onKey);
+    drawerRef.current?.querySelector("button")?.focus();
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = previousOverflow;
+      if (opener && document.contains(opener)) opener.focus();
+    };
+  }, [drawerOpen, onClose]);
+
   // On desktop: always visible. On mobile: slide-out drawer.
   if (isMobile) {
     return (
       <>
         {/* Backdrop */}
         {isOpen && (
-          <div onClick={onClose} style={styles.backdrop} />
+          <div onClick={onClose} style={styles.backdrop} aria-hidden="true" />
         )}
 
-        {/* Drawer */}
-        <aside style={{
-          ...styles.aside,
-          position:   "fixed",
-          top:        0,
-          left:       0,
-          height:     "100vh",
-          zIndex:     300,
-          transform:  isOpen ? "translateX(0)" : "translateX(-100%)",
-          transition: "transform 0.25s ease",
-          boxShadow:  isOpen ? "4px 0 24px rgba(0,0,0,0.18)" : "none",
-        }}>
+        {/* Drawer: hidden (and out of the tab order) while closed */}
+        <aside
+          ref={drawerRef}
+          id="app-sidebar"
+          className="app-sidebar"
+          aria-label="Main menu"
+          aria-hidden={!isOpen}
+          inert={!isOpen}
+          style={{
+            ...styles.aside,
+            position:   "fixed",
+            top:        0,
+            left:       0,
+            height:     "100dvh",
+            minHeight:  0,
+            zIndex:     300,
+            transform:  isOpen ? "translateX(0)" : "translateX(-100%)",
+            visibility: isOpen ? "visible" : "hidden",
+            transition: "transform 0.25s ease, visibility 0.25s", // visibility flips at the end of the slide-out
+            boxShadow:  isOpen ? "4px 0 24px rgba(0,0,0,0.18)" : "none",
+          }}
+        >
           <SidebarContent
             groups={groups}
             role={role}
@@ -202,7 +230,7 @@ function Sidebar({ role = "student", isMobile = false, isOpen = false, onClose }
   }
 
   return (
-    <aside style={styles.aside}>
+    <aside className="app-sidebar" style={styles.aside} aria-label="Main menu">
       <SidebarContent
         groups={groups}
         role={role}
@@ -328,9 +356,11 @@ const styles = {
   closeBtn: {
     background:   "transparent",
     border:       "none",
-    color:        "rgba(255,255,255,0.5)",
+    color:        "rgba(255,255,255,0.7)",
     cursor:       "pointer",
-    padding:      "4px",
+    padding:      "0",
+    width:        "40px",
+    height:       "40px",
     display:      "flex",
     alignItems:   "center",
     justifyContent:"center",

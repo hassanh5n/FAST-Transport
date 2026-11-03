@@ -6,6 +6,7 @@ import PageShell, { PageTitle } from "../../components/PageShell";
 import { Spinner } from "../../components/ui";
 import { btn, colors, fonts, input, radius } from "../../theme";
 import { getActivityLogs, getAdminModules, getAdminUsers } from "../../services/transportService";
+import { useBreakpoint } from "../../utils/useBreakpoint";
 
 const ACTIONS = [
   { key: "create", label: "Created", bg: colors.successBg, text: colors.successText },
@@ -24,13 +25,13 @@ const show = (v) => {
   return String(v);
 };
 
-function ChangesTable({ changes }) {
+function ChangesTable({ changes, compact = false }) {
   const entries = Object.entries(changes || {});
   if (entries.length === 0) return <div style={{ color: colors.textMuted, fontSize: "12.5px" }}>No field details recorded.</div>;
   const hasFrom = entries.some(([, c]) => "from" in c);
   const hasTo = entries.some(([, c]) => "to" in c);
   return (
-    <table style={styles.diffTable}>
+    <table style={compact ? { ...styles.diffTable, width: "100%", minWidth: 0 } : styles.diffTable}>
       <thead>
         <tr>
           <th style={styles.diffTh}>Field</th>
@@ -51,7 +52,49 @@ function ChangesTable({ changes }) {
   );
 }
 
+// The expanded part of a log entry: field changes plus request details.
+function LogDetails({ log, compact }) {
+  return (
+    <>
+      <div style={{ overflowX: "auto" }}>
+        <ChangesTable changes={log.changes} compact={compact} />
+      </div>
+      <div style={styles.meta}>
+        {log.method && <span style={{ overflowWrap: "anywhere" }}>{log.method} {log.path}</span>}
+        {log.ip_address && <span>IP {log.ip_address}</span>}
+        {log.model_name && <span>{log.model_name} #{log.object_id}</span>}
+      </div>
+    </>
+  );
+}
+
+// Phones: one card per entry instead of a six-column table.
+function LogCard({ log, open, onToggle }) {
+  const a = ACTION_MAP[log.action] || ACTION_MAP.action;
+  return (
+    <li style={{ ...styles.logCard, background: open ? colors.tableRowHover : "#fff" }}>
+      <div style={styles.logCardTop}>
+        <span style={{ ...styles.tag, background: a.bg, color: a.text }}>{a.label}</span>
+        <span style={styles.logCardModule}>{log.module_label}</span>
+        <time style={styles.logCardTime} dateTime={log.created_at}>{new Date(log.created_at).toLocaleString()}</time>
+      </div>
+      <p style={styles.logCardText}>{log.description}</p>
+      <div style={styles.logCardBottom}>
+        <span style={{ minWidth: 0 }}>
+          <strong style={{ fontWeight: 600 }}>{log.actor_name || "—"}</strong>
+          <span style={{ color: colors.textMuted }}> @{log.actor_username}</span>
+        </span>
+        <button type="button" style={styles.detailBtn} onClick={onToggle} aria-expanded={open}>
+          {open ? "Hide" : "Details"}
+        </button>
+      </div>
+      {open && <div style={styles.logCardDetails}><LogDetails log={log} compact /></div>}
+    </li>
+  );
+}
+
 function ActivityLogs() {
+  const isPhone = useBreakpoint(768);
   const [searchParams] = useSearchParams();
   const [filters, setFilters] = useState({
     actor: searchParams.get("actor") || "",
@@ -137,6 +180,12 @@ function ActivityLogs() {
           <Spinner />
         ) : data.items.length === 0 ? (
           <div style={styles.empty}>No activity matches these filters.</div>
+        ) : isPhone ? (
+          <ul style={styles.logList}>
+            {data.items.map((log) => (
+              <LogCard key={log.id} log={log} open={expanded === log.id} onToggle={() => setExpanded(expanded === log.id ? null : log.id)} />
+            ))}
+          </ul>
         ) : (
           <div style={{ overflowX: "auto" }}>
             <table style={styles.table}>
@@ -169,12 +218,7 @@ function ActivityLogs() {
                       {open && (
                         <tr>
                           <td colSpan={6} style={styles.detailCell}>
-                            <ChangesTable changes={log.changes} />
-                            <div style={styles.meta}>
-                              {log.method && <span>{log.method} {log.path}</span>}
-                              {log.ip_address && <span>IP {log.ip_address}</span>}
-                              {log.model_name && <span>{log.model_name} #{log.object_id}</span>}
-                            </div>
+                            <LogDetails log={log} />
                           </td>
                         </tr>
                       )}
@@ -223,6 +267,14 @@ const styles = {
   diffTh: { textAlign: "left", padding: "7px 12px", background: colors.tableHeaderBg, color: colors.textSecondary, fontSize: "11px", fontWeight: 700 },
   diffTd: { padding: "7px 12px", borderTop: `1px solid ${colors.tableRowBorder}`, wordBreak: "break-word", maxWidth: "420px" },
   meta: { display: "flex", flexWrap: "wrap", gap: "14px", marginTop: "10px", fontSize: "11.5px", color: colors.textMuted },
+  logList: { listStyle: "none", margin: 0, padding: 0 },
+  logCard: { padding: "14px 16px", borderBottom: `1px solid ${colors.tableRowBorder}`, fontSize: "13px", color: colors.textPrimary },
+  logCardTop: { display: "flex", flexWrap: "wrap", alignItems: "center", gap: "6px 10px" },
+  logCardModule: { fontSize: "12px", fontWeight: 600, color: colors.textSecondary },
+  logCardTime: { fontSize: "12px", color: colors.textMuted, marginLeft: "auto" },
+  logCardText: { margin: "8px 0 10px", lineHeight: 1.5, overflowWrap: "anywhere" },
+  logCardBottom: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", fontSize: "12.5px" },
+  logCardDetails: { marginTop: "12px", padding: "12px", background: colors.pageBg, borderRadius: radius.md },
   pager: {
     display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px",
     padding: "12px 16px", borderTop: `1px solid ${colors.borderLight}`, fontSize: "12.5px", color: colors.textSecondary,

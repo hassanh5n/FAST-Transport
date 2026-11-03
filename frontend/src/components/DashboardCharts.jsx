@@ -38,8 +38,9 @@ function ChartPanel({ title, summary, meta, children }) {
 function FleetStatusChart({ buses }) {
   const navigate = useNavigate();
   const data = [
-    { name: "Live", value: buses.filter((bus) => bus.status === "live").length, color: colors.successDot },
-    { name: "Stale", value: buses.filter((bus) => ["stale", "ping"].includes(bus.status)).length, color: colors.warningDot },
+    // "ping" is a live position from the driver's phone, so it counts as live.
+    { name: "Live", value: buses.filter((bus) => ["live", "ping"].includes(bus.status)).length, color: colors.successDot },
+    { name: "Stale", value: buses.filter((bus) => ["stale", "last_known"].includes(bus.status)).length, color: colors.warningDot },
     { name: "Offline", value: buses.filter((bus) => ["offline", "invalid"].includes(bus.status)).length, color: colors.dangerDot },
     { name: "No tracker", value: buses.filter((bus) => bus.status === "no_tracker").length, color: colors.neutralText },
   ];
@@ -160,7 +161,7 @@ export default function DashboardCharts({ stats, fleetData, showFleet = true }) 
 }
 
 const styles = {
-  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14, marginBottom: 20 },
+  grid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 280px), 1fr))", gap: 14, marginBottom: 20 },
   panel: { minWidth: 0, background: "#fff", border: `1px solid ${colors.borderLight}`, borderRadius: 12, padding: "16px 18px 12px", boxShadow: "0 1px 3px rgba(11,45,66,0.06)" },
   header: { minHeight: 52, display: "flex", justifyContent: "space-between", gap: 10 },
   title: { margin: 0, fontSize: 14, fontWeight: 700, color: colors.textPrimary, fontFamily: fonts.heading },

@@ -118,8 +118,9 @@ function OTPVerification() {
 
           <div style={styles.form}>
             <div style={styles.field}>
-              <label style={styles.label}>OTP Code</label>
+              <label htmlFor="auth-otp" style={styles.label}>OTP Code</label>
               <input
+                id="auth-otp" inputMode="numeric" autoComplete="one-time-code"
                 type="text"
                 placeholder="Enter 6-digit code"
                 value={otp}
@@ -312,7 +313,7 @@ const styles = refineAuthStyles({
   },
   buttonHover: {
     marginTop: "6px",
-    background: "#288dc4",
+    background: "#1d79ad",
     color: "#fff",
     border: "none",
     borderRadius: "10px",

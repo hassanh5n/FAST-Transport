@@ -331,7 +331,7 @@ function StopsPage() {
       {view === "list" && <Table columns={columns} rows={filteredStops} emptyMessage={emptyMessage} />}
       {view === "map" && stopsMap}
       {view === "split" && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: 16, alignItems: "start" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 16, alignItems: "start" }}>
           <div style={{ maxHeight: 560, overflowY: "auto" }}>
             <Table columns={splitColumns} rows={filteredStops} emptyMessage={emptyMessage} onRowHover={(row) => setHoveredId(row?.id ?? null)} />
           </div>

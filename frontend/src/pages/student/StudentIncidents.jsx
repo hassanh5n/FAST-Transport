@@ -3,11 +3,13 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import PageShell, { PageTitle } from "../../components/PageShell";
 import { Banner, Pill } from "../../components/ui";
+import Table from "../../components/Table";
 import { colors, fonts, radius, btn, input, shadow } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
 import { CAMPUS, addCampusMarker, MAP_STYLE } from "../../components/maps/campus";
 import { circleRing } from "../../components/maps/incidents";
+import { addMyLocationControl } from "../../components/maps/myLocation";
 
 const Icon = ({ name, size = 18, color = "currentColor" }) => {
   const icons = {
@@ -44,6 +46,38 @@ const INCIDENT_TYPES = [
 
 const statusVariant = (s) =>
   s === "Approved" ? "success" : s === "Rejected" ? "danger" : "warning";
+
+const clip = { display: "block", maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" };
+const none = <span style={{ color: colors.textMuted }}>—</span>;
+
+// The passenger's own reports; on phones Table shows each one as a card.
+const incidentColumns = [
+  { key: "id", label: "#", render: (inc) => <span style={{ color: colors.textMuted }}>{inc.id}</span> },
+  {
+    key: "type", label: "Type",
+    render: (inc) => {
+      const type = INCIDENT_TYPES.find((t) => t.value === inc.incident_type);
+      return <span style={{ display: "flex", alignItems: "center", gap: 6 }}><Icon name={type?.icon} size={14} color={colors.textSecondary} /> {inc.incident_type_display}</span>;
+    },
+  },
+  {
+    key: "severity", label: "Severity",
+    render: (inc) => {
+      const sev = SEVERITY_CONFIG[inc.severity] || SEVERITY_CONFIG.low;
+      return (
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 10px", borderRadius: radius.pill, background: `${sev.color}1a`, color: sev.color, fontWeight: 700, fontSize: 11 }}>
+          <Icon name={sev.icon} size={12} /> {sev.label}
+        </span>
+      );
+    },
+  },
+  { key: "location", label: "Location", render: (inc) => <span style={{ fontSize: 11.5, color: colors.textSecondary }}>{parseFloat(inc.latitude).toFixed(4)},&nbsp;{parseFloat(inc.longitude).toFixed(4)}</span> },
+  { key: "radius", label: "Radius", render: (inc) => `${inc.radius_meters} m` },
+  { key: "description", label: "Description", render: (inc) => <span style={clip} title={inc.description || undefined}>{inc.description || none}</span> },
+  { key: "status", label: "Status", render: (inc) => <Pill label={inc.status} variant={statusVariant(inc.status)} /> },
+  { key: "submitted", label: "Submitted", render: (inc) => <span style={{ whiteSpace: "nowrap", fontSize: 12, color: colors.textSecondary }}>{new Date(inc.created_at).toLocaleString()}</span> },
+  { key: "notes", label: "Admin notes", render: (inc) => <span style={{ ...clip, color: colors.textSecondary, fontSize: 12 }} title={inc.admin_notes || undefined}>{inc.admin_notes || none}</span> },
+];
 
 function buildCircleGeoJSON(lng, lat, radiusM) {
   return { type: "FeatureCollection", features: [{ type: "Feature", geometry: { type: "Polygon", coordinates: [circleRing(lng, lat, radiusM)] } }] };
@@ -84,6 +118,7 @@ export default function StudentIncidents() {
     mapRef.current = map;
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
+    addMyLocationControl(map); // "show my location" button
 
     map.on("load", () => {
       map.addSource("incident-preview", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
@@ -306,40 +341,11 @@ export default function StudentIncidents() {
             No incident reports yet. Use the form above to submit one.
           </div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: colors.tableHeaderBg }}>
-                  {["#","Type","Severity","Location","Radius","Description","Status","Submitted","Admin Notes"].map(h => (
-                    <th key={h} style={{ padding: "10px 14px", textAlign: "left", fontSize: 10.5, fontWeight: 700, color: colors.textMuted, letterSpacing: "0.06em", textTransform: "uppercase", borderBottom: `1px solid ${colors.borderLight}`, whiteSpace: "nowrap" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {myIncidents.map((inc, i) => {
-                  const sev  = SEVERITY_CONFIG[inc.severity] || SEVERITY_CONFIG.low;
-                  const type = INCIDENT_TYPES.find(t => t.value === inc.incident_type);
-                  return (
-                    <tr key={inc.id} style={{ background: i%2===0 ? "#fff" : colors.tableRowAlt }}>
-                      <td style={{ ...td, color: colors.textMuted }}>{inc.id}</td>
-                      <td style={td}><span style={{ display:"flex", alignItems:"center", gap:6 }}><Icon name={type?.icon} size={14} color={colors.textSecondary} /> {inc.incident_type_display}</span></td>
-                      <td style={td}>
-                        <span style={{ display:"inline-flex", alignItems:"center", gap:5, padding:"3px 10px", borderRadius:radius.pill, background:`${sev.color}1a`, color:sev.color, fontWeight:700, fontSize:11 }}>
-                          <Icon name={sev.icon} size={12} /> {sev.label}
-                        </span>
-                      </td>
-                      <td style={{ ...td, fontSize:11.5, color:colors.textSecondary }}>{parseFloat(inc.latitude).toFixed(4)},&nbsp;{parseFloat(inc.longitude).toFixed(4)}</td>
-                      <td style={td}>{inc.radius_meters} m</td>
-                      <td style={{ ...td, maxWidth:160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{inc.description || <span style={{ color:colors.textMuted }}>—</span>}</td>
-                      <td style={td}><Pill label={inc.status} variant={statusVariant(inc.status)} /></td>
-                      <td style={{ ...td, whiteSpace:"nowrap", fontSize:12, color:colors.textSecondary }}>{new Date(inc.created_at).toLocaleString()}</td>
-                      <td style={{ ...td, maxWidth:160, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap", color:colors.textSecondary, fontSize:12 }}>{inc.admin_notes || <span style={{ color:colors.textMuted }}>—</span>}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <Table
+            columns={incidentColumns}
+            rows={myIncidents}
+            style={{ border: "none", borderRadius: 0, boxShadow: "none" }}
+          />
         )}
       </div>
     </PageShell>
@@ -355,10 +361,4 @@ function FormField({ label, children }) {
   );
 }
 
-const td = {
-  padding: "11px 14px",
-  borderBottom: `1px solid ${colors.tableRowBorder}`,
-  color: colors.textPrimary,
-  verticalAlign: "middle",
-};
 

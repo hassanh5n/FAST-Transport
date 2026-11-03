@@ -72,8 +72,9 @@ function ForgotPassword() {
                   </div>
                 )}
                 <div style={styles.field}>
-                  <label style={styles.label}>Email</label>
+                  <label htmlFor="auth-email" style={styles.label}>Email</label>
                   <input
+                    id="auth-email" autoComplete="email"
                     type="email"
                     placeholder="k220001@nu.edu.pk"
                     value={email}

@@ -67,6 +67,7 @@ function scheduleVariance(arrival, scheduled) {
 
 export default function DriverTrip() {
   const isMobile = useBreakpoint(768);
+  const isNarrow = useBreakpoint(1100); // below this the map and stop list stack (the sidebar takes 236px)
   const [data, setData] = useState(null);
   const [error, setError] = useState("");
   const [direction, setDirection] = useState(() => (new Date().getHours() < 12 ? "morning" : "evening"));
@@ -310,7 +311,7 @@ export default function DriverTrip() {
       </div>
 
       {/* ── Map + stop list ── */}
-      <div style={{ display: "grid", gridTemplateColumns: isMobile ? "minmax(0, 1fr)" : "minmax(0, 1fr) 380px", gap: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "minmax(0, 1fr)" : "minmax(0, 1fr) 380px", gap: 16, alignItems: "start" }}>
         <ContentCard style={{ marginBottom: 0, padding: 12, position: "relative" }}>
           <RouteMap
             routes={routeMap ? [routeMap] : []}
@@ -354,7 +355,7 @@ export default function DriverTrip() {
           {stops.length === 0 ? (
             <p style={{ margin: 0, fontSize: 13, color: colors.textSecondary }}>This route has no stops yet.</p>
           ) : (
-            <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8, maxHeight: isMobile ? "none" : 470, overflowY: "auto" }}>
+            <ol style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 8, maxHeight: isNarrow ? "none" : 470, overflowY: "auto" }}>
               {stops.map((stop) => (
                 <TripStop
                   key={stop.route_stop_id}

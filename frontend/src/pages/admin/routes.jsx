@@ -173,7 +173,7 @@ function RoutesPage() {
       )}
 
       <ContentCard style={{ marginBottom: 20 }}>
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 320px) minmax(0, 1fr)", gap: 16, alignItems: "start" }}>
+        <div className="split-layout">
           <div>
             <h3 style={{ margin: "0 0 10px", fontSize: 15 }}>Route network</h3>
             <div style={{ display: "grid", gap: 8, maxHeight: 420, overflowY: "auto" }}>

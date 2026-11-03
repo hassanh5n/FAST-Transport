@@ -3,6 +3,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { resolveMapLocation } from "../../services/transportService";
 import { CAMPUS, addCampusMarker, MAP_STYLE } from "./campus";
+import { addMyLocationControl } from "./myLocation";
 
 const KARACHI_BOUNDS = {
   latitude: { min: 24.4, max: 25.4 },
@@ -68,6 +69,7 @@ export default function StopLocationPicker({ latitude, longitude, onChange, heig
     const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
+    addMyLocationControl(map); // "show my location" button
     map.on("click", (event) => updatePosition(event.lngLat));
     mapRef.current = map;
     return () => { map.remove(); mapRef.current = null; markerRef.current = null; };

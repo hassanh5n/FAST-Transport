@@ -47,7 +47,7 @@ function ViewRoutes() {
       {!loading && !routes.length && !error && <Banner variant="info">No published routes are available yet.</Banner>}
 
       {!loading && !!routes.length && (
-        <div style={{ display: "grid", gridTemplateColumns: "minmax(260px, 340px) minmax(0, 1fr)", gap: 18, alignItems: "start" }}>
+        <div className="split-layout">
           <ContentCard style={{ marginBottom: 0, padding: 14 }}>
             <div style={{ marginBottom: 12 }}>
               <label style={{ display: "block", fontSize: 12, color: colors.textSecondary, marginBottom: 6 }}>Search routes or stops</label>

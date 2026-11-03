@@ -5,6 +5,7 @@ import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { CAMPUS, addCampusMarker, MAP_STYLE } from "./campus";
 import { circleRing, incidentColor } from "./incidents";
+import { addMyLocationControl } from "./myLocation";
 
 const IF_SELECTED = (yes, no) => ["case", ["get", "selected"], yes, no];
 
@@ -54,6 +55,7 @@ export default function IncidentsMap({ incidents, selectedId = null, onSelect, h
     const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
+    addMyLocationControl(map); // "show my location" button
     map.on("load", () => {
       const empty = { type: "FeatureCollection", features: [] };
       map.addSource("incident-areas", { type: "geojson", data: empty });

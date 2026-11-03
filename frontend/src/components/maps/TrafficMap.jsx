@@ -9,6 +9,7 @@ import { CAMPUS } from "./campusLocation";
 import { formatUpdated, statusColor, statusLabel } from "./fleetStatus";
 import { loadGoogleMaps, onGoogleMapsAuthFailure } from "./googleMaps";
 import { colors } from "../../theme";
+import { LOCATION_OPTIONS, canLocate, locationErrorMessage } from "./myLocation";
 
 // Google's own traffic colours, for the legend.
 const TRAFFIC_LEGEND = [
@@ -17,6 +18,11 @@ const TRAFFIC_LEGEND = [
   ["Heavy", "#f23c32"],
   ["Standstill", "#811f1f"],
 ];
+
+const overlayBtn = {
+  border: `1px solid ${colors.borderMid}`, borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 600,
+  cursor: "pointer", boxShadow: "0 1px 4px rgba(11,45,66,0.18)",
+};
 
 const toLatLng = ([lng, lat]) => ({ lat: Number(lat), lng: Number(lng) });
 
@@ -57,6 +63,10 @@ export default function TrafficMap({ routes = [], buses = [], height = 420, show
   const fittedRef = useRef(false);
   const [state, setState] = useState("loading"); // loading | ready | error
   const [showRoutes, setShowRoutes] = useState(showRoutesInitially);
+  // The viewer's own position: off until they press "My location", then followed.
+  const [locating, setLocating] = useState("off"); // off | finding | on
+  const [locationError, setLocationError] = useState("");
+  const meRef = useRef(null);           // { watchId, dot, ring, centred }
 
   useEffect(() => {
     let cancelled = false;
@@ -88,6 +98,7 @@ export default function TrafficMap({ routes = [], buses = [], height = 420, show
     return () => {
       cancelled = true;
       stopListening();
+      if (meRef.current) navigator.geolocation.clearWatch(meRef.current.watchId);
       markers.forEach((marker) => marker.setMap(null));
       markers.clear();
       googleRef.current = null;
@@ -156,24 +167,88 @@ export default function TrafficMap({ routes = [], buses = [], height = 420, show
     });
   }, [buses, state]);
 
+  // "My location": watch the browser's position and draw a blue dot with an accuracy ring.
+  const toggleMyLocation = () => {
+    const google = googleRef.current;
+    if (!google) return;
+    if (meRef.current) { // second press: stop following and remove the dot
+      navigator.geolocation.clearWatch(meRef.current.watchId);
+      meRef.current.dot?.setMap(null);
+      meRef.current.ring?.setMap(null);
+      meRef.current = null;
+      setLocating("off");
+      return;
+    }
+    setLocationError("");
+    setLocating("finding");
+    const me = { centred: false };
+    me.watchId = navigator.geolocation.watchPosition(
+      ({ coords }) => {
+        const here = { lat: coords.latitude, lng: coords.longitude };
+        if (!me.dot) {
+          me.ring = new google.maps.Circle({
+            map: google.map, center: here, radius: coords.accuracy, clickable: false,
+            strokeColor: "#1a73e8", strokeOpacity: 0.3, strokeWeight: 1, fillColor: "#1a73e8", fillOpacity: 0.12,
+          });
+          me.dot = new google.Marker({
+            map: google.map, position: here, zIndex: 20, title: "You are here",
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 8, fillColor: "#1a73e8", fillOpacity: 1, strokeColor: "#fff", strokeWeight: 3 },
+          });
+        } else {
+          me.dot.setPosition(here);
+          me.ring.setCenter(here);
+          me.ring.setRadius(coords.accuracy);
+        }
+        if (!me.centred) { // centre once; after that the viewer pans freely
+          google.map.panTo(here);
+          if (google.map.getZoom() < 14) google.map.setZoom(14);
+          me.centred = true;
+        }
+        setLocating("on");
+      },
+      (error) => {
+        navigator.geolocation.clearWatch(me.watchId);
+        me.dot?.setMap(null);
+        me.ring?.setMap(null);
+        meRef.current = null;
+        setLocating("off");
+        setLocationError(locationErrorMessage(error));
+      },
+      LOCATION_OPTIONS,
+    );
+    meRef.current = me;
+  };
+
   return (
     <div>
       <div style={{ position: "relative", height, width: "100%", borderRadius: 10, overflow: "hidden", background: colors.pageBg }}>
         <div ref={containerRef} style={{ position: "absolute", inset: 0 }} aria-label="Live traffic map" />
         {state === "ready" && (
-          <button
-            type="button"
-            aria-pressed={showRoutes}
-            onClick={() => setShowRoutes((value) => !value)}
-            style={{
-              position: "absolute", top: 10, left: 10, zIndex: 2, border: `1px solid ${colors.borderMid}`,
-              background: showRoutes ? colors.navyDeep : "#fff", color: showRoutes ? "#fff" : colors.textSecondary,
-              borderRadius: 8, padding: "6px 10px", fontSize: 12, fontWeight: 600, cursor: "pointer",
-              boxShadow: "0 1px 4px rgba(11,45,66,0.18)",
-            }}
-          >
-            {`${showRoutes ? "Hide" : "Show"} ${routes.length === 1 ? "route" : "bus routes"}`}
-          </button>
+          <div style={{ position: "absolute", top: 10, left: 10, zIndex: 2, display: "flex", flexWrap: "wrap", gap: 6, maxWidth: "calc(100% - 70px)" }}>
+            <button
+              type="button"
+              aria-pressed={showRoutes}
+              onClick={() => setShowRoutes((value) => !value)}
+              style={{ ...overlayBtn, background: showRoutes ? colors.navyDeep : "#fff", color: showRoutes ? "#fff" : colors.textSecondary }}
+            >
+              {`${showRoutes ? "Hide" : "Show"} ${routes.length === 1 ? "route" : "bus routes"}`}
+            </button>
+            {canLocate() && (
+              <button
+                type="button"
+                aria-pressed={locating !== "off"}
+                onClick={toggleMyLocation}
+                style={{ ...overlayBtn, background: locating === "on" ? "#1a73e8" : "#fff", color: locating === "on" ? "#fff" : colors.textSecondary }}
+              >
+                {locating === "finding" ? "Finding you…" : locating === "on" ? "Hide my location" : "My location"}
+              </button>
+            )}
+          </div>
+        )}
+        {locationError && (
+          <div role="alert" style={{ position: "absolute", left: 10, right: 10, bottom: 10, zIndex: 2, background: colors.warningBg, color: colors.warningText, border: "1px solid rgba(245,158,11,0.3)", borderRadius: 8, padding: "8px 10px", fontSize: 12 }}>
+            {locationError}
+          </div>
         )}
         {state !== "ready" && (
           <div style={{ position: "absolute", inset: 0, zIndex: 3, background: colors.pageBg, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, textAlign: "center", fontSize: 13, color: state === "error" ? colors.warningText : colors.textMuted }}>
@@ -194,6 +269,12 @@ export default function TrafficMap({ routes = [], buses = [], height = 420, show
           <span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: "50%", background: statusColor("live"), border: `3px solid ${colors.navyDeep}` }} />
           Bus (colour shows tracker status)
         </span>
+        {locating === "on" && (
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <span aria-hidden="true" style={{ width: 12, height: 12, borderRadius: "50%", background: "#1a73e8", border: "2px solid #fff", boxShadow: "0 0 0 1px #1a73e8" }} />
+            You
+          </span>
+        )}
         <span style={{ color: colors.textMuted }}>Live traffic from Google; it refreshes on its own.</span>
       </div>
     </div>

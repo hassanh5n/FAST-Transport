@@ -4,7 +4,8 @@ export const colors = {
   navyDeep:    "#0b2d42",   // sidebar background
   navyMid:     "#0f3a55",   // navbar background
   navyLight:   "#1a4a68",   // hover on sidebar
-  accent:      "#288dc4",   // sky blue — primary CTA, active indicator
+  accent:      "#288dc4",   // sky blue — active indicator, dots, fills
+  accentStrong:"#1d79ad",   // accent behind white text (buttons, badges): 4.8:1, WCAG AA
   accentLight: "#62a1be",   // lighter blue — secondary badges, hover tints
   accentGlow:  "rgba(40, 141, 196, 0.12)", // subtle glow for active bg
 
@@ -17,7 +18,7 @@ export const colors = {
   // Text
   textPrimary:   "#0f1f2d",
   textSecondary: "#4a6178",
-  textMuted:     "#8faabb",
+  textMuted:     "#5b7489",   // secondary labels; 4.9:1 on white (AA)
   textOnDark:    "#ffffff",
   textOnDarkDim: "rgba(255,255,255,0.45)",
 
@@ -98,7 +99,7 @@ export const badge = (variant = "neutral") => {
 
 export const btn = {
   primary: {
-    background:   colors.accent,
+    background:   colors.accentStrong,
     color:        "#fff",
     border:       "none",
     borderRadius: radius.md,

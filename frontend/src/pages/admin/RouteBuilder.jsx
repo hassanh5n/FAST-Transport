@@ -8,6 +8,7 @@ import RouteMap from "../../components/maps/RouteMap";
 import { getRouteMapDetail, getStops, saveRouteBuilder, updateRoute } from "../../services/transportService";
 import { routeGeometry } from "../../services/routingService";
 import RouteTransfer from "../../components/RouteTransfer";
+import { useBreakpoint } from "../../utils/useBreakpoint";
 
 const usableStops = (res) => (res.data?.results || res.data || [])
   .filter((stop) => stop.is_active !== false && Number(stop.latitude) !== 0 && Number(stop.longitude) !== 0);
@@ -64,6 +65,7 @@ const controlsStyle = {
 
 export default function RouteBuilder() {
   const { id } = useParams();
+  const isPhone = useBreakpoint(640);
   const [route, setRoute] = useState(null);
   const [routeMeta, setRouteMeta] = useState({ name: "", description: "" });
   const [allStops, setAllStops] = useState([]);
@@ -283,7 +285,7 @@ export default function RouteBuilder() {
       <RouteTransfer route={{ ...route, ...routeMeta }} stops={selectedStops} onImport={applyImport} />
 
       {/* ─── Route Builder Section ─────────────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 1fr)", gap: 16, alignItems: "start", marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 340px), 1fr))", gap: 16, alignItems: "start", marginBottom: 24 }}>
         {/* Left: Maps and Stop Selection */}
         <div style={{ display: "grid", gap: 16 }}>
           <ContentCard>
@@ -380,7 +382,7 @@ export default function RouteBuilder() {
           ) : (
             <div style={{ display: "grid", gap: 10 }}>
               {selectedStops.map((stop, index) => (
-                <div key={stop.id} style={stopCardStyle}>
+                <div key={stop.id} style={isPhone ? { ...stopCardStyle, gridTemplateColumns: "minmax(0, 1fr)" } : stopCardStyle}>
                   <div style={stopHeaderStyle}>
                     <div style={{ display: "flex", gap: 8, alignItems: "baseline" }}>
                       <strong style={{ fontSize: 16, color: colors.accent, minWidth: "24px" }}>{index + 1}.</strong>
@@ -431,11 +433,11 @@ export default function RouteBuilder() {
                       </div>
                     )}
                   </div>
-                  <div style={controlsStyle}>
-                    <button onClick={() => moveStop(index, -1)} disabled={index === 0} title="Move up" style={{ ...btn.ghost, padding: "6px 8px", fontSize: 13 }}>↑</button>
-                    <button onClick={() => moveStop(index, 1)} disabled={index === selectedStops.length - 1} title="Move down" style={{ ...btn.ghost, padding: "6px 8px", fontSize: 13 }}>↓</button>
-                    <button onClick={() => handleEtaEdit(stop.id)} title="Adjust ETA" style={{ ...btn.ghost, padding: "6px 8px", fontSize: 11 }}>Adjust ETA</button>
-                    <button onClick={() => removeStop(stop.id)} title="Remove stop" style={{ ...btn.danger, padding: "6px 8px", fontSize: 11 }}>Remove</button>
+                  <div style={isPhone ? { ...controlsStyle, flexDirection: "row", flexWrap: "wrap" } : controlsStyle}>
+                    <button onClick={() => moveStop(index, -1)} disabled={index === 0} title="Move up" aria-label={`Move ${stop.name} up`} style={{ ...btn.ghost, padding: "6px 8px", fontSize: 13, minHeight: 36, minWidth: 40 }}>↑</button>
+                    <button onClick={() => moveStop(index, 1)} disabled={index === selectedStops.length - 1} title="Move down" aria-label={`Move ${stop.name} down`} style={{ ...btn.ghost, padding: "6px 8px", fontSize: 13, minHeight: 36, minWidth: 40 }}>↓</button>
+                    <button onClick={() => handleEtaEdit(stop.id)} title="Adjust ETA" style={{ ...btn.ghost, padding: "6px 8px", fontSize: 12, minHeight: 36 }}>Adjust ETA</button>
+                    <button onClick={() => removeStop(stop.id)} title="Remove stop" aria-label={`Remove ${stop.name}`} style={{ ...btn.danger, padding: "6px 8px", fontSize: 12, minHeight: 36 }}>Remove</button>
                   </div>
                 </div>
               ))}

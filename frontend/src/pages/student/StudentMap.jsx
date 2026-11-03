@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { Suspense, lazy, useEffect, useRef, useState, useCallback } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import PageShell, { PageTitle } from "../../components/PageShell";
-import { Banner } from "../../components/ui";
-import { colors, radius } from "../../theme";
+import { Banner, Spinner } from "../../components/ui";
+import { btn, colors, radius } from "../../theme";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 import api from "../../services/api";
 import {
@@ -12,7 +12,13 @@ import {
 } from "../../components/maps/campus";
 import { showTrafficAlerts, useTrafficAlerts } from "../../components/maps/trafficAlerts";
 import { rememberMapboxTraffic, savedMapboxTraffic, setMapboxTraffic } from "../../components/maps/mapboxTraffic";
-import { LiveTrafficDialog, TrafficLegend } from "../../components/maps/TrafficControls";
+import { TrafficLegend } from "../../components/maps/TrafficControls";
+import { ageLabel } from "../../components/maps/fleetStatus";
+import { GOOGLE_MAPS_API_KEY, loadGoogleMaps } from "../../components/maps/googleMaps";
+import { addMyLocationControl } from "../../components/maps/myLocation";
+
+// Google's live traffic, as on the admin dashboard. Loaded only when the student opens it.
+const TrafficMap = lazy(() => import("../../components/maps/TrafficMap"));
 
 const POLL_INTERVAL_MS = 8000;
 const INCIDENT_POLL_INTERVAL_MS = 30000;
@@ -61,7 +67,10 @@ export default function StudentMap() {
   const [mapReady, setMapReady] = useState(false);  // the map's "load" has fired
   const traffic = useTrafficAlerts();
   const [trafficShown, setTrafficShown] = useState(true);
-  const [liveTrafficOpen, setLiveTrafficOpen] = useState(false);
+  // "bus" (our map) or "traffic" (Google). Google counts every map it creates, so the
+  // traffic map is created the first time it is opened and then kept, not re-made.
+  const [mapView, setMapView] = useState("bus");
+  const [trafficOpened, setTrafficOpened] = useState(false);
 
   const [mapboxOn, setMapboxOn] = useState(savedMapboxTraffic);
 
@@ -87,16 +96,18 @@ export default function StudentMap() {
   }, []);
 
   // 2. Poll live GPS
+  // The server sends the newest position from the bus tracker or the driver's phone,
+  // live or last known (up to 12 h), with the time it was actually recorded.
   const fetchLiveLocation = useCallback(() => {
     api.get("/api/student/live-location/")
       .then(res => {
         if (res.data?.lat && res.data?.lng) {
           setLiveData(res.data);
-          setLastUpdated(new Date());
-          setIsStale(false);
+          setLastUpdated(res.data.timestamp ? new Date(res.data.timestamp) : new Date());
+          setIsStale(res.data.is_live === false);
         }
       })
-      .catch(() => setIsStale(true));
+      .catch(() => setIsStale(true)); // keep showing whatever was last received
   }, []);
 
   useEffect(() => {
@@ -148,6 +159,7 @@ export default function StudentMap() {
 
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl(), "top-right");
+    addMyLocationControl(map); // "show my location" button
 
     map.on("load", () => {
       setMapReady(true);
@@ -391,13 +403,15 @@ export default function StudentMap() {
           box-shadow: 0 1px 3px rgba(11,45,66,0.35);
           cursor: pointer;
         `;
-        new maplibregl.Marker({ element: el })
+        const pin = new maplibregl.Marker({ element: el })
           .setLngLat([stop.lng, stop.lat])
           .setPopup(new maplibregl.Popup({ offset: 14, closeButton: false }).setHTML(stopPopupHtml({
             name: stop.name, morningEta: stop.est_morning_eta, eveningEta: stop.est_evening_eta,
             walkM: stop.walk_m, isYours: isStudentStop,
           })))
           .addTo(map);
+        // MapLibre labels every pin "Map marker"; name the stop for screen readers instead.
+        pin.getElement().setAttribute("aria-label", `Stop ${number}: ${stop.name}${isStudentStop ? " (your stop)" : ""}`);
       });
     };
 
@@ -405,6 +419,7 @@ export default function StudentMap() {
   }, [trackingData, mapReady]);
 
   // 5. Move bus marker on every GPS update
+  const busFramedRef = useRef(false);
   useEffect(() => {
     if (!liveData || !busMarkerRef.current || !mapRef.current) return;
     const { lat, lng, heading } = liveData;
@@ -413,9 +428,23 @@ export default function StudentMap() {
     if (markerElRef.current) {
       markerElRef.current.style.display = "flex";
       if (heading) markerElRef.current.style.transform = `rotate(${heading}deg)`;
+      markerElRef.current.title = isStale ? `Last seen ${ageLabel(liveData.age_seconds)}` : "Your bus";
     }
-    busMarkerRef.current.setLngLat([lng, lat]);
-  }, [liveData]);
+    // A last-known position is faded so it does not read as the bus being there now.
+    // (MapLibre owns the marker's opacity, so it is set through the marker.)
+    busMarkerRef.current.setLngLat([lng, lat]).setOpacity(isStale ? "0.55" : "1");
+
+    // The first time the bus appears, widen the view if it is outside it (once, so the
+    // student can still pan freely while the bus moves).
+    const map = mapRef.current;
+    if (!busFramedRef.current && map.getBounds) {
+      busFramedRef.current = true;
+      const view = map.getBounds();
+      if (!view.contains([lng, lat])) {
+        map.fitBounds(view.extend([lng, lat]), { padding: isMobileRef.current ? 30 : 60, maxZoom: 14, duration: 600 });
+      }
+    }
+  }, [liveData, isStale]);
 
   // 6. Update incidents GeoJSON
   useEffect(() => {
@@ -452,17 +481,42 @@ export default function StudentMap() {
 
   const timeSince = (date) => {
     if (!date) return "—";
-    const secs = Math.floor((new Date() - date) / 1000);
-    if (secs < 60) return `${secs}s ago`;
-    return `${Math.floor(secs / 60)}m ago`;
+    return ageLabel(Math.max(0, Math.floor((new Date() - date) / 1000)));
   };
 
   const speedLabel = () => {
     if (!liveData) return "Waiting for GPS...";
+    if (isStale) return "Not moving live";
+    if (liveData.speed == null) return "Location from driver's phone";
     if (liveData.ignition === false) return "🔴 Ignition OFF";
     if (liveData.speed === 0) return "🟡 Idling";
     return `🟢 ${liveData.speed} km/h`;
   };
+
+  const mapHeight = isMobile ? Math.max(280, window.innerHeight - 380) : 520;
+
+  const chooseMapView = (view) => {
+    setMapView(view);
+    if (view === "traffic") setTrafficOpened(true);
+    // MapLibre cannot measure itself while hidden; size it again when it comes back.
+    else requestAnimationFrame(() => mapRef.current?.resize());
+  };
+  const warmUpTraffic = () => {
+    import("../../components/maps/TrafficMap");
+    loadGoogleMaps().catch(() => {});
+  };
+
+  // The student's own route and bus, in the shape TrafficMap draws.
+  const myRoute = trackingData ? [{
+    id: "mine", geometry: trackingData.geometry,
+    stops: (trackingData.stops || []).map((s) => ({ longitude: s.lng, latitude: s.lat })),
+  }] : [];
+  const myBus = liveData?.lat && liveData?.lng ? [{
+    bus_id: "mine", bus_number: liveData.bus_number || trackingData?.bus?.bus_number || "Your bus",
+    latitude: liveData.lat, longitude: liveData.lng, status: isStale ? "stale" : "live",
+    route: { name: trackingData?.route_name }, driver: { name: liveData.driver_name || trackingData?.bus?.driver_name },
+    position_timestamp: lastUpdated,
+  }] : [];
 
   return (
     <PageShell role="student" title="Live Bus Tracking">
@@ -472,7 +526,9 @@ export default function StudentMap() {
 
       {isStale && (
         <Banner variant="warning">
-          GPS signal lost or bus is offline. Showing last known position.
+          {liveData
+            ? `Your bus has stopped sharing its location. The map shows where it was last seen, ${timeSince(lastUpdated)}.`
+            : "Your bus is not sharing its location right now. It will appear on the map once it does."}
         </Banner>
       )}
 
@@ -488,13 +544,39 @@ export default function StudentMap() {
         <InfoCard label="Bus"         value={liveData?.bus_number ?? trackingData?.bus?.bus_number ?? "—"} />
         <InfoCard label="Driver"      value={liveData?.driver_name ?? trackingData?.bus?.driver_name ?? "—"} />
         <InfoCard label="Speed"       value={speedLabel()} accent={liveData?.speed > 0} />
-        <InfoCard label="GPS Updated" value={timeSince(lastUpdated)} warning={isStale} />
+        <InfoCard label={isStale && liveData ? "Last seen" : "GPS updated"} value={timeSince(lastUpdated)} warning={isStale} />
       </div>
+
+      {/* Bus map or Google live traffic, as on the admin dashboard */}
+      {GOOGLE_MAPS_API_KEY && (
+        <div role="group" aria-label="Map view" style={{ display: "flex", gap: 6, marginBottom: 10 }}>
+          {[["bus", "Bus map"], ["traffic", "Live traffic"]].map(([key, label]) => (
+            <button
+              key={key} type="button" aria-pressed={mapView === key} onClick={() => chooseMapView(key)}
+              // Start fetching Google's script on hover or focus; it is free until a map is made.
+              onPointerEnter={key === "traffic" ? warmUpTraffic : undefined}
+              onFocus={key === "traffic" ? warmUpTraffic : undefined}
+              style={{ ...(mapView === key ? btn.primary : btn.ghost), padding: "7px 14px", fontSize: 12.5 }}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {trafficOpened && (
+        <div style={{ display: mapView === "traffic" ? "block" : "none", marginBottom: 0 }}>
+          <Suspense fallback={<Spinner />}>
+            <TrafficMap routes={myRoute} buses={myBus} height={mapHeight} showRoutesInitially />
+          </Suspense>
+        </div>
+      )}
 
       {/* Map */}
       <div style={{
+        display: mapView === "bus" ? "block" : "none",
         position: "relative",
-        height: isMobile ? "calc(100vh - 380px)" : 520,
+        height: mapHeight,
         minHeight: 280,
         borderRadius: 12,
         border: `1px solid ${colors.borderLight}`,
@@ -515,7 +597,8 @@ export default function StudentMap() {
             <span><i style={{ display: "inline-block", width: 9, height: 9, background: "#DC2626", marginRight: 3 }} />High</span>
           </div>}
         </div>
-        <TrafficLegend traffic={traffic} visible={trafficShown} onToggle={setTrafficShown} onOpenLive={() => setLiveTrafficOpen(true)} style={{ bottom: 30 }}
+        <TrafficLegend traffic={traffic} visible={trafficShown} onToggle={setTrafficShown} onOpenLive={() => chooseMapView("traffic")} style={{ bottom: 30 }}
+          compact={isMobile} // one row on phones, so the legend does not cover half the map
           mapbox={{ on: mapboxOn, onChange: (on) => { setMapboxOn(on); rememberMapboxTraffic(on); } }} />
         {!trackingData && (
           <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.8)", borderRadius: 12, zIndex: 10 }}>
@@ -531,19 +614,6 @@ export default function StudentMap() {
 
       {crimeRiskStatus && <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>{crimeRiskStatus}</p>}
 
-      {liveTrafficOpen && (
-        <LiveTrafficDialog
-          title={`Live traffic on ${trackingData?.route_name || "your route"}`}
-          routes={trackingData ? [{ id: "mine", geometry: trackingData.geometry, stops: (trackingData.stops || []).map((s) => ({ longitude: s.lng, latitude: s.lat })) }] : []}
-          buses={liveData?.lat && liveData?.lng ? [{
-            bus_id: "mine", bus_number: liveData.bus_number || trackingData?.bus?.bus_number || "Your bus",
-            latitude: liveData.lat, longitude: liveData.lng, status: isStale ? "stale" : "live",
-            route: { name: trackingData?.route_name }, driver: { name: liveData.driver_name || trackingData?.bus?.driver_name },
-            position_timestamp: lastUpdated,
-          }] : []}
-          onClose={() => setLiveTrafficOpen(false)}
-        />
-      )}
 
 <p style={{ fontSize: 13, color: colors.textSecondary, marginTop: 10, lineHeight: 1.5 }}>
         {(() => {

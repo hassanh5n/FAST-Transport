@@ -179,16 +179,13 @@ def student_bus_tracking(request):
     })
 
 
-# Map each route to its tracker token
-BUS_TRACKER_TOKENS = {
-    # Route assignment ID → iTecknologi token
-    # You'll fill these in once you have tokens for each bus
-    "default": "YgIw0Z",
-}
-
 ITECKNOLOGI_BASE = "https://iot.itecknologi.com/fleet"
 
 LIVE_FLEET_FRESHNESS_SECONDS = 60
+# Older than live, a position is still shown as "last known" for this long, so a bus whose
+# tracker or driver's phone goes quiet stays on the map with its age. Past it (yesterday's
+# trip) the bus has no position.
+LAST_KNOWN_MAX_SECONDS = 12 * 60 * 60
 
 
 def _parse_tracker_timestamp(value):
@@ -207,6 +204,29 @@ def _location_status(position_timestamp, now):
         return "offline"
     age = (now - position_timestamp).total_seconds()
     return "live" if 0 <= age <= LIVE_FLEET_FRESHNESS_SECONDS else "stale"
+
+
+def _best_position(tracker, ping, now):
+    """
+    The freshest position for a bus from its GPS tracker and the driver's newest phone
+    ping, or None. Returns {latitude, longitude, timestamp, age_seconds, source}, where
+    source is "tracker" or "driver".
+    """
+    candidates = []
+    if tracker and tracker.get("latitude") is not None:
+        # A tracker that sends no time is taken as reporting now.
+        candidates.append((tracker.get("position_timestamp") or now, "tracker",
+                           tracker["latitude"], tracker["longitude"]))
+    if ping is not None:
+        candidates.append((ping.recorded_at, "driver", float(ping.latitude), float(ping.longitude)))
+    if not candidates:
+        return None
+    timestamp, source, latitude, longitude = max(candidates, key=lambda item: item[0])
+    age = max(0, (now - timestamp).total_seconds())
+    if age > LAST_KNOWN_MAX_SECONDS:
+        return None
+    return {"latitude": latitude, "longitude": longitude, "timestamp": timestamp,
+            "age_seconds": round(age), "source": source}
 
 
 def _fetch_tracker_location(bus):
@@ -253,21 +273,23 @@ def _fetch_tracker_location(bus):
 def _serialize_fleet_bus(bus, now):
     assignment = bus.active_assignments[0] if bus.active_assignments else None
     tracker = _fetch_tracker_location(bus)
-    source = tracker.get("status")
-    latitude = tracker.get("latitude")
-    longitude = tracker.get("longitude")
-    position_timestamp = tracker.get("position_timestamp")
+    ping = bus.recent_location_pings[0] if bus.recent_location_pings else None
+    best = _best_position(tracker, ping, now)
 
-    if latitude is None and bus.recent_location_pings:
-        ping = bus.recent_location_pings[0]
-        ping_age = (now - ping.recorded_at).total_seconds()
-        if ping_age <= LIVE_FLEET_FRESHNESS_SECONDS:
-            latitude = float(ping.latitude)
-            longitude = float(ping.longitude)
-            position_timestamp = ping.recorded_at
+    if best is None:
+        # No position in the last 12 hours: say why (no tracker fitted, or offline).
+        latitude = longitude = position_timestamp = age_seconds = None
+        source = status = tracker.get("status")
+    else:
+        latitude, longitude = best["latitude"], best["longitude"]
+        position_timestamp, age_seconds = best["timestamp"], best["age_seconds"]
+        live = age_seconds <= LIVE_FLEET_FRESHNESS_SECONDS
+        if best["source"] == "driver":
             source = "ping"
-
-    status = "ping" if source == "ping" else (_location_status(position_timestamp, now) if latitude is not None else source)
+            status = "ping" if live else "last_known"
+        else:
+            source = tracker.get("status")
+            status = "live" if live else "stale"
     return {
         "bus_id": bus.id,
         "bus_number": bus.bus_number,
@@ -276,10 +298,11 @@ def _serialize_fleet_bus(bus, now):
         "status": status,
         "latitude": latitude,
         "longitude": longitude,
-        "speed_kmh": tracker.get("speed_kmh"),
-        "heading_degrees": tracker.get("heading_degrees"),
-        "ignition": tracker.get("ignition"),
+        "speed_kmh": tracker.get("speed_kmh") if source != "ping" else None,
+        "heading_degrees": tracker.get("heading_degrees") if source != "ping" else None,
+        "ignition": tracker.get("ignition") if source != "ping" else None,
         "position_timestamp": position_timestamp,
+        "position_age_seconds": age_seconds,
         "source": source,
         "route": {"id": assignment.route_id, "name": assignment.route.name} if assignment else None,
         "driver": {"id": assignment.driver_id, "name": assignment.driver.name} if assignment else None,
@@ -326,6 +349,7 @@ def admin_live_fleet(request):
     return Response({
         "server_time": now,
         "freshness_threshold_seconds": LIVE_FLEET_FRESHNESS_SECONDS,
+        "last_known_max_seconds": LAST_KNOWN_MAX_SECONDS,
         "buses": results,
     })
 
@@ -334,70 +358,50 @@ def admin_live_fleet(request):
 @permission_classes([IsAuthenticated])
 def live_bus_location(request):
     """
-    Returns real GPS coordinates for the student's assigned bus.
-    Falls back to last known position if GPS is stale.
+    Where the student's bus is: the newer of its GPS tracker and the driver's phone.
+    When both have gone quiet, the last known position is still returned (up to 12 h old)
+    with its real time, so the page can say "last seen 5 min ago" instead of nothing.
     """
-    from ..models import SeatAllocation, SemesterRegistration, RouteAssignment
-    
-    # Get student's active registration
+    from ..models import SemesterRegistration, RouteAssignment
+
     try:
         profile = request.user.studentprofile
-        registration = SemesterRegistration.objects.filter(
-            student=profile,
-            semester__is_active=True
-        ).select_related("route", "stop").first()
-        
-        if not registration:
-            return Response({"detail": "No active registration"}, status=404)
-        
-        # Find route assignment (which bus is on this route)
-        assignment = RouteAssignment.objects.filter(
-            route=registration.route,
-            semester__is_active=True,
-            is_active=True
-        ).select_related("bus").first()
-        
-        if not assignment:
-            return Response({"detail": "No active bus assignment"}, status=404)
-        
-        # Get the tracker token for this bus
-        # You can store this on the Bus model (see Step 3)
-        token = getattr(assignment.bus, 'tracker_token', None) or BUS_TRACKER_TOKENS["default"]
-        
-    except Exception as e:
-        return Response({"detail": str(e)}, status=500)
-    
-    # Call iTecknologi API
-    try:
-        resp = req_lib.get(
-        "https://iot.itecknologi.com/fleet/live_data_api_token.php",
-        params={"token": token},
-        timeout=5
-        )
-        resp.raise_for_status()
-        gps_data = resp.json()
+    except Exception:
+        return Response({"detail": "No student profile."}, status=404)
+    registration = SemesterRegistration.objects.filter(
+        student=profile, semester__is_active=True,
+    ).select_related("route", "stop").first()
+    if not registration:
+        return Response({"detail": "No active registration"}, status=404)
+    assignment = RouteAssignment.objects.filter(
+        route=registration.route, semester__is_active=True, is_active=True,
+    ).select_related("bus", "driver").first()
+    if not assignment:
+        return Response({"detail": "No active bus assignment"}, status=404)
 
-        if not gps_data.get("status"):
-            return Response({"detail": "Tracker returned no data"}, status=503)
+    bus = assignment.bus
+    now = timezone.now()
+    # Same cached lookup as the admin fleet map (5 s), so students polling every 8 s
+    # do not each call the tracker company.
+    tracker = _fetch_tracker_location(bus) if bus.tracker_token else {}
+    ping = bus.location_pings.order_by("-recorded_at").first()
+    best = _best_position(tracker, ping, now)
+    if best is None:
+        return Response({"detail": "Your bus has not shared a location in the last 12 hours."}, status=503)
 
-        d = gps_data["data"]
-
-        return Response({
-            "lat":         d["lat"],
-            "lng":         d["lng"],
-            "speed":       d["speed"],
-            "heading":     d["angle"],           # "angle" → heading
-            "ignition":    d["ign_value"] == 1,  # 0/1 int → bool
-            "timestamp":   d["message"],
-            "vehicle":     gps_data.get("vehicle"),   # "JE-5354"
-            "model":       gps_data.get("model"),     # "MINI BUS"
-            "bus_number":  assignment.bus.bus_number,
-            "driver_name": assignment.driver.name,
-            "route_name":  registration.route.name,
-            "student_stop": registration.stop.name,
-        })
-    
-    except req_lib.Timeout:
-        return Response({"detail": "GPS tracker timeout"}, status=503)
-    except Exception as e:
-        return Response({"detail": f"Tracker error: {str(e)}"}, status=502)
+    from_tracker = best["source"] == "tracker"
+    return Response({
+        "lat": best["latitude"],
+        "lng": best["longitude"],
+        "speed": tracker.get("speed_kmh") if from_tracker else None,
+        "heading": tracker.get("heading_degrees") if from_tracker else None,
+        "ignition": tracker.get("ignition") if from_tracker else None,
+        "timestamp": best["timestamp"],
+        "age_seconds": best["age_seconds"],
+        "is_live": best["age_seconds"] <= LIVE_FLEET_FRESHNESS_SECONDS,
+        "source": best["source"],          # "tracker" or "driver"
+        "bus_number": bus.bus_number,
+        "driver_name": assignment.driver.name if assignment.driver else None,
+        "route_name": registration.route.name,
+        "student_stop": registration.stop.name if registration.stop else None,
+    })

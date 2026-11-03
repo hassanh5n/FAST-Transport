@@ -4,7 +4,14 @@
 // lifts text contrast; each page keeps its own layout and sizing.
 
 const patch = {
+  // The page grows and scrolls instead of clipping: on a short phone, or with the
+  // keyboard open, a fixed 100vh box cut off the top of the form. The gradient stays
+  // pinned to the viewport behind it.
+  root: { width: "100%", height: "auto", minHeight: "100dvh", overflow: "visible", padding: "24px 0", boxSizing: "border-box" },
+  shader: { position: "fixed" },
+  grain: { position: "fixed" },
   card: {
+    padding: "clamp(24px, 7vw, 36px) clamp(20px, 6vw, 32px)",
     background: "rgba(6,28,44,0.40)",
     border: "1px solid rgba(255,255,255,0.18)",
     backdropFilter: "blur(24px) saturate(150%)",
@@ -25,7 +32,7 @@ const patch = {
 };
 
 const scrim = {
-  position: "absolute",
+  position: "fixed",
   inset: 0,
   zIndex: 1,
   pointerEvents: "none",

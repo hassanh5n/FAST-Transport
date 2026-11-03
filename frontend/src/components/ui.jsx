@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { colors, fonts, radius, btn } from "../theme";
 import { validateField } from "../utils/validation";
@@ -9,36 +9,60 @@ import { validateField } from "../utils/validation";
 // page", so a modal rendered in place stretched over the whole page and scrolled
 // away with it. The page behind is locked while any modal is open.
 let openModals = 0;
-export function ModalLayer({ children }) {
+const escapeStack = []; // Escape closes only the topmost modal
+export function ModalLayer({ children, onClose }) {
   useEffect(() => {
     openModals += 1;
     const previous = document.body.style.overflow;
+    const returnFocus = document.activeElement;
     document.body.style.overflow = "hidden";
     return () => {
       openModals -= 1;
       if (openModals === 0) document.body.style.overflow = previous;
+      // Give keyboard focus back to whatever opened the modal.
+      if (returnFocus && document.contains(returnFocus)) returnFocus.focus?.();
     };
   }, []);
+
+  // Read through a ref so a new onClose each render does not re-order the stack.
+  const onCloseRef = useRef(onClose);
+  useEffect(() => { onCloseRef.current = onClose; });
+  useEffect(() => {
+    const entry = {};
+    escapeStack.push(entry);
+    const onKey = (e) => {
+      if (e.key === "Escape" && escapeStack[escapeStack.length - 1] === entry) onCloseRef.current?.();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      escapeStack.splice(escapeStack.indexOf(entry), 1);
+    };
+  }, []);
+
   return createPortal(children, document.body);
 }
 
 // ── Confirm Modal ─────────────────────────────────────────────────────────────
 export function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel = "Confirm", danger = true }) {
+  const titleId = useId();
+  const cancelRef = useRef(null);
+  useEffect(() => { cancelRef.current?.focus(); }, []);
   return (
-    <ModalLayer>
+    <ModalLayer onClose={onCancel}>
     <div style={modalStyles.overlay}>
-      <div style={modalStyles.box}>
+      <div style={modalStyles.box} role="alertdialog" aria-modal="true" aria-labelledby={titleId}>
         <div style={modalStyles.iconWrap}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={danger ? colors.dangerText : colors.accent} strokeWidth="2" strokeLinecap="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={danger ? colors.dangerText : colors.accent} strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <h3 style={modalStyles.title}>{title}</h3>
-        <p style={modalStyles.message}>{message}</p>
+        <h3 id={titleId} style={modalStyles.title}>{title}</h3>
+        <div style={modalStyles.message}>{message}</div>
         <div style={modalStyles.actions}>
-          <button onClick={onCancel} style={modalStyles.cancelBtn}>Cancel</button>
-          <button onClick={onConfirm} style={danger ? modalStyles.dangerBtn : modalStyles.confirmBtn}>
+          <button ref={cancelRef} type="button" onClick={onCancel} style={modalStyles.cancelBtn}>Cancel</button>
+          <button type="button" onClick={onConfirm} style={danger ? modalStyles.dangerBtn : modalStyles.confirmBtn}>
             {confirmLabel}
           </button>
         </div>
@@ -50,17 +74,24 @@ export function ConfirmModal({ title, message, onConfirm, onCancel, confirmLabel
 
 // ── Form Modal ────────────────────────────────────────────────────────────────
 export function FormModal({ title, sub, children, onSubmit, onClose, submitLabel = "Save", loading = false, width = "560px" }) {
+  const titleId = useId();
+  const boxRef = useRef(null);
+  // Start keyboard users on the first field, not behind the modal.
+  useEffect(() => {
+    const first = boxRef.current?.querySelector("form input:not([type=hidden]), form select, form textarea");
+    (first || boxRef.current)?.focus();
+  }, []);
   return (
-    <ModalLayer>
+    <ModalLayer onClose={onClose}>
     <div style={modalStyles.overlay} onMouseDown={onClose}>
-      <div style={{ ...modalStyles.box, maxWidth: width }} onMouseDown={(e) => e.stopPropagation()}>
+      <div ref={boxRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={titleId} style={{ ...modalStyles.box, maxWidth: width, outline: "none" }} onMouseDown={(e) => e.stopPropagation()}>
         <div style={modalStyles.header}>
-          <div>
-            <h3 style={modalStyles.title}>{title}</h3>
+          <div style={{ minWidth: 0 }}>
+            <h3 id={titleId} style={modalStyles.title}>{title}</h3>
             {sub && <p style={modalStyles.message}>{sub}</p>}
           </div>
           <button type="button" onClick={onClose} style={modalStyles.closeBtn} aria-label="Close dialog">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
               <path d="M18 6 6 18" />
               <path d="M6 6l12 12" />
             </svg>
@@ -87,13 +118,15 @@ const modalStyles = {
     background: "rgba(11,45,66,0.45)",
     display: "flex", alignItems: "center", justifyContent: "center",
     zIndex: 1000, backdropFilter: "blur(3px)",
+    padding: "12px",
   },
   box: {
     background: "#fff", borderRadius: radius.xl,
-    padding: "28px 24px", maxWidth: "420px", width: "94%",
+    padding: "clamp(18px, 5vw, 28px) clamp(16px, 5vw, 24px)", maxWidth: "420px", width: "100%",
     boxShadow: "0 24px 64px rgba(11,45,66,0.22)",
     textAlign: "center",
-    maxHeight: "90vh", overflowY: "auto",
+    maxHeight: "calc(100dvh - 24px)", overflowY: "auto",
+    overscrollBehavior: "contain",
   },
   header: {
     display: "flex",
@@ -111,7 +144,7 @@ const modalStyles = {
   },
   title: { margin: "0 0 10px", fontSize: "17px", fontWeight: "700", color: colors.textPrimary, fontFamily: fonts.heading },
   message: { margin: "0 0 24px", fontSize: "13.5px", color: colors.textSecondary, lineHeight: 1.6 },
-  actions: { display: "flex", gap: "10px", justifyContent: "center" },
+  actions: { display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "center" },
   cancelBtn: { ...btn.ghost, minWidth: "100px" },
   dangerBtn: { ...btn.danger, minWidth: "120px", fontWeight: "700" },
   confirmBtn: { ...btn.primary, minWidth: "120px" },
@@ -129,7 +162,7 @@ const modalStyles = {
   },
   form: { display: "flex", flexDirection: "column", gap: "18px" },
   formBody: { display: "flex", flexWrap: "wrap", gap: "12px" },
-  formActions: { display: "flex", gap: "10px", justifyContent: "flex-end" },
+  formActions: { display: "flex", flexWrap: "wrap", gap: "10px", justifyContent: "flex-end" },
 };
 
 // ── Status Badge (clickable toggle) ──────────────────────────────────────────
@@ -227,30 +260,38 @@ const formCardStyles = {
 // ── Labelled field wrapper ────────────────────────────────────────────────────
 export function Field({ label, required, children, flex = "1 1 160px", validators = [] }) {
   const [error, setError] = React.useState(null);
+  const autoId = useId();
 
   // If validators are provided and there's a single child element, clone it
-  const child = React.Children.count(children) === 1 ? React.Children.only(children) : null;
+  const child = React.Children.count(children) === 1 && React.isValidElement(children) ? React.Children.only(children) : null;
+  // Tie the label to its control so screen readers announce it and tapping the label focuses it.
+  const controlId = child ? (child.props.id || autoId) : undefined;
+  const errorId = `${autoId}-error`;
 
   const handleBlur = (e) => {
-    if (!validators || validators.length === 0) return;
-    const v = validateField(e.target.value, validators);
-    setError(v);
     if (child?.props?.onBlur) child.props.onBlur(e);
+    if (!validators || validators.length === 0) return;
+    setError(validateField(e.target.value, validators));
   };
 
   const renderedChild = child
-    ? React.cloneElement(child, { onBlur: handleBlur, style: child.props.style })
+    ? React.cloneElement(child, {
+        id: controlId,
+        onBlur: handleBlur,
+        style: child.props.style,
+        ...(error ? { "aria-invalid": true, "aria-describedby": errorId } : {}),
+      })
     : children;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "5px", flex }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "5px", flex, minWidth: 0 }}>
       {label && (
-        <label style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-          {label}{required && <span style={{ color: colors.dangerText, marginLeft: 2 }}>*</span>}
+        <label htmlFor={controlId} style={{ fontSize: "11px", fontWeight: "600", color: colors.textSecondary, letterSpacing: "0.04em", textTransform: "uppercase" }}>
+          {label}{required && <span style={{ color: colors.dangerText, marginLeft: 2 }} aria-hidden="true">*</span>}
         </label>
       )}
       {renderedChild}
-      {error && <div style={{ color: colors.dangerText, fontSize: "12px", marginTop: "6px" }}>{error}</div>}
+      {error && <div id={errorId} role="alert" style={{ color: colors.dangerText, fontSize: "12px", marginTop: "6px" }}>{error}</div>}
     </div>
   );
 }
@@ -279,7 +320,7 @@ export function Banner({ variant = "info", children }) {
 // ── Spinner / loading state ───────────────────────────────────────────────────
 export function Spinner() {
   return (
-    <div style={{ padding: "48px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
+    <div role="status" style={{ padding: "48px 0", display: "flex", flexDirection: "column", alignItems: "center", gap: "14px" }}>
       <div style={{
         width: "28px", height: "28px", borderRadius: "50%",
         border: `3px solid ${colors.borderLight}`,

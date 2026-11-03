@@ -41,7 +41,7 @@ function Navbar({ title = "Fleetcentric.ai", isMobile = false, onMenuToggle }) {
       <div style={styles.left}>
         {/* Hamburger — mobile only */}
         {isMobile && (
-          <button onClick={onMenuToggle} style={styles.hamburger} aria-label="Open menu">
+          <button onClick={onMenuToggle} style={styles.hamburger} aria-label="Open menu" aria-controls="app-sidebar">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
               <line x1="3" y1="6"  x2="21" y2="6"/>
               <line x1="3" y1="12" x2="21" y2="12"/>
@@ -81,7 +81,7 @@ function Navbar({ title = "Fleetcentric.ai", isMobile = false, onMenuToggle }) {
         </div>
 
         {/* Logout: icon-only on mobile, icon+text on desktop */}
-        <button onClick={handleLogout} style={isMobile ? styles.logoutBtnIcon : styles.logoutBtn} title="Sign out">
+        <button onClick={handleLogout} style={isMobile ? styles.logoutBtnIcon : styles.logoutBtn} title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
             <polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/>
@@ -121,7 +121,9 @@ const styles = {
     background:   "transparent",
     border:       `1px solid ${colors.borderLight}`,
     borderRadius: "8px",
-    padding:      "6px",
+    padding:      "0",
+    width:        "40px",
+    height:       "40px",
     cursor:       "pointer",
     display:      "flex",
     alignItems:   "center",
@@ -213,7 +215,7 @@ const styles = {
     width:          "28px",
     height:         "28px",
     borderRadius:   "50%",
-    background:     colors.accent,
+    background:     colors.accentStrong,
     color:          "#fff",
     fontSize:       "10px",
     fontWeight:     "800",
@@ -252,7 +254,9 @@ const styles = {
     display:       "flex",
     alignItems:    "center",
     justifyContent:"center",
-    padding:       "7px",
+    padding:       0,
+    width:         "40px",
+    height:        "40px",
     background:    "transparent",
     border:        `1px solid ${colors.borderMid}`,
     borderRadius:  "9px",

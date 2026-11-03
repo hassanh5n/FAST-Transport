@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { CAMPUS, MAP_COLORS, MAP_STYLE, addCampusMarker, escapeHtml } from "./campus";
+import { addMyLocationControl } from "./myLocation";
 
 const lngLatOf = (stop) => {
   const lat = Number(stop.latitude);
@@ -38,6 +39,7 @@ export default function StopsMap({ stops, height = 520, highlightId = null, onSt
     const map = new maplibregl.Map({ container: containerRef.current, style: MAP_STYLE, center: CAMPUS.center, zoom: CAMPUS.zoom });
     addCampusMarker(map);
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    addMyLocationControl(map); // "show my location" button
     const tip = new maplibregl.Popup({ closeButton: false, closeOnClick: false, offset: 10 });
     map.on("load", () => {
       map.addSource("stops", { type: "geojson", data: { type: "FeatureCollection", features: [] } });
@@ -68,7 +70,7 @@ export default function StopsMap({ stops, height = 520, highlightId = null, onSt
         const feature = event.features?.[0];
         if (!feature) return;
         const name = escapeHtml(feature.properties.name);
-        const note = feature.properties.active ? "" : ' <span style="color:#8faabb;">(inactive)</span>';
+        const note = feature.properties.active ? "" : ' <span style="color:#5b7489;">(inactive)</span>';
         tip.setLngLat(feature.geometry.coordinates).setHTML(`<div style="font:600 12px 'DM Sans',system-ui,sans-serif;color:#0f1f2d;">${name}${note}</div>`).addTo(map);
       });
       map.on("mouseleave", "stops", () => { map.getCanvas().style.cursor = ""; tip.remove(); });
