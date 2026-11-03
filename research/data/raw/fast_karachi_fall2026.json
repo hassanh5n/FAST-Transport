@@ -1,0 +1,3973 @@
+{
+ "tenant": "FAST NUCES Karachi",
+ "term": "Fall 2026",
+ "campus": {
+  "name": "FAST NUCES Karachi Campus",
+  "lat": 24.856899,
+  "lng": 67.264684
+ },
+ "routes": [
+  {
+   "operator": "Jadoon",
+   "code": "R-2",
+   "driver": "Sabir",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Gawalia",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "K.U. Society",
+     "morning_eta": "6:31"
+    },
+    {
+     "order": 3,
+     "name": "PCSIR",
+     "morning_eta": "6:32"
+    },
+    {
+     "order": 4,
+     "name": "Quetta Town",
+     "morning_eta": "6:32"
+    },
+    {
+     "order": 5,
+     "name": "G3 Stop",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 6,
+     "name": "KBACHS Society / Sachal",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 7,
+     "name": "Shahmir Colony Gate",
+     "morning_eta": "6:56"
+    },
+    {
+     "order": 8,
+     "name": "Makhdoom Bilawal",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 9,
+     "name": "Chapal Bungalows",
+     "morning_eta": "6:58"
+    },
+    {
+     "order": 10,
+     "name": "Memon Medical Hospital",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 11,
+     "name": "Roofi Bungalows",
+     "morning_eta": "7:01"
+    },
+    {
+     "order": 12,
+     "name": "Sunlay Bungalows",
+     "morning_eta": "7:02"
+    },
+    {
+     "order": 13,
+     "name": "Safoora",
+     "morning_eta": "7:05"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-3",
+   "driver": "Zeeshan",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "POB Eye Hospital",
+     "morning_eta": "6:25"
+    },
+    {
+     "order": 2,
+     "name": "Gate 3 PIA",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 3,
+     "name": "Nawaz Sharif School",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 4,
+     "name": "Bismillah Tower (PIA)",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 5,
+     "name": "Magsi Chowk",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 6,
+     "name": "Saima Flats",
+     "morning_eta": "6:55"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-3B",
+   "driver": "Shahid",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Chishti Nagar",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 2,
+     "name": "Kamran Chowrangi",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 3,
+     "name": "Tyre Puncture Shop",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 4,
+     "name": "Munawar Chowrangi",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 5,
+     "name": "Sardar CNG",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 6,
+     "name": "Nawabish",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-4",
+   "driver": "Babu",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Maymar Gate",
+     "morning_eta": "6:25"
+    },
+    {
+     "order": 2,
+     "name": "Al Habib Restaurant",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 3,
+     "name": "Jamali Pul",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 4,
+     "name": "Al Asif",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 5,
+     "name": "Abbas Town",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 6,
+     "name": "Paradise Bakery",
+     "morning_eta": "6:52"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-4B",
+   "driver": "Kashif",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Maskan",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 2,
+     "name": "Disco Bakery",
+     "morning_eta": "6:58"
+    },
+    {
+     "order": 3,
+     "name": "Rimjhim Hall",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 4,
+     "name": "Gulshan Turn",
+     "morning_eta": "7:01"
+    },
+    {
+     "order": 5,
+     "name": "Dhaka Sweets",
+     "morning_eta": "7:02"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-5",
+   "driver": "Zardari",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Saima Arabian",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "4K Stop",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 3,
+     "name": "2 Minute",
+     "morning_eta": "6:36"
+    },
+    {
+     "order": 4,
+     "name": "Power House",
+     "morning_eta": "6:38"
+    },
+    {
+     "order": 5,
+     "name": "Saleem Center",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 6,
+     "name": "UP More",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 7,
+     "name": "Nagan (Dahli Hall)",
+     "morning_eta": "6:44"
+    },
+    {
+     "order": 8,
+     "name": "Alnoor Edhi Center",
+     "morning_eta": "6:50"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-5B",
+   "driver": "Fahad",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Dolmen Mall",
+     "morning_eta": null
+    },
+    {
+     "order": 2,
+     "name": "5 Star",
+     "morning_eta": null
+    },
+    {
+     "order": 3,
+     "name": "Farooq-e-Azam",
+     "morning_eta": null
+    },
+    {
+     "order": 4,
+     "name": "Gulberg",
+     "morning_eta": null
+    },
+    {
+     "order": 5,
+     "name": "Fazal Mill",
+     "morning_eta": null
+    },
+    {
+     "order": 6,
+     "name": "Lucky One",
+     "morning_eta": null
+    },
+    {
+     "order": 7,
+     "name": "Moti Mahal",
+     "morning_eta": null
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-6",
+   "driver": "Saeed",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Ajmer Nagri",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "Bombay Bakery",
+     "morning_eta": "6:31"
+    },
+    {
+     "order": 3,
+     "name": "Oxford School",
+     "morning_eta": "6:32"
+    },
+    {
+     "order": 4,
+     "name": "Bara Dari",
+     "morning_eta": "6:33"
+    },
+    {
+     "order": 5,
+     "name": "Babul Islam",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 6,
+     "name": "Disco More",
+     "morning_eta": "6:37"
+    },
+    {
+     "order": 7,
+     "name": "Anda More",
+     "morning_eta": "6:38"
+    },
+    {
+     "order": 8,
+     "name": "Cafe Al Habib",
+     "morning_eta": "6:44"
+    },
+    {
+     "order": 9,
+     "name": "Cafe 2 Days",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 10,
+     "name": "Namak Bank",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 11,
+     "name": "Shafiq More",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 12,
+     "name": "Power House",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 13,
+     "name": "Alnoor",
+     "morning_eta": "6:50"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-6B",
+   "driver": "Ahsan",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Haider Food",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 2,
+     "name": "Qalandria",
+     "morning_eta": "6:41"
+    },
+    {
+     "order": 3,
+     "name": "DC Office",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 4,
+     "name": "Peoples Chowrangi",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 5,
+     "name": "Cafe Piyala",
+     "morning_eta": "6:49"
+    },
+    {
+     "order": 6,
+     "name": "Raheem Hospital",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 7,
+     "name": "Water Pump More",
+     "morning_eta": "6:51"
+    },
+    {
+     "order": 8,
+     "name": "KIHD",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 9,
+     "name": "16 No Chowrangi",
+     "morning_eta": "6:54"
+    },
+    {
+     "order": 10,
+     "name": "Moti Mahal",
+     "morning_eta": "6:55"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-7",
+   "driver": "Yaqoob",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Esa Lab 5 Star",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Donesil",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 3,
+     "name": "Landi Kotal",
+     "morning_eta": "6:37"
+    },
+    {
+     "order": 4,
+     "name": "Tahir Villas",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 5,
+     "name": "Shadab Masjid",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 6,
+     "name": "Gulberg Thana",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 7,
+     "name": "Shahzad Store",
+     "morning_eta": "6:47"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-8",
+   "driver": "Talib",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "2K Stop",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 2,
+     "name": "Mateen Food",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 3,
+     "name": "Dental College",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 4,
+     "name": "Green House",
+     "morning_eta": "6:50"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-8B",
+   "driver": "Wali",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Naya Nazimabad",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Nusrat Bhutto Colony",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 3,
+     "name": "Shadman 1",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 4,
+     "name": "Shadman 2",
+     "morning_eta": "6:46"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-9B",
+   "driver": "Ghafoor",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Masjid Khairul Bashir",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 2,
+     "name": "CNG Pump",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 3,
+     "name": "Usman Ghani Masjid",
+     "morning_eta": "6:44"
+    },
+    {
+     "order": 4,
+     "name": "Mochi Gali",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 5,
+     "name": "Shipowner",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 6,
+     "name": "Lady Bird",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 7,
+     "name": "Imam Clinic",
+     "morning_eta": "6:52"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-10",
+   "driver": "Wazir",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Hyderi Super Mart KDA",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Ziauddin",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 3,
+     "name": "Landi Kotal",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 4,
+     "name": "Tahir Villas",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 5,
+     "name": "Ayesha Manzil More",
+     "morning_eta": "6:56"
+    },
+    {
+     "order": 6,
+     "name": "Naseerabad",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-17",
+   "driver": "Rafique",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Karimabad",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Ayesha Manzil",
+     "morning_eta": "6:37"
+    },
+    {
+     "order": 3,
+     "name": "Bhaijan Chowk",
+     "morning_eta": "6:39"
+    },
+    {
+     "order": 4,
+     "name": "8.5 Number",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 5,
+     "name": "Gulshan-e-Shamim",
+     "morning_eta": "6:43"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-18",
+   "driver": "Hasnain",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "7 No Nazimabad",
+     "morning_eta": "6:25"
+    },
+    {
+     "order": 2,
+     "name": "Abbasi Hospital",
+     "morning_eta": "6:27"
+    },
+    {
+     "order": 3,
+     "name": "Khilafat Chowk",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 4,
+     "name": "Board Office",
+     "morning_eta": "6:34"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-20",
+   "driver": "Shani",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Rana Lawn",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "Tank Chowk",
+     "morning_eta": "6:32"
+    },
+    {
+     "order": 3,
+     "name": "Kazimabad",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 4,
+     "name": "Model More",
+     "morning_eta": "6:38"
+    },
+    {
+     "order": 5,
+     "name": "Model Colony",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 6,
+     "name": "RCD Ground",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 7,
+     "name": "Baraf Khana",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 8,
+     "name": "Kala Board",
+     "morning_eta": "6:50"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-23",
+   "driver": "Adnan",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Orangi Town 5",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "Abdullah College",
+     "morning_eta": "6:32"
+    },
+    {
+     "order": 3,
+     "name": "Katti Pahari",
+     "morning_eta": "6:36"
+    },
+    {
+     "order": 4,
+     "name": "Ali Asghar Stadium",
+     "morning_eta": "6:38"
+    },
+    {
+     "order": 5,
+     "name": "Star House",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 6,
+     "name": "LDA",
+     "morning_eta": "6:42"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-23B",
+   "driver": "Asim",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Javed Nihari",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Bhaijan Chowk",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 3,
+     "name": "Mukka Chowk",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 4,
+     "name": "13D 8-1/2",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 5,
+     "name": "Rab Medical",
+     "morning_eta": "6:46"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-24",
+   "driver": "Javaid",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Lala Zar NIPA",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Safari Park",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 3,
+     "name": "Samama",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 4,
+     "name": "Continental",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 5,
+     "name": "KESC",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 6,
+     "name": "Johar Chowrangi",
+     "morning_eta": "6:55"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-24B",
+   "driver": "Asadullah",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Kamran Chowrangi",
+     "morning_eta": null
+    },
+    {
+     "order": 2,
+     "name": "Munawar Chowrangi",
+     "morning_eta": null
+    },
+    {
+     "order": 3,
+     "name": "Darul Sehat",
+     "morning_eta": null
+    },
+    {
+     "order": 4,
+     "name": "Rado Center",
+     "morning_eta": null
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-25",
+   "driver": "Lakhmir",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Al-Hira",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Puncture Shop Saadi Road",
+     "morning_eta": "6:37"
+    },
+    {
+     "order": 3,
+     "name": "Amroha Society",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 4,
+     "name": "Saadi Town",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 5,
+     "name": "Police Society",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 6,
+     "name": "Falcon",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 7,
+     "name": "6 No Check Post",
+     "morning_eta": "7:05"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-25B",
+   "driver": "Zakir",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Malik Society",
+     "morning_eta": "6:31"
+    },
+    {
+     "order": 2,
+     "name": "KDA",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 3,
+     "name": "PCSIR",
+     "morning_eta": "6:36"
+    },
+    {
+     "order": 4,
+     "name": "Quetta Town",
+     "morning_eta": "6:38"
+    },
+    {
+     "order": 5,
+     "name": "Sumaira Chowk",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 6,
+     "name": "Anara Garden",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 7,
+     "name": "Noman Garden",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 8,
+     "name": "Al Azhar",
+     "morning_eta": "6:50"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-26",
+   "driver": "Lal Khan",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "NED",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Karachi University",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 3,
+     "name": "Commander CNG",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 4,
+     "name": "G-10 Gul House",
+     "morning_eta": "6:57"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-26B",
+   "driver": "Aamir",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Fariya Chowk",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 2,
+     "name": "Khatm-e-Nabuwat",
+     "morning_eta": "6:41"
+    },
+    {
+     "order": 3,
+     "name": "Kaneez Fatima",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 4,
+     "name": "Madras Chowk",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 5,
+     "name": "Dow Medical",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 6,
+     "name": "Mosamiyat",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 7,
+     "name": "Johar Complex (Bin Hashim)",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 8,
+     "name": "Safoora",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 9,
+     "name": "Check Post 5",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-27",
+   "driver": "Mashooq",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Dentist Society",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "Officers Society",
+     "morning_eta": "6:31"
+    },
+    {
+     "order": 3,
+     "name": "Teachers Society",
+     "morning_eta": "6:33"
+    },
+    {
+     "order": 4,
+     "name": "Madras Chowk",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 5,
+     "name": "Suchal",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 6,
+     "name": "Furniture Market",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 7,
+     "name": "Rizvia",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 8,
+     "name": "Gulshan-e-Umair",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 9,
+     "name": "Saima",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Jadoon",
+   "code": "R-27B",
+   "driver": "Tanveer",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Saleem Bank",
+     "morning_eta": "6:30"
+    },
+    {
+     "order": 2,
+     "name": "Rabia City",
+     "morning_eta": "6:31"
+    },
+    {
+     "order": 3,
+     "name": "Al Habib University",
+     "morning_eta": "6:33"
+    },
+    {
+     "order": 4,
+     "name": "Pehlwan Goth",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 5,
+     "name": "Sindh Baloch",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 6,
+     "name": "Commander City",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 7,
+     "name": "Gul Chowrangi",
+     "morning_eta": "6:48"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "1",
+   "driver": "Iqbal Khatak",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Malir Cantt Askari-V",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 2,
+     "name": "Check Post 5",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 3,
+     "name": "Check Post 6",
+     "morning_eta": "7:05"
+    },
+    {
+     "order": 4,
+     "name": "Tank Chowk Malir",
+     "morning_eta": "7:07"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "1-B",
+   "driver": "Naveed",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Sector J Malir Cantt",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 2,
+     "name": "Sector G Malir Cantt",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 3,
+     "name": "Malir Cantt Phase-I",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 4,
+     "name": "Sector H Malir Cantt",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 5,
+     "name": "Tariq Bin Zaid Society",
+     "morning_eta": "7:07"
+    },
+    {
+     "order": 6,
+     "name": "Security Printing Press",
+     "morning_eta": "7:08"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "11",
+   "driver": "Shoaib",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Soldier Bazar",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Guru Mandir",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 3,
+     "name": "Islamia College",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 4,
+     "name": "Stadium Road",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "12",
+   "driver": "Sarfaraz",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Khudadad Colony",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 2,
+     "name": "Kashmir Road",
+     "morning_eta": "6:54"
+    },
+    {
+     "order": 3,
+     "name": "Sir Syed Road",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 4,
+     "name": "Khalid Bin Waleed Road",
+     "morning_eta": "6:59"
+    },
+    {
+     "order": 5,
+     "name": "Tariq Road",
+     "morning_eta": "7:01"
+    },
+    {
+     "order": 6,
+     "name": "Tipu Sultan Road",
+     "morning_eta": "7:05"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "13",
+   "driver": "Abdul Raheem",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Usman Memorial",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 2,
+     "name": "Essa Nagri",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 3,
+     "name": "Stadium",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 4,
+     "name": "Dalmia",
+     "morning_eta": "7:03"
+    },
+    {
+     "order": 5,
+     "name": "Millennium Mall",
+     "morning_eta": "7:05"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "14",
+   "driver": "Ghulam Yasin",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Old Sabzi Mandi",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Sharfabad",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 3,
+     "name": "Bahadurabad",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 4,
+     "name": "Rangoon Wala Hall",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 5,
+     "name": "Karsaz Pankha Stop",
+     "morning_eta": "6:56"
+    },
+    {
+     "order": 6,
+     "name": "NHS-IV",
+     "morning_eta": "6:58"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "15",
+   "driver": "Jahanzaib",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Forum Shopping Mall",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Gizri",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 3,
+     "name": "DHA Phase IV",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 4,
+     "name": "Sunset Club",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 5,
+     "name": "United Bakery",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 6,
+     "name": "KFC Phase II",
+     "morning_eta": "7:02"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "16",
+   "driver": "Shahnawaz",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Saba Avenue Imambargah",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Khayaban-e-Bukhari",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 3,
+     "name": "Bukhari Commercial",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 4,
+     "name": "Misri Shah",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 5,
+     "name": "Khayaban-e-Muhafiz",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 6,
+     "name": "Rahat Park",
+     "morning_eta": "7:01"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "16-B",
+   "driver": "Sameer Haroon",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Bilawal Chowrangi",
+     "morning_eta": "6:36"
+    },
+    {
+     "order": 2,
+     "name": "Hyperstar",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 3,
+     "name": "Florida Homes B-Street",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 4,
+     "name": "Kamal Mart",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 5,
+     "name": "KFC Badar",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 6,
+     "name": "Khayaban-e-Bahria",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 7,
+     "name": "Shell Petrol Pump",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 8,
+     "name": "NADRA Mega Center",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "19",
+   "driver": "Younus",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Hassan Square",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 2,
+     "name": "Mumtaz Manzil",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 3,
+     "name": "Bait-ul-Mukarram",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 4,
+     "name": "Urdu Science College",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 5,
+     "name": "Aziz Bhatti Park",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "21",
+   "driver": "Abid",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Tower",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Jang Press",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 3,
+     "name": "Sindh Secretariat",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 4,
+     "name": "Atrium Mall",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 5,
+     "name": "Lucky Star",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 6,
+     "name": "FTC",
+     "morning_eta": "6:58"
+    },
+    {
+     "order": 7,
+     "name": "Shahrah-e-Faisal Nursery",
+     "morning_eta": "7:00"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "29",
+   "driver": "Naveed",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Falcon Malir Cantt",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 2,
+     "name": "CMH Malir Cantt",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 3,
+     "name": "X-20 Malir Cantt",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 4,
+     "name": "Cantt Bazar Malir",
+     "morning_eta": "6:59"
+    },
+    {
+     "order": 5,
+     "name": "Check Post 2",
+     "morning_eta": "7:02"
+    },
+    {
+     "order": 6,
+     "name": "Jinnah Garden",
+     "morning_eta": "7:05"
+    },
+    {
+     "order": 7,
+     "name": "Qazimabad",
+     "morning_eta": "7:06"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "30",
+   "driver": "Atiq",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Jahangirabad",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 2,
+     "name": "Golimar Chowrangi",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 3,
+     "name": "Urdu Bazar Nazimabad",
+     "morning_eta": "6:49"
+    },
+    {
+     "order": 4,
+     "name": "Inquiry Office",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 5,
+     "name": "Naz Petrol Pump",
+     "morning_eta": "6:51"
+    },
+    {
+     "order": 6,
+     "name": "Sona Chandi Lawn",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 7,
+     "name": "Liaquatabad Erum Bakery",
+     "morning_eta": "6:53"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "31",
+   "driver": "Noman",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "KPT Bridge Kababjees",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 2,
+     "name": "Iqra University",
+     "morning_eta": "7:02"
+    },
+    {
+     "order": 3,
+     "name": "Diamond",
+     "morning_eta": "7:03"
+    },
+    {
+     "order": 4,
+     "name": "Manzoor Colony",
+     "morning_eta": "7:05"
+    },
+    {
+     "order": 5,
+     "name": "PAF Chapter",
+     "morning_eta": "7:07"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "32",
+   "driver": "Sameer",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Tyre Company",
+     "morning_eta": "6:33"
+    },
+    {
+     "order": 2,
+     "name": "Boat Basin",
+     "morning_eta": "6:36"
+    },
+    {
+     "order": 3,
+     "name": "26 Street",
+     "morning_eta": "6:43"
+    },
+    {
+     "order": 4,
+     "name": "Badar Commercial",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 5,
+     "name": "Khayaban-e-Sehar",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 6,
+     "name": "Nexus College",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 7,
+     "name": "Khayaban-e-Shahbaz",
+     "morning_eta": "6:58"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "33",
+   "driver": "Khadim Hussain",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Liaquatabad 10 No",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 2,
+     "name": "Usman Memorial",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 3,
+     "name": "Saylani Chowk",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 4,
+     "name": "Zubaida Hospital",
+     "morning_eta": "7:03"
+    },
+    {
+     "order": 5,
+     "name": "M. Ali Society",
+     "morning_eta": "7:05"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "34",
+   "driver": null,
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Korangi Crossing",
+     "morning_eta": "7:10"
+    },
+    {
+     "order": 2,
+     "name": "Nasir Jump",
+     "morning_eta": "7:12"
+    },
+    {
+     "order": 3,
+     "name": "Korangi No 2",
+     "morning_eta": "7:15"
+    },
+    {
+     "order": 4,
+     "name": "Korangi No 5",
+     "morning_eta": "7:19"
+    },
+    {
+     "order": 5,
+     "name": "Landhi No 4",
+     "morning_eta": "7:25"
+    },
+    {
+     "order": 6,
+     "name": "Landhi 89",
+     "morning_eta": "7:27"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "35",
+   "driver": "Mola Bux",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Teen Talwar",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 2,
+     "name": "Race Course",
+     "morning_eta": "6:51"
+    },
+    {
+     "order": 3,
+     "name": "Cantt Station",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 4,
+     "name": "Askari II & III",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 5,
+     "name": "NMC",
+     "morning_eta": "6:58"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "36",
+   "driver": "Amaan",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Police Headquarter Garden",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Uncle Sariya",
+     "morning_eta": "6:37"
+    },
+    {
+     "order": 3,
+     "name": "Mobile Market",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 4,
+     "name": "Naz Plaza",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 5,
+     "name": "Numaish",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 6,
+     "name": "Islamia College",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 7,
+     "name": "New Town Chandni Chowk",
+     "morning_eta": "6:53"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "37",
+   "driver": "Shoukat Ali",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Ram Swami",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 2,
+     "name": "Garden Zoo",
+     "morning_eta": "6:42"
+    },
+    {
+     "order": 3,
+     "name": "Ali Bhai",
+     "morning_eta": "6:45"
+    },
+    {
+     "order": 4,
+     "name": "Garden Jamat Khana",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 5,
+     "name": "Fatmi Blood Bank",
+     "morning_eta": "6:48"
+    },
+    {
+     "order": 6,
+     "name": "Khurasan",
+     "morning_eta": "6:49"
+    },
+    {
+     "order": 7,
+     "name": "Numaish",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 8,
+     "name": "Khudadad Colony",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 9,
+     "name": "Noorani Kabab",
+     "morning_eta": "6:54"
+    },
+    {
+     "order": 10,
+     "name": "Allah Wali Chowrangi",
+     "morning_eta": "6:55"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "38",
+   "driver": "Shahzad Iqbal",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Bacha Party",
+     "morning_eta": "6:50"
+    },
+    {
+     "order": 2,
+     "name": "Punjab Chowrangi PSO Pump",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 3,
+     "name": "Chandio Village",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 4,
+     "name": "Altamash",
+     "morning_eta": "6:55"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "39",
+   "driver": "Aslam",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Perfume Chowk Johar",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 2,
+     "name": "Hilltop",
+     "morning_eta": "6:53"
+    },
+    {
+     "order": 3,
+     "name": "Johar More",
+     "morning_eta": "6:55"
+    },
+    {
+     "order": 4,
+     "name": "Drigh Road",
+     "morning_eta": "6:57"
+    },
+    {
+     "order": 5,
+     "name": "Colony Gate",
+     "morning_eta": "6:59"
+    },
+    {
+     "order": 6,
+     "name": "Star Gate",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 7,
+     "name": "Wireless Gate",
+     "morning_eta": "7:02"
+    },
+    {
+     "order": 8,
+     "name": "Kala Board",
+     "morning_eta": "7:04"
+    },
+    {
+     "order": 9,
+     "name": "Hafiz Sweets Malir 15",
+     "morning_eta": "7:05"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "40",
+   "driver": "Safeer",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Matka Stop",
+     "morning_eta": "7:00"
+    },
+    {
+     "order": 2,
+     "name": "Aladin Park",
+     "morning_eta": "7:02"
+    },
+    {
+     "order": 3,
+     "name": "Lal Flat",
+     "morning_eta": "7:03"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "41",
+   "driver": "Fakhr-ud-Din",
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Green Mosque Bahria Town",
+     "morning_eta": "6:35"
+    },
+    {
+     "order": 2,
+     "name": "Bahria Adventure Land",
+     "morning_eta": "6:37"
+    },
+    {
+     "order": 3,
+     "name": "Bahria International Hospital",
+     "morning_eta": "6:39"
+    },
+    {
+     "order": 4,
+     "name": "Bahria Town Apartments Tower 15",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 5,
+     "name": "Bahria Town Apartments Tower 20",
+     "morning_eta": "6:40"
+    },
+    {
+     "order": 6,
+     "name": "Bahria Town Main Gate",
+     "morning_eta": "6:45"
+    }
+   ]
+  },
+  {
+   "operator": "Nadeem",
+   "code": "42",
+   "driver": null,
+   "destination": "FAST NUCES Karachi",
+   "stops": [
+    {
+     "order": 1,
+     "name": "Jamshed Road",
+     "morning_eta": "6:46"
+    },
+    {
+     "order": 2,
+     "name": "Yadgar Fish",
+     "morning_eta": "6:47"
+    },
+    {
+     "order": 3,
+     "name": "New Town Chandni Chowk",
+     "morning_eta": "6:52"
+    },
+    {
+     "order": 4,
+     "name": "Askari IV",
+     "morning_eta": "7:05"
+    }
+   ]
+  }
+ ],
+ "stops": {
+  "13D 8-1/2": {
+   "lat": 24.912941,
+   "lng": 67.085612,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "16 No Chowrangi": {
+   "lat": 24.937728,
+   "lng": 67.080715,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "2 Minute": {
+   "lat": 24.995643,
+   "lng": 67.06368,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "26 Street": {
+   "lat": 24.785065,
+   "lng": 67.065915,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "2K Stop": {
+   "lat": 24.948968,
+   "lng": 67.052899,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "4K Stop": {
+   "lat": 25.006176,
+   "lng": 67.064995,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "5 Star": {
+   "lat": 24.940487,
+   "lng": 67.046194,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "6 No Check Post": {
+   "lat": 24.947993,
+   "lng": 67.182505,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "7 No Nazimabad": {
+   "lat": 24.918533,
+   "lng": 67.031171,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "8.5 Number": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "FB Area, between Bhaijan Chowk and Gulshan-e-Shamim"
+  },
+  "Abbas Town": {
+   "lat": 24.941464,
+   "lng": 67.093003,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Abbasi Hospital": {
+   "lat": 24.921187,
+   "lng": 67.029557,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Abdullah College": {
+   "lat": 24.929441,
+   "lng": 67.023425,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ajmer Nagri": {
+   "lat": 24.985479,
+   "lng": 67.059237,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Al Asif": {
+   "lat": 24.950866,
+   "lng": 67.092151,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Al Azhar": {
+   "lat": 24.95572,
+   "lng": 67.149195,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Al Habib Restaurant": {
+   "lat": 24.991069,
+   "lng": 67.177963,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Al Habib University": {
+   "lat": 24.905157,
+   "lng": 67.137583,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Al-Hira": {
+   "lat": 24.948375,
+   "lng": 67.16032,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Aladin Park": {
+   "lat": 24.911558,
+   "lng": 67.105636,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ali Asghar Stadium": {
+   "lat": 24.937066,
+   "lng": 67.031079,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ali Bhai": {
+   "lat": 24.883951,
+   "lng": 67.026618,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Allah Wali Chowrangi": {
+   "lat": 24.874753,
+   "lng": 67.028502,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Alnoor": {
+   "lat": 24.949025,
+   "lng": 67.076991,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Alnoor Edhi Center": {
+   "lat": 24.95965,
+   "lng": 67.07458,
+   "status": "probable",
+   "landmark_or_hint": "Edhi Welfare Center Buffer Zone, Rashid Minhas Rd"
+  },
+  "Altamash": {
+   "lat": 24.828936,
+   "lng": 67.050049,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Amroha Society": {
+   "lat": 24.96287,
+   "lng": 67.167105,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Anara Garden": {
+   "lat": 24.963923,
+   "lng": 67.141932,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Anda More": {
+   "lat": 24.964983,
+   "lng": 67.057362,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Askari II & III": {
+   "lat": 24.84791,
+   "lng": 67.042756,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Askari IV": {
+   "lat": 24.901397,
+   "lng": 67.120185,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Atrium Mall": {
+   "lat": 24.856074,
+   "lng": 67.030271,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ayesha Manzil": {
+   "lat": 24.927333,
+   "lng": 67.064578,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ayesha Manzil More": {
+   "lat": 24.927333,
+   "lng": 67.064578,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Aziz Bhatti Park": {
+   "lat": 24.913596,
+   "lng": 67.095806,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Babul Islam": {
+   "lat": 24.97614,
+   "lng": 67.05541,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Bab-ul-Islam Mosque, Sector 9 North Karachi"
+  },
+  "Bacha Party": {
+   "lat": 24.831933,
+   "lng": 67.040269,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Badar Commercial": {
+   "lat": 24.79838,
+   "lng": 67.045714,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bahadurabad": {
+   "lat": 24.882451,
+   "lng": 67.069389,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bahria Adventure Land": {
+   "lat": 25.020276,
+   "lng": 67.313196,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bahria International Hospital": {
+   "lat": 25.013681,
+   "lng": 67.310841,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bahria Town Apartments Tower 15": {
+   "lat": 25.010056,
+   "lng": 67.313363,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bahria Town Apartments Tower 20": {
+   "lat": 25.005519,
+   "lng": 67.314646,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bahria Town Main Gate": {
+   "lat": 24.993801,
+   "lng": 67.316956,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bait-ul-Mukarram": {
+   "lat": 24.906629,
+   "lng": 67.082695,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bara Dari": {
+   "lat": 24.97864,
+   "lng": 67.05558,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Baradari Bus Stop, Sector 8 North Karachi"
+  },
+  "Baraf Khana": {
+   "lat": 24.889567,
+   "lng": 67.187028,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bhaijan Chowk": {
+   "lat": 24.925498,
+   "lng": 67.066222,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bilawal Chowrangi": {
+   "lat": 24.815837,
+   "lng": 67.020292,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bismillah Tower (PIA)": {
+   "lat": 24.922858,
+   "lng": 67.145311,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Board Office": {
+   "lat": 24.924493,
+   "lng": 67.030991,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Boat Basin": {
+   "lat": 24.821231,
+   "lng": 67.018162,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Bombay Bakery": {
+   "lat": 24.98304,
+   "lng": 67.05509,
+   "status": "landmark_matched",
+   "landmark_or_hint": "BomBay Bakers & Broast, Sector 8 North Karachi"
+  },
+  "Bukhari Commercial": {
+   "lat": 24.7931,
+   "lng": 67.065076,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "CMH Malir Cantt": {
+   "lat": 24.95035,
+   "lng": 67.215517,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "CNG Pump": {
+   "lat": 24.954412,
+   "lng": 67.078407,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Cafe 2 Days": {
+   "lat": 24.96068,
+   "lng": 67.07296,
+   "status": "probable",
+   "landmark_or_hint": "Cafe Todays, Sector 15-B Buffer Zone"
+  },
+  "Cafe Al Habib": {
+   "lat": 24.961792,
+   "lng": 67.070533,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Cafe Piyala": {
+   "lat": 24.945789,
+   "lng": 67.067785,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Cantt Bazar Malir": {
+   "lat": 24.927663,
+   "lng": 67.20509,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Cantt Station": {
+   "lat": 24.843874,
+   "lng": 67.04124,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Chandio Village": {
+   "lat": 24.829659,
+   "lng": 67.044508,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Chapal Bungalows": {
+   "lat": 24.953757,
+   "lng": 67.141721,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Check Post 2": {
+   "lat": 24.912651,
+   "lng": 67.198293,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Check Post 5": {
+   "lat": 24.947733,
+   "lng": 67.182738,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Check Post 6": {
+   "lat": 24.934239,
+   "lng": 67.177073,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Chishti Nagar": {
+   "lat": 24.92653,
+   "lng": 67.13967,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Chishti Nagar, Block 10 Gulistan-e-Johar"
+  },
+  "Colony Gate": {
+   "lat": 24.887121,
+   "lng": 67.149684,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Commander CNG": {
+   "lat": 24.933082,
+   "lng": 67.155235,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Commander City": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Gulistan-e-Johar, between Sindh Baloch and Gul Chowrangi"
+  },
+  "Continental": {
+   "lat": 24.925237,
+   "lng": 67.114593,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "DC Office": {
+   "lat": 24.951382,
+   "lng": 67.061776,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "DHA Phase IV": {
+   "lat": 24.824003,
+   "lng": 67.061353,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Dalmia": {
+   "lat": 24.9016,
+   "lng": 67.10103,
+   "status": "probable",
+   "landmark_or_hint": "Dalmia / Shanti Nagar, Dalmia Cement Factory Rd"
+  },
+  "Darul Sehat": {
+   "lat": 24.914333,
+   "lng": 67.127346,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Dental College": {
+   "lat": 24.942625,
+   "lng": 67.061931,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Dentist Society": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Scheme 33, just before Officers/Teachers Society"
+  },
+  "Dhaka Sweets": {
+   "lat": 24.923063,
+   "lng": 67.093312,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Diamond": {
+   "lat": 24.84296,
+   "lng": 67.08188,
+   "status": "probable",
+   "landmark_or_hint": "Diamond Residency, Defence View Phase 3"
+  },
+  "Disco Bakery": {
+   "lat": 24.929142,
+   "lng": 67.09736,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Disco More": {
+   "lat": 24.971835,
+   "lng": 67.056041,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Dolmen Mall": {
+   "lat": 24.93556,
+   "lng": 67.04023,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Dolmen Mall Hyderi, North Nazimabad"
+  },
+  "Donesil": {
+   "lat": 24.940003,
+   "lng": 67.059339,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Dow Medical": {
+   "lat": 24.943043,
+   "lng": 67.137988,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Drigh Road": {
+   "lat": 24.88692,
+   "lng": 67.12835,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Drigh Road Bus Stop, Shah Faisal Colony"
+  },
+  "Esa Lab 5 Star": {
+   "lat": 24.938824,
+   "lng": 67.052431,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Essa Nagri": {
+   "lat": 24.901724,
+   "lng": 67.065821,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "FTC": {
+   "lat": 24.858446,
+   "lng": 67.052247,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Falcon": {
+   "lat": 24.950919,
+   "lng": 67.17946,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Falcon Malir Cantt": {
+   "lat": 24.956432,
+   "lng": 67.218496,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Fariya Chowk": {
+   "lat": 24.950248,
+   "lng": 67.106019,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Farooq-e-Azam": {
+   "lat": 24.94846,
+   "lng": 67.05147,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Fatmi Blood Bank": {
+   "lat": 24.881569,
+   "lng": 67.033636,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Fazal Mill": {
+   "lat": 24.937907,
+   "lng": 67.085664,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Florida Homes B-Street": {
+   "lat": 24.796881,
+   "lng": 67.041012,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Forum Shopping Mall": {
+   "lat": 24.827207,
+   "lng": 67.037798,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Furniture Market": {
+   "lat": 24.94512,
+   "lng": 67.134462,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "G-10 Gul House": {
+   "lat": 24.92938,
+   "lng": 67.140782,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "G3 Stop": {
+   "lat": 24.955691,
+   "lng": 67.135188,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Garden Jamat Khana": {
+   "lat": 24.882144,
+   "lng": 67.032184,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Garden Zoo": {
+   "lat": 24.87594,
+   "lng": 67.022943,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gate 3 PIA": {
+   "lat": 24.916169,
+   "lng": 67.143018,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gawalia": {
+   "lat": 24.965031,
+   "lng": 67.121914,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gizri": {
+   "lat": 24.819381,
+   "lng": 67.045714,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Golimar Chowrangi": {
+   "lat": 24.885391,
+   "lng": 67.015935,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Green House": {
+   "lat": 24.94429,
+   "lng": 67.06334,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Green House, Block N North Nazimabad"
+  },
+  "Green Mosque Bahria Town": {
+   "lat": 25.012197,
+   "lng": 67.317638,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gul Chowrangi": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Gulistan-e-Johar, last stop of JR-27B"
+  },
+  "Gulberg": {
+   "lat": 24.936817,
+   "lng": 67.076,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gulberg Thana": {
+   "lat": 24.935833,
+   "lng": 67.066691,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gulshan Turn": {
+   "lat": 24.917218,
+   "lng": 67.092387,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gulshan-e-Shamim": {
+   "lat": 24.916347,
+   "lng": 67.074013,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Gulshan-e-Umair": {
+   "lat": 24.940053,
+   "lng": 67.166733,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Guru Mandir": {
+   "lat": 24.880707,
+   "lng": 67.039852,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Hafiz Sweets Malir 15": {
+   "lat": 24.87686,
+   "lng": 67.19182,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Haider Food": {
+   "lat": 24.961858,
+   "lng": 67.053045,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Hassan Square": {
+   "lat": 24.902517,
+   "lng": 67.072896,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Hilltop": {
+   "lat": 24.908081,
+   "lng": 67.119012,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Hyderi Super Mart KDA": {
+   "lat": 24.929162,
+   "lng": 67.04005,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Hyperstar": {
+   "lat": 24.802728,
+   "lng": 67.030043,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Imam Clinic": {
+   "lat": 24.943599,
+   "lng": 67.047493,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Inquiry Office": {
+   "lat": 24.90642,
+   "lng": 67.03096,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Iqra University": {
+   "lat": 24.839575,
+   "lng": 67.082314,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Islamia College": {
+   "lat": 24.87886,
+   "lng": 67.046452,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Jahangirabad": {
+   "lat": 24.89962,
+   "lng": 67.02452,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Jahangirabad, Nazimabad (near Golimar)"
+  },
+  "Jamali Pul": {
+   "lat": 24.973261,
+   "lng": 67.118405,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Jamshed Road": {
+   "lat": 24.883542,
+   "lng": 67.047057,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Jang Press": {
+   "lat": 24.850233,
+   "lng": 67.015758,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Javed Nihari": {
+   "lat": 24.928201,
+   "lng": 67.075002,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Jinnah Garden": {
+   "lat": 24.910493,
+   "lng": 67.187587,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Johar Chowrangi": {
+   "lat": 24.914953,
+   "lng": 67.123216,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Johar Complex (Bin Hashim)": {
+   "lat": 24.938061,
+   "lng": 67.151647,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Johar More": {
+   "lat": 24.904474,
+   "lng": 67.113549,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "K.U. Society": {
+   "lat": 24.959045,
+   "lng": 67.121675,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "KBACHS Society / Sachal": {
+   "lat": 24.956069,
+   "lng": 67.134668,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "KDA": {
+   "lat": 24.956361,
+   "lng": 67.116017,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "KESC": {
+   "lat": 24.91507,
+   "lng": 67.1221,
+   "status": "probable",
+   "landmark_or_hint": "K-Electric IBC Jauhar-I, Block 16-A Gulistan-e-Johar"
+  },
+  "KFC Badar": {
+   "lat": 24.799845,
+   "lng": 67.04718,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "KFC Phase II": {
+   "lat": 24.83282,
+   "lng": 67.073537,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "KIHD": {
+   "lat": 24.933375,
+   "lng": 67.080138,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "KPT Bridge Kababjees": {
+   "lat": 24.831487,
+   "lng": 67.079163,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Kala Board": {
+   "lat": 24.887791,
+   "lng": 67.187959,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Kamal Mart": {
+   "lat": 24.797925,
+   "lng": 67.043178,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Kamran Chowrangi": {
+   "lat": 24.923687,
+   "lng": 67.137837,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Kaneez Fatima": {
+   "lat": 24.954703,
+   "lng": 67.116462,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Karachi University": {
+   "lat": 24.938902,
+   "lng": 67.123732,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Karimabad": {
+   "lat": 24.919538,
+   "lng": 67.059119,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Karsaz Pankha Stop": {
+   "lat": 24.87627,
+   "lng": 67.101205,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Kashmir Road": {
+   "lat": 24.876952,
+   "lng": 67.051934,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Katti Pahari": {
+   "lat": 24.944265,
+   "lng": 67.031379,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Kazimabad": {
+   "lat": 24.910544,
+   "lng": 67.185725,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khalid Bin Waleed Road": {
+   "lat": 24.874338,
+   "lng": 67.056882,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khatm-e-Nabuwat": {
+   "lat": 24.955773,
+   "lng": 67.106874,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khayaban-e-Bahria": {
+   "lat": 24.81331,
+   "lng": 67.060991,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khayaban-e-Bukhari": {
+   "lat": 24.794067,
+   "lng": 67.064549,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khayaban-e-Muhafiz": {
+   "lat": 24.798408,
+   "lng": 67.063535,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khayaban-e-Sehar": {
+   "lat": 24.805328,
+   "lng": 67.060161,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khayaban-e-Shahbaz": {
+   "lat": 24.808404,
+   "lng": 67.061428,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khilafat Chowk": {
+   "lat": 24.922349,
+   "lng": 67.024423,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khudadad Colony": {
+   "lat": 24.872753,
+   "lng": 67.046524,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Khurasan": {
+   "lat": 24.875051,
+   "lng": 67.03555,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Korangi Crossing": {
+   "lat": 24.8157,
+   "lng": 67.110133,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Korangi No 2": {
+   "lat": 24.820926,
+   "lng": 67.138757,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Korangi No 5": {
+   "lat": 24.836364,
+   "lng": 67.162597,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "LDA": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "North Nazimabad, after Star House"
+  },
+  "Lady Bird": {
+   "lat": 24.951637,
+   "lng": 67.057182,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Lal Flat": {
+   "lat": 24.908631,
+   "lng": 67.109776,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Lala Zar NIPA": {
+   "lat": 24.92568,
+   "lng": 67.0928,
+   "status": "probable",
+   "landmark_or_hint": "New Lalazar, Block 3 Gulshan (near NIPA)"
+  },
+  "Landhi 89": {
+   "lat": 24.845581,
+   "lng": 67.209249,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Landhi No 4": {
+   "lat": 24.85636,
+   "lng": 67.208864,
+   "status": "probable",
+   "landmark_or_hint": "4 Landhi Rd, Landhi"
+  },
+  "Landi Kotal": {
+   "lat": 24.937191,
+   "lng": 67.055365,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Liaquatabad 10 No": {
+   "lat": 24.90496,
+   "lng": 67.039991,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Liaquatabad Erum Bakery": {
+   "lat": 24.909312,
+   "lng": 67.043159,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Lucky One": {
+   "lat": 24.932353,
+   "lng": 67.087264,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Lucky Star": {
+   "lat": 24.856986,
+   "lng": 67.033417,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "M. Ali Society": {
+   "lat": 24.877911,
+   "lng": 67.087417,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Madras Chowk": {
+   "lat": 24.956905,
+   "lng": 67.121491,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Magsi Chowk": {
+   "lat": 24.927972,
+   "lng": 67.152582,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Makhdoom Bilawal": {
+   "lat": 24.95501,
+   "lng": 67.14065,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Makhdoom Bilawal Main Rd, Gulzar-e-Hijri"
+  },
+  "Malik Society": {
+   "lat": 24.951521,
+   "lng": 67.109759,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Malir Cantt Askari-V": {
+   "lat": 24.94006,
+   "lng": 67.182001,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Malir Cantt Phase-I": {
+   "lat": 24.962502,
+   "lng": 67.186598,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Manzoor Colony": {
+   "lat": 24.852482,
+   "lng": 67.0853,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Masjid Khairul Bashir": {
+   "lat": 24.943892,
+   "lng": 67.080788,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Maskan": {
+   "lat": 24.934848,
+   "lng": 67.105248,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Mateen Food": {
+   "lat": 24.947175,
+   "lng": 67.052622,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Matka Stop": {
+   "lat": 24.90808,
+   "lng": 67.11007,
+   "status": "probable",
+   "landmark_or_hint": "Rashid Minhas Rd, Block 10-A Gulshan"
+  },
+  "Maymar Gate": {
+   "lat": 25.006631,
+   "lng": 67.117512,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Memon Medical Hospital": {
+   "lat": 24.945529,
+   "lng": 67.146358,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Millennium Mall": {
+   "lat": 24.90127,
+   "lng": 67.115321,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Misri Shah": {
+   "lat": 24.799204,
+   "lng": 67.070043,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Mobile Market": {
+   "lat": 24.874188,
+   "lng": 67.032536,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Mochi Gali": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "North Nazimabad Block L/N, between Usman Ghani Masjid and Shipowner"
+  },
+  "Model Colony": {
+   "lat": 24.902347,
+   "lng": 67.1892,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Model More": {
+   "lat": 24.902347,
+   "lng": 67.1892,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Mosamiyat": {
+   "lat": 24.938895,
+   "lng": 67.13835,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Moti Mahal": {
+   "lat": 24.924423,
+   "lng": 67.088237,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Mukka Chowk": {
+   "lat": 24.923304,
+   "lng": 67.068067,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Mumtaz Manzil": {
+   "lat": 24.905326,
+   "lng": 67.078227,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Munawar Chowrangi": {
+   "lat": 24.91766,
+   "lng": 67.137642,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "NADRA Mega Center": {
+   "lat": 24.828937,
+   "lng": 67.033761,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "NED": {
+   "lat": 24.93001,
+   "lng": 67.115348,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "NHS-IV": {
+   "lat": 24.862047,
+   "lng": 67.057839,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "NMC": {
+   "lat": 24.846592,
+   "lng": 67.055725,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Nagan (Dahli Hall)": {
+   "lat": 24.96807,
+   "lng": 67.0663,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Nagan Chowrangi"
+  },
+  "Namak Bank": {
+   "lat": 24.958981,
+   "lng": 67.074315,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Naseerabad": {
+   "lat": 24.930684,
+   "lng": 67.071778,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Nasir Jump": {
+   "lat": 24.823429,
+   "lng": 67.124534,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Nawabish": {
+   "lat": 24.91799,
+   "lng": 67.132969,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Nawaz Sharif School": {
+   "lat": 24.92163,
+   "lng": 67.14364,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Nawaz Sharif Housing Scheme (PHA Flats); board 'Sch' = Scheme"
+  },
+  "Naya Nazimabad": {
+   "lat": 24.973381,
+   "lng": 67.033821,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Naz Petrol Pump": {
+   "lat": 24.91034,
+   "lng": 67.03178,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Nazimabad Petrol Pump Bus Stop"
+  },
+  "Naz Plaza": {
+   "lat": 24.865616,
+   "lng": 67.026159,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "New Town Chandni Chowk": {
+   "lat": 24.890454,
+   "lng": 67.063215,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Nexus College": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "DHA Ph 6/7, between Khayaban-e-Sehar and Khayaban-e-Shahbaz"
+  },
+  "Noman Garden": {
+   "lat": 24.95736,
+   "lng": 67.14726,
+   "status": "probable",
+   "landmark_or_hint": "Noman Residencia, Sector 30 Gulzar-e-Hijri"
+  },
+  "Noorani Kabab": {
+   "lat": 24.867762,
+   "lng": 67.05246,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Numaish": {
+   "lat": 24.872316,
+   "lng": 67.035292,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Nusrat Bhutto Colony": {
+   "lat": 24.962157,
+   "lng": 67.045714,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Officers Society": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Scheme 33, between Dentist and Teachers Society"
+  },
+  "Old Sabzi Mandi": {
+   "lat": 24.890911,
+   "lng": 67.064419,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Orangi Town 5": {
+   "lat": 24.94065,
+   "lng": 67.00176,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Oxford School": {
+   "lat": 24.996937,
+   "lng": 67.059438,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "PAF Chapter": {
+   "lat": 24.862482,
+   "lng": 67.087745,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "PCSIR": {
+   "lat": 24.955306,
+   "lng": 67.127735,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "POB Eye Hospital": {
+   "lat": 24.916995,
+   "lng": 67.138449,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Paradise Bakery": {
+   "lat": 24.942801,
+   "lng": 67.09715,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Pehlwan Goth": {
+   "lat": 24.908958,
+   "lng": 67.141038,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Peoples Chowrangi": {
+   "lat": 24.947775,
+   "lng": 67.0659,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Perfume Chowk Johar": {
+   "lat": 24.909705,
+   "lng": 67.122957,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Police Headquarter Garden": {
+   "lat": 24.868741,
+   "lng": 67.02042,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Police Society": {
+   "lat": 24.962809,
+   "lng": 67.179766,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Power House": {
+   "lat": 24.985657,
+   "lng": 67.065249,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Puncture Shop Saadi Road": {
+   "lat": 24.95888,
+   "lng": 67.167247,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Punjab Chowrangi PSO Pump": {
+   "lat": 24.828735,
+   "lng": 67.042621,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Qalandria": {
+   "lat": 24.959583,
+   "lng": 67.0512,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Qazimabad": {
+   "lat": 24.910544,
+   "lng": 67.185725,
+   "status": "probable",
+   "landmark_or_hint": "Same place as Kazimabad (Malir) - board spelling"
+  },
+  "Quetta Town": {
+   "lat": 24.968025,
+   "lng": 67.12093,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "RCD Ground": {
+   "lat": 24.900596,
+   "lng": 67.196117,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Rab Medical": {
+   "lat": 24.923735,
+   "lng": 67.09043,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Rabia City": {
+   "lat": 24.907613,
+   "lng": 67.133777,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Race Course": {
+   "lat": 24.83809,
+   "lng": 67.04196,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Old Race Course Ground, Karachi Cantonment"
+  },
+  "Rado Center": {
+   "lat": 24.91643,
+   "lng": 67.13094,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Rado Tower, Block 12 Gulistan-e-Johar"
+  },
+  "Rahat Park": {
+   "lat": 24.815467,
+   "lng": 67.075543,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Raheem Hospital": {
+   "lat": 24.938929,
+   "lng": 67.073769,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ram Swami": {
+   "lat": 24.867761,
+   "lng": 67.015928,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Rana Lawn": {
+   "lat": 24.91197,
+   "lng": 67.196299,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Rangoon Wala Hall": {
+   "lat": 24.88534,
+   "lng": 67.074472,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Rimjhim Hall": {
+   "lat": 24.926906,
+   "lng": 67.095287,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Rizvia": {
+   "lat": 24.94834,
+   "lng": 67.14485,
+   "status": "landmark_matched",
+   "landmark_or_hint": "New Rizvia Society Main Gate, Gulzar-e-Hijri"
+  },
+  "Roofi Bungalows": {
+   "lat": 24.94221,
+   "lng": 67.15181,
+   "status": "probable",
+   "landmark_or_hint": "Rufi Homes, Gulzar-e-Hijri"
+  },
+  "Saadi Town": {
+   "lat": 24.967858,
+   "lng": 67.172414,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Saba Avenue Imambargah": {
+   "lat": 24.793323,
+   "lng": 67.048323,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Safari Park": {
+   "lat": 24.922294,
+   "lng": 67.108212,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Safoora": {
+   "lat": 24.93944,
+   "lng": 67.15624,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Safoora Chowrangi Bus Stop, University Rd"
+  },
+  "Saima": {
+   "lat": 24.94853,
+   "lng": 67.15597,
+   "status": "probable",
+   "landmark_or_hint": "Saima Residencia area, Sector 34-A Gulzar-e-Hijri"
+  },
+  "Saima Arabian": {
+   "lat": 25.012149,
+   "lng": 67.039012,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Saima Flats": {
+   "lat": 24.922672,
+   "lng": 67.137379,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Saleem Bank": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Gulistan-e-Johar, just before Rabia City"
+  },
+  "Saleem Center": {
+   "lat": 24.978547,
+   "lng": 67.066705,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Samama": {
+   "lat": 24.927895,
+   "lng": 67.111169,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sardar CNG": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Gulistan-e-Johar, between Munawar Chowrangi and Nawabish"
+  },
+  "Saylani Chowk": {
+   "lat": 24.882703,
+   "lng": 67.067994,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sector G Malir Cantt": {
+   "lat": 24.958443,
+   "lng": 67.196152,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sector H Malir Cantt": {
+   "lat": 24.950938,
+   "lng": 67.184275,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sector J Malir Cantt": {
+   "lat": 24.961559,
+   "lng": 67.199437,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Security Printing Press": {
+   "lat": 24.889157,
+   "lng": 67.179022,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shadab Masjid": {
+   "lat": 24.934183,
+   "lng": 67.061211,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shadman 1": {
+   "lat": 24.961867,
+   "lng": 67.056885,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shadman 2": {
+   "lat": 24.960014,
+   "lng": 67.062374,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shafiq More": {
+   "lat": 24.957119,
+   "lng": 67.076139,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shahmir Colony Gate": {
+   "lat": 24.956944,
+   "lng": 67.140255,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shahrah-e-Faisal Nursery": {
+   "lat": 24.86063,
+   "lng": 67.06286,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Nursery Bus Stop, PECHS Block 6"
+  },
+  "Shahzad Store": {
+   "lat": 24.93822,
+   "lng": 67.07822,
+   "status": "probable",
+   "landmark_or_hint": "Shahzad General Store, UK Square FB Area Block 16"
+  },
+  "Sharfabad": {
+   "lat": 24.88542,
+   "lng": 67.06642,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Sharfabad Masjid, BMCHS"
+  },
+  "Shell Petrol Pump": {
+   "lat": 24.817675,
+   "lng": 67.065487,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Shipowner": {
+   "lat": 24.948987,
+   "lng": 67.040165,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sindh Baloch": {
+   "lat": 24.915194,
+   "lng": 67.13689,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sindh Secretariat": {
+   "lat": 24.854258,
+   "lng": 67.017091,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sir Syed Road": {
+   "lat": 24.877681,
+   "lng": 67.057933,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Soldier Bazar": {
+   "lat": 24.87683,
+   "lng": 67.033055,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sona Chandi Lawn": {
+   "lat": 24.9106,
+   "lng": 67.03741,
+   "status": "probable",
+   "landmark_or_hint": "Sona / Chandi Banquet, Sir Shah Suleman Rd, Nazimabad 4"
+  },
+  "Stadium": {
+   "lat": 24.895964,
+   "lng": 67.08148,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Stadium Road": {
+   "lat": 24.89742,
+   "lng": 67.07943,
+   "status": "probable",
+   "landmark_or_hint": "Stadium Rd, National Stadium Colony"
+  },
+  "Star Gate": {
+   "lat": 24.887124,
+   "lng": 67.155791,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Star House": {
+   "lat": 24.935359,
+   "lng": 67.034637,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Suchal": {
+   "lat": 24.952576,
+   "lng": 67.127947,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sumaira Chowk": {
+   "lat": 24.967964,
+   "lng": 67.132149,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sunlay Bungalows": {
+   "lat": 24.941224,
+   "lng": 67.154609,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Sunset Club": {
+   "lat": 24.830058,
+   "lng": 67.065159,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tahir Villas": {
+   "lat": 24.931866,
+   "lng": 67.05962,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tank Chowk": {
+   "lat": 24.9115,
+   "lng": 67.18467,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tank Chowk Malir": {
+   "lat": 24.912563,
+   "lng": 67.185974,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tariq Bin Zaid Society": {
+   "lat": 24.891821,
+   "lng": 67.173808,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tariq Road": {
+   "lat": 24.872679,
+   "lng": 67.060564,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Teachers Society": {
+   "lat": 24.978279,
+   "lng": 67.130239,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Teen Talwar": {
+   "lat": 24.833831,
+   "lng": 67.033672,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tipu Sultan Road": {
+   "lat": 24.874331,
+   "lng": 67.083907,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tower": {
+   "lat": 24.848784,
+   "lng": 66.997472,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Tyre Company": {
+   "lat": null,
+   "lng": null,
+   "status": "unresolved",
+   "landmark_or_hint": "Clifton/DHA, before Boat Basin"
+  },
+  "Tyre Puncture Shop": {
+   "lat": 24.922512,
+   "lng": 67.102798,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "UP More": {
+   "lat": 24.9728,
+   "lng": 67.066753,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Uncle Sariya": {
+   "lat": 24.866998,
+   "lng": 67.023654,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "United Bakery": {
+   "lat": 24.82992,
+   "lng": 67.069196,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Urdu Bazar Nazimabad": {
+   "lat": 24.90328,
+   "lng": 67.029998,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Urdu Science College": {
+   "lat": 24.911083,
+   "lng": 67.089215,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Usman Ghani Masjid": {
+   "lat": 24.935944,
+   "lng": 67.053999,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Usman Memorial": {
+   "lat": 24.914501,
+   "lng": 67.056662,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Water Pump More": {
+   "lat": 24.937503,
+   "lng": 67.07518,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Wireless Gate": {
+   "lat": 24.885168,
+   "lng": 67.167982,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "X-20 Malir Cantt": {
+   "lat": 24.96022,
+   "lng": 67.192466,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Yadgar Fish": {
+   "lat": 24.886018,
+   "lng": 67.050624,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  },
+  "Ziauddin": {
+   "lat": 24.92406,
+   "lng": 67.04525,
+   "status": "landmark_matched",
+   "landmark_or_hint": "Dr. Ziauddin Hospital, North Nazimabad"
+  },
+  "Zubaida Hospital": {
+   "lat": 24.883221,
+   "lng": 67.082196,
+   "status": "auto_checked",
+   "landmark_or_hint": ""
+  }
+ }
+}

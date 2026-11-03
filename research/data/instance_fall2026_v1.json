@@ -1,0 +1,5048 @@
+{
+ "version": "fall2026-v1",
+ "frozen": true,
+ "built_by": "research/build_instance.py",
+ "students_are_synthetic": true,
+ "seed": 2026,
+ "campus": {
+  "name": "FAST NUCES Karachi Campus",
+  "lat": 24.856899,
+  "lng": 67.264684,
+  "h3_r9": "8942e44eb13ffff"
+ },
+ "arrival_deadline": "08:00",
+ "contractors": {
+  "Jadoon": {
+   "buses": [
+    {
+     "bus_number": "JDN-101",
+     "capacity": 30
+    },
+    {
+     "bus_number": "JDN-102",
+     "capacity": 50
+    },
+    {
+     "bus_number": "JDN-103",
+     "capacity": 30
+    },
+    {
+     "bus_number": "JDN-104",
+     "capacity": 30
+    },
+    {
+     "bus_number": "JDN-105",
+     "capacity": 40
+    },
+    {
+     "bus_number": "JDN-106",
+     "capacity": 60
+    },
+    {
+     "bus_number": "JDN-107",
+     "capacity": 60
+    },
+    {
+     "bus_number": "JDN-108",
+     "capacity": 50
+    },
+    {
+     "bus_number": "JDN-109",
+     "capacity": 40
+    },
+    {
+     "bus_number": "JDN-110",
+     "capacity": 45
+    },
+    {
+     "bus_number": "JDN-111",
+     "capacity": 60
+    },
+    {
+     "bus_number": "JDN-112",
+     "capacity": 40
+    },
+    {
+     "bus_number": "JDN-113",
+     "capacity": 30
+    },
+    {
+     "bus_number": "JDN-114",
+     "capacity": 45
+    },
+    {
+     "bus_number": "JDN-115",
+     "capacity": 45
+    },
+    {
+     "bus_number": "JDN-116",
+     "capacity": 50
+    },
+    {
+     "bus_number": "JDN-117",
+     "capacity": 30
+    },
+    {
+     "bus_number": "JDN-118",
+     "capacity": 50
+    },
+    {
+     "bus_number": "JDN-119",
+     "capacity": 40
+    },
+    {
+     "bus_number": "JDN-120",
+     "capacity": 40
+    },
+    {
+     "bus_number": "JDN-121",
+     "capacity": 60
+    },
+    {
+     "bus_number": "JDN-122",
+     "capacity": 50
+    },
+    {
+     "bus_number": "JDN-123",
+     "capacity": 60
+    },
+    {
+     "bus_number": "JDN-124",
+     "capacity": 40
+    },
+    {
+     "bus_number": "JDN-125",
+     "capacity": 50
+    },
+    {
+     "bus_number": "JDN-126",
+     "capacity": 45
+    },
+    {
+     "bus_number": "JDN-901",
+     "capacity": 50
+    }
+   ],
+   "baseline_routes": [
+    {
+     "code": "R-10",
+     "bus": "JDN-114",
+     "capacity": 45,
+     "students": 30,
+     "stops": [
+      "Hyderi Super Mart KDA",
+      "Ziauddin",
+      "Landi Kotal",
+      "Tahir Villas",
+      "Ayesha Manzil More",
+      "Naseerabad"
+     ]
+    },
+    {
+     "code": "R-17",
+     "bus": "JDN-119",
+     "capacity": 40,
+     "students": 35,
+     "stops": [
+      "Karimabad",
+      "Ayesha Manzil More",
+      "Bhaijan Chowk",
+      "8.5 Number",
+      "Gulshan-e-Shamim"
+     ]
+    },
+    {
+     "code": "R-18",
+     "bus": "JDN-101",
+     "capacity": 30,
+     "students": 25,
+     "stops": [
+      "7 No Nazimabad",
+      "Abbasi Hospital",
+      "Khilafat Chowk",
+      "Board Office"
+     ]
+    },
+    {
+     "code": "R-2",
+     "bus": "JDN-106",
+     "capacity": 60,
+     "students": 41,
+     "stops": [
+      "Gawalia",
+      "K.U. Society",
+      "PCSIR",
+      "Quetta Town",
+      "G3 Stop",
+      "KBACHS Society / Sachal",
+      "Shahmir Colony Gate",
+      "Makhdoom Bilawal",
+      "Chapal Bungalows",
+      "Memon Medical Hospital",
+      "Roofi Bungalows",
+      "Sunlay Bungalows",
+      "Safoora"
+     ]
+    },
+    {
+     "code": "R-20",
+     "bus": "JDN-102",
+     "capacity": 50,
+     "students": 36,
+     "stops": [
+      "Rana Lawn",
+      "Tank Chowk",
+      "Kazimabad",
+      "Model More",
+      "RCD Ground",
+      "Baraf Khana",
+      "Kala Board"
+     ]
+    },
+    {
+     "code": "R-23",
+     "bus": "JDN-115",
+     "capacity": 45,
+     "students": 31,
+     "stops": [
+      "Orangi Town 5",
+      "Abdullah College",
+      "Katti Pahari",
+      "Ali Asghar Stadium",
+      "Star House",
+      "LDA"
+     ]
+    },
+    {
+     "code": "R-23B",
+     "bus": "JDN-120",
+     "capacity": 40,
+     "students": 27,
+     "stops": [
+      "Javed Nihari",
+      "Bhaijan Chowk",
+      "Mukka Chowk",
+      "13D 8-1/2",
+      "Rab Medical"
+     ]
+    },
+    {
+     "code": "R-24",
+     "bus": "JDN-126",
+     "capacity": 45,
+     "students": 35,
+     "stops": [
+      "Lala Zar NIPA",
+      "Safari Park",
+      "Samama",
+      "Continental",
+      "KESC",
+      "Johar Chowrangi"
+     ]
+    },
+    {
+     "code": "R-24B",
+     "bus": "JDN-103",
+     "capacity": 30,
+     "students": 22,
+     "stops": [
+      "Kamran Chowrangi",
+      "Munawar Chowrangi",
+      "Darul Sehat",
+      "Rado Center"
+     ]
+    },
+    {
+     "code": "R-25",
+     "bus": "JDN-118",
+     "capacity": 50,
+     "students": 38,
+     "stops": [
+      "Al-Hira",
+      "Puncture Shop Saadi Road",
+      "Amroha Society",
+      "Saadi Town",
+      "Police Society",
+      "Falcon",
+      "6 No Check Post"
+     ]
+    },
+    {
+     "code": "R-25B",
+     "bus": "JDN-108",
+     "capacity": 50,
+     "students": 42,
+     "stops": [
+      "Malik Society",
+      "KDA",
+      "PCSIR",
+      "Quetta Town",
+      "Sumaira Chowk",
+      "Anara Garden",
+      "Noman Garden",
+      "Al Azhar"
+     ]
+    },
+    {
+     "code": "R-26",
+     "bus": "JDN-104",
+     "capacity": 30,
+     "students": 24,
+     "stops": [
+      "NED",
+      "Karachi University",
+      "Commander CNG",
+      "G-10 Gul House"
+     ]
+    },
+    {
+     "code": "R-26B",
+     "bus": "JDN-121",
+     "capacity": 60,
+     "students": 44,
+     "stops": [
+      "Fariya Chowk",
+      "Khatm-e-Nabuwat",
+      "Kaneez Fatima",
+      "Madras Chowk",
+      "Dow Medical",
+      "Mosamiyat",
+      "Johar Complex (Bin Hashim)",
+      "Safoora",
+      "Check Post 5"
+     ]
+    },
+    {
+     "code": "R-27",
+     "bus": "JDN-123",
+     "capacity": 60,
+     "students": 41,
+     "stops": [
+      "Dentist Society",
+      "Officers Society",
+      "Teachers Society",
+      "Madras Chowk",
+      "Suchal",
+      "Furniture Market",
+      "Rizvia",
+      "Gulshan-e-Umair",
+      "Saima"
+     ]
+    },
+    {
+     "code": "R-27B",
+     "bus": "JDN-122",
+     "capacity": 50,
+     "students": 35,
+     "stops": [
+      "Saleem Bank",
+      "Rabia City",
+      "Al Habib University",
+      "Pehlwan Goth",
+      "Sindh Baloch",
+      "Commander City",
+      "Gul Chowrangi"
+     ]
+    },
+    {
+     "code": "R-3",
+     "bus": "JDN-105",
+     "capacity": 40,
+     "students": 28,
+     "stops": [
+      "POB Eye Hospital",
+      "Gate 3 PIA",
+      "Nawaz Sharif School",
+      "Bismillah Tower (PIA)",
+      "Magsi Chowk",
+      "Saima Flats"
+     ]
+    },
+    {
+     "code": "R-3B",
+     "bus": "JDN-109",
+     "capacity": 40,
+     "students": 27,
+     "stops": [
+      "Chishti Nagar",
+      "Kamran Chowrangi",
+      "Tyre Puncture Shop",
+      "Munawar Chowrangi",
+      "Sardar CNG",
+      "Nawabish"
+     ]
+    },
+    {
+     "code": "R-4",
+     "bus": "JDN-112",
+     "capacity": 40,
+     "students": 28,
+     "stops": [
+      "Maymar Gate",
+      "Al Habib Restaurant",
+      "Jamali Pul",
+      "Al Asif",
+      "Abbas Town",
+      "Paradise Bakery"
+     ]
+    },
+    {
+     "code": "R-4B",
+     "bus": "JDN-124",
+     "capacity": 40,
+     "students": 33,
+     "stops": [
+      "Maskan",
+      "Disco Bakery",
+      "Rimjhim Hall",
+      "Gulshan Turn",
+      "Dhaka Sweets"
+     ]
+    },
+    {
+     "code": "R-5",
+     "bus": "JDN-116",
+     "capacity": 50,
+     "students": 34,
+     "stops": [
+      "Saima Arabian",
+      "4K Stop",
+      "2 Minute",
+      "Power House",
+      "Saleem Center",
+      "UP More",
+      "Nagan (Dahli Hall)",
+      "Alnoor Edhi Center"
+     ]
+    },
+    {
+     "code": "R-5B",
+     "bus": "JDN-125",
+     "capacity": 50,
+     "students": 37,
+     "stops": [
+      "Dolmen Mall",
+      "5 Star",
+      "Farooq-e-Azam",
+      "Gulberg",
+      "Fazal Mill",
+      "Lucky One",
+      "Moti Mahal"
+     ]
+    },
+    {
+     "code": "R-6",
+     "bus": "JDN-107",
+     "capacity": 60,
+     "students": 46,
+     "stops": [
+      "Ajmer Nagri",
+      "Bombay Bakery",
+      "Oxford School",
+      "Bara Dari",
+      "Babul Islam",
+      "Disco More",
+      "Anda More",
+      "Cafe Al Habib",
+      "Cafe 2 Days",
+      "Namak Bank",
+      "Shafiq More",
+      "Power House",
+      "Alnoor"
+     ]
+    },
+    {
+     "code": "R-6B",
+     "bus": "JDN-111",
+     "capacity": 60,
+     "students": 49,
+     "stops": [
+      "Haider Food",
+      "Qalandria",
+      "DC Office",
+      "Peoples Chowrangi",
+      "Cafe Piyala",
+      "Raheem Hospital",
+      "Water Pump More",
+      "KIHD",
+      "16 No Chowrangi",
+      "Moti Mahal"
+     ]
+    },
+    {
+     "code": "R-7",
+     "bus": "JDN-901",
+     "capacity": 50,
+     "students": 33,
+     "stops": [
+      "Esa Lab 5 Star",
+      "Donesil",
+      "Landi Kotal",
+      "Tahir Villas",
+      "Shadab Masjid",
+      "Gulberg Thana",
+      "Shahzad Store"
+     ]
+    },
+    {
+     "code": "R-8",
+     "bus": "JDN-113",
+     "capacity": 30,
+     "students": 25,
+     "stops": [
+      "2K Stop",
+      "Mateen Food",
+      "Dental College",
+      "Green House"
+     ]
+    },
+    {
+     "code": "R-8B",
+     "bus": "JDN-117",
+     "capacity": 30,
+     "students": 26,
+     "stops": [
+      "Naya Nazimabad",
+      "Nusrat Bhutto Colony",
+      "Shadman 1",
+      "Shadman 2"
+     ]
+    },
+    {
+     "code": "R-9B",
+     "bus": "JDN-110",
+     "capacity": 45,
+     "students": 34,
+     "stops": [
+      "Masjid Khairul Bashir",
+      "CNG Pump",
+      "Usman Ghani Masjid",
+      "Mochi Gali",
+      "Shipowner",
+      "Lady Bird",
+      "Imam Clinic"
+     ]
+    }
+   ],
+   "stops": [
+    "13D 8-1/2",
+    "16 No Chowrangi",
+    "2 Minute",
+    "2K Stop",
+    "4K Stop",
+    "5 Star",
+    "6 No Check Post",
+    "7 No Nazimabad",
+    "8.5 Number",
+    "Abbas Town",
+    "Abbasi Hospital",
+    "Abdullah College",
+    "Ajmer Nagri",
+    "Al Asif",
+    "Al Azhar",
+    "Al Habib Restaurant",
+    "Al Habib University",
+    "Al-Hira",
+    "Ali Asghar Stadium",
+    "Alnoor",
+    "Alnoor Edhi Center",
+    "Amroha Society",
+    "Anara Garden",
+    "Anda More",
+    "Ayesha Manzil More",
+    "Babul Islam",
+    "Bara Dari",
+    "Baraf Khana",
+    "Bhaijan Chowk",
+    "Bismillah Tower (PIA)",
+    "Board Office",
+    "Bombay Bakery",
+    "CNG Pump",
+    "Cafe 2 Days",
+    "Cafe Al Habib",
+    "Cafe Piyala",
+    "Chapal Bungalows",
+    "Check Post 5",
+    "Chishti Nagar",
+    "Commander CNG",
+    "Commander City",
+    "Continental",
+    "DC Office",
+    "Darul Sehat",
+    "Dental College",
+    "Dentist Society",
+    "Dhaka Sweets",
+    "Disco Bakery",
+    "Disco More",
+    "Dolmen Mall",
+    "Donesil",
+    "Dow Medical",
+    "Esa Lab 5 Star",
+    "Falcon",
+    "Fariya Chowk",
+    "Farooq-e-Azam",
+    "Fazal Mill",
+    "Furniture Market",
+    "G-10 Gul House",
+    "G3 Stop",
+    "Gate 3 PIA",
+    "Gawalia",
+    "Green House",
+    "Gul Chowrangi",
+    "Gulberg",
+    "Gulberg Thana",
+    "Gulshan Turn",
+    "Gulshan-e-Shamim",
+    "Gulshan-e-Umair",
+    "Haider Food",
+    "Hyderi Super Mart KDA",
+    "Imam Clinic",
+    "Jamali Pul",
+    "Javed Nihari",
+    "Johar Chowrangi",
+    "Johar Complex (Bin Hashim)",
+    "K.U. Society",
+    "KBACHS Society / Sachal",
+    "KDA",
+    "KESC",
+    "KIHD",
+    "Kala Board",
+    "Kamran Chowrangi",
+    "Kaneez Fatima",
+    "Karachi University",
+    "Karimabad",
+    "Katti Pahari",
+    "Kazimabad",
+    "Khatm-e-Nabuwat",
+    "Khilafat Chowk",
+    "LDA",
+    "Lady Bird",
+    "Lala Zar NIPA",
+    "Landi Kotal",
+    "Lucky One",
+    "Madras Chowk",
+    "Magsi Chowk",
+    "Makhdoom Bilawal",
+    "Malik Society",
+    "Masjid Khairul Bashir",
+    "Maskan",
+    "Mateen Food",
+    "Maymar Gate",
+    "Memon Medical Hospital",
+    "Mochi Gali",
+    "Model More",
+    "Mosamiyat",
+    "Moti Mahal",
+    "Mukka Chowk",
+    "Munawar Chowrangi",
+    "NED",
+    "Nagan (Dahli Hall)",
+    "Namak Bank",
+    "Naseerabad",
+    "Nawabish",
+    "Nawaz Sharif School",
+    "Naya Nazimabad",
+    "Noman Garden",
+    "Nusrat Bhutto Colony",
+    "Officers Society",
+    "Orangi Town 5",
+    "Oxford School",
+    "PCSIR",
+    "POB Eye Hospital",
+    "Paradise Bakery",
+    "Pehlwan Goth",
+    "Peoples Chowrangi",
+    "Police Society",
+    "Power House",
+    "Puncture Shop Saadi Road",
+    "Qalandria",
+    "Quetta Town",
+    "RCD Ground",
+    "Rab Medical",
+    "Rabia City",
+    "Rado Center",
+    "Raheem Hospital",
+    "Rana Lawn",
+    "Rimjhim Hall",
+    "Rizvia",
+    "Roofi Bungalows",
+    "Saadi Town",
+    "Safari Park",
+    "Safoora",
+    "Saima",
+    "Saima Arabian",
+    "Saima Flats",
+    "Saleem Bank",
+    "Saleem Center",
+    "Samama",
+    "Sardar CNG",
+    "Shadab Masjid",
+    "Shadman 1",
+    "Shadman 2",
+    "Shafiq More",
+    "Shahmir Colony Gate",
+    "Shahzad Store",
+    "Shipowner",
+    "Sindh Baloch",
+    "Star House",
+    "Suchal",
+    "Sumaira Chowk",
+    "Sunlay Bungalows",
+    "Tahir Villas",
+    "Tank Chowk",
+    "Teachers Society",
+    "Tyre Puncture Shop",
+    "UP More",
+    "Usman Ghani Masjid",
+    "Water Pump More",
+    "Ziauddin"
+   ]
+  },
+  "Nadeem": {
+   "buses": [
+    {
+     "bus_number": "NDM-201",
+     "capacity": 40
+    },
+    {
+     "bus_number": "NDM-202",
+     "capacity": 45
+    },
+    {
+     "bus_number": "NDM-203",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-204",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-205",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-206",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-207",
+     "capacity": 40
+    },
+    {
+     "bus_number": "NDM-208",
+     "capacity": 40
+    },
+    {
+     "bus_number": "NDM-209",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-210",
+     "capacity": 60
+    },
+    {
+     "bus_number": "NDM-211",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-212",
+     "capacity": 45
+    },
+    {
+     "bus_number": "NDM-213",
+     "capacity": 50
+    },
+    {
+     "bus_number": "NDM-214",
+     "capacity": 45
+    },
+    {
+     "bus_number": "NDM-215",
+     "capacity": 30
+    },
+    {
+     "bus_number": "NDM-216",
+     "capacity": 40
+    },
+    {
+     "bus_number": "NDM-217",
+     "capacity": 30
+    },
+    {
+     "bus_number": "NDM-218",
+     "capacity": 60
+    },
+    {
+     "bus_number": "NDM-219",
+     "capacity": 40
+    },
+    {
+     "bus_number": "NDM-220",
+     "capacity": 60
+    },
+    {
+     "bus_number": "NDM-221",
+     "capacity": 30
+    },
+    {
+     "bus_number": "NDM-222",
+     "capacity": 45
+    },
+    {
+     "bus_number": "NDM-223",
+     "capacity": 60
+    },
+    {
+     "bus_number": "NDM-224",
+     "capacity": 45
+    },
+    {
+     "bus_number": "NDM-225",
+     "capacity": 45
+    },
+    {
+     "bus_number": "NDM-902",
+     "capacity": 45
+    }
+   ],
+   "baseline_routes": [
+    {
+     "code": "1",
+     "bus": "NDM-208",
+     "capacity": 40,
+     "students": 34,
+     "stops": [
+      "Malir Cantt Askari-V",
+      "Check Post 5",
+      "Check Post 6",
+      "Tank Chowk Malir"
+     ]
+    },
+    {
+     "code": "1-B",
+     "bus": "NDM-209",
+     "capacity": 50,
+     "students": 33,
+     "stops": [
+      "Sector J Malir Cantt",
+      "Sector G Malir Cantt",
+      "Malir Cantt Phase-I",
+      "Sector H Malir Cantt",
+      "Tariq Bin Zaid Society",
+      "Security Printing Press"
+     ]
+    },
+    {
+     "code": "11",
+     "bus": "NDM-216",
+     "capacity": 40,
+     "students": 29,
+     "stops": [
+      "Soldier Bazar",
+      "Guru Mandir",
+      "Islamia College",
+      "Stadium Road"
+     ]
+    },
+    {
+     "code": "12",
+     "bus": "NDM-211",
+     "capacity": 50,
+     "students": 34,
+     "stops": [
+      "Khudadad Colony",
+      "Kashmir Road",
+      "Sir Syed Road",
+      "Khalid Bin Waleed Road",
+      "Tariq Road",
+      "Tipu Sultan Road"
+     ]
+    },
+    {
+     "code": "13",
+     "bus": "NDM-224",
+     "capacity": 45,
+     "students": 39,
+     "stops": [
+      "Usman Memorial",
+      "Essa Nagri",
+      "Stadium",
+      "Dalmia",
+      "Millennium Mall"
+     ]
+    },
+    {
+     "code": "14",
+     "bus": "NDM-213",
+     "capacity": 50,
+     "students": 36,
+     "stops": [
+      "Old Sabzi Mandi",
+      "Sharfabad",
+      "Bahadurabad",
+      "Rangoon Wala Hall",
+      "Karsaz Pankha Stop",
+      "NHS-IV"
+     ]
+    },
+    {
+     "code": "15",
+     "bus": "NDM-202",
+     "capacity": 45,
+     "students": 33,
+     "stops": [
+      "Forum Shopping Mall",
+      "Gizri",
+      "DHA Phase IV",
+      "Sunset Club",
+      "United Bakery",
+      "KFC Phase II"
+     ]
+    },
+    {
+     "code": "16",
+     "bus": "NDM-212",
+     "capacity": 45,
+     "students": 37,
+     "stops": [
+      "Saba Avenue Imambargah",
+      "Khayaban-e-Bukhari",
+      "Bukhari Commercial",
+      "Misri Shah",
+      "Khayaban-e-Muhafiz",
+      "Rahat Park"
+     ]
+    },
+    {
+     "code": "16-B",
+     "bus": "NDM-220",
+     "capacity": 60,
+     "students": 50,
+     "stops": [
+      "Bilawal Chowrangi",
+      "Hyperstar",
+      "Florida Homes B-Street",
+      "Kamal Mart",
+      "KFC Badar",
+      "Khayaban-e-Bahria",
+      "Shell Petrol Pump",
+      "NADRA Mega Center"
+     ]
+    },
+    {
+     "code": "19",
+     "bus": "NDM-225",
+     "capacity": 45,
+     "students": 33,
+     "stops": [
+      "Hassan Square",
+      "Mumtaz Manzil",
+      "Bait-ul-Mukarram",
+      "Urdu Science College",
+      "Aziz Bhatti Park"
+     ]
+    },
+    {
+     "code": "21",
+     "bus": "NDM-223",
+     "capacity": 60,
+     "students": 52,
+     "stops": [
+      "Tower",
+      "Jang Press",
+      "Sindh Secretariat",
+      "Atrium Mall",
+      "Lucky Star",
+      "FTC",
+      "Shahrah-e-Faisal Nursery"
+     ]
+    },
+    {
+     "code": "29",
+     "bus": "NDM-203",
+     "capacity": 50,
+     "students": 34,
+     "stops": [
+      "Falcon Malir Cantt",
+      "CMH Malir Cantt",
+      "X-20 Malir Cantt",
+      "Cantt Bazar Malir",
+      "Check Post 2",
+      "Jinnah Garden",
+      "Kazimabad"
+     ]
+    },
+    {
+     "code": "30",
+     "bus": "NDM-204",
+     "capacity": 50,
+     "students": 45,
+     "stops": [
+      "Jahangirabad",
+      "Golimar Chowrangi",
+      "Urdu Bazar Nazimabad",
+      "Inquiry Office",
+      "Naz Petrol Pump",
+      "Sona Chandi Lawn",
+      "Liaquatabad Erum Bakery"
+     ]
+    },
+    {
+     "code": "31",
+     "bus": "NDM-902",
+     "capacity": 45,
+     "students": 39,
+     "stops": [
+      "KPT Bridge Kababjees",
+      "Iqra University",
+      "Diamond",
+      "Manzoor Colony",
+      "PAF Chapter"
+     ]
+    },
+    {
+     "code": "32",
+     "bus": "NDM-205",
+     "capacity": 50,
+     "students": 37,
+     "stops": [
+      "Tyre Company",
+      "Boat Basin",
+      "26 Street",
+      "Badar Commercial",
+      "Khayaban-e-Sehar",
+      "Nexus College",
+      "Khayaban-e-Shahbaz"
+     ]
+    },
+    {
+     "code": "33",
+     "bus": "NDM-201",
+     "capacity": 40,
+     "students": 34,
+     "stops": [
+      "Liaquatabad 10 No",
+      "Usman Memorial",
+      "Saylani Chowk",
+      "Zubaida Hospital",
+      "M. Ali Society"
+     ]
+    },
+    {
+     "code": "34",
+     "bus": "NDM-214",
+     "capacity": 45,
+     "students": 35,
+     "stops": [
+      "Korangi Crossing",
+      "Nasir Jump",
+      "Korangi No 2",
+      "Korangi No 5",
+      "Landhi No 4",
+      "Landhi 89"
+     ]
+    },
+    {
+     "code": "35",
+     "bus": "NDM-207",
+     "capacity": 40,
+     "students": 28,
+     "stops": [
+      "Teen Talwar",
+      "Race Course",
+      "Cantt Station",
+      "Askari II & III",
+      "NMC"
+     ]
+    },
+    {
+     "code": "36",
+     "bus": "NDM-206",
+     "capacity": 50,
+     "students": 41,
+     "stops": [
+      "Police Headquarter Garden",
+      "Uncle Sariya",
+      "Mobile Market",
+      "Naz Plaza",
+      "Numaish",
+      "Islamia College",
+      "New Town Chandni Chowk"
+     ]
+    },
+    {
+     "code": "37",
+     "bus": "NDM-210",
+     "capacity": 60,
+     "students": 49,
+     "stops": [
+      "Ram Swami",
+      "Garden Zoo",
+      "Ali Bhai",
+      "Garden Jamat Khana",
+      "Fatmi Blood Bank",
+      "Khurasan",
+      "Numaish",
+      "Khudadad Colony",
+      "Noorani Kabab",
+      "Allah Wali Chowrangi"
+     ]
+    },
+    {
+     "code": "38",
+     "bus": "NDM-219",
+     "capacity": 40,
+     "students": 30,
+     "stops": [
+      "Bacha Party",
+      "Punjab Chowrangi PSO Pump",
+      "Chandio Village",
+      "Altamash"
+     ]
+    },
+    {
+     "code": "39",
+     "bus": "NDM-218",
+     "capacity": 60,
+     "students": 42,
+     "stops": [
+      "Perfume Chowk Johar",
+      "Hilltop",
+      "Johar More",
+      "Drigh Road",
+      "Colony Gate",
+      "Star Gate",
+      "Wireless Gate",
+      "Kala Board",
+      "Hafiz Sweets Malir 15"
+     ]
+    },
+    {
+     "code": "40",
+     "bus": "NDM-217",
+     "capacity": 30,
+     "students": 22,
+     "stops": [
+      "Matka Stop",
+      "Aladin Park",
+      "Lal Flat"
+     ]
+    },
+    {
+     "code": "41",
+     "bus": "NDM-222",
+     "capacity": 45,
+     "students": 31,
+     "stops": [
+      "Green Mosque Bahria Town",
+      "Bahria Adventure Land",
+      "Bahria International Hospital",
+      "Bahria Town Apartments Tower 15",
+      "Bahria Town Apartments Tower 20",
+      "Bahria Town Main Gate"
+     ]
+    },
+    {
+     "code": "42",
+     "bus": "NDM-215",
+     "capacity": 30,
+     "students": 23,
+     "stops": [
+      "Jamshed Road",
+      "Yadgar Fish",
+      "New Town Chandni Chowk",
+      "Askari IV"
+     ]
+    }
+   ],
+   "stops": [
+    "26 Street",
+    "Aladin Park",
+    "Ali Bhai",
+    "Allah Wali Chowrangi",
+    "Altamash",
+    "Askari II & III",
+    "Askari IV",
+    "Atrium Mall",
+    "Aziz Bhatti Park",
+    "Bacha Party",
+    "Badar Commercial",
+    "Bahadurabad",
+    "Bahria Adventure Land",
+    "Bahria International Hospital",
+    "Bahria Town Apartments Tower 15",
+    "Bahria Town Apartments Tower 20",
+    "Bahria Town Main Gate",
+    "Bait-ul-Mukarram",
+    "Bilawal Chowrangi",
+    "Boat Basin",
+    "Bukhari Commercial",
+    "CMH Malir Cantt",
+    "Cantt Bazar Malir",
+    "Cantt Station",
+    "Chandio Village",
+    "Check Post 2",
+    "Check Post 5",
+    "Check Post 6",
+    "Colony Gate",
+    "DHA Phase IV",
+    "Dalmia",
+    "Diamond",
+    "Drigh Road",
+    "Essa Nagri",
+    "FTC",
+    "Falcon Malir Cantt",
+    "Fatmi Blood Bank",
+    "Florida Homes B-Street",
+    "Forum Shopping Mall",
+    "Garden Jamat Khana",
+    "Garden Zoo",
+    "Gizri",
+    "Golimar Chowrangi",
+    "Green Mosque Bahria Town",
+    "Guru Mandir",
+    "Hafiz Sweets Malir 15",
+    "Hassan Square",
+    "Hilltop",
+    "Hyperstar",
+    "Inquiry Office",
+    "Iqra University",
+    "Islamia College",
+    "Jahangirabad",
+    "Jamshed Road",
+    "Jang Press",
+    "Jinnah Garden",
+    "Johar More",
+    "KFC Badar",
+    "KFC Phase II",
+    "KPT Bridge Kababjees",
+    "Kala Board",
+    "Kamal Mart",
+    "Karsaz Pankha Stop",
+    "Kashmir Road",
+    "Kazimabad",
+    "Khalid Bin Waleed Road",
+    "Khayaban-e-Bahria",
+    "Khayaban-e-Bukhari",
+    "Khayaban-e-Muhafiz",
+    "Khayaban-e-Sehar",
+    "Khayaban-e-Shahbaz",
+    "Khudadad Colony",
+    "Khurasan",
+    "Korangi Crossing",
+    "Korangi No 2",
+    "Korangi No 5",
+    "Lal Flat",
+    "Landhi 89",
+    "Landhi No 4",
+    "Liaquatabad 10 No",
+    "Liaquatabad Erum Bakery",
+    "Lucky Star",
+    "M. Ali Society",
+    "Malir Cantt Askari-V",
+    "Malir Cantt Phase-I",
+    "Manzoor Colony",
+    "Matka Stop",
+    "Millennium Mall",
+    "Misri Shah",
+    "Mobile Market",
+    "Mumtaz Manzil",
+    "NADRA Mega Center",
+    "NHS-IV",
+    "NMC",
+    "Nasir Jump",
+    "Naz Petrol Pump",
+    "Naz Plaza",
+    "New Town Chandni Chowk",
+    "Nexus College",
+    "Noorani Kabab",
+    "Numaish",
+    "Old Sabzi Mandi",
+    "PAF Chapter",
+    "Perfume Chowk Johar",
+    "Police Headquarter Garden",
+    "Punjab Chowrangi PSO Pump",
+    "Race Course",
+    "Rahat Park",
+    "Ram Swami",
+    "Rangoon Wala Hall",
+    "Saba Avenue Imambargah",
+    "Saylani Chowk",
+    "Sector G Malir Cantt",
+    "Sector H Malir Cantt",
+    "Sector J Malir Cantt",
+    "Security Printing Press",
+    "Shahrah-e-Faisal Nursery",
+    "Sharfabad",
+    "Shell Petrol Pump",
+    "Sindh Secretariat",
+    "Sir Syed Road",
+    "Soldier Bazar",
+    "Sona Chandi Lawn",
+    "Stadium",
+    "Stadium Road",
+    "Star Gate",
+    "Sunset Club",
+    "Tank Chowk Malir",
+    "Tariq Bin Zaid Society",
+    "Tariq Road",
+    "Teen Talwar",
+    "Tipu Sultan Road",
+    "Tower",
+    "Tyre Company",
+    "Uncle Sariya",
+    "United Bakery",
+    "Urdu Bazar Nazimabad",
+    "Urdu Science College",
+    "Usman Memorial",
+    "Wireless Gate",
+    "X-20 Malir Cantt",
+    "Yadgar Fish",
+    "Zubaida Hospital"
+   ]
+  }
+ },
+ "stops": [
+  {
+   "name": "13D 8-1/2",
+   "lat": 24.912941,
+   "lng": 67.085612,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440527ffff",
+   "h3_r10": "8a42e4405257fff",
+   "students": {
+    "Jadoon": 14
+   }
+  },
+  {
+   "name": "16 No Chowrangi",
+   "lat": 24.937728,
+   "lng": 67.080715,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442eafffff",
+   "h3_r10": "8a42e442eacffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "2 Minute",
+   "lat": 24.995643,
+   "lng": 67.06368,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4551d7ffff",
+   "h3_r10": "8a42e4551d47fff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "26 Street",
+   "lat": 24.785065,
+   "lng": 67.065915,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44aec3ffff",
+   "h3_r10": "8a42e44aec2ffff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "2K Stop",
+   "lat": 24.948968,
+   "lng": 67.052899,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4421bbffff",
+   "h3_r10": "8a42e4421b8ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "4K Stop",
+   "lat": 25.006176,
+   "lng": 67.064995,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45425bffff",
+   "h3_r10": "8a42e45425b7fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "5 Star",
+   "lat": 24.940487,
+   "lng": 67.046194,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4421cfffff",
+   "h3_r10": "8a42e4421ceffff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "6 No Check Post",
+   "lat": 24.947993,
+   "lng": 67.182505,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4473a3ffff",
+   "h3_r10": "8a42e4473a37fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "7 No Nazimabad",
+   "lat": 24.918533,
+   "lng": 67.031171,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4422bbffff",
+   "h3_r10": "8a42e4422baffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "8.5 Number",
+   "lat": 24.9209225,
+   "lng": 67.0701175,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e442e4bffff",
+   "h3_r10": "8a42e442e487fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Abbas Town",
+   "lat": 24.941464,
+   "lng": 67.093003,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442803ffff",
+   "h3_r10": "8a42e4428037fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Abbasi Hospital",
+   "lat": 24.921187,
+   "lng": 67.029557,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4422b3ffff",
+   "h3_r10": "8a42e4422b27fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Abdullah College",
+   "lat": 24.929441,
+   "lng": 67.023425,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4420cfffff",
+   "h3_r10": "8a42e4420cf7fff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Ajmer Nagri",
+   "lat": 24.985479,
+   "lng": 67.059237,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455023ffff",
+   "h3_r10": "8a42e4550237fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Al Asif",
+   "lat": 24.950866,
+   "lng": 67.092151,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442d4bffff",
+   "h3_r10": "8a42e442886ffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Al Azhar",
+   "lat": 24.95572,
+   "lng": 67.149195,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44709bffff",
+   "h3_r10": "8a42e4470987fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Al Habib Restaurant",
+   "lat": 24.991069,
+   "lng": 67.177963,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e446287ffff",
+   "h3_r10": "8a42e446286ffff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Al Habib University",
+   "lat": 24.905157,
+   "lng": 67.137583,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4408bbffff",
+   "h3_r10": "8a42e4408b87fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Al-Hira",
+   "lat": 24.948375,
+   "lng": 67.16032,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44700bffff",
+   "h3_r10": "8a42e447008ffff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Aladin Park",
+   "lat": 24.911558,
+   "lng": 67.105636,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440cd7ffff",
+   "h3_r10": "8a42e440cd77fff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Ali Asghar Stadium",
+   "lat": 24.937066,
+   "lng": 67.031079,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4420bbffff",
+   "h3_r10": "8a42e4420b9ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Ali Bhai",
+   "lat": 24.883951,
+   "lng": 67.026618,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e443143ffff",
+   "h3_r10": "8a42e4431427fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Allah Wali Chowrangi",
+   "lat": 24.874753,
+   "lng": 67.028502,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44338fffff",
+   "h3_r10": "8a42e44338effff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Alnoor",
+   "lat": 24.949025,
+   "lng": 67.076991,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442c73ffff",
+   "h3_r10": "8a42e442c72ffff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Alnoor Edhi Center",
+   "lat": 24.95965,
+   "lng": 67.07458,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e442ca3ffff",
+   "h3_r10": "8a42e442ca37fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Altamash",
+   "lat": 24.828936,
+   "lng": 67.050049,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441043ffff",
+   "h3_r10": "8a42e44104affff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Amroha Society",
+   "lat": 24.96287,
+   "lng": 67.167105,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4471d3ffff",
+   "h3_r10": "8a42e4471d27fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Anara Garden",
+   "lat": 24.963923,
+   "lng": 67.141932,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447407ffff",
+   "h3_r10": "8a42e447404ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Anda More",
+   "lat": 24.964983,
+   "lng": 67.057362,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455233ffff",
+   "h3_r10": "8a42e4552317fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Askari II & III",
+   "lat": 24.84791,
+   "lng": 67.042756,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44142fffff",
+   "h3_r10": "8a42e44142d7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Askari IV",
+   "lat": 24.901397,
+   "lng": 67.120185,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440c7bffff",
+   "h3_r10": "8a42e440c79ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Atrium Mall",
+   "lat": 24.856074,
+   "lng": 67.030271,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4414b3ffff",
+   "h3_r10": "8a42e4414b17fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Ayesha Manzil More",
+   "lat": 24.927333,
+   "lng": 67.064578,
+   "location": "auto_checked",
+   "also_named": [
+    "Ayesha Manzil"
+   ],
+   "h3_r9": "8942e442ecbffff",
+   "h3_r10": "8a42e442ec87fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Aziz Bhatti Park",
+   "lat": 24.913596,
+   "lng": 67.095806,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a47ffff",
+   "h3_r10": "8a42e442a45ffff",
+   "students": {
+    "Nadeem": 13
+   }
+  },
+  {
+   "name": "Babul Islam",
+   "lat": 24.97614,
+   "lng": 67.05541,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e45507bffff",
+   "h3_r10": "8a42e455079ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Bacha Party",
+   "lat": 24.831933,
+   "lng": 67.040269,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441637ffff",
+   "h3_r10": "8a42e4416347fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Badar Commercial",
+   "lat": 24.79838,
+   "lng": 67.045714,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a18bffff",
+   "h3_r10": "8a42e44a18b7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Bahadurabad",
+   "lat": 24.882451,
+   "lng": 67.069389,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440043ffff",
+   "h3_r10": "8a42e4400437fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Bahria Adventure Land",
+   "lat": 25.020276,
+   "lng": 67.313196,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e473077ffff",
+   "h3_r10": "8a42e47300dffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Bahria International Hospital",
+   "lat": 25.013681,
+   "lng": 67.310841,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e47307bffff",
+   "h3_r10": "8a42e4730797fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Bahria Town Apartments Tower 15",
+   "lat": 25.010056,
+   "lng": 67.313363,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4732a7ffff",
+   "h3_r10": "8a42e4732a77fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Bahria Town Apartments Tower 20",
+   "lat": 25.005519,
+   "lng": 67.314646,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e473233ffff",
+   "h3_r10": "8a42e473232ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Bahria Town Main Gate",
+   "lat": 24.993801,
+   "lng": 67.316956,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e47326fffff",
+   "h3_r10": "8a42e47326f7fff",
+   "students": {
+    "Nadeem": 14
+   }
+  },
+  {
+   "name": "Bait-ul-Mukarram",
+   "lat": 24.906629,
+   "lng": 67.082695,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440567ffff",
+   "h3_r10": "8a42e4405647fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Bara Dari",
+   "lat": 24.97864,
+   "lng": 67.05558,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e455073ffff",
+   "h3_r10": "8a42e455071ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Baraf Khana",
+   "lat": 24.889567,
+   "lng": 67.187028,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44566bffff",
+   "h3_r10": "8a42e4456687fff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "Bhaijan Chowk",
+   "lat": 24.925498,
+   "lng": 67.066222,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442e53ffff",
+   "h3_r10": "8a42e442e537fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Bilawal Chowrangi",
+   "lat": 24.815837,
+   "lng": 67.020292,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e458b2bffff",
+   "h3_r10": "8a42e458b28ffff",
+   "students": {
+    "Nadeem": 12
+   }
+  },
+  {
+   "name": "Bismillah Tower (PIA)",
+   "lat": 24.922858,
+   "lng": 67.145311,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d33ffff",
+   "h3_r10": "8a42e440d227fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Board Office",
+   "lat": 24.924493,
+   "lng": 67.030991,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44204fffff",
+   "h3_r10": "8a42e44204effff",
+   "students": {
+    "Jadoon": 12
+   }
+  },
+  {
+   "name": "Boat Basin",
+   "lat": 24.821231,
+   "lng": 67.018162,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e458b37ffff",
+   "h3_r10": "8a42e458b377fff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Bombay Bakery",
+   "lat": 24.98304,
+   "lng": 67.05509,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e45500fffff",
+   "h3_r10": "8a42e45500c7fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Bukhari Commercial",
+   "lat": 24.7931,
+   "lng": 67.065076,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44ae93ffff",
+   "h3_r10": "8a42e44ae907fff",
+   "students": {
+    "Nadeem": 15
+   }
+  },
+  {
+   "name": "CMH Malir Cantt",
+   "lat": 24.95035,
+   "lng": 67.215517,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44462fffff",
+   "h3_r10": "8a42e44462cffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "CNG Pump",
+   "lat": 24.954412,
+   "lng": 67.078407,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442c33ffff",
+   "h3_r10": "8a42e442c317fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Cafe 2 Days",
+   "lat": 24.96068,
+   "lng": 67.07296,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e442cb3ffff",
+   "h3_r10": "8a42e442cb17fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Cafe Al Habib",
+   "lat": 24.961792,
+   "lng": 67.070533,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45534bffff",
+   "h3_r10": "8a42e455349ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Cafe Piyala",
+   "lat": 24.945789,
+   "lng": 67.067785,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442c53ffff",
+   "h3_r10": "8a42e442c51ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Cantt Bazar Malir",
+   "lat": 24.927663,
+   "lng": 67.20509,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44550fffff",
+   "h3_r10": "8a42e44550dffff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Cantt Station",
+   "lat": 24.843874,
+   "lng": 67.04124,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441467ffff",
+   "h3_r10": "8a42e441464ffff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Chandio Village",
+   "lat": 24.829659,
+   "lng": 67.044508,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441627ffff",
+   "h3_r10": "8a42e441625ffff",
+   "students": {
+    "Nadeem": 11
+   }
+  },
+  {
+   "name": "Chapal Bungalows",
+   "lat": 24.953757,
+   "lng": 67.141721,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44747bffff",
+   "h3_r10": "8a42e447479ffff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Check Post 2",
+   "lat": 24.912651,
+   "lng": 67.198293,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44508fffff",
+   "h3_r10": "8a42e44508d7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Check Post 5",
+   "lat": 24.947733,
+   "lng": 67.182738,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4473a3ffff",
+   "h3_r10": "8a42e4473a37fff",
+   "students": {
+    "Jadoon": 3,
+    "Nadeem": 12
+   }
+  },
+  {
+   "name": "Check Post 6",
+   "lat": 24.934239,
+   "lng": 67.177073,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447343ffff",
+   "h3_r10": "8a42e4473427fff",
+   "students": {
+    "Nadeem": 15
+   }
+  },
+  {
+   "name": "Chishti Nagar",
+   "lat": 24.92653,
+   "lng": 67.13967,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e440da3ffff",
+   "h3_r10": "8a42e440da17fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Colony Gate",
+   "lat": 24.887121,
+   "lng": 67.149684,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440bc3ffff",
+   "h3_r10": "8a42e440bc07fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Commander CNG",
+   "lat": 24.933082,
+   "lng": 67.155235,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447213ffff",
+   "h3_r10": "8a42e4472127fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Commander City",
+   "lat": 24.91750413673725,
+   "lng": 67.13535336639093,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e440d1bffff",
+   "h3_r10": "8a42e440d19ffff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Continental",
+   "lat": 24.925237,
+   "lng": 67.114593,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442b47ffff",
+   "h3_r10": "8a42e442b477fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "DC Office",
+   "lat": 24.951382,
+   "lng": 67.061776,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442cd3ffff",
+   "h3_r10": "8a42e442cd1ffff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "DHA Phase IV",
+   "lat": 24.824003,
+   "lng": 67.061353,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4413dbffff",
+   "h3_r10": "8a42e4413d87fff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Dalmia",
+   "lat": 24.9016,
+   "lng": 67.10103,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e440133ffff",
+   "h3_r10": "8a42e4401317fff",
+   "students": {
+    "Nadeem": 9
+   }
+  },
+  {
+   "name": "Darul Sehat",
+   "lat": 24.914333,
+   "lng": 67.127346,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440c37ffff",
+   "h3_r10": "8a42e440c267fff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Dental College",
+   "lat": 24.942625,
+   "lng": 67.061931,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442123ffff",
+   "h3_r10": "8a42e442121ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Dentist Society",
+   "lat": 24.98333793282577,
+   "lng": 67.13230953169084,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e455bc7ffff",
+   "h3_r10": "8a42e455bc4ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Dhaka Sweets",
+   "lat": 24.923063,
+   "lng": 67.093312,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a13ffff",
+   "h3_r10": "8a42e442a10ffff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Diamond",
+   "lat": 24.84296,
+   "lng": 67.08188,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e441167ffff",
+   "h3_r10": "8a42e4411677fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Disco Bakery",
+   "lat": 24.929142,
+   "lng": 67.09736,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442aa3ffff",
+   "h3_r10": "8a42e442aa27fff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "Disco More",
+   "lat": 24.971835,
+   "lng": 67.056041,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4552a7ffff",
+   "h3_r10": "8a42e4552a77fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Dolmen Mall",
+   "lat": 24.93556,
+   "lng": 67.04023,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e442037ffff",
+   "h3_r10": "8a42e442035ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Donesil",
+   "lat": 24.940003,
+   "lng": 67.059339,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442177ffff",
+   "h3_r10": "8a42e442174ffff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Dow Medical",
+   "lat": 24.943043,
+   "lng": 67.137988,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447617ffff",
+   "h3_r10": "8a42e447615ffff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Drigh Road",
+   "lat": 24.88692,
+   "lng": 67.12835,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e440a93ffff",
+   "h3_r10": "8a42e440a927fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Esa Lab 5 Star",
+   "lat": 24.938824,
+   "lng": 67.052431,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44210bffff",
+   "h3_r10": "8a42e442109ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Essa Nagri",
+   "lat": 24.901724,
+   "lng": 67.065821,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44055bffff",
+   "h3_r10": "8a42e44055b7fff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "FTC",
+   "lat": 24.858446,
+   "lng": 67.052247,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441503ffff",
+   "h3_r10": "8a42e4415007fff",
+   "students": {
+    "Nadeem": 19
+   }
+  },
+  {
+   "name": "Falcon",
+   "lat": 24.950919,
+   "lng": 67.17946,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4473b3ffff",
+   "h3_r10": "8a42e4473b27fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Falcon Malir Cantt",
+   "lat": 24.956432,
+   "lng": 67.218496,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e444057ffff",
+   "h3_r10": "8a42e4440577fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Fariya Chowk",
+   "lat": 24.950248,
+   "lng": 67.106019,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4429c3ffff",
+   "h3_r10": "8a42e4429c37fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Farooq-e-Azam",
+   "lat": 24.94846,
+   "lng": 67.05147,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4421bbffff",
+   "h3_r10": "8a42e4421b87fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Fatmi Blood Bank",
+   "lat": 24.881569,
+   "lng": 67.033636,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44317bffff",
+   "h3_r10": "8a42e4431797fff",
+   "students": {
+    "Nadeem": 9
+   }
+  },
+  {
+   "name": "Fazal Mill",
+   "lat": 24.937907,
+   "lng": 67.085664,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4428cbffff",
+   "h3_r10": "8a42e4428c87fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Florida Homes B-Street",
+   "lat": 24.796881,
+   "lng": 67.041012,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a1d3ffff",
+   "h3_r10": "8a42e44a1d2ffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Forum Shopping Mall",
+   "lat": 24.827207,
+   "lng": 67.037798,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44163bffff",
+   "h3_r10": "8a42e4416387fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Furniture Market",
+   "lat": 24.94512,
+   "lng": 67.134462,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44768fffff",
+   "h3_r10": "8a42e44768d7fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "G-10 Gul House",
+   "lat": 24.92938,
+   "lng": 67.140782,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440db7ffff",
+   "h3_r10": "8a42e440db57fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "G3 Stop",
+   "lat": 24.955691,
+   "lng": 67.135188,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447443ffff",
+   "h3_r10": "8a42e447442ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Garden Jamat Khana",
+   "lat": 24.882144,
+   "lng": 67.032184,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44314fffff",
+   "h3_r10": "8a42e44314cffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Garden Zoo",
+   "lat": 24.87594,
+   "lng": 67.022943,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e443393ffff",
+   "h3_r10": "8a42e443391ffff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Gate 3 PIA",
+   "lat": 24.916169,
+   "lng": 67.143018,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d77ffff",
+   "h3_r10": "8a42e440d757fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Gawalia",
+   "lat": 24.965031,
+   "lng": 67.121914,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455a6bffff",
+   "h3_r10": "8a42e455a6affff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Gizri",
+   "lat": 24.819381,
+   "lng": 67.045714,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44128bffff",
+   "h3_r10": "8a42e44128b7fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Golimar Chowrangi",
+   "lat": 24.885391,
+   "lng": 67.015935,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4430afffff",
+   "h3_r10": "8a42e4430adffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Green House",
+   "lat": 24.94429,
+   "lng": 67.06334,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e442127ffff",
+   "h3_r10": "8a42e4421257fff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Green Mosque Bahria Town",
+   "lat": 25.012197,
+   "lng": 67.317638,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4733d3ffff",
+   "h3_r10": "8a42e4733d07fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Gul Chowrangi",
+   "lat": 24.9198142734745,
+   "lng": 67.13381673278187,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e440d1bffff",
+   "h3_r10": "8a42e440d1a7fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Gulberg",
+   "lat": 24.936817,
+   "lng": 67.076,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442eabffff",
+   "h3_r10": "8a42e442eaa7fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Gulberg Thana",
+   "lat": 24.935833,
+   "lng": 67.066691,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442e8bffff",
+   "h3_r10": "8a42e442e8a7fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Gulshan Turn",
+   "lat": 24.917218,
+   "lng": 67.092387,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a57ffff",
+   "h3_r10": "8a42e442a56ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Gulshan-e-Shamim",
+   "lat": 24.916347,
+   "lng": 67.074013,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4405bbffff",
+   "h3_r10": "8a42e4405b9ffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Gulshan-e-Umair",
+   "lat": 24.940053,
+   "lng": 67.166733,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4473d3ffff",
+   "h3_r10": "8a42e4472a4ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Guru Mandir",
+   "lat": 24.880707,
+   "lng": 67.039852,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4406d3ffff",
+   "h3_r10": "8a42e4406d2ffff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Hafiz Sweets Malir 15",
+   "lat": 24.87686,
+   "lng": 67.19182,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44e52fffff",
+   "h3_r10": "8a42e44e52d7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Haider Food",
+   "lat": 24.961858,
+   "lng": 67.053045,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45520fffff",
+   "h3_r10": "8a42e45520f7fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Hassan Square",
+   "lat": 24.902517,
+   "lng": 67.072896,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44054fffff",
+   "h3_r10": "8a42e44054e7fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Hilltop",
+   "lat": 24.908081,
+   "lng": 67.119012,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440c0fffff",
+   "h3_r10": "8a42e440c0d7fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Hyderi Super Mart KDA",
+   "lat": 24.929162,
+   "lng": 67.04005,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44202bffff",
+   "h3_r10": "8a42e442066ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Hyperstar",
+   "lat": 24.802728,
+   "lng": 67.030043,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a557ffff",
+   "h3_r10": "8a42e44a554ffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Imam Clinic",
+   "lat": 24.943599,
+   "lng": 67.047493,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442113ffff",
+   "h3_r10": "8a42e4421137fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Inquiry Office",
+   "lat": 24.90642,
+   "lng": 67.03096,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442247ffff",
+   "h3_r10": "8a42e442246ffff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Iqra University",
+   "lat": 24.839575,
+   "lng": 67.082314,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44116fffff",
+   "h3_r10": "8a42e44116d7fff",
+   "students": {
+    "Nadeem": 10
+   }
+  },
+  {
+   "name": "Islamia College",
+   "lat": 24.87886,
+   "lng": 67.046452,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4406c7ffff",
+   "h3_r10": "8a42e4406c5ffff",
+   "students": {
+    "Nadeem": 12
+   }
+  },
+  {
+   "name": "Jahangirabad",
+   "lat": 24.89962,
+   "lng": 67.02452,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e443197ffff",
+   "h3_r10": "8a42e4431947fff",
+   "students": {
+    "Nadeem": 15
+   }
+  },
+  {
+   "name": "Jamali Pul",
+   "lat": 24.973261,
+   "lng": 67.118405,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455a07ffff",
+   "h3_r10": "8a42e455a057fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Jamshed Road",
+   "lat": 24.883542,
+   "lng": 67.047057,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44068bffff",
+   "h3_r10": "8a42e44068affff",
+   "students": {
+    "Nadeem": 14
+   }
+  },
+  {
+   "name": "Jang Press",
+   "lat": 24.850233,
+   "lng": 67.015758,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44326bffff",
+   "h3_r10": "8a42e4432687fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Javed Nihari",
+   "lat": 24.928201,
+   "lng": 67.075002,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442e0bffff",
+   "h3_r10": "8a42e442e727fff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Jinnah Garden",
+   "lat": 24.910493,
+   "lng": 67.187587,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44546bffff",
+   "h3_r10": "8a42e445468ffff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Johar Chowrangi",
+   "lat": 24.914953,
+   "lng": 67.123216,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440cafffff",
+   "h3_r10": "8a42e440cadffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Johar Complex (Bin Hashim)",
+   "lat": 24.938061,
+   "lng": 67.151647,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447293ffff",
+   "h3_r10": "8a42e447290ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Johar More",
+   "lat": 24.904474,
+   "lng": 67.113549,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440c57ffff",
+   "h3_r10": "8a42e440c55ffff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "K.U. Society",
+   "lat": 24.959045,
+   "lng": 67.121675,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4429afffff",
+   "h3_r10": "8a42e4429ae7fff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "KBACHS Society / Sachal",
+   "lat": 24.956069,
+   "lng": 67.134668,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447443ffff",
+   "h3_r10": "8a42e447442ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "KDA",
+   "lat": 24.956361,
+   "lng": 67.116017,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442917ffff",
+   "h3_r10": "8a42e442916ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "KESC",
+   "lat": 24.91507,
+   "lng": 67.1221,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e440cafffff",
+   "h3_r10": "8a42e440cad7fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "KFC Badar",
+   "lat": 24.799845,
+   "lng": 67.04718,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a18bffff",
+   "h3_r10": "8a42e44a18affff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "KFC Phase II",
+   "lat": 24.83282,
+   "lng": 67.073537,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4413bbffff",
+   "h3_r10": "8a42e4413b87fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "KIHD",
+   "lat": 24.933375,
+   "lng": 67.080138,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442e33ffff",
+   "h3_r10": "8a42e442e31ffff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "KPT Bridge Kababjees",
+   "lat": 24.831487,
+   "lng": 67.079163,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4413afffff",
+   "h3_r10": "8a42e4413ad7fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Kala Board",
+   "lat": 24.887791,
+   "lng": 67.187959,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44e5a7ffff",
+   "h3_r10": "8a42e4452d37fff",
+   "students": {
+    "Jadoon": 6,
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Kamal Mart",
+   "lat": 24.797925,
+   "lng": 67.043178,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a1d7ffff",
+   "h3_r10": "8a42e44a1d47fff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Kamran Chowrangi",
+   "lat": 24.923687,
+   "lng": 67.137837,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d17ffff",
+   "h3_r10": "8a42e440d147fff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Kaneez Fatima",
+   "lat": 24.954703,
+   "lng": 67.116462,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442917ffff",
+   "h3_r10": "8a42e4429147fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Karachi University",
+   "lat": 24.938902,
+   "lng": 67.123732,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4476dbffff",
+   "h3_r10": "8a42e442ba5ffff",
+   "students": {
+    "Jadoon": 11
+   }
+  },
+  {
+   "name": "Karimabad",
+   "lat": 24.919538,
+   "lng": 67.059119,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442377ffff",
+   "h3_r10": "8a42e442376ffff",
+   "students": {
+    "Jadoon": 15
+   }
+  },
+  {
+   "name": "Karsaz Pankha Stop",
+   "lat": 24.87627,
+   "lng": 67.101205,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440377ffff",
+   "h3_r10": "8a42e4403747fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Kashmir Road",
+   "lat": 24.876952,
+   "lng": 67.051934,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44060bffff",
+   "h3_r10": "8a42e4406087fff",
+   "students": {
+    "Nadeem": 10
+   }
+  },
+  {
+   "name": "Katti Pahari",
+   "lat": 24.944265,
+   "lng": 67.031379,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44254fffff",
+   "h3_r10": "8a42e44254cffff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Kazimabad",
+   "lat": 24.910544,
+   "lng": 67.185725,
+   "location": "auto_checked",
+   "also_named": [
+    "Qazimabad"
+   ],
+   "h3_r9": "8942e44546bffff",
+   "h3_r10": "8a42e44546b7fff",
+   "students": {
+    "Jadoon": 8,
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Khalid Bin Waleed Road",
+   "lat": 24.874338,
+   "lng": 67.056882,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440673ffff",
+   "h3_r10": "8a42e440671ffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Khatm-e-Nabuwat",
+   "lat": 24.955773,
+   "lng": 67.106874,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44299bffff",
+   "h3_r10": "8a42e4429997fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Khayaban-e-Bahria",
+   "lat": 24.81331,
+   "lng": 67.060991,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441267ffff",
+   "h3_r10": "8a42e4412667fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Khayaban-e-Bukhari",
+   "lat": 24.794067,
+   "lng": 67.064549,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44ae93ffff",
+   "h3_r10": "8a42e44ae927fff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Khayaban-e-Muhafiz",
+   "lat": 24.798408,
+   "lng": 67.063535,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a127ffff",
+   "h3_r10": "8a42e44a1277fff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Khayaban-e-Sehar",
+   "lat": 24.805328,
+   "lng": 67.060161,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a1a7ffff",
+   "h3_r10": "8a42e44a1a4ffff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Khayaban-e-Shahbaz",
+   "lat": 24.808404,
+   "lng": 67.061428,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44126fffff",
+   "h3_r10": "8a42e44126d7fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Khilafat Chowk",
+   "lat": 24.922349,
+   "lng": 67.024423,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44205bffff",
+   "h3_r10": "8a42e4420597fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Khudadad Colony",
+   "lat": 24.872753,
+   "lng": 67.046524,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440653ffff",
+   "h3_r10": "8a42e440651ffff",
+   "students": {
+    "Nadeem": 9
+   }
+  },
+  {
+   "name": "Khurasan",
+   "lat": 24.875051,
+   "lng": 67.03555,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4433afffff",
+   "h3_r10": "8a42e4433af7fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Korangi Crossing",
+   "lat": 24.8157,
+   "lng": 67.110133,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a997ffff",
+   "h3_r10": "8a42e44a9967fff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Korangi No 2",
+   "lat": 24.820926,
+   "lng": 67.138757,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44f4bbffff",
+   "h3_r10": "8a42e44f4b9ffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Korangi No 5",
+   "lat": 24.836364,
+   "lng": 67.162597,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44f5b7ffff",
+   "h3_r10": "8a42e44f5b47fff",
+   "students": {
+    "Nadeem": 11
+   }
+  },
+  {
+   "name": "LDA",
+   "lat": 24.934097261177197,
+   "lng": 67.03726691607001,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e442033ffff",
+   "h3_r10": "8a42e442031ffff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Lady Bird",
+   "lat": 24.951637,
+   "lng": 67.057182,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4421a7ffff",
+   "h3_r10": "8a42e4421a67fff",
+   "students": {
+    "Jadoon": 11
+   }
+  },
+  {
+   "name": "Lal Flat",
+   "lat": 24.908631,
+   "lng": 67.109776,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440ccfffff",
+   "h3_r10": "8a42e440cc57fff",
+   "students": {
+    "Nadeem": 11
+   }
+  },
+  {
+   "name": "Lala Zar NIPA",
+   "lat": 24.92568,
+   "lng": 67.0928,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e442a8fffff",
+   "h3_r10": "8a42e442a8cffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Landhi 89",
+   "lat": 24.845581,
+   "lng": 67.209249,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44e33bffff",
+   "h3_r10": "8a42e44e339ffff",
+   "students": {
+    "Nadeem": 9
+   }
+  },
+  {
+   "name": "Landhi No 4",
+   "lat": 24.85636,
+   "lng": 67.208864,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e44e3a7ffff",
+   "h3_r10": "8a42e44e3a6ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Landi Kotal",
+   "lat": 24.937191,
+   "lng": 67.055365,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442173ffff",
+   "h3_r10": "8a42e442171ffff",
+   "students": {
+    "Jadoon": 11
+   }
+  },
+  {
+   "name": "Liaquatabad 10 No",
+   "lat": 24.90496,
+   "lng": 67.039991,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44226fffff",
+   "h3_r10": "8a42e44226effff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Liaquatabad Erum Bakery",
+   "lat": 24.909312,
+   "lng": 67.043159,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440493ffff",
+   "h3_r10": "8a42e440492ffff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Lucky One",
+   "lat": 24.932353,
+   "lng": 67.087264,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44285bffff",
+   "h3_r10": "8a42e44285b7fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Lucky Star",
+   "lat": 24.856986,
+   "lng": 67.033417,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4414a3ffff",
+   "h3_r10": "8a42e4414a27fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "M. Ali Society",
+   "lat": 24.877911,
+   "lng": 67.087417,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4403c3ffff",
+   "h3_r10": "8a42e4403c0ffff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Madras Chowk",
+   "lat": 24.956905,
+   "lng": 67.121491,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4429afffff",
+   "h3_r10": "8a42e4429ad7fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Magsi Chowk",
+   "lat": 24.927972,
+   "lng": 67.152582,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4472cfffff",
+   "h3_r10": "8a42e4472cc7fff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "Makhdoom Bilawal",
+   "lat": 24.95501,
+   "lng": 67.14065,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e44747bffff",
+   "h3_r10": "8a42e4474787fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Malik Society",
+   "lat": 24.951521,
+   "lng": 67.109759,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4429c7ffff",
+   "h3_r10": "8a42e4429c57fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Malir Cantt Askari-V",
+   "lat": 24.94006,
+   "lng": 67.182001,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44730fffff",
+   "h3_r10": "8a42e44730e7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Malir Cantt Phase-I",
+   "lat": 24.962502,
+   "lng": 67.186598,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44713bffff",
+   "h3_r10": "8a42e44713affff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Manzoor Colony",
+   "lat": 24.852482,
+   "lng": 67.0853,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441ccbffff",
+   "h3_r10": "8a42e441cc97fff",
+   "students": {
+    "Nadeem": 11
+   }
+  },
+  {
+   "name": "Masjid Khairul Bashir",
+   "lat": 24.943892,
+   "lng": 67.080788,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442c6bffff",
+   "h3_r10": "8a42e442c68ffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Maskan",
+   "lat": 24.934848,
+   "lng": 67.105248,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44286fffff",
+   "h3_r10": "8a42e44286cffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Mateen Food",
+   "lat": 24.947175,
+   "lng": 67.052622,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4421bbffff",
+   "h3_r10": "8a42e4421b9ffff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Matka Stop",
+   "lat": 24.90808,
+   "lng": 67.11007,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e440ccfffff",
+   "h3_r10": "8a42e440cceffff",
+   "students": {
+    "Nadeem": 10
+   }
+  },
+  {
+   "name": "Maymar Gate",
+   "lat": 25.006631,
+   "lng": 67.117512,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455d7bffff",
+   "h3_r10": "8a42e455d7b7fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Memon Medical Hospital",
+   "lat": 24.945529,
+   "lng": 67.146358,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447637ffff",
+   "h3_r10": "8a42e4476347fff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Millennium Mall",
+   "lat": 24.90127,
+   "lng": 67.115321,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440c4fffff",
+   "h3_r10": "8a42e440c4f7fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Misri Shah",
+   "lat": 24.799204,
+   "lng": 67.070043,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44ac43ffff",
+   "h3_r10": "8a42e44ac427fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Mobile Market",
+   "lat": 24.874188,
+   "lng": 67.032536,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4433abffff",
+   "h3_r10": "8a42e4433ab7fff",
+   "students": {
+    "Nadeem": 24
+   }
+  },
+  {
+   "name": "Mochi Gali",
+   "lat": 24.942465499999997,
+   "lng": 67.047082,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e4421c7ffff",
+   "h3_r10": "8a42e4421c4ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Model More",
+   "lat": 24.902347,
+   "lng": 67.1892,
+   "location": "auto_checked",
+   "also_named": [
+    "Model Colony"
+   ],
+   "h3_r9": "8942e445637ffff",
+   "h3_r10": "8a42e4456357fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Mosamiyat",
+   "lat": 24.938895,
+   "lng": 67.13835,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44760bffff",
+   "h3_r10": "8a42e44760affff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "Moti Mahal",
+   "lat": 24.924423,
+   "lng": 67.088237,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a8bffff",
+   "h3_r10": "8a42e442a8a7fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Mukka Chowk",
+   "lat": 24.923304,
+   "lng": 67.068067,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442e5bffff",
+   "h3_r10": "8a42e442e58ffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Mumtaz Manzil",
+   "lat": 24.905326,
+   "lng": 67.078227,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440563ffff",
+   "h3_r10": "8a42e4405627fff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Munawar Chowrangi",
+   "lat": 24.91766,
+   "lng": 67.137642,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d0bffff",
+   "h3_r10": "8a42e440d087fff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "NADRA Mega Center",
+   "lat": 24.828937,
+   "lng": 67.033761,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441607ffff",
+   "h3_r10": "8a42e4416047fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "NED",
+   "lat": 24.93001,
+   "lng": 67.115348,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442b03ffff",
+   "h3_r10": "8a42e442b017fff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "NHS-IV",
+   "lat": 24.862047,
+   "lng": 67.057839,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441533ffff",
+   "h3_r10": "8a42e4415327fff",
+   "students": {
+    "Nadeem": 16
+   }
+  },
+  {
+   "name": "NMC",
+   "lat": 24.846592,
+   "lng": 67.055725,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4410a3ffff",
+   "h3_r10": "8a42e4410a2ffff",
+   "students": {
+    "Nadeem": 11
+   }
+  },
+  {
+   "name": "Nagan (Dahli Hall)",
+   "lat": 24.96807,
+   "lng": 67.0663,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e455353ffff",
+   "h3_r10": "8a42e4553527fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Namak Bank",
+   "lat": 24.958981,
+   "lng": 67.074315,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442cbbffff",
+   "h3_r10": "8a42e442cb8ffff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Naseerabad",
+   "lat": 24.930684,
+   "lng": 67.071778,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442e1bffff",
+   "h3_r10": "8a42e442e18ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Nasir Jump",
+   "lat": 24.823429,
+   "lng": 67.124534,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441a77ffff",
+   "h3_r10": "8a42e441a74ffff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Nawabish",
+   "lat": 24.91799,
+   "lng": 67.132969,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440dcfffff",
+   "h3_r10": "8a42e440dccffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Nawaz Sharif School",
+   "lat": 24.92163,
+   "lng": 67.14364,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e440d3bffff",
+   "h3_r10": "8a42e440d3affff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Naya Nazimabad",
+   "lat": 24.973381,
+   "lng": 67.033821,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45560fffff",
+   "h3_r10": "8a42e45560effff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Naz Petrol Pump",
+   "lat": 24.91034,
+   "lng": 67.03178,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e442203ffff",
+   "h3_r10": "8a42e442201ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Naz Plaza",
+   "lat": 24.865616,
+   "lng": 67.026159,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4433cfffff",
+   "h3_r10": "8a42e4433cdffff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "New Town Chandni Chowk",
+   "lat": 24.890454,
+   "lng": 67.063215,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4400d7ffff",
+   "h3_r10": "8a42e4400d0ffff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Nexus College",
+   "lat": 24.806866,
+   "lng": 67.0607945,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e44acd3ffff",
+   "h3_r10": "8a42e44acd27fff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Noman Garden",
+   "lat": 24.95736,
+   "lng": 67.14726,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e447467ffff",
+   "h3_r10": "8a42e4474647fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Noorani Kabab",
+   "lat": 24.867762,
+   "lng": 67.05246,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4415b3ffff",
+   "h3_r10": "8a42e4415b07fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Numaish",
+   "lat": 24.872316,
+   "lng": 67.035292,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e443333ffff",
+   "h3_r10": "8a42e4433337fff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Nusrat Bhutto Colony",
+   "lat": 24.962157,
+   "lng": 67.045714,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4552c7ffff",
+   "h3_r10": "8a42e4552c57fff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Officers Society",
+   "lat": 24.980808466412885,
+   "lng": 67.13127426584542,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e455bcfffff",
+   "h3_r10": "8a42e455bceffff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Old Sabzi Mandi",
+   "lat": 24.890911,
+   "lng": 67.064419,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4400d7ffff",
+   "h3_r10": "8a42e4400d47fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Orangi Town 5",
+   "lat": 24.94065,
+   "lng": 67.00176,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4424cfffff",
+   "h3_r10": "8a42e4424ce7fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Oxford School",
+   "lat": 24.996937,
+   "lng": 67.059438,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45556fffff",
+   "h3_r10": "8a42e45556f7fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "PAF Chapter",
+   "lat": 24.862482,
+   "lng": 67.087745,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e441c9bffff",
+   "h3_r10": "8a42e441c98ffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "PCSIR",
+   "lat": 24.955306,
+   "lng": 67.127735,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442927ffff",
+   "h3_r10": "8a42e4429267fff",
+   "students": {
+    "Jadoon": 12
+   }
+  },
+  {
+   "name": "POB Eye Hospital",
+   "lat": 24.916995,
+   "lng": 67.138449,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d0bffff",
+   "h3_r10": "8a42e440d09ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Paradise Bakery",
+   "lat": 24.942801,
+   "lng": 67.09715,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442807ffff",
+   "h3_r10": "8a42e4428057fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Pehlwan Goth",
+   "lat": 24.908958,
+   "lng": 67.141038,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4408b7ffff",
+   "h3_r10": "8a42e4408b5ffff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Peoples Chowrangi",
+   "lat": 24.947775,
+   "lng": 67.0659,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442c53ffff",
+   "h3_r10": "8a42e442c527fff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "Perfume Chowk Johar",
+   "lat": 24.909705,
+   "lng": 67.122957,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440c3bffff",
+   "h3_r10": "8a42e440c39ffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Police Headquarter Garden",
+   "lat": 24.868741,
+   "lng": 67.02042,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4433c3ffff",
+   "h3_r10": "8a42e4433c27fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Police Society",
+   "lat": 24.962809,
+   "lng": 67.179766,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447103ffff",
+   "h3_r10": "8a42e4471027fff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Power House",
+   "lat": 24.985657,
+   "lng": 67.065249,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45515bffff",
+   "h3_r10": "8a42e45515b7fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Puncture Shop Saadi Road",
+   "lat": 24.95888,
+   "lng": 67.167247,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4471dbffff",
+   "h3_r10": "8a42e4471db7fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Punjab Chowrangi PSO Pump",
+   "lat": 24.828735,
+   "lng": 67.042621,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44162fffff",
+   "h3_r10": "8a42e44162e7fff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Qalandria",
+   "lat": 24.959583,
+   "lng": 67.0512,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45520bffff",
+   "h3_r10": "8a42e4552097fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Quetta Town",
+   "lat": 24.968025,
+   "lng": 67.12093,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455a63ffff",
+   "h3_r10": "8a42e455a627fff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "RCD Ground",
+   "lat": 24.900596,
+   "lng": 67.196117,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44505bffff",
+   "h3_r10": "8a42e4450587fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Rab Medical",
+   "lat": 24.923735,
+   "lng": 67.09043,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a8bffff",
+   "h3_r10": "8a42e442a88ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Rabia City",
+   "lat": 24.907613,
+   "lng": 67.133777,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440887ffff",
+   "h3_r10": "8a42e4408867fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Race Course",
+   "lat": 24.83809,
+   "lng": 67.04196,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e4410d3ffff",
+   "h3_r10": "8a42e4410d0ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Rado Center",
+   "lat": 24.91643,
+   "lng": 67.13094,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e440dcfffff",
+   "h3_r10": "8a42e440dcd7fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Rahat Park",
+   "lat": 24.815467,
+   "lng": 67.075543,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44acb3ffff",
+   "h3_r10": "8a42e44acb0ffff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Raheem Hospital",
+   "lat": 24.938929,
+   "lng": 67.073769,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442ebbffff",
+   "h3_r10": "8a42e442ebaffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Ram Swami",
+   "lat": 24.867761,
+   "lng": 67.015928,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4432a7ffff",
+   "h3_r10": "8a42e4432a47fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Rana Lawn",
+   "lat": 24.91197,
+   "lng": 67.196299,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44508bffff",
+   "h3_r10": "8a42e4450887fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Rangoon Wala Hall",
+   "lat": 24.88534,
+   "lng": 67.074472,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44000bffff",
+   "h3_r10": "8a42e440046ffff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Rimjhim Hall",
+   "lat": 24.926906,
+   "lng": 67.095287,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442abbffff",
+   "h3_r10": "8a42e442ab87fff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Rizvia",
+   "lat": 24.94834,
+   "lng": 67.14485,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e4470dbffff",
+   "h3_r10": "8a42e4470db7fff",
+   "students": {
+    "Jadoon": 9
+   }
+  },
+  {
+   "name": "Roofi Bungalows",
+   "lat": 24.94221,
+   "lng": 67.15181,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e44705bffff",
+   "h3_r10": "8a42e44705b7fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Saadi Town",
+   "lat": 24.967858,
+   "lng": 67.172414,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447183ffff",
+   "h3_r10": "8a42e4471837fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Saba Avenue Imambargah",
+   "lat": 24.793323,
+   "lng": 67.048323,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44a1cfffff",
+   "h3_r10": "8a42e44a1ccffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Safari Park",
+   "lat": 24.922294,
+   "lng": 67.108212,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442b5bffff",
+   "h3_r10": "8a42e442b5b7fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Safoora",
+   "lat": 24.93944,
+   "lng": 67.15624,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e447287ffff",
+   "h3_r10": "8a42e447286ffff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Saima",
+   "lat": 24.94853,
+   "lng": 67.15597,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e44701bffff",
+   "h3_r10": "8a42e447056ffff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Saima Arabian",
+   "lat": 25.012149,
+   "lng": 67.039012,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e457367ffff",
+   "h3_r10": "8a42e457366ffff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Saima Flats",
+   "lat": 24.922672,
+   "lng": 67.137379,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d17ffff",
+   "h3_r10": "8a42e440d157fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Saleem Bank",
+   "lat": 24.90917705178324,
+   "lng": 67.13135322919909,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e440897ffff",
+   "h3_r10": "8a42e4408967fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Saleem Center",
+   "lat": 24.978547,
+   "lng": 67.066705,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455383ffff",
+   "h3_r10": "8a42e4553817fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Samama",
+   "lat": 24.927895,
+   "lng": 67.111169,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442bcfffff",
+   "h3_r10": "8a42e442bccffff",
+   "students": {
+    "Jadoon": 8
+   }
+  },
+  {
+   "name": "Sardar CNG",
+   "lat": 24.917825,
+   "lng": 67.1353055,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e440d1bffff",
+   "h3_r10": "8a42e440d19ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Saylani Chowk",
+   "lat": 24.882703,
+   "lng": 67.067994,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440053ffff",
+   "h3_r10": "8a42e440051ffff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Sector G Malir Cantt",
+   "lat": 24.958443,
+   "lng": 67.196152,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e444697ffff",
+   "h3_r10": "8a42e444682ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Sector H Malir Cantt",
+   "lat": 24.950938,
+   "lng": 67.184275,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4473b7ffff",
+   "h3_r10": "8a42e4473b4ffff",
+   "students": {
+    "Nadeem": 5
+   }
+  },
+  {
+   "name": "Sector J Malir Cantt",
+   "lat": 24.961559,
+   "lng": 67.199437,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44444bffff",
+   "h3_r10": "8a42e444448ffff",
+   "students": {
+    "Nadeem": 17
+   }
+  },
+  {
+   "name": "Security Printing Press",
+   "lat": 24.889157,
+   "lng": 67.179022,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44564bffff",
+   "h3_r10": "8a42e44564f7fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Shadab Masjid",
+   "lat": 24.934183,
+   "lng": 67.061211,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44216fffff",
+   "h3_r10": "8a42e44216c7fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Shadman 1",
+   "lat": 24.961867,
+   "lng": 67.056885,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e45523bffff",
+   "h3_r10": "8a42e4552397fff",
+   "students": {
+    "Jadoon": 14
+   }
+  },
+  {
+   "name": "Shadman 2",
+   "lat": 24.960014,
+   "lng": 67.062374,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442c93ffff",
+   "h3_r10": "8a42e442c937fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Shafiq More",
+   "lat": 24.957119,
+   "lng": 67.076139,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442cabffff",
+   "h3_r10": "8a42e442ca87fff",
+   "students": {
+    "Jadoon": 2
+   }
+  },
+  {
+   "name": "Shahmir Colony Gate",
+   "lat": 24.956944,
+   "lng": 67.140255,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447473ffff",
+   "h3_r10": "8a42e4474717fff",
+   "students": {
+    "Jadoon": 6
+   }
+  },
+  {
+   "name": "Shahrah-e-Faisal Nursery",
+   "lat": 24.86063,
+   "lng": 67.06286,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e441523ffff",
+   "h3_r10": "8a42e441520ffff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Shahzad Store",
+   "lat": 24.93822,
+   "lng": 67.07822,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e442eafffff",
+   "h3_r10": "8a42e442eae7fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Sharfabad",
+   "lat": 24.88542,
+   "lng": 67.06642,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e4400cbffff",
+   "h3_r10": "8a42e4400c8ffff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Shell Petrol Pump",
+   "lat": 24.817675,
+   "lng": 67.065487,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44122fffff",
+   "h3_r10": "8a42e44122effff",
+   "students": {
+    "Nadeem": 6
+   }
+  },
+  {
+   "name": "Shipowner",
+   "lat": 24.948987,
+   "lng": 67.040165,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442567ffff",
+   "h3_r10": "8a42e442566ffff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Sindh Baloch",
+   "lat": 24.915194,
+   "lng": 67.13689,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440d47ffff",
+   "h3_r10": "8a42e440d467fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Sindh Secretariat",
+   "lat": 24.854258,
+   "lng": 67.017091,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e443267ffff",
+   "h3_r10": "8a42e4432677fff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Sir Syed Road",
+   "lat": 24.877681,
+   "lng": 67.057933,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440677ffff",
+   "h3_r10": "8a42e4406767fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Soldier Bazar",
+   "lat": 24.87683,
+   "lng": 67.033055,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4433a3ffff",
+   "h3_r10": "8a42e4433a37fff",
+   "students": {
+    "Nadeem": 11
+   }
+  },
+  {
+   "name": "Sona Chandi Lawn",
+   "lat": 24.9106,
+   "lng": 67.03741,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e44223bffff",
+   "h3_r10": "8a42e442239ffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Stadium",
+   "lat": 24.895964,
+   "lng": 67.08148,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4400afffff",
+   "h3_r10": "8a42e4400acffff",
+   "students": {
+    "Nadeem": 8
+   }
+  },
+  {
+   "name": "Stadium Road",
+   "lat": 24.89742,
+   "lng": 67.07943,
+   "location": "probable",
+   "also_named": [],
+   "h3_r9": "8942e4400a7ffff",
+   "h3_r10": "8a42e4400a57fff",
+   "students": {
+    "Nadeem": 9
+   }
+  },
+  {
+   "name": "Star Gate",
+   "lat": 24.887124,
+   "lng": 67.155791,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440b1bffff",
+   "h3_r10": "8a42e440b187fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Star House",
+   "lat": 24.935359,
+   "lng": 67.034637,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4420abffff",
+   "h3_r10": "8a42e4420a9ffff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Suchal",
+   "lat": 24.952576,
+   "lng": 67.127947,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44292fffff",
+   "h3_r10": "8a42e44292e7fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Sumaira Chowk",
+   "lat": 24.967964,
+   "lng": 67.132149,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e447483ffff",
+   "h3_r10": "8a42e447481ffff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Sunlay Bungalows",
+   "lat": 24.941224,
+   "lng": 67.154609,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44704bffff",
+   "h3_r10": "8a42e44704b7fff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Sunset Club",
+   "lat": 24.830058,
+   "lng": 67.065159,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4413d7ffff",
+   "h3_r10": "8a42e4413d6ffff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Tahir Villas",
+   "lat": 24.931866,
+   "lng": 67.05962,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442ed3ffff",
+   "h3_r10": "8a42e442ed37fff",
+   "students": {
+    "Jadoon": 10
+   }
+  },
+  {
+   "name": "Tank Chowk",
+   "lat": 24.9115,
+   "lng": 67.18467,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44547bffff",
+   "h3_r10": "8a42e445479ffff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Tank Chowk Malir",
+   "lat": 24.912563,
+   "lng": 67.185974,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e445463ffff",
+   "h3_r10": "8a42e4454617fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Tariq Bin Zaid Society",
+   "lat": 24.891821,
+   "lng": 67.173808,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e445653ffff",
+   "h3_r10": "8a42e4456517fff",
+   "students": {
+    "Nadeem": 2
+   }
+  },
+  {
+   "name": "Tariq Road",
+   "lat": 24.872679,
+   "lng": 67.060564,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44066fffff",
+   "h3_r10": "8a42e44066e7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Teachers Society",
+   "lat": 24.978279,
+   "lng": 67.130239,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e455b53ffff",
+   "h3_r10": "8a42e455b527fff",
+   "students": {
+    "Jadoon": 7
+   }
+  },
+  {
+   "name": "Teen Talwar",
+   "lat": 24.833831,
+   "lng": 67.033672,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4416a3ffff",
+   "h3_r10": "8a42e4416a17fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Tipu Sultan Road",
+   "lat": 24.874331,
+   "lng": 67.083907,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440237ffff",
+   "h3_r10": "8a42e440236ffff",
+   "students": {
+    "Nadeem": 7
+   }
+  },
+  {
+   "name": "Tower",
+   "lat": 24.848784,
+   "lng": 66.997472,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e458d2bffff",
+   "h3_r10": "8a42e458d2affff",
+   "students": {
+    "Nadeem": 17
+   }
+  },
+  {
+   "name": "Tyre Company",
+   "lat": 24.822959398143485,
+   "lng": 67.01587985111581,
+   "location": "interpolated",
+   "also_named": [],
+   "h3_r9": "8942e458bafffff",
+   "h3_r10": "8a42e458bac7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Tyre Puncture Shop",
+   "lat": 24.922512,
+   "lng": 67.102798,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a23ffff",
+   "h3_r10": "8a42e442a237fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "UP More",
+   "lat": 24.9728,
+   "lng": 67.066753,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4553c7ffff",
+   "h3_r10": "8a42e4553c57fff",
+   "students": {
+    "Jadoon": 5
+   }
+  },
+  {
+   "name": "Uncle Sariya",
+   "lat": 24.866998,
+   "lng": 67.023654,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4433cfffff",
+   "h3_r10": "8a42e4433ce7fff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "United Bakery",
+   "lat": 24.82992,
+   "lng": 67.069196,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44138bffff",
+   "h3_r10": "8a42e441388ffff",
+   "students": {
+    "Nadeem": 9
+   }
+  },
+  {
+   "name": "Urdu Bazar Nazimabad",
+   "lat": 24.90328,
+   "lng": 67.029998,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44224fffff",
+   "h3_r10": "8a42e44224e7fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "Urdu Science College",
+   "lat": 24.911083,
+   "lng": 67.089215,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442a5bffff",
+   "h3_r10": "8a42e442a59ffff",
+   "students": {
+    "Nadeem": 3
+   }
+  },
+  {
+   "name": "Usman Ghani Masjid",
+   "lat": 24.935944,
+   "lng": 67.053999,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44217bffff",
+   "h3_r10": "8a42e44217a7fff",
+   "students": {
+    "Jadoon": 1
+   }
+  },
+  {
+   "name": "Usman Memorial",
+   "lat": 24.914501,
+   "lng": 67.056662,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44237bffff",
+   "h3_r10": "8a42e442378ffff",
+   "students": {
+    "Nadeem": 18
+   }
+  },
+  {
+   "name": "Water Pump More",
+   "lat": 24.937503,
+   "lng": 67.07518,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e442ebbffff",
+   "h3_r10": "8a42e442eb8ffff",
+   "students": {
+    "Jadoon": 3
+   }
+  },
+  {
+   "name": "Wireless Gate",
+   "lat": 24.885168,
+   "lng": 67.167982,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e440b67ffff",
+   "h3_r10": "8a42e440b667fff",
+   "students": {
+    "Nadeem": 4
+   }
+  },
+  {
+   "name": "X-20 Malir Cantt",
+   "lat": 24.96022,
+   "lng": 67.192466,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44712fffff",
+   "h3_r10": "8a42e44712d7fff",
+   "students": {
+    "Nadeem": 12
+   }
+  },
+  {
+   "name": "Yadgar Fish",
+   "lat": 24.886018,
+   "lng": 67.050624,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e4406bbffff",
+   "h3_r10": "8a42e440685ffff",
+   "students": {
+    "Nadeem": 1
+   }
+  },
+  {
+   "name": "Ziauddin",
+   "lat": 24.92406,
+   "lng": 67.04525,
+   "location": "landmark_matched",
+   "also_named": [],
+   "h3_r9": "8942e44238bffff",
+   "h3_r10": "8a42e4423897fff",
+   "students": {
+    "Jadoon": 4
+   }
+  },
+  {
+   "name": "Zubaida Hospital",
+   "lat": 24.883221,
+   "lng": 67.082196,
+   "location": "auto_checked",
+   "also_named": [],
+   "h3_r9": "8942e44006fffff",
+   "h3_r10": "8a42e44006e7fff",
+   "students": {
+    "Nadeem": 7
+   }
+  }
+ ]
+}
