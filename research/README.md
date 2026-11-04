@@ -4,6 +4,27 @@ This folder is research only. Nothing here is imported by the website, and nothi
 here changes the backend, frontend, settings or database. Results reach the live
 system only after the team decides they are good enough to build in properly.
 
+## Research hub: start here
+
+Double-click **`research/Research Hub.bat`**. It opens one page in your browser with everything:
+
+- **Overview**: the research questions, progress, pass/fail, what's next, latest logbook entries.
+- **Experiments**: charts and tables per experiment, updated as runs finish.
+- **Runs**: every optimizer run, with current vs optimized routes on a map.
+- **Data**: the dataset and a map of every stop.
+- **Documents**: logbook, this README, literature, PDFs.
+- **Run & publish** (only in the hub): check the WSL setup, start / resume / stop experiments,
+  and publish results to the shared page. No terminal commands needed.
+
+Teammates and the supervisor open the shared read-only copy:
+**https://hassanh5n.github.io/FAST-Transport/**. It is rebuilt by
+`.github/workflows/research-site.yml` whenever research/ changes on main (the Publish button
+does that push). The website's own deploy ignores research-only pushes.
+
+The hub's files are in `hub/` (`serve.py` local server, `build_site.py` page builder,
+`web/` the page, `project.json` the questions and next steps shown on the overview; edit it
+when the plan changes). Everything below is what the hub runs for you, for reference.
+
 ## Scope
 
 | Phase | Question |
@@ -23,6 +44,9 @@ system only after the team decides they are good enough to build in properly.
 | `data/instance_fall2026_v1.json` | The frozen dataset every experiment uses |
 | `data/students_synthetic_fall2026.csv` | One row per synthetic student |
 | `data/matrix_fall2026_v1.json` | Travel times and distances, campus plus every stop, per contractor |
+| `optimize.py` | OR-Tools optimizer: plans all-stop routes and scores them against the current routes |
+| `run_budget.py` | Time-budget experiment: optimizer under free-tier limits vs no limits |
+| `results/` | Run reports (`opt-*.json/html`); `results/budget/` holds the time-budget experiment |
 | `literature/` | Literature notes |
 
 ## Dataset rules (3 Nov 2026)
@@ -38,22 +62,84 @@ system only after the team decides they are good enough to build in properly.
 To change anything, edit `build_instance.py`, bump the version (`v2`) and rebuild.
 Never edit a frozen file by hand.
 
-## Setup in WSL (Ubuntu), once
+## Paths
 
-OSRM and the map files live in your WSL home folder, not in this repository.
+Commands below use `REPO`, the repository as WSL sees it. Set it once per WSL window:
 
 ```bash
-# Docker inside WSL (no Docker Desktop needed) and the map cutting tool
-sudo apt update && sudo apt install -y docker.io osmium-tool python3-venv
-sudo service docker start
-sudo usermod -aG docker $USER        # then close and reopen the WSL window
-
-# Python for the research scripts, separate from the website's environment
-python3 -m venv ~/fc-research-venv
-~/fc-research-venv/bin/pip install -r /mnt/c/Users/hp/Desktop/FAST-Transport/research/requirements.txt
+REPO=/mnt/d/Projects/Python/SE/Project/fast-transport   # D:\Projects\Python\SE\Project\fast-transport
 ```
 
+(On the laptop where the matrices were built, the repository was at
+`/mnt/c/Users/hp/Desktop/FAST-Transport`.)
+
+## If WSL will not start
+
+`WSL2 is unable to start since virtualization is not enabled` with
+`HCS_E_HYPERV_NOT_INSTALLED` means the Windows "Virtual Machine Platform" feature is off.
+In an administrator PowerShell, then restart Windows:
+
+```powershell
+wsl.exe --install --no-distribution
+```
+
+If it still fails, turn on virtualization (Intel VT-x / AMD SVM) in the BIOS.
+
+## Setup in WSL (Ubuntu), once
+
+```bash
+sudo apt update && sudo apt install -y python3-venv
+python3 -m venv ~/fc-research-venv
+~/fc-research-venv/bin/pip install -r $REPO/research/requirements.txt
+```
+
+The optimizer and the time-budget experiment need only this: the travel-time matrices are
+already in `data/`. Docker and OSRM are needed only to rebuild the matrices or, later, to
+block roads for the rerouting experiments.
+
+## Limits without Docker (systemd cgroups)
+
+The free-tier limits (512 MB, no swap, 0.1 CPU) are applied with systemd, which uses the same
+kernel feature (cgroups v2) that `docker run --memory --cpus` uses. Turn systemd on once:
+
+```bash
+sudo nano /etc/wsl.conf      # keep anything already there, and add:
+                             # [boot]
+                             # systemd=true
+```
+
+Then `wsl --shutdown` in PowerShell, reopen Ubuntu, and check:
+
+```bash
+stat -fc %T /sys/fs/cgroup                               # must print cgroup2fs
+~/fc-research-venv/bin/python $REPO/research/run_budget.py --check
+```
+
+`--check` starts a limited scope and reads back what the kernel applied
+(`memory.max=536870912`, `memory.swap.max=0`, `cpu.max=10000 100000`). If it fails, try
+`--check --sudo`. Every later command then needs `--sudo` too.
+
+## Time-budget experiment
+
+Does the optimizer find good routes on a free-tier server, and how much quality do the limits
+cost? Each contractor is solved at 10, 60, 300 and 600 s, 3 repeats, limited and unlimited,
+plus a 30-minute unlimited reference: 50 runs, about 4.5 hours.
+
+```bash
+cd $REPO
+~/fc-research-venv/bin/python research/run_budget.py --quick    # about 3 min: tests the whole pipeline
+~/fc-research-venv/bin/python research/run_budget.py            # the real run, overnight
+```
+
+- Resumable: finished runs are in `results/budget/runs.jsonl`, so rerunning the command continues.
+- Output: `results/budget/summary.html` (chart and table) and `summary.json`; per-run JSON and logs.
+- Pass/fail thresholds are fixed in `run_budget.py` and LOGBOOK (2026-11-04) before any run.
+- Keep the laptop plugged in, stop Windows from sleeping, and run nothing heavy alongside.
+
 ## Build the Karachi road network, once (about 10 to 20 minutes)
+
+Needs Docker Engine inside WSL (`sudo apt install -y docker.io osmium-tool`; no Docker Desktop).
+Already done once (runs N1 and M1 in LOGBOOK); repeat only to rebuild the matrices.
 
 ```bash
 mkdir -p ~/fleetcentric-osrm && cd ~/fleetcentric-osrm
@@ -80,7 +166,7 @@ docker run -d --rm --name osrm -p 5000:5000 -v "$PWD:/data" ghcr.io/project-osrm
 # check: one route from Saddar to campus, should print "Ok"
 curl -s "http://localhost:5000/route/v1/driving/67.0298,24.8607;67.2647,24.8569?overview=false" | head -c 120
 
-cd /mnt/c/Users/hp/Desktop/FAST-Transport
+cd $REPO
 ~/fc-research-venv/bin/python research/build_matrix.py
 
 docker stop osrm      # when done

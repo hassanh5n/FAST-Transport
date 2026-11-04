@@ -1,0 +1,63 @@
+{
+ "title": "FleetCentric research",
+ "subtitle": "Route optimization and rerouting for FAST NUCES Karachi shuttles",
+ "question": "Can good shuttle routes be planned, and re-planned when a road is blocked, within free-tier compute limits (512 MB RAM, 0.1 CPU)?",
+ "caveats": [
+  "Students are synthetic (bus loads 65 to 90 percent of capacity), not real registrations.",
+  "Travel times are free-flow OSRM times with no traffic; real morning times are higher."
+ ],
+ "phases": [
+  {
+   "name": "FYP-1",
+   "items": [
+    {
+     "title": "Optimization",
+     "question": "Can all-stop routes be built from a travel-time matrix within free-tier CPU and memory limits, and how do they compare with the current hand-made routes?",
+     "status": "in progress",
+     "experiments": ["time-budget"]
+    },
+    {
+     "title": "Rerouting",
+     "question": "When a road is blocked, which road and which stops (keep, skip, or let students walk to a nearby point) give the lowest student delay, within the same limits?",
+     "status": "not started",
+     "experiments": []
+    }
+   ]
+  },
+  {
+   "name": "FYP-2",
+   "items": [
+    {
+     "title": "Context",
+     "question": "How much do real incidents slow shuttle routes, recorded on an H3 grid?",
+     "status": "later",
+     "experiments": []
+    },
+    {
+     "title": "Prediction",
+     "question": "Does that context predict travel times better than the timetable and the router?",
+     "status": "later",
+     "experiments": []
+    }
+   ]
+  }
+ ],
+ "planned_experiments": [
+  {
+   "title": "Road-block test",
+   "question": "Does OSRM really route around a road when its speed is set to 0, and how long does re-customizing take?"
+  },
+  {
+   "title": "Walking-radius sweep",
+   "question": "For walking limits from 0 m (visit every stop) to 800 m, how many minutes does letting students walk to a nearby point save after a block?"
+  },
+  {
+   "title": "Must-serve stops",
+   "question": "How many minutes do must-stop rules (accessibility, unsafe walking after dark) add to a reroute?"
+  }
+ ],
+ "next_steps": [
+  "Confirm with the supervisor that the new rerouting question replaces the old SQ1/SQ2 wording in the proposal.",
+  "Build the rerouting pieces: walking graph, covering-path solver, H3 corridor pruning."
+ ]
+}

@@ -1,0 +1,40 @@
+name: Research site
+
+# Publishes the read-only research pages (research/hub) to GitHub Pages, on the gh-pages branch.
+# Runs only when research/ changes. It does not build or deploy the website.
+on:
+  push:
+    branches: [main]
+    paths:
+      - "research/**"
+      - ".github/workflows/research-site.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: research-site
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Build the research site
+        run: python research/hub/build_site.py --out _site --commit "$GITHUB_SHA"
+
+      - name: Push to gh-pages
+        working-directory: _site
+        run: |
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Research site from ${GITHUB_SHA::7}"
+          git push -f -q "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" gh-pages

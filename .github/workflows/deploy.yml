@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+    # Research-only pushes do not redeploy the website (research/ is published by research-site.yml).
+    paths-ignore:
+      - "research/**"
+      - ".github/workflows/research-site.yml"
 
 jobs:
   deploy:

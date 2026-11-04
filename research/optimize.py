@@ -126,6 +126,9 @@ def main():
     ap.add_argument("--contractor", default=None)
     ap.add_argument("--tag", default="", help="label added to the run id, e.g. limited")
     ap.add_argument("--render", metavar="RUN_JSON", help="only rebuild the HTML page of an earlier run")
+    ap.add_argument("--out-dir", type=Path, default=RESULTS, help="where to write the run files")
+    ap.add_argument("--run-id", default=None, help="fixed run id instead of a timestamp (used by run_budget.py)")
+    ap.add_argument("--no-html", action="store_true", help="write only the JSON")
     args = ap.parse_args()
     if args.render:
         run = Path(args.render)
@@ -137,9 +140,10 @@ def main():
     inst = json.loads((DATA / "instance_fall2026_v1.json").read_text())
     mat = json.loads((DATA / "matrix_fall2026_v1.json").read_text())
     by_name = {s["name"]: s for s in inst["stops"]}
-    RESULTS.mkdir(exist_ok=True)
+    out = args.out_dir
+    out.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
-    run_id = f"opt-{stamp}-t{args.time_limit}" + (f"-{args.tag}" if args.tag else "")
+    run_id = args.run_id or f"opt-{stamp}-t{args.time_limit}" + (f"-{args.tag}" if args.tag else "")
     report = {"run_id": run_id, "instance": inst["version"], "time_limit_s": args.time_limit,
               "model": {"deadline": "08:00", "max_ride_min": 90, "stop_time": "60 s + 5 s/student",
                         "objective": "total student ride time, driving time as tie-breaker"},
@@ -180,9 +184,10 @@ def main():
         entry["baseline_routes"] = [r["stops"] for r in c["baseline_routes"]]
         report["contractors"][cname] = entry
 
-    (RESULTS / f"{run_id}.json").write_text(json.dumps(report, indent=1))
-    write_html(RESULTS / f"{run_id}.html", report, inst)
-    print(f"wrote research/results/{run_id}.json and .html")
+    (out / f"{run_id}.json").write_text(json.dumps(report, indent=1))
+    if not args.no_html:
+        write_html(out / f"{run_id}.html", report, inst)
+    print(f"wrote {out / run_id}.json" + ("" if args.no_html else " and .html"))
 
 
 def write_html(path, report, inst):

@@ -108,3 +108,34 @@ Development check, not a reported result: 20 s limit, unthrottled cloud machine 
 - Every stop visited exactly once; no bus over capacity.
 - Nadeem's plan uses its spare bus: the objective rewards shorter rides, so it uses every bus available. Note for the report.
 - Caveat: free-flow times and synthetic students; numbers show the method works, not real savings.
+
+### Run O1: 60 s development run (`opt-20261103-162833-t60`)
+
+Logged 2026-11-04 from the result file; machine not recorded, not resource-limited. Development check, not a reported result.
+
+| | Jadoon | Nadeem |
+| --- | --- | --- |
+| Total student ride, optimized (min) | 31,492 (-21.7% vs current) | 29,807 (-20.0% vs current) |
+| Change vs 20 s run (O0) | -0.2% | -0.5% |
+| Solve wall / CPU | 58.5 s / 61.2 s | 57.0 s / 59.7 s |
+| Peak memory | 57 MB | 64 MB |
+| First valid plan | 0.07 s | 0.10 s |
+
+- Tripling the search time improved the plan by under 1%: the search flattens early on an unlimited machine.
+  The time-budget experiment tests whether that still holds at 0.1 CPU.
+
+## 2026-11-04: Time-budget experiment planned (fixed before any run)
+
+- Question: on a free-tier server (512 MB RAM, no swap, 0.1 CPU, as on Render's free tier),
+  how close does the optimizer get to the best known plan, and how fast?
+- Design (`run_budget.py`): per contractor, search budgets 10, 60, 300, 600 s; 3 repeats each;
+  setups limited and unlimited; plus one 1,800 s unlimited reference. 50 runs, about 4.2 h of search time.
+  Median over repeats reported. Gap measured against the best plan found by any run (normally the reference).
+- Limits applied with systemd cgroups v2 (`systemd-run --scope`, MemoryMax=512M, MemorySwapMax=0,
+  CPUQuota=10%) inside WSL, not Docker: same kernel mechanism Docker uses. Each run first checks that the
+  kernel applied the limits (`--check`) and records what it found. A run over 512 MB is killed and counted as a failure.
+- Each run is a fresh process, so peak memory is per run.
+- **Thresholds, fixed now:** (1) limited setup within 5% of the best known plan at 60 s, for both contractors;
+  (2) peak memory under 400 MB in every limited run, none killed.
+- Also recorded: time from launch to first valid plan, wall and CPU time, machine details (`meta.json`).
+- Caveats carried over: free-flow travel times, synthetic students.

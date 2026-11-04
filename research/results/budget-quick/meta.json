@@ -1,0 +1,31 @@
+{
+ "started_at": "2026-11-04T17:07:02+00:00",
+ "machine": {
+  "host": "DESKTOP-VIQC8PE",
+  "kernel": "6.18.54.1-microsoft-standard-WSL2",
+  "python": "3.14.4",
+  "cpus": 8,
+  "cpu": "Intel(R) Core(TM) i7-3770 CPU @ 3.40GHz",
+  "ram_gb": 3.8,
+  "ortools": "9.15.6755"
+ },
+ "limits": {
+  "ok": true,
+  "expected": {
+   "memory.max": "536870912",
+   "memory.swap.max": "0",
+   "cpu.max": "10000 100000"
+  },
+  "found": {
+   "memory.max": "536870912",
+   "memory.swap.max": "0",
+   "cpu.max": "10000 100000"
+  }
+ },
+ "budgets_s": [
+  5
+ ],
+ "repeats": 1,
+ "reference_s": 10,
+ "use_sudo": false
+}
