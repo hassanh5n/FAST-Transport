@@ -155,7 +155,22 @@ def machine_info(python):
         pass
     r = subprocess.run([python, "-c", "import ortools; print(ortools.__version__)"], capture_output=True, text=True)
     info["ortools"] = r.stdout.strip() or "unknown"
+    r = subprocess.run([python, "-m", "pip", "freeze"], capture_output=True, text=True)
+    info["packages"] = [l for l in r.stdout.splitlines() if l.strip() and not l.startswith("#")]
     return info
+
+
+def git_version():
+    """Current commit of the research code, '-dirty' if research/ code (not results) has uncommitted edits."""
+    try:
+        r = subprocess.run(["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, timeout=20)
+        if r.returncode:
+            return None
+        d = subprocess.run(["git", "-C", str(ROOT), "status", "--porcelain", "--", ".", ":!results"],
+                           capture_output=True, text=True, timeout=20)
+        return r.stdout.strip() + ("-dirty" if d.stdout.strip() else "")
+    except (OSError, subprocess.SubprocessError):
+        return None
 
 
 # ---------------------------------------------------------------- summary
@@ -236,9 +251,14 @@ def build_summary(out_dir):
             plan(sorted({r["contractor"] for r in rows}), meta.get("budgets_s", BUDGETS),
                  meta.get("repeats", REPEATS), meta.get("reference_s", REFERENCE_S))),
     }
+    full_plan = plan(CONTRACTORS, meta.get("budgets_s", BUDGETS), meta.get("repeats", REPEATS),
+                     meta.get("reference_s", REFERENCE_S))
     summary["runs_done"] = len(rows)
-    summary["runs_total"] = len(plan(CONTRACTORS, meta.get("budgets_s", BUDGETS), meta.get("repeats", REPEATS),
-                                     meta.get("reference_s", REFERENCE_S)))
+    summary["runs_total"] = len(full_plan)
+    # Time left: each remaining run's budget plus the typical start-up overhead seen so far.
+    overheads = [r["wall_s"] - r["budget_s"] for r in rows if r.get("status") == "ok" and r.get("wall_s")]
+    overhead = statistics.median(overheads) if overheads else 5
+    summary["remaining_s"] = round(sum(j["budget_s"] + overhead for j in full_plan if j["key"] not in latest))
     summary["rows"] = sorted(rows, key=lambda r: r.get("started_at", ""))
     return summary
 
@@ -307,7 +327,10 @@ def main():
     ap.add_argument("--contractor", action="append", choices=CONTRACTORS, help="limit to one contractor (repeatable)")
     ap.add_argument("--python", default=sys.executable, help="Python that has OR-Tools (default: this one)")
     ap.add_argument("--out-dir", type=Path, default=None)
+    ap.add_argument("--code-version", default=None, help="git commit of the code (the hub passes it; else read from git)")
     args = ap.parse_args()
+    if args.code_version in (None, "", "{code_version}"):
+        args.code_version = git_version()
     out_dir = args.out_dir or ROOT / "results" / ("budget-quick" if args.quick else "budget")
 
     if args.summarize:
@@ -334,7 +357,7 @@ def main():
         meta_path.write_text(json.dumps({
             "started_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
             "machine": machine_info(args.python), "limits": check, "budgets_s": budgets, "repeats": repeats,
-            "reference_s": reference_s, "use_sudo": args.sudo}, indent=1))
+            "reference_s": reference_s, "use_sudo": args.sudo, "code_version": args.code_version}, indent=1))
 
     runs_path = out_dir / "runs.jsonl"
     done = set()
@@ -347,6 +370,7 @@ def main():
     for i, job in enumerate(jobs, 1):
         print(f"[{i}/{len(jobs)}] {job['key']} ...", end=" ", flush=True)
         row = run_one(job, out_dir, args.python, args.sudo)
+        row["code_version"] = args.code_version
         with open(runs_path, "a") as fh:
             fh.write(json.dumps(row) + "\n")
         detail = (f"{row['total_student_ride_min']} student-min, peak {row['peak_mb']} MB"

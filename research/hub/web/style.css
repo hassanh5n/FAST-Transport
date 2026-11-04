@@ -135,5 +135,12 @@ svg.chart text{font:12px system-ui,sans-serif;fill:var(--muted)}
 .ok-i{background:var(--good-bg);color:var(--good)}.no-i{background:var(--bad-bg);color:var(--bad)}.q-i{background:var(--soft);color:var(--muted)}
 pre.log{background:var(--top);color:#d1d5db;border-radius:8px;padding:12px;max-height:280px;overflow:auto;font-size:12px;margin:10px 0 0;white-space:pre-wrap}
 .msg{margin-top:10px;font-size:13px}
+.tools{display:inline-flex;gap:4px}
+.mini{appearance:none;border:1px solid var(--line);background:var(--card);color:var(--muted);font:inherit;font-size:11px;font-weight:600;padding:3px 8px;border-radius:6px;cursor:pointer;letter-spacing:.03em}
+.mini:hover{color:var(--ink);border-color:var(--muted)}
+.notice{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--warn-bg);border-radius:10px;padding:10px 14px;margin:6px 0 4px}
+.schedform{background:var(--soft);border-radius:8px;padding:8px 10px;margin:8px 0}
+.schedform input{font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--top);color:var(--top-ink);padding:10px 16px;border-radius:10px;font-size:13px;z-index:2000;box-shadow:0 6px 24px rgba(0,0,0,.25)}
 .empty{padding:28px;text-align:center;color:var(--muted)}
 @media(max-width:600px){.top{gap:10px;padding:10px 14px}.mode{margin-left:0}main{padding:16px 12px 32px}}

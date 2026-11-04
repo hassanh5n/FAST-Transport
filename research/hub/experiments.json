@@ -1,0 +1,26 @@
+[
+ {
+  "id": "time-budget",
+  "title": "Time-budget experiment",
+  "kind": "budget",
+  "main": true,
+  "dir": "results/budget",
+  "script": "research/run_budget.py",
+  "args": ["--code-version", "{code_version}"],
+  "runs_total": 50,
+  "question": "On a free-tier server (512 MB, no swap, 0.1 CPU), how close does the optimizer get to the best known plan, and how fast?",
+  "design": "Each contractor solved at 10, 60, 300 and 600 s, 3 repeats, limited and unlimited, plus one 30-minute unlimited reference. 50 runs, about 4.5 hours. Limits applied with systemd cgroups in WSL."
+ },
+ {
+  "id": "time-budget-quick",
+  "title": "Pipeline test",
+  "kind": "budget",
+  "main": false,
+  "dir": "results/budget-quick",
+  "script": "research/run_budget.py",
+  "args": ["--quick", "--code-version", "{code_version}"],
+  "runs_total": 6,
+  "question": "Does the whole experiment pipeline work? 5 s runs, about 1 minute. Not a reported result.",
+  "design": "One 5 s run per contractor and setup, plus a 10 s reference."
+ }
+]

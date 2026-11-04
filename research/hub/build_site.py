@@ -20,28 +20,33 @@ WEB = HUB / "web"
 sys.path.insert(0, str(RESEARCH))
 import run_budget  # noqa: E402  (stdlib only at import time)
 
-EXPERIMENTS = [
-    {
-        "id": "time-budget",
-        "title": "Time-budget experiment",
-        "dir": "results/budget",
-        "args": [],
-        "main": True,
-        "question": "On a free-tier server (512 MB, no swap, 0.1 CPU), how close does the optimizer get to the "
-                    "best known plan, and how fast?",
-        "design": "Each contractor solved at 10, 60, 300 and 600 s, 3 repeats, limited and unlimited, plus one "
-                  "30-minute unlimited reference. 50 runs, about 4.5 hours. Limits applied with systemd cgroups in WSL.",
-    },
-    {
-        "id": "time-budget-quick",
-        "title": "Pipeline test",
-        "dir": "results/budget-quick",
-        "args": ["--quick"],
-        "main": False,
-        "question": "Does the whole experiment pipeline work? 5 s runs, about 1 minute. Not a reported result.",
-        "design": "One 5 s run per contractor and setup, plus a 10 s reference.",
-    },
-]
+def load_experiments():
+    """The experiments the hub knows, from hub/experiments.json.
+
+    To add one, add an entry there. Contract for any experiment script:
+    - it is run from the repository root in WSL as `python -u <script> <args>`
+      ("{code_version}" in args is replaced with the current git commit);
+    - it appends one JSON line per finished run to <dir>/runs.jsonl, with at least
+      "key", "status" ("ok" or a failure word) and "started_at";
+    - it writes <dir>/meta.json once (machine, settings); it may set "runs_total";
+    - finished runs are skipped on the next start, so Resume works;
+    - runs in optimize.py's JSON format may be saved as <dir>/runs/<key>.json to appear under Runs.
+    kind "budget" gets the time-budget charts; any other kind gets a progress bar and a table of runs.
+    """
+    return json.loads((HUB / "experiments.json").read_text(encoding="utf-8"))
+
+
+def generic_summary(d, exp):
+    path = d / "runs.jsonl"
+    latest = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            r = json.loads(line)
+            latest[r.get("key", str(len(latest)))] = r
+    meta = read_json(d / "meta.json") if (d / "meta.json").exists() else {}
+    rows = sorted(latest.values(), key=lambda r: r.get("started_at", ""))
+    total = meta.get("runs_total") or exp.get("runs_total") or len(rows)
+    return {"meta": meta, "rows": rows, "runs_done": len(rows), "runs_total": total, "verdict": {}}
 
 
 def read_json(path):
@@ -114,15 +119,17 @@ def build(out, git_info=None):
         shutil.copy2(f, out / "data" / "runs" / f.name)
 
     experiments = []
-    for exp in EXPERIMENTS:
+    for exp in load_experiments():
         d = RESEARCH / exp["dir"]
-        summary = run_budget.build_summary(d) if (d / "runs.jsonl").exists() else None
+        summary = None
+        if (d / "runs.jsonl").exists():
+            summary = run_budget.build_summary(d) if exp.get("kind") == "budget" else generic_summary(d, exp)
         rows = {r["key"]: r for r in (summary or {}).get("rows", [])}
         for f in sorted((d / "runs").glob("*.json")) if (d / "runs").exists() else []:
             report = read_json(f)
             runs.append(run_summary(f.stem, report, exp["id"], rows.get(f.stem)))
             shutil.copy2(f, out / "data" / "runs" / f.name)
-        info = {k: exp[k] for k in ("id", "title", "main", "question", "design")}
+        info = {k: exp.get(k) for k in ("id", "title", "kind", "main", "question", "design", "runs_total")}
         if summary is None:
             info["state"] = "not started"
         else:

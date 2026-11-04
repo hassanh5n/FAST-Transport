@@ -19,6 +19,8 @@ concurrency:
 
 jobs:
   publish:
+    # Pushes also go to a private copy of the repo; the shared page is served only from the public one.
+    if: github.repository == 'hassanh5n/FAST-Transport'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

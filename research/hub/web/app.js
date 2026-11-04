@@ -85,7 +85,81 @@ const expById = id => D.experiments.find(e => e.id === id);
 
 function expProgress(e) {
   const s = e.summary;
-  return s ? { done: s.runs_done, total: s.runs_total } : { done: 0, total: e.id === 'time-budget' ? 50 : 6 };
+  return s ? { done: s.runs_done, total: s.runs_total, left: s.remaining_s } : { done: 0, total: e.runs_total || 0, left: null };
+}
+
+const dur = s => s == null ? '' : s < 90 ? `${Math.round(s)} s` : s < 5400 ? `${Math.round(s / 60)} min`
+  : `${Math.floor(s / 3600)} h ${Math.round((s % 3600) / 60)} min`;
+const leftText = p => (p.left && p.done < p.total ? ` · about ${dur(p.left)} left` : '');
+
+/* ------------------------------------------------------------------ export (charts and tables, for the report) */
+
+const EXPORT_COLOURS = { '--line': '#e4e7ec', '--muted': '#667085', '--bad': '#b42318', '--lim': '#2457d6', '--unl': '#8b3fd9',
+  '--accent': '#2457d6', '--ink': '#1c2330', '--good': '#067647' };
+
+function svgForExport(svg) {
+  const vb = svg.viewBox.baseVal, w = vb.width || 900, h = vb.height || 300;
+  const clone = svg.cloneNode(true);
+  clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+  clone.setAttribute('width', w); clone.setAttribute('height', h);
+  let s = new XMLSerializer().serializeToString(clone).replace(/var\((--[a-z0-9-]+)\)/g, (m, n) => EXPORT_COLOURS[n] || '#333');
+  s = s.replace(/(<svg[^>]*>)/, `$1<style>text{font:12px Arial,Helvetica,sans-serif;fill:${EXPORT_COLOURS['--muted']}}</style><rect width="100%" height="100%" fill="#ffffff"/>`);
+  return { s, w, h };
+}
+
+function download(name, blob) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+function exportChart(svg, name, fmt) {
+  const { s, w, h } = svgForExport(svg);
+  if (fmt === 'svg') return download(`${name}.svg`, new Blob([s], { type: 'image/svg+xml' }));
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas'); c.width = w * 2; c.height = h * 2;
+    const ctx = c.getContext('2d'); ctx.scale(2, 2); ctx.drawImage(img, 0, 0, w, h);
+    c.toBlob(b => download(`${name}.png`, b), 'image/png');
+  };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+}
+
+const tableRows = t => [...t.rows].map(r => [...r.cells].map(c => c.textContent.replace(/\s+/g, ' ').trim()));
+const csvCell = x => /[",\n]/.test(x) ? `"${x.replace(/"/g, '""')}"` : x;
+const texCell = x => x.replace(/\\/g, '\\textbackslash{}').replace(/([&%$#_{}])/g, '\\$1').replace(/~/g, '\\textasciitilde{}')
+  .replace(/\^/g, '\\textasciicircum{}').replace(/→/g, '$\\rightarrow$').replace(/–/g, '--');
+
+function toLatex(rows) {
+  const n = Math.max(...rows.map(r => r.length));
+  const line = r => r.map(texCell).join(' & ') + ' \\\\';
+  return [`\\begin{tabular}{l${'r'.repeat(n - 1)}}`, '\\toprule', line(rows[0]), '\\midrule', ...rows.slice(1).map(line),
+    '\\bottomrule', '\\end{tabular}'].join('\n');
+}
+
+async function exportTable(t, name, fmt) {
+  const rows = tableRows(t);
+  if (fmt === 'csv') return download(`${name}.csv`, new Blob([rows.map(r => r.map(csvCell).join(',')).join('\n')], { type: 'text/csv' }));
+  const tex = toLatex(rows);
+  try { await navigator.clipboard.writeText(tex); toast('LaTeX table copied. Needs \\usepackage{booktabs}.'); }
+  catch { download(`${name}.tex`, new Blob([tex], { type: 'text/plain' })); }
+}
+
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast'; el.textContent = msg;
+  document.body.append(el);
+  setTimeout(() => el.remove(), 3200);
+}
+
+// Buttons: chartTools('svg-id', 'file-name') and tableTools('table-id', 'file-name'); bindExports(root) wires them.
+const chartTools = (id, name) => `<span class="tools"><button class="mini" data-chart="${esc(id)}" data-name="${esc(name)}" data-fmt="png" title="Download as PNG">PNG</button><button class="mini" data-chart="${esc(id)}" data-name="${esc(name)}" data-fmt="svg" title="Download as SVG">SVG</button></span>`;
+const tableTools = (id, name) => `<span class="tools"><button class="mini" data-table="${esc(id)}" data-name="${esc(name)}" data-fmt="csv" title="Download as CSV">CSV</button><button class="mini" data-table="${esc(id)}" data-name="${esc(name)}" data-fmt="tex" title="Copy as a LaTeX table">LaTeX</button></span>`;
+
+function bindExports(root) {
+  root.querySelectorAll('[data-chart]').forEach(b => b.onclick = () => exportChart(document.getElementById(b.dataset.chart), b.dataset.name, b.dataset.fmt));
+  root.querySelectorAll('[data-table]').forEach(b => b.onclick = () => exportTable(document.getElementById(b.dataset.table), b.dataset.name, b.dataset.fmt));
 }
 
 function expVerdicts(e) {
@@ -170,29 +244,31 @@ function viewExperiment(v, id) {
     v.innerHTML = html + `<div class="card empty">No runs yet.${LOCAL ? ' Start it from <a href="#/control">Run &amp; publish</a>.' : ''}</div>`;
     return;
   }
+  if (e.kind !== 'budget') { v.innerHTML = html + genericExperiment(e, s, p); bindRunRows(v); bindExports(v); return; }
   const V = s.verdict;
   html += `<div class="tiles">
     ${tile(`Gap at ${T.gap_budget_s} s, limited`, V.gap ? `<span class="${V.gap === 'pass' ? 'good-t' : 'bad-t'}">${V.gap}${V.complete ? '' : ' so far'}</span>` : 'pending',
       `pass if within ${T.gap_threshold_pct}% of the best known plan`)}
     ${tile('Memory, limited', V.memory ? `<span class="${V.memory === 'pass' ? 'good-t' : 'bad-t'}">${V.memory}${V.complete ? '' : ' so far'}</span>` : 'pending',
       `peak ${fmt(V.limited_peak_mb)} MB, limit ${T.memory_threshold_mb} MB, ${V.limited_killed} killed`)}
-    ${tile('Progress', `${p.done} / ${p.total}`, V.complete ? 'complete: verdicts are final' : 'partial: verdicts may change')}
+    ${tile('Progress', `${p.done} / ${p.total}`, (V.complete ? 'complete: verdicts are final' : 'partial: verdicts may change') + leftText(p))}
   </div>`;
   for (const [c, d] of Object.entries(s.contractors)) {
     if (!d.cells.length) { html += `<div class="card"><h2>${esc(c)}</h2>${esc(d.note || '')}</div>`; continue; }
-    html += `<div class="card" style="margin-bottom:14px"><h2>${esc(c)}</h2>
+    html += `<div class="card" style="margin-bottom:14px"><div class="spread"><h2>${esc(c)}</h2>${chartTools(`gap-${c}`, `${e.id}-${c}-gap`)}</div>
       <div class="legend"><span><i style="background:var(--lim)"></i>limited (512 MB, 0.1 CPU)</span><span><i style="background:var(--unl)"></i>unlimited</span>
-      <span><i style="background:var(--bad)"></i>${T.gap_threshold_pct}% threshold</span></div>
+      <span><i style="background:var(--bad)"></i>${T.gap_threshold_pct}% threshold</span><span>bars: range over repeats</span></div>
       <svg class="chart" id="gap-${esc(c)}" viewBox="0 0 900 280"></svg>
       <p class="muted" style="font-size:12px">Gap = median total student ride time over repeats, compared with the best plan any run found
       (${fmt(d.best_known_ride_min)} student-min, from ${esc(d.best_from)}). The current hand-made routes are ${d.current_routes_gap_pct}% above it
       (${fmt(d.current_routes_ride_min)} student-min).</p>
-      <div class="tbl-wrap"><table><tr><th>Setup</th><th>Budget</th><th>Runs ok</th><th>Student-min</th><th>Gap</th><th>First plan</th><th>Wall</th><th>Solver CPU</th><th>Peak MB</th></tr>
+      <div class="spread" style="margin-top:6px"><h3 style="margin:0">Results by setup and budget</h3>${tableTools(`cells-${c}`, `${e.id}-${c}-results`)}</div>
+      <div class="tbl-wrap"><table id="cells-${esc(c)}"><tr><th>Setup</th><th>Budget</th><th>Runs ok</th><th>Student-min</th><th>Gap</th><th>First plan</th><th>Wall</th><th>Solver CPU</th><th>Peak MB</th></tr>
       ${d.cells.map(x => `<tr><td>${esc(x.setup)}</td><td>${x.budget_s} s</td><td>${x.ok}/${x.runs}${x.not_ok.length ? ` <span class="bad-t">(${esc(x.not_ok.join(', '))})</span>` : ''}</td>
         <td>${fmt(x.ride_min)}</td><td>${x.gap_pct == null ? '–' : x.gap_pct + '%'}</td><td>${x.first_plan_s ?? '–'} s</td><td>${x.wall_s ?? '–'} s</td><td>${x.cpu_s ?? '–'} s</td><td>${x.peak_mb ?? '–'}</td></tr>`).join('')}
       </table></div></div>`;
   }
-  html += `<div class="card" style="margin-bottom:14px"><h2>Every run</h2><div class="tbl-wrap"><table>
+  html += `<div class="card" style="margin-bottom:14px"><div class="spread"><h2>Every run</h2>${tableTools('allruns', `${e.id}-runs`)}</div><div class="tbl-wrap"><table id="allruns">
     <tr><th>Run</th><th>Status</th><th>Started</th><th>Student-min</th><th>Peak MB</th><th>Wall</th></tr>
     ${s.rows.map(r => `<tr class="${r.status === 'ok' ? 'click' : ''}" data-run="${esc(r.key)}"><td>${esc(r.key)}</td>
       <td><span class="chip ${r.status === 'ok' ? 'good' : 'bad'}">${esc(r.status)}</span></td><td>${esc(when(r.started_at))}</td>
@@ -202,17 +278,54 @@ function viewExperiment(v, id) {
   html += `<div class="card"><h2>Machine</h2><div class="tbl-wrap"><table>
     ${[['Host', mc.host], ['CPU', mc.cpu], ['Cores', mc.cpus], ['RAM', mc.ram_gb ? mc.ram_gb + ' GB' : null], ['Kernel', mc.kernel], ['Python', mc.python],
       ['OR-Tools', mc.ortools], ['Limits the kernel applied', m.limits ? Object.entries(m.limits.found || {}).map(([k, x]) => `${k}=${x}`).join(', ') : null],
-      ['Started', when(m.started_at)]].map(([k, x]) => `<tr><td>${esc(k)}</td><td class="l">${esc(x ?? '–')}</td></tr>`).join('')}
+      ['Code version', codeVersions(s.rows, m)], ['Python packages', (mc.packages || []).join(', ') || null],
+      ['Started', when(m.started_at)]].map(([k, x]) => `<tr><td>${esc(k)}</td><td class="l" style="white-space:normal">${esc(x ?? '–')}</td></tr>`).join('')}
     </table></div></div>`;
   v.innerHTML = html;
-  v.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { location.hash = `#/runs/${encodeURIComponent(tr.dataset.run)}`; });
-  for (const [c, d] of Object.entries(s.contractors)) if (d.cells.length) gapChart(document.getElementById(`gap-${c}`), d.cells, T.gap_threshold_pct);
+  bindRunRows(v);
+  bindExports(v);
+  for (const [c, d] of Object.entries(s.contractors)) {
+    if (!d.cells.length) continue;
+    const spread = repeatSpread(s.rows.filter(r => r.contractor === c), d.best_known_ride_min);
+    gapChart(document.getElementById(`gap-${c}`), d.cells, T.gap_threshold_pct, spread);
+  }
 }
 
-function gapChart(svg, cells, threshold) {
+function bindRunRows(v) {
+  v.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { location.hash = `#/runs/${encodeURIComponent(tr.dataset.run)}`; });
+}
+
+function codeVersions(rows, meta) {
+  const vs = [...new Set(rows.map(r => r.code_version).filter(Boolean))];
+  if (!vs.length && meta.code_version) vs.push(meta.code_version);
+  return vs.length ? vs.map(x => x.slice(0, 7) + (x.endsWith('-dirty') ? ' (with uncommitted edits)' : '')).join(', ') : 'not recorded (runs before 2026-11-04)';
+}
+
+// Min and max gap per (setup, budget) over the repeats, for the range bars.
+function repeatSpread(rows, best) {
+  const out = {};
+  rows.filter(r => r.status === 'ok' && r.setup !== 'reference').forEach(r => {
+    const k = `${r.setup}|${r.budget_s}`, g = (r.total_student_ride_min - best) / best * 100;
+    out[k] = out[k] ? [Math.min(out[k][0], g), Math.max(out[k][1], g)] : [g, g];
+  });
+  return out;
+}
+
+function genericExperiment(e, s, p) {
+  const rows = s.rows || [];
+  const cols = [...new Set(rows.flatMap(r => Object.keys(r).filter(k => r[k] === null || typeof r[k] !== 'object')))].slice(0, 10);
+  return `<div class="tiles">${tile('Progress', `${p.done} / ${p.total}`, leftText(p).replace(' · ', ''))}
+      ${tile('Runs ok', rows.filter(r => r.status === 'ok').length, `${rows.filter(r => r.status && r.status !== 'ok').length} not ok`)}</div>
+    <div class="card"><div class="spread"><h2>Every run</h2>${tableTools('allruns', `${e.id}-runs`)}</div>
+    ${rows.length ? `<div class="tbl-wrap"><table id="allruns"><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>
+      ${rows.map(r => `<tr class="${D.runs.some(x => x.id === r.key) ? 'click' : ''}" data-run="${esc(r.key)}">${cols.map(c => `<td>${esc(typeof r[c] === 'number' ? fmt(r[c]) : r[c] ?? '–')}</td>`).join('')}</tr>`).join('')}
+      </table></div>` : '<div class="empty">No runs yet.</div>'}</div>`;
+}
+
+function gapChart(svg, cells, threshold, spread = {}) {
   const W = 900, H = 280, l = 56, r = 90, t = 30, b = 36;
   const bud = [...new Set(cells.map(x => x.budget_s))].sort((a, z) => a - z);
-  const gaps = cells.map(x => x.gap_pct).filter(x => x != null);
+  const gaps = cells.map(x => x.gap_pct).filter(x => x != null).concat(Object.values(spread).map(s => s[1]));
   const y1 = Math.max(threshold * 1.4, Math.max(...gaps, 0) * 1.1, 1);
   const X = s => l + (W - l - r) * (bud.length < 2 ? 0.5 : Math.log(s / bud[0]) / Math.log(bud[bud.length - 1] / bud[0]));
   const Y = g => t + (H - t - b) * (1 - g / y1);
@@ -223,6 +336,13 @@ function gapChart(svg, cells, threshold) {
   for (const [setup, col] of [['limited', 'var(--lim)'], ['unlimited', 'var(--unl)']]) {
     const pts = cells.filter(x => x.setup === setup && x.gap_pct != null).map(x => [X(x.budget_s), Y(x.gap_pct), x]);
     if (!pts.length) continue;
+    pts.forEach(([px, , x]) => {
+      const sp = spread[`${setup}|${x.budget_s}`];
+      if (sp && sp[1] - sp[0] > 0.01) {
+        g += `<line x1="${px}" x2="${px}" y1="${Y(sp[0])}" y2="${Y(sp[1])}" stroke="${col}" stroke-width="1.5" opacity=".5"/>` +
+          `<line x1="${px - 5}" x2="${px + 5}" y1="${Y(sp[0])}" y2="${Y(sp[0])}" stroke="${col}" opacity=".5"/><line x1="${px - 5}" x2="${px + 5}" y1="${Y(sp[1])}" y2="${Y(sp[1])}" stroke="${col}" opacity=".5"/>`;
+      }
+    });
     g += `<polyline points="${pts.map(p => p[0] + ',' + p[1]).join(' ')}" fill="none" stroke="${col}" stroke-width="2.5"/>`;
     g += pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="4.5" fill="${col}"><title>${setup}, ${p[2].budget_s} s: ${p[2].gap_pct}% gap</title></circle>`).join('');
     const last = pts[pts.length - 1];
@@ -240,12 +360,14 @@ function viewRuns(v) {
     .flatMap(r => Object.entries(r.contractors).map(([c, x]) => ({ r, c, x })));
   v.innerHTML = `<h1>Runs</h1><p class="muted">Every optimizer run with a result. Click one to compare its routes with the current routes on a map.</p>
     <div class="seg" id="filt" style="margin:8px 0 14px">${sources.map(s => `<button data-s="${esc(s)}" class="${s === runFilter ? 'on' : ''}">${esc(label(s))}</button>`).join('')}</div>
-    <div class="card">${rows.length ? `<div class="tbl-wrap"><table>
+    <div class="card">${rows.length ? `<div class="spread" style="margin-bottom:6px"><span class="muted">${plural(rows.length, 'row')}</span>${tableTools('runslist', 'runs')}</div>
+      <div class="tbl-wrap"><table id="runslist">
       <tr><th>Run</th><th>Contractor</th><th>Setup</th><th>Budget</th><th>Student-min</th><th>vs current</th><th>Buses</th><th>Peak MB</th><th>Started</th></tr>
       ${rows.map(({ r, c, x }) => `<tr class="click" data-run="${esc(r.id)}" data-c="${esc(c)}"><td>${esc(r.id)}</td><td>${esc(c)}</td><td>${esc(r.setup)}</td>
         <td>${r.time_limit_s} s</td><td>${fmt(x.ride_min)}</td><td class="${x.vs_current_pct < 0 ? 'good-t' : ''}">${sign(x.vs_current_pct)}</td>
         <td>${x.buses ?? '–'}</td><td>${r.peak_mb ?? x.peak_mb ?? '–'}</td><td>${esc(when(r.started_at))}</td></tr>`).join('')}
       </table></div>` : '<div class="empty">No runs yet.</div>'}</div>`;
+  bindExports(v);
   v.querySelectorAll('#filt button').forEach(b => b.onclick = () => { runFilter = b.dataset.s; route(); });
   v.querySelectorAll('tr.click').forEach(tr => tr.onclick = () => { location.hash = `#/runs/${encodeURIComponent(tr.dataset.run)}/${encodeURIComponent(tr.dataset.c)}`; });
 }
@@ -294,8 +416,8 @@ async function viewRun(v, arg) {
     <div class="card" style="margin-bottom:14px"><h2>Routes</h2><div class="maps">
       <div><h3>Current routes</h3><div id="m1" class="map"></div></div><div><h3>Optimized routes</h3><div id="m2" class="map"></div></div></div>
       <p class="muted" style="font-size:12px">One colour per bus. Lines join stops in visiting order (straight lines, not roads); the dashed line is the drive to campus. The two maps move together.</p></div>
-    <div class="grid g2"><div class="card"><h2>Comparison</h2><div class="tbl-wrap" id="rtable"></div></div>
-      <div class="card"><h2>How the search improved the plan</h2><svg class="chart" id="prog" viewBox="0 0 900 300"></svg>
+    <div class="grid g2"><div class="card"><div class="spread"><h2>Comparison</h2><span id="cmptools"></span></div><div class="tbl-wrap" id="rtable"></div></div>
+      <div class="card"><div class="spread"><h2>How the search improved the plan</h2><span id="progtools"></span></div><svg class="chart" id="prog" viewBox="0 0 900 300"></svg>
       <p class="muted" style="font-size:12px">Each step is a better plan found. Where the line goes flat, extra search time stops paying off.</p></div></div>`;
   const ms = [baseMap('m1'), baseMap('m2')];
   const layers = ms.map(m => L.layerGroup().addTo(m));
@@ -310,7 +432,10 @@ async function viewRun(v, arg) {
       tile('Compute', `${c.solve_wall_s} s`, `${c.solve_cpu_s} s CPU · peak ${c.peak_rss_mb} MB`);
     const rows = [['Buses used', 'buses_used'], ['Total student ride (min)', 'total_student_ride_min'], ['Mean ride (min)', 'mean_ride_min'],
       ['Longest ride (min)', 'longest_ride_min'], ['Stops over 90 min', 'stops_over_90_min'], ['Bus driving (min)', 'bus_driving_min']];
-    $('#rtable').innerHTML = `<table><tr><th>Measure</th><th>Current</th><th>Optimized</th></tr>${rows.map(([l, k]) =>
+    $('#cmptools').innerHTML = tableTools('cmp', `${id}-${cur}-comparison`);
+    $('#progtools').innerHTML = chartTools('prog', `${id}-${cur}-search`);
+    bindExports(v);
+    $('#rtable').innerHTML = `<table id="cmp"><tr><th>Measure</th><th>Current</th><th>Optimized</th></tr>${rows.map(([l, k]) =>
       `<tr><td>${l}</td><td>${fmt(b[k])}</td><td>${fmt(o[k])}</td></tr>`).join('')}</table>
       <p class="muted" style="font-size:12px">Stops dropped: ${(o.dropped_stops || []).length}. Both plans scored the same way on the same travel-time matrix.</p>`;
     drawRoutes(layers[0], c.baseline_routes, cur);
@@ -355,7 +480,7 @@ function viewData(v) {
       <div class="row"><span class="muted">Show current routes:</span><div class="seg" id="rt"><button data-c="" class="on">None</button>${names.map(n => `<button data-c="${esc(n)}">${esc(n)}</button>`).join('')}</div></div></div>
       <div class="legend" style="margin-bottom:8px">${names.map(n => `<span><i style="background:${cols[n]}"></i>${esc(n)}</span>`).join('')}<span><i style="background:var(--c3)"></i>both</span><span>Circle size = students at the stop</span></div>
       <div id="dmap" class="map tall"></div></div>
-    <div class="card"><div class="spread"><h2>Current routes</h2><div class="seg" id="rtab">${names.map((n, i) => `<button data-c="${esc(n)}" class="${i ? '' : 'on'}">${esc(n)}</button>`).join('')}</div></div>
+    <div class="card"><div class="spread"><h2>Current routes</h2><div class="row">${tableTools('routes-tbl', 'current-routes')}<div class="seg" id="rtab">${names.map((n, i) => `<button data-c="${esc(n)}" class="${i ? '' : 'on'}">${esc(n)}</button>`).join('')}</div></div></div>
       <div class="tbl-wrap" id="rtbl"></div></div>`;
   const m = baseMap('dmap');
   const stopLayer = L.layerGroup().addTo(m), routeLayer = L.layerGroup().addTo(m);
@@ -372,13 +497,14 @@ function viewData(v) {
     if (!b.dataset.c) routeLayer.clearLayers(); else drawRoutes(routeLayer, ds.contractors[b.dataset.c].current_routes.map(r => r.stops), b.dataset.c);
   });
   const table = c => {
-    $('#rtbl').innerHTML = `<table><tr><th>Route</th><th>Bus</th><th>Seats</th><th>Students</th><th>Load</th><th>Stops</th><th class="l">First and last stop</th></tr>
+    $('#rtbl').innerHTML = `<table id="routes-tbl"><tr><th>Route</th><th>Bus</th><th>Seats</th><th>Students</th><th>Load</th><th>Stops</th><th class="l">First and last stop</th></tr>
       ${ds.contractors[c].current_routes.map(r => `<tr><td>${esc(r.code)}</td><td>${esc(r.bus)}</td><td>${r.capacity}</td><td>${r.students}</td>
         <td>${Math.round(r.students / r.capacity * 100)}%</td><td>${r.stops.length}</td><td class="l">${esc(r.stops[0])} → ${esc(r.stops[r.stops.length - 1])}</td></tr>`).join('')}</table>`;
     v.querySelectorAll('#rtab button').forEach(x => x.classList.toggle('on', x.dataset.c === c));
   };
   v.querySelectorAll('#rtab button').forEach(b => b.onclick = () => table(b.dataset.c));
   table(names[0]);
+  bindExports(v);
 }
 
 /* ------------------------------------------------------------------ documents */
@@ -404,6 +530,9 @@ async function viewDocs(v, arg) {
 /* ------------------------------------------------------------------ local control (hub only) */
 
 const icon = ok => ok == null ? '<span class="q-i">?</span>' : ok ? '<span class="ok-i">✓</span>' : '<span class="no-i">✕</span>';
+let autoPublish = true;        // "Publish when it finishes" box
+let schedFor = null;           // experiment whose schedule form is open
+let schedAt = '01:00';
 
 function viewControl(v) {
   if (!LOCAL) { v.innerHTML = '<div class="empty">Run controls exist only in the local hub on the research laptop.</div>'; return; }
@@ -412,37 +541,66 @@ function viewControl(v) {
       <div class="card"><div class="spread"><h2>Setup</h2><button class="btn" id="chk">Check setup</button></div><div id="env"></div></div>
       <div class="card"><h2>Publish to the shared page</h2><div id="pub"></div></div>
     </div>
-    <div class="card" style="margin-top:14px"><h2>Experiments</h2><div id="jobs"></div></div>`;
+    <div class="card" style="margin-top:14px"><div class="spread"><h2>Experiments</h2>
+      <label class="row" style="gap:6px;cursor:pointer"><input type="checkbox" id="autopub" ${autoPublish ? 'checked' : ''}>Publish to the shared page when a run finishes</label></div>
+      <div id="sched"></div><div id="jobs"></div></div>`;
   $('#chk').onclick = async e => { e.target.disabled = true; e.target.textContent = 'Checking…'; try { STATUS.env = (await api('check', {})).env; } catch (x) { alert(x.message); } renderControl(); };
+  $('#autopub').onchange = e => { autoPublish = e.target.checked; };
   renderControl();
 }
 
 function renderControl() {
-  if (PAGE !== 'control' || !STATUS) return;
-  const env = STATUS.env, job = STATUS.job, git = STATUS.git || {};
+  if (PAGE !== 'control' || !STATUS || !$('#jobs')) return;
+  const env = STATUS.env, job = STATUS.job, git = STATUS.git || {}, sch = STATUS.schedule || {};
   const chk = $('#chk'); if (chk) { chk.disabled = false; chk.textContent = 'Check setup'; }
   const items = [['WSL starts', env && env.wsl], ['Python environment (~/fc-research-venv)', env && env.venv],
     ['OR-Tools installed', env && env.ortools ? true : env ? false : null], ['Free-tier limits apply (512 MB, 0.1 CPU)', env && env.limits]];
   $('#env').innerHTML = `<ul class="checks">${items.map(([t, ok]) => `<li>${icon(ok)}<span>${esc(t)}</span>${t.startsWith('OR') && env && env.ortools ? `<span class="muted">${esc(env.ortools)}</span>` : ''}</li>`).join('')}</ul>
-    ${!env ? '<p class="msg muted">Not checked yet. Checking takes a few seconds.</p>' : ''}
+    ${!env ? '<p class="msg muted">Checking… this takes a few seconds after the hub starts.</p>' : ''}
     ${env && env.wsl && !env.ortools ? `<p class="msg">The research Python environment is missing. <button class="btn primary" id="inst">Install it</button></p>` : ''}
     ${env && env.message ? `<p class="msg bad-t">${esc(env.message)}</p>` : ''}
     ${env ? `<p class="msg muted">Checked ${esc(when(env.checked_at))}.</p>` : ''}`;
   const inst = $('#inst'); if (inst) inst.onclick = () => startJob('install');
 
   const running = job && job.state === 'running';
-  $('#jobs').innerHTML = D.experiments.slice().sort((a, b) => b.main - a.main).map(e => {
-    const p = expProgress(e), mine = running && job.experiment === e.id, left = p.total - p.done;
-    const action = mine ? `<button class="btn danger" data-stop>Stop</button>`
-      : `<button class="btn ${e.main ? 'primary' : ''}" data-start="${e.id}" ${running ? 'disabled' : ''}>${p.done === 0 ? 'Start' : left > 0 ? 'Resume' : 'Run again'}</button>`;
-    return `<div class="item"><div class="spread"><div class="row"><strong>${esc(e.title)}</strong>${stateChip(mine ? 'running' : e.state)}<span class="muted">${p.done}/${p.total} runs</span></div>${action}</div>
-      <p>${esc(e.design)}</p>${bar(p.done, p.total)}
-      ${mine && job.log_tail ? `<pre class="log">${esc(job.log_tail.join('\n'))}</pre>` : ''}</div>`;
-  }).join('') + (job && job.state === 'running' && job.experiment === 'install' ? `<pre class="log">${esc((job.log_tail || []).join('\n'))}</pre>` : '') +
-    (job && job.state !== 'running' && job.finished_at ? `<p class="msg muted">Last job: ${esc(job.title)} ${job.exit_code === 0 ? 'finished' : `stopped (exit ${job.exit_code})`} at ${esc(when(job.finished_at))}.</p>` : '') +
-    `<p class="msg muted">While a job runs, the hub keeps this PC from sleeping. Keep this hub window open; if it closes, press Resume later and it continues from the last finished run.</p>`;
-  $('#jobs').querySelectorAll('[data-start]').forEach(b => b.onclick = () => startJob(b.dataset.start));
-  $('#jobs').querySelectorAll('[data-stop]').forEach(b => b.onclick = stopJob);
+  const busy = running || (STATUS && STATUS.wsl_busy);
+  $('#sched').innerHTML = sch.pending ? `<div class="notice"><div><strong>Scheduled:</strong> ${esc(sch.pending.title)} starts at
+      ${esc(new Date(sch.pending.at).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }))}${sch.pending.publish_after ? ', then publishes' : ''}.
+      <span class="muted">Keep this hub open and the PC plugged in; the hub stops it from sleeping until then.</span></div>
+      <button class="btn" id="unsched">Cancel</button></div>`
+    : sch.last ? `<p class="msg muted">${esc(sch.last)}</p>` : '';
+  const un = $('#unsched'); if (un) un.onclick = async () => { try { STATUS = await api('schedule/cancel', {}); } catch (x) { alert(x.message); } renderStrip(); renderControl(); };
+
+  // Do not redraw the list under someone typing a time.
+  const typing = document.activeElement && document.activeElement.closest && document.activeElement.closest('#jobs');
+  if (!typing) {
+    $('#jobs').innerHTML = D.experiments.slice().sort((a, b) => b.main - a.main).map(e => {
+      const p = expProgress(e), mine = running && job.experiment === e.id, left = p.total - p.done;
+      const label = p.done === 0 ? 'Start now' : left > 0 ? 'Resume now' : 'Run again';
+      const action = mine ? `<button class="btn danger" data-stop>Stop</button>`
+        : `<div class="row"><button class="btn ${e.main ? 'primary' : ''}" data-start="${e.id}" ${busy ? 'disabled' : ''}>${label}</button>
+           <button class="btn" data-sched="${e.id}" ${sch.pending ? 'disabled' : ''}>Schedule…</button></div>`;
+      return `<div class="item"><div class="spread"><div class="row"><strong>${esc(e.title)}</strong>${stateChip(mine ? 'running' : e.state)}
+          <span class="muted">${p.done}/${p.total} runs${leftText(p)}</span></div>${action}</div>
+        ${schedFor === e.id ? `<div class="row schedform">Start at <input type="time" id="schedat" value="${esc(schedAt)}"> (tonight or tomorrow)
+          <button class="btn primary" data-setsched="${e.id}">Set</button><button class="btn" data-closesched>Close</button></div>` : ''}
+        <p>${esc(e.design)}</p>${bar(p.done, p.total)}
+        ${mine && job.log_tail ? `<pre class="log">${esc(job.log_tail.join('\n'))}</pre>` : ''}</div>`;
+    }).join('') + (running && job.experiment === 'install' ? `<pre class="log">${esc((job.log_tail || []).join('\n'))}</pre>` : '') +
+      (job && !running && job.finished_at ? `<p class="msg muted">Last job: ${esc(job.title)} ${job.exit_code === 0 && !job.stopped ? 'finished' : job.stopped ? 'stopped' : `failed (exit ${job.exit_code})`} at ${esc(when(job.finished_at))}.
+        ${job.publish_result ? `<span class="${job.publish_result.ok ? 'good-t' : 'bad-t'}">${esc(job.publish_result.message)}</span>` : ''}</p>` : '') +
+      `<p class="msg muted">While a job runs or waits for its start time, the hub keeps this PC from sleeping. If the hub closes, press Resume later: it continues from the last finished run.</p>`;
+    $('#jobs').querySelectorAll('[data-start]').forEach(b => b.onclick = () => startJob(b.dataset.start));
+    $('#jobs').querySelectorAll('[data-stop]').forEach(b => b.onclick = stopJob);
+    $('#jobs').querySelectorAll('[data-sched]').forEach(b => b.onclick = () => { schedFor = b.dataset.sched; renderControl(); const t = $('#schedat'); if (t) t.focus(); });
+    $('#jobs').querySelectorAll('[data-closesched]').forEach(b => b.onclick = () => { schedFor = null; renderControl(); });
+    const t = $('#schedat'); if (t) t.oninput = () => { schedAt = t.value; };
+    $('#jobs').querySelectorAll('[data-setsched]').forEach(b => b.onclick = async () => {
+      try { STATUS = await api('schedule', { experiment: b.dataset.setsched, at: schedAt, publish_after: autoPublish }); schedFor = null; }
+      catch (x) { alert(x.message); }
+      renderStrip(); renderControl();
+    });
+  }
 
   $('#pub').innerHTML = `<p style="margin-top:0">${git.changes ? `<strong>${plural(git.changes, 'research change')}</strong> not published yet.` : 'Everything in research/ is saved to git.'}
     ${git.ahead ? ` ${plural(git.ahead, 'commit')} waiting to be pushed.` : ''}</p>
@@ -459,7 +617,7 @@ function renderControl() {
 }
 
 async function startJob(id) {
-  try { STATUS = await api('start', { experiment: id }); } catch (x) { alert(x.message); }
+  try { STATUS = await api('start', { experiment: id, publish_after: id !== 'install' && autoPublish }); } catch (x) { alert(x.message); }
   renderStrip(); renderControl();
 }
 async function stopJob() {
@@ -469,7 +627,7 @@ async function stopJob() {
 }
 
 function renderStrip() {
-  const el = $('#strip'), job = STATUS && STATUS.job;
+  const el = $('#strip'), job = STATUS && STATUS.job, sch = STATUS && STATUS.schedule && STATUS.schedule.pending;
   if ((!job || job.state !== 'running') && STATUS && STATUS.wsl_busy) {
     el.hidden = false;
     el.innerHTML = `<strong>An experiment is running in WSL</strong><span class="muted">started outside this hub; results still show up here as runs finish.</span>
@@ -477,12 +635,21 @@ function renderStrip() {
     $('#xstop').onclick = stopJob;
     return;
   }
-  if (!job || job.state !== 'running') { el.hidden = true; return; }
-  const e = expById(job.experiment), p = e ? expProgress(e) : null;
-  el.hidden = false;
-  el.innerHTML = `<strong>Running:</strong> ${esc(job.title)}${p ? ` · ${p.done}/${p.total} runs` : ''}
-    ${p ? `<div class="bar"><i style="width:${p.total ? p.done / p.total * 100 : 0}%"></i></div>` : ''}
-    <span class="muted">started ${esc(when(job.started_at))}</span><a href="#/control">Details</a>`;
+  if (job && job.state === 'running') {
+    const e = expById(job.experiment), p = e ? expProgress(e) : null;
+    el.hidden = false;
+    el.innerHTML = `<strong>Running:</strong> ${esc(job.title)}${p ? ` · ${p.done}/${p.total} runs${leftText(p)}` : ''}
+      ${p ? `<div class="bar"><i style="width:${p.total ? p.done / p.total * 100 : 0}%"></i></div>` : ''}
+      <span class="muted">started ${esc(when(job.started_at))}${job.publish_after ? ' · publishes when finished' : ''}</span><a href="#/control">Details</a>`;
+    return;
+  }
+  if (sch) {
+    el.hidden = false;
+    el.innerHTML = `<strong>Scheduled:</strong> ${esc(sch.title)} at ${esc(new Date(sch.at).toLocaleString([], { weekday: 'short', hour: '2-digit', minute: '2-digit' }))}
+      <span class="muted">keep this hub open and the PC plugged in</span><a href="#/control">Details</a>`;
+    return;
+  }
+  el.hidden = true;
 }
 
 async function poll() {
