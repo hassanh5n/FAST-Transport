@@ -77,4 +77,5 @@ urlpatterns = [
     path("admin-management/activity-logs/", activity_logs, name="admin-activity-logs"),
     path("driver/overview/", driver_overview, name="driver-overview"),
     path("driver/location/", driver_location, name="driver-location"),
+    path("driver/tracker/", driver_tracker, name="driver-tracker"),
 ] + router.urls  # Router LAST

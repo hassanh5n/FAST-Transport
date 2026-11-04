@@ -282,6 +282,8 @@ def driver_overview(request):
                 "capacity": bus.capacity,
                 "is_active": bus.is_active,
                 "is_off_route": bus.is_off_route,
+                # A fitted GPS tracker lets the trip run without the driver's phone location.
+                "has_tracker": bool(bus.tracker_token),
             },
             "route": {"id": route.id, "name": route.name, "description": route.description},
         },
@@ -299,6 +301,63 @@ def driver_overview(request):
         } if ping else None,
     })
     return Response(data)
+
+
+def _remaining_stop_ids(raw):
+    """Route stop IDs the driver has not reached yet, from a list or "1,2,3"."""
+    if isinstance(raw, str):
+        raw = [item for item in raw.split(",") if item.strip()]
+    if not isinstance(raw, list) or len(raw) > 60:
+        raise ValidationError({"remaining": "Send up to 60 route stop IDs."})
+    try:
+        return [int(item) for item in raw]
+    except (TypeError, ValueError):
+        raise ValidationError({"remaining": "Route stop IDs must be integers."})
+
+
+@api_view(["GET"])
+@permission_classes([IsDriver])
+def driver_tracker(request):
+    """
+    A trip on a bus with a GPS tracker, without the driver's phone location: the
+    tracker's latest position and live ETAs for the stops not reached yet.
+
+    Read-only. Unlike phone fixes nothing is stored: the tracker is already the
+    source the student and admin maps read. Same 5 s tracker cache as those maps.
+    """
+    from .tracking import LIVE_FLEET_FRESHNESS_SECONDS, _fetch_tracker_location
+
+    assignment = _driver_assignment(_driver_for(request.user))
+    if not assignment:
+        return Response({"detail": "You have no active bus assignment."}, status=400)
+    bus = assignment.bus
+    if not bus.tracker_token:
+        return Response({"detail": "This bus has no GPS tracker. Share your phone's location to start the trip."}, status=400)
+
+    remaining = _remaining_stop_ids(request.query_params.get("remaining", ""))
+    tracker = _fetch_tracker_location(bus)
+    if tracker.get("latitude") is None:
+        return Response({"detail": "The bus tracker is not reporting a position right now."}, status=503)
+
+    latitude, longitude = tracker["latitude"], tracker["longitude"]
+    recorded_at = tracker.get("position_timestamp") or timezone.now()
+    age = max(0, (timezone.now() - recorded_at).total_seconds())
+
+    by_id = RouteStop.objects.filter(route=assignment.route, id__in=remaining).select_related("stop").in_bulk()
+    etas, source = _stop_etas(
+        (longitude, latitude), [by_id[i] for i in remaining if i in by_id], assignment.route.geometry,
+    )
+    return Response({
+        "latitude": latitude,
+        "longitude": longitude,
+        "recorded_at": recorded_at,
+        "age_seconds": round(age),
+        "is_live": age <= LIVE_FLEET_FRESHNESS_SECONDS,
+        "speed_kmh": tracker.get("speed_kmh"),
+        "is_off_route": bus.is_off_route,
+        "etas": etas,
+        "eta_source": source,
+    })
 
 
 @api_view(["POST"])
@@ -321,13 +380,7 @@ def driver_location(request):
     if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
         raise ValidationError("Coordinates are out of range.")
 
-    remaining = request.data.get("remaining") or []
-    if not isinstance(remaining, list) or len(remaining) > 60:
-        raise ValidationError({"remaining": "Send up to 60 route stop IDs."})
-    try:
-        remaining = [int(item) for item in remaining]
-    except (TypeError, ValueError):
-        raise ValidationError({"remaining": "Route stop IDs must be integers."})
+    remaining = _remaining_stop_ids(request.data.get("remaining") or [])
 
     # ponytail: one row per 15 s ping per bus; prune old pings with a cron once the table grows.
     ping = BusLocationPing.objects.create(

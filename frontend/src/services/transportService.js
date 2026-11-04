@@ -193,3 +193,5 @@ export const getActivityLogs   = (params = {}) => api.get("/api/admin-management
 // ── Driver console ──
 export const getDriverOverview = () => api.get("/api/driver/overview/");
 export const sendDriverLocation = (data) => api.post("/api/driver/location/", data);
+// Trip on a tracker bus without the phone: tracker position + ETAs for the stops left.
+export const getDriverTracker = (remaining) => api.get("/api/driver/tracker/", { params: { remaining: remaining.join(",") } });

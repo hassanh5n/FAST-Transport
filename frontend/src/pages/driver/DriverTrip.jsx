@@ -8,7 +8,7 @@ import RouteMap from "../../components/maps/RouteMap";
 import { useTrafficAlerts } from "../../components/maps/trafficAlerts";
 import { rememberMapboxTraffic, savedMapboxTraffic } from "../../components/maps/mapboxTraffic";
 import { LiveTrafficDialog, TrafficLegend } from "../../components/maps/TrafficControls";
-import { getDriverOverview, sendDriverLocation } from "../../services/transportService";
+import { getDriverOverview, getDriverTracker, sendDriverLocation } from "../../services/transportService";
 import { useBreakpoint } from "../../utils/useBreakpoint";
 
 const PING_INTERVAL_MS = 15000;
@@ -72,7 +72,10 @@ export default function DriverTrip() {
   const [error, setError] = useState("");
   const [direction, setDirection] = useState(() => (new Date().getHours() < 12 ? "morning" : "evening"));
   const [reached, setReached] = useState(() => loadProgress(new Date().getHours() < 12 ? "morning" : "evening"));
-  const [sharing, setSharing] = useState(false);
+  const [sharing, setSharing] = useState(false); // a trip is running
+  // Where the trip's position comes from: the driver's phone, or the bus's GPS tracker
+  // (tracker buses only; no location permission needed).
+  const [source, setSource] = useState("phone");
   const [position, setPosition] = useState(null);
   const [geoError, setGeoError] = useState("");
   const [live, setLive] = useState(null);       // last server reply + when it arrived
@@ -111,9 +114,18 @@ export default function DriverTrip() {
     setLive(null);
   };
 
-  // ── GPS watch + screen wake lock while sharing ─────────────────────────
+  const hasTracker = Boolean(data?.assignment?.bus?.has_tracker);
+
+  // "x s ago" labels refresh while a trip runs, whatever the source.
   useEffect(() => {
     if (!sharing) return undefined;
+    const tick = setInterval(() => setTick((n) => n + 1), 5000);
+    return () => clearInterval(tick);
+  }, [sharing]);
+
+  // ── GPS watch + screen wake lock while sharing the phone's location ─────
+  useEffect(() => {
+    if (!sharing || source !== "phone") return undefined;
     const watchId = navigator.geolocation.watchPosition(
       (pos) => {
         setGeoError("");
@@ -126,6 +138,13 @@ export default function DriverTrip() {
         });
       },
       (err) => {
+        // Blocked or no fix: a tracker bus keeps the trip going on its tracker.
+        if (hasTracker && err.code !== 3) {
+          setPosition(null);
+          setSource("tracker");
+          setGeoError("Your phone's location is not available, so the trip now follows the bus's GPS tracker.");
+          return;
+        }
         setGeoError(GEO_ERRORS[err.code] || "Location is unavailable right now.");
         if (err.code === 1) setSharing(false);
       },
@@ -134,13 +153,11 @@ export default function DriverTrip() {
     // Location stops when the screen sleeps, so keep it awake during the trip.
     let wakeLock = null;
     navigator.wakeLock?.request("screen").then((lock) => { wakeLock = lock; }).catch(() => {});
-    const tick = setInterval(() => setTick((n) => n + 1), 5000);
     return () => {
       navigator.geolocation.clearWatch(watchId);
       wakeLock?.release().catch(() => {});
-      clearInterval(tick);
     };
-  }, [sharing]);
+  }, [sharing, source, hasTracker]);
 
   // ── Send the latest fix every 15 s; server stores it and returns ETAs ───
   const positionRef = useRef(null);
@@ -148,9 +165,34 @@ export default function DriverTrip() {
   useEffect(() => { positionRef.current = position; }, [position]);
   useEffect(() => { remainingRef.current = remaining; }, [remaining]);
 
+  // Tracker trip: read the tracker's position and ETAs. Nothing is stored server-side.
+  const readTracker = useCallback(() => {
+    getDriverTracker(remainingRef.current.map((s) => s.route_stop_id))
+      .then((res) => {
+        const t = res.data;
+        setPosition({
+          lat: t.latitude, lng: t.longitude, accuracy: null,
+          speed: t.speed_kmh != null ? t.speed_kmh / 3.6 : null,
+          at: new Date(t.recorded_at).getTime(), fromTracker: true, isLive: t.is_live,
+        });
+        setLive({ ...t, at: Date.now() });
+        setSendError("");
+      })
+      .catch((err) => setSendError(
+        err.response?.data?.detail || "Could not reach the bus tracker. Trying again in a few seconds."
+      ));
+  }, []);
+
+  useEffect(() => {
+    if (!sharing || source !== "tracker") return undefined;
+    readTracker();
+    const id = setInterval(readTracker, PING_INTERVAL_MS);
+    return () => clearInterval(id);
+  }, [sharing, source, readTracker]);
+
   const sendFix = useCallback(() => {
     const fix = positionRef.current;
-    if (!fix) return;
+    if (!fix || fix.fromTracker) return;
     sendDriverLocation({
       latitude: fix.lat,
       longitude: fix.lng,
@@ -164,16 +206,21 @@ export default function DriverTrip() {
 
   const hasFix = Boolean(position);
   useEffect(() => {
-    if (!sharing || !hasFix) return undefined;
+    if (!sharing || source !== "phone" || !hasFix) return undefined;
     sendFix();
     const id = setInterval(sendFix, PING_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [sharing, hasFix, sendFix]);
+  }, [sharing, source, hasFix, sendFix]);
 
   // A stop was reached (or undone): refresh ETAs now instead of at the next tick.
+  // Only on a change to the stops, not when a trip starts (the polling above covers that).
+  const reachedRef = useRef(reached);
   useEffect(() => {
-    if (sharing) sendFix();
-  }, [reached, sharing, sendFix]);
+    if (reachedRef.current === reached) return;
+    reachedRef.current = reached;
+    if (!sharing) return;
+    if (source === "tracker") readTracker(); else sendFix();
+  }, [reached, sharing, source, sendFix, readTracker]);
 
   // Auto-arrive when the bus is within the radius of the next stop.
   useEffect(() => {
@@ -184,18 +231,34 @@ export default function DriverTrip() {
     }
   }, [position, nextStop, markReached]);
 
+  // A tracker bus starts on its tracker (no location prompt); other buses need the phone.
   const startTrip = () => {
-    if (!("geolocation" in navigator)) {
+    const phoneCanShare = "geolocation" in navigator;
+    if (!hasTracker && !phoneCanShare) {
       setGeoError("This browser cannot share location. Open the portal in Chrome or Safari on your phone.");
       return;
     }
     setPosition(null);
     setGeoError("");
     setSendError("");
+    setSource(hasTracker ? "tracker" : "phone");
     setSharing(true);
   };
 
-  const stopTrip = () => { setSharing(false); setLive(null); };
+  // Tracker buses can switch between the tracker and the phone during a trip.
+  const switchSource = (next) => {
+    if (next === "phone" && !("geolocation" in navigator)) {
+      setGeoError("This browser cannot share location, so the trip stays on the bus tracker.");
+      return;
+    }
+    setPosition(null);
+    setLive(null);
+    setGeoError("");
+    setSendError("");
+    setSource(next);
+  };
+
+  const stopTrip = () => { setSharing(false); setLive(null); setPosition(null); };
 
   // ── Render ──────────────────────────────────────────────────────────────
   if (error) return (
@@ -274,10 +337,23 @@ export default function DriverTrip() {
             width: 7, height: 7, borderRadius: "50%", flexShrink: 0,
             background: sharing ? (position ? colors.successDot : colors.warningDot) : colors.borderMid,
           }} />
-          {!sharing && "Location sharing is off. Start the trip when the bus leaves."}
-          {sharing && !position && "Finding your location…"}
-          {sharing && position && `Sharing location · sent ${live ? ago(live.at) : "shortly"} · keep this page open while driving`}
+          {!sharing && (hasTracker
+            ? "This bus has a GPS tracker, so the trip runs without your phone's location. Start it when the bus leaves."
+            : "Location sharing is off. Start the trip when the bus leaves.")}
+          {sharing && source === "phone" && !position && "Finding your location…"}
+          {sharing && source === "phone" && position && `Sharing location · sent ${live ? ago(live.at) : "shortly"} · keep this page open while driving`}
+          {sharing && source === "tracker" && !position && "Reading the bus tracker…"}
+          {sharing && source === "tracker" && position && `Following the bus tracker · position from ${ago(position.at)}${position.isLive === false ? " (the tracker has not reported recently)" : ""}`}
         </p>
+        {sharing && hasTracker && (
+          <button
+            type="button"
+            onClick={() => switchSource(source === "tracker" ? "phone" : "tracker")}
+            style={{ ...btn.ghost, marginTop: 10, padding: "7px 12px", fontSize: 12.5 }}
+          >
+            {source === "tracker" ? "Use my phone's GPS instead" : "Use the bus tracker instead"}
+          </button>
+        )}
       </ContentCard>
 
       {geoError && <Banner variant={sharing ? "warning" : "danger"}>{geoError}</Banner>}
@@ -304,9 +380,9 @@ export default function DriverTrip() {
         <Readout label="Speed" value={speedKmh != null ? `${speedKmh} km/h` : "—"} />
         <Readout
           label="GPS"
-          value={position ? `±${Math.round(position.accuracy)} m` : "Off"}
+          value={position?.fromTracker ? "Bus tracker" : position ? `±${Math.round(position.accuracy)} m` : "Off"}
           sub={!position && lastPing ? `Last seen ${ago(new Date(lastPing.recorded_at).getTime())}` : undefined}
-          tone={position && position.accuracy > 100 ? colors.warningText : undefined}
+          tone={position && !position.fromTracker && position.accuracy > 100 ? colors.warningText : undefined}
         />
       </div>
 
