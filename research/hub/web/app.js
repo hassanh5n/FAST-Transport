@@ -163,7 +163,13 @@ function bindExports(root) {
 }
 
 function expVerdicts(e) {
-  const v = (e.summary || {}).verdict || {};
+  const s = e.summary || {}, v = s.verdict || {};
+  if (e.kind === 'query-budget') {
+    const t = s.thresholds || {};
+    return verdictChip(v.gap, `Gap at ${t.primary || 'K=10'}`, v.complete) + ' ' +
+      verdictChip(v.feasibility, `Nobody over 90 min (K ≥ ${t.feasible_from_k ?? 10})`, v.complete);
+  }
+  if (e.kind !== 'budget') return '';
   const T = D.thresholds;
   return verdictChip(v.gap, `Gap at ${T.gap_budget_s} s`, v.complete) + ' ' + verdictChip(v.memory, 'Memory', v.complete);
 }
@@ -313,8 +319,9 @@ function repeatSpread(rows, best) {
 
 function genericExperiment(e, s, p) {
   const rows = s.rows || [];
+  const verdicts = expVerdicts(e);
   const cols = [...new Set(rows.flatMap(r => Object.keys(r).filter(k => r[k] === null || typeof r[k] !== 'object')))].slice(0, 10);
-  return `<div class="tiles">${tile('Progress', `${p.done} / ${p.total}`, leftText(p).replace(' · ', ''))}
+  return `${verdicts ? `<p>${verdicts}</p>` : ''}<div class="tiles">${tile('Progress', `${p.done} / ${p.total}`, leftText(p).replace(' · ', ''))}
       ${tile('Runs ok', rows.filter(r => r.status === 'ok').length, `${rows.filter(r => r.status && r.status !== 'ok').length} not ok`)}</div>
     <div class="card"><div class="spread"><h2>Every run</h2>${tableTools('allruns', `${e.id}-runs`)}</div>
     ${rows.length ? `<div class="tbl-wrap"><table id="allruns"><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr>

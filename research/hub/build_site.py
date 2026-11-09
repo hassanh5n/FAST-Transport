@@ -19,6 +19,7 @@ RESEARCH = HUB.parent
 WEB = HUB / "web"
 sys.path.insert(0, str(RESEARCH))
 import run_budget  # noqa: E402  (stdlib only at import time)
+import run_query_budget  # noqa: E402  (stdlib only at import time)
 
 def load_experiments():
     """The experiments the hub knows, from hub/experiments.json.
@@ -124,7 +125,12 @@ def build(out, git_info=None):
         d = RESEARCH / exp["dir"]
         summary = None
         if (d / "runs.jsonl").exists():
-            summary = run_budget.build_summary(d) if exp.get("kind") == "budget" else generic_summary(d, exp)
+            if exp.get("kind") == "budget":
+                summary = run_budget.build_summary(d)
+            elif exp.get("kind") == "query-budget":
+                summary = run_query_budget.build_summary(d)
+            else:
+                summary = generic_summary(d, exp)
         rows = {r["key"]: r for r in (summary or {}).get("rows", [])}
         for f in sorted((d / "runs").glob("*.json")) if (d / "runs").exists() else []:
             report = read_json(f)
