@@ -605,6 +605,7 @@ function renderControl() {
   $('#pub').innerHTML = `<p style="margin-top:0">${git.changes ? `<strong>${plural(git.changes, 'research change')}</strong> not published yet.` : 'Everything in research/ is saved to git.'}
     ${git.ahead ? ` ${plural(git.ahead, 'commit')} waiting to be pushed.` : ''}</p>
     <p class="muted">Publishing saves research/ to git (only that folder) and pushes it. The shared page updates a minute or two later${git.pages_url ? `: <a href="${esc(git.pages_url)}" target="_blank" rel="noopener">${esc(git.pages_url)}</a>` : ''}.</p>
+    ${git.error ? `<p class="msg bad-t">${esc(git.error)}</p>` : ''}
     ${git.branch && git.branch !== 'main' ? `<p class="msg bad-t">You are on branch ${esc(git.branch)}. The shared page only updates from main.</p>` : ''}
     <button class="btn primary" id="pubbtn" ${running || (!git.changes && !git.ahead) ? 'disabled' : ''}>Publish results</button><div id="pubmsg" class="msg"></div>`;
   const pb = $('#pubbtn');

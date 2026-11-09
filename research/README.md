@@ -46,6 +46,7 @@ when the plan changes). Everything below is what the hub runs for you, for refer
 | `data/matrix_fall2026_v1.json` | Travel times and distances, campus plus every stop, per contractor |
 | `optimize.py` | OR-Tools optimizer: plans all-stop routes and scores them against the current routes |
 | `run_budget.py` | Time-budget experiment: optimizer under free-tier limits vs no limits |
+| `run_query_budget.py` | Query-budget experiment: K nearest real travel times, the rest estimated |
 | `results/` | Run reports (`opt-*.json/html`); `results/budget/` holds the time-budget experiment |
 | `literature/` | Literature notes |
 
@@ -135,6 +136,23 @@ cd $REPO
 - Output: `results/budget/summary.html` (chart and table) and `summary.json`; per-run JSON and logs.
 - Pass/fail thresholds are fixed in `run_budget.py` and LOGBOOK (2026-11-04) before any run.
 - Keep the laptop plugged in, stop Windows from sleeping, and run nothing heavy alongside.
+
+## Query-budget experiment
+
+How few real travel-time queries still give good routes? Each run "queries" only each stop's leg to
+campus and its K nearest stops (K = 0, 3, 5, 10, 20, 40), estimates the rest (straight-line fit, or
+shortest path through the queried legs), plans on that matrix and scores the plan on the full OSRM
+matrix. The full matrix is the control. 72 runs, 60 s each, about 40 minutes with `--workers 2`.
+No limits and no OSRM needed: it uses the saved matrices.
+
+```bash
+cd $REPO
+~/fc-research-venv/bin/python research/run_query_budget.py --quick --workers 2   # about 20 s pipeline test
+~/fc-research-venv/bin/python research/run_query_budget.py --workers 2           # the real run, resumable
+~/fc-research-venv/bin/python research/run_query_budget.py --summarize           # print the results table
+```
+
+Thresholds are fixed in `run_query_budget.py` and LOGBOOK (2026-11-09) before the runs.
 
 ## Build the Karachi road network, once (about 10 to 20 minutes)
 

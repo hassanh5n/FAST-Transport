@@ -46,7 +46,8 @@ def generic_summary(d, exp):
     meta = read_json(d / "meta.json") if (d / "meta.json").exists() else {}
     rows = sorted(latest.values(), key=lambda r: r.get("started_at", ""))
     total = meta.get("runs_total") or exp.get("runs_total") or len(rows)
-    return {"meta": meta, "rows": rows, "runs_done": len(rows), "runs_total": total, "verdict": {}}
+    ok = sum(r.get("status") == "ok" for r in rows)       # failed runs are rerun on Resume, so they are not done
+    return {"meta": meta, "rows": rows, "runs_done": ok, "runs_failed": len(rows) - ok, "runs_total": total, "verdict": {}}
 
 
 def read_json(path):

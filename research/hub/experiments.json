@@ -6,10 +6,30 @@
   "main": true,
   "dir": "results/budget",
   "script": "research/run_budget.py",
-  "args": ["--code-version", "{code_version}"],
+  "args": [
+   "--code-version",
+   "{code_version}"
+  ],
   "runs_total": 50,
   "question": "On a free-tier server (512 MB, no swap, 0.1 CPU), how close does the optimizer get to the best known plan, and how fast?",
   "design": "Each contractor solved at 10, 60, 300 and 600 s, 3 repeats, limited and unlimited, plus one 30-minute unlimited reference. 50 runs, about 4.5 hours. Limits applied with systemd cgroups in WSL."
+ },
+ {
+  "id": "query-budget",
+  "title": "Query-budget experiment",
+  "kind": "query-budget",
+  "main": true,
+  "dir": "results/query-budget",
+  "script": "research/run_query_budget.py",
+  "args": [
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 72,
+  "question": "How few real travel-time queries (each stop's K nearest stops plus its leg to campus, the rest estimated) still give routes within 3% of the full matrix?",
+  "design": "K = 0, 3, 5, 10, 20, 40 with two estimators (straight-line fit, shortest path through queried legs) plus the full matrix as control; 2 contractors, 3 repeats, 60 s unlimited search. Plans are scored on real OSRM times. 72 runs, about 40 minutes on 2 cores."
  },
  {
   "id": "time-budget-quick",
@@ -18,9 +38,31 @@
   "main": false,
   "dir": "results/budget-quick",
   "script": "research/run_budget.py",
-  "args": ["--quick", "--code-version", "{code_version}"],
+  "args": [
+   "--quick",
+   "--code-version",
+   "{code_version}"
+  ],
   "runs_total": 6,
   "question": "Does the whole experiment pipeline work? 5 s runs, about 1 minute. Not a reported result.",
   "design": "One 5 s run per contractor and setup, plus a 10 s reference."
+ },
+ {
+  "id": "query-budget-quick",
+  "title": "Query-budget pipeline test",
+  "kind": "query-budget",
+  "main": false,
+  "dir": "results/query-budget-quick",
+  "script": "research/run_query_budget.py",
+  "args": [
+   "--quick",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 6,
+  "question": "Does the query-budget pipeline work? 5 s runs, about 20 seconds. Not a reported result.",
+  "design": "K = 10 with both estimators plus the full matrix, 1 repeat."
  }
 ]

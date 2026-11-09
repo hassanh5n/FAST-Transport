@@ -14,7 +14,10 @@
      "title": "Optimization",
      "question": "Can all-stop routes be built from a travel-time matrix within free-tier CPU and memory limits, and how do they compare with the current hand-made routes?",
      "status": "in progress",
-     "experiments": ["time-budget"]
+     "experiments": [
+      "time-budget",
+      "query-budget"
+     ]
     },
     {
      "title": "Rerouting",
@@ -57,7 +60,9 @@
   }
  ],
  "next_steps": [
+  "Write the optimization chapter from LOGBOOK runs B1 and Q1.",
   "Confirm with the supervisor that the new rerouting question replaces the old SQ1/SQ2 wording in the proposal.",
+  "Road-block test: set a road's speed to 0 in OSRM and time the re-customize (needs Docker).",
   "Build the rerouting pieces: walking graph, covering-path solver, H3 corridor pruning."
  ]
 }

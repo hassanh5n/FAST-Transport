@@ -1,0 +1,23 @@
+{
+ "started_at": "2026-11-09T13:15:39+00:00",
+ "machine": {
+  "host": "DESKTOP-5AQQKU3",
+  "kernel": "6.18.33.2-microsoft-standard-WSL2",
+  "python": "3.14.4",
+  "cpus": 4,
+  "cpu": "Intel(R) Core(TM) i5-4310U CPU @ 2.00GHz",
+  "ortools": "9.15.6755"
+ },
+ "setup": "unlimited",
+ "budget_s": 5,
+ "ks": [
+  10
+ ],
+ "estimators": [
+  "crowfly",
+  "graph"
+ ],
+ "repeats": 1,
+ "workers": 2,
+ "code_version": "190deb9f99b52e5060c55804d11b910658fbfd1a-dirty"
+}
