@@ -20,6 +20,7 @@ WEB = HUB / "web"
 sys.path.insert(0, str(RESEARCH))
 import run_budget  # noqa: E402  (stdlib only at import time)
 import run_query_budget  # noqa: E402  (stdlib only at import time)
+import run_robustness  # noqa: E402  (stdlib only at import time)
 
 def load_experiments():
     """The experiments the hub knows, from hub/experiments.json.
@@ -33,6 +34,7 @@ def load_experiments():
     - finished runs are skipped on the next start, so Resume works;
     - runs in optimize.py's JSON format may be saved as <dir>/runs/<key>.json to appear under Runs.
     kind "budget" gets the time-budget charts; any other kind gets a progress bar and a table of runs.
+    A summary may carry "chips": [{"label", "result": "pass" | "fail" | None}], shown as pass/fail badges.
     """
     return json.loads((HUB / "experiments.json").read_text(encoding="utf-8"))
 
@@ -129,6 +131,8 @@ def build(out, git_info=None):
                 summary = run_budget.build_summary(d)
             elif exp.get("kind") == "query-budget":
                 summary = run_query_budget.build_summary(d)
+            elif exp.get("kind") == "robustness":
+                summary = run_robustness.build_summary(d)
             else:
                 summary = generic_summary(d, exp)
         rows = {r["key"]: r for r in (summary or {}).get("rows", [])}

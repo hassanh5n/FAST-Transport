@@ -64,5 +64,79 @@
   "runs_total": 6,
   "question": "Does the query-budget pipeline work? 5 s runs, about 20 seconds. Not a reported result.",
   "design": "K = 10 with both estimators plus the full matrix, 1 repeat."
+ },
+ {
+  "id": "traffic-check",
+  "title": "Traffic check",
+  "kind": "robustness",
+  "main": true,
+  "dir": "results/traffic-check",
+  "script": "research/run_robustness.py",
+  "args": [
+   "traffic",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 18,
+  "question": "If every travel time is 1.3 or 1.5 times longer (morning traffic), can the optimizer still keep every student under 90 minutes, and does it still beat the current routes?",
+  "design": "Travel times x1.0 (control), x1.3 and x1.5, stop times unchanged. Each contractor planned and scored on the scaled times, 3 repeats, 60 s unlimited. 18 runs, about 10 minutes. Judged at x1.5 on the worst run."
+ },
+ {
+  "id": "seed-check",
+  "title": "Seed check",
+  "kind": "robustness",
+  "main": true,
+  "dir": "results/seed-check",
+  "script": "research/run_robustness.py",
+  "args": [
+   "seed",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 8,
+  "question": "With the synthetic students redrawn from other seeds, is the improvement over the current routes still there?",
+  "design": "Seed 2026 (the frozen dataset, control) plus students redrawn with seeds 2027, 2028 and 2029; same stops, routes, buses and travel times. One 60 s unlimited run per contractor and seed. 8 runs, about 5 minutes. Judged on the new seeds, worst run."
+ },
+ {
+  "id": "traffic-check-quick",
+  "title": "Traffic check pipeline test",
+  "kind": "robustness",
+  "main": false,
+  "dir": "results/traffic-check-quick",
+  "script": "research/run_robustness.py",
+  "args": [
+   "traffic",
+   "--quick",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 4,
+  "question": "Does the traffic-check pipeline work? 5 s runs, about 15 seconds. Not a reported result.",
+  "design": "x1.0 and x1.5 only, 1 repeat."
+ },
+ {
+  "id": "seed-check-quick",
+  "title": "Seed check pipeline test",
+  "kind": "robustness",
+  "main": false,
+  "dir": "results/seed-check-quick",
+  "script": "research/run_robustness.py",
+  "args": [
+   "seed",
+   "--quick",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 4,
+  "question": "Does the seed-check pipeline work? 5 s runs, about 15 seconds. Not a reported result.",
+  "design": "Seeds 2026 and 2027 only."
  }
 ]

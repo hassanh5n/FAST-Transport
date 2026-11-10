@@ -169,6 +169,7 @@ function expVerdicts(e) {
     return verdictChip(v.gap, `Gap at ${t.primary || 'K=10'}`, v.complete) + ' ' +
       verdictChip(v.feasibility, `Nobody over 90 min (K ≥ ${t.feasible_from_k ?? 10})`, v.complete);
   }
+  if (s.chips) return s.chips.map(c => verdictChip(c.result, c.label, v.complete)).join(' ');
   if (e.kind !== 'budget') return '';
   const T = D.thresholds;
   return verdictChip(v.gap, `Gap at ${T.gap_budget_s} s`, v.complete) + ' ' + verdictChip(v.memory, 'Memory', v.complete);

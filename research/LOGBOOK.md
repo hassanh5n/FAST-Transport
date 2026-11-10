@@ -287,3 +287,87 @@ Logged 2026-11-04 from the result file; machine not recorded, not resource-limit
   queries again when stops change. Query counts are cells; how they map to API calls depends on the provider.
 
 **Optimization part of FYP-1: both experiments done.** Next: road-block test (OSRM, Docker), then rerouting.
+
+## 2026-11-10: Plan review after the optimization experiments
+
+Plan changes only; no runs. The hub's plan (`hub/project.json`) is updated to match.
+
+- **Open decisions closed.** The three items under "Open decisions" above (maximum ride time, objective, stop time)
+  were all decided on 2026-11-03 ("Optimizer model fixed"). Nothing is open there.
+- **Rerouting wording.** The rerouting question is now "keep, skip, or let students walk to a nearby point", which
+  replaces "keep, skip or merge" from 2026-10-21. Still to be confirmed with the supervisor against the proposal.
+- **Rerouting scope for FYP-1:** morning runs to campus only, one bus rerouted at a time. Evening runs differ
+  (students walk home after dark) and are out of scope for now.
+- **Standard search budget: 300 s** for planning runs from now on; 60 s is the minimum. Reason: in B1 Jadoon passed
+  at 60 s limited with a worst repeat of 4.6% against a 5% threshold.
+- **Judging rule for future experiments:** thresholds are checked on the worst repeat as well as the median.
+  B1 and Q1 keep the rules they were run under.
+- **Pre-registration rule:** the logbook entry with the pass/fail rule is pushed before the first run. For Q1 the
+  thresholds, script and results reached git in one commit (`9ed6a89`), so git history cannot show the order.
+- **Solver time limit is wall-clock time.** The literature note left open whether the OR-Tools time limit counts
+  wall or CPU time under a CPU cap. B1 answers it: 600 s limited gave the same plans as 60 s unlimited, so the
+  limit is wall-clock.
+- **Two robustness checks added to the optimization part** (re-runs on existing data, thresholds to be fixed in
+  their own entries before running):
+  - Traffic check: scale every travel time by 1.3 to 1.5 and re-score and re-plan; does the 90-minute limit hold?
+  - Seed check: redraw the synthetic students with two or three other seeds; is the improvement still about 20%?
+- **Rerouting evaluation, to be fixed before any rerouting run:**
+  - A frozen set of road-closure scenarios on or near shuttle routes (random closures on roads no shuttle uses make
+    every method look perfect), including the 24 Feb 2024 Shahrah-e-Faisal protest closure and University Road ponding.
+  - Baselines: the published route with the blocked leg patched by a detour, and an oracle (exact solve, no time limit).
+  - Scores: delay against the oracle, students asked to walk, extra walking distance per affected student.
+  - The road-block test also covers slowed roads (partial speed reduction), not only full blocks.
+- **Q1 carried into the rerouting design:** after a block, re-query only nearest-neighbour travel times and estimate
+  the rest, erring high (overestimate, do not underestimate).
+- Not done yet: owners and target dates for each next step; a hub warning when git is missing so runs are not
+  recorded with code version `unknown`.
+
+## 2026-11-10: Rerouting question confirmed
+
+- The supervisor confirmed the rerouting question: "When a road is blocked, which road and which stops (keep, skip, or
+  let students walk to a nearby point) give the lowest student delay, within the same limits?" It replaces the old
+  SQ1/SQ2 wording in the proposal. Reported by the team on 2026-11-10.
+- This supersedes "Still to be confirmed with the supervisor" in the plan-review entry above. The step is removed
+  from the hub's next steps.
+
+## 2026-11-10: Traffic check and seed check planned (fixed before any run)
+
+Two robustness checks on the optimization results (runs B1 and Q1), both in `run_robustness.py`, both re-runs on the
+saved data: no OSRM, no limits. Search 60 s unlimited per run (B1: 60 s unlimited = 600 s at 0.1 CPU in plan quality).
+
+**Traffic check** (`run_robustness.py traffic`, `results/traffic-check/`)
+
+- Question: the matrix holds free-flow times. If real morning times are 1.3 or 1.5 times longer, can the optimizer
+  still keep every student under 90 minutes, and does it still beat the current routes?
+- Design: every travel time multiplied by 1.0 (control), 1.3 and 1.5; stop times unchanged. Each run plans on the
+  scaled matrix and is scored on the same matrix; the current routes are scored the same way. 3 factors x 2 contractors
+  x 3 repeats = 18 runs.
+- Also recorded, not judged: the control run's plan (made on free-flow times) re-scored at 1.3 and 1.5, to show what
+  a plan made without traffic does in traffic.
+- **Thresholds, fixed now, judged at x1.5 on the worst run:** (1) every x1.5 run is at least 15% below the current
+  routes in total student ride time, both contractors; (2) no x1.5 run drops a stop or has a student over 90 minutes.
+
+**Seed check** (`run_robustness.py seed`, `results/seed-check/`)
+
+- Question: students are synthetic (seed 2026). Is the improvement over the current routes specific to that draw?
+- Design: seed 2026 is the frozen dataset (control). For seeds 2027, 2028 and 2029 the students are redrawn with the
+  rule from run D1 (each current route's bus filled to 65 to 90 percent, log-normal stop weights with sigma 0.6, at
+  least one student per stop), over the frozen current routes in the order they are stored. Stops, routes, buses and
+  travel times do not change, and the frozen dataset files are not rewritten. One run per contractor and seed: 8 runs.
+  The redraw uses its own random stream per contractor, so it is the same rule as D1 but not the same code path;
+  seed 2026 is therefore read from the frozen file, not redrawn.
+- **Thresholds, fixed now, judged on the three new seeds, worst run:** (1) every run is at least 15% below the current
+  routes for the same students, both contractors; (2) no run drops a stop or has a student over 90 minutes.
+
+**Notes**
+
+- 15% chosen because B1 found 21.8% (Jadoon) and 20.5% (Nadeem) on the frozen data; a result that falls below 15%
+  under traffic or another draw would mean the headline figure does not carry.
+- Before this entry the script was tested end to end with a stand-in for the solver that returns the current routes
+  (no optimizer run, files written outside `results/`). That test showed current-route scores only: on scaled times
+  the current routes themselves have rides over 90 minutes (Jadoon from x1.3, longest 97 min; both contractors at
+  x1.5, longest 110 and 91 min). No optimized plan had been produced or seen when the thresholds were set.
+- Hub: both checks are in `hub/experiments.json` with a pipeline test each (`--quick`, 5 s runs, separate folders,
+  not reported results).
+- Caveats: a single multiplier is not real traffic (it slows every road equally); the redraw varies who boards
+  where, not the stops or routes.

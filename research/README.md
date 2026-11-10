@@ -30,7 +30,7 @@ when the plan changes). Everything below is what the hub runs for you, for refer
 | Phase | Question |
 | --- | --- |
 | FYP-1 | **Optimization:** can all-stop routes be built from a travel-time matrix within free-tier CPU and query limits, and how do they compare with the current hand-made routes? |
-| FYP-1 | **Rerouting:** when a road is blocked, which road and which stops (keep, skip, merge) give the lowest student delay? |
+| FYP-1 | **Rerouting:** when a road is blocked, which road and which stops (keep, skip, or let students walk to a nearby point) give the lowest student delay? Morning runs, one bus at a time. |
 | FYP-2 | **Context:** how much real incidents slow shuttle routes, recorded on an H3 grid. |
 | FYP-2 | **Prediction:** whether that context predicts travel times better than the timetable and the router. |
 
@@ -47,6 +47,7 @@ when the plan changes). Everything below is what the hub runs for you, for refer
 | `optimize.py` | OR-Tools optimizer: plans all-stop routes and scores them against the current routes |
 | `run_budget.py` | Time-budget experiment: optimizer under free-tier limits vs no limits |
 | `run_query_budget.py` | Query-budget experiment: K nearest real travel times, the rest estimated |
+| `run_robustness.py` | Traffic check and seed check on the optimization results |
 | `results/` | Run reports (`opt-*.json/html`); `results/budget/` holds the time-budget experiment |
 | `literature/` | Literature notes |
 
@@ -153,6 +154,21 @@ cd $REPO
 ```
 
 Thresholds are fixed in `run_query_budget.py` and LOGBOOK (2026-11-09) before the runs.
+
+## Traffic check and seed check
+
+Two short checks on the optimization results, both re-runs on the saved data (no limits, no OSRM).
+The traffic check multiplies every travel time by 1.0, 1.3 and 1.5 and plans again (18 runs, about
+10 minutes). The seed check redraws the synthetic students with three other seeds (8 runs, about 5 minutes).
+
+```bash
+cd $REPO
+~/fc-research-venv/bin/python research/run_robustness.py traffic --quick --workers 2   # pipeline test
+~/fc-research-venv/bin/python research/run_robustness.py traffic --workers 2           # the real run, resumable
+~/fc-research-venv/bin/python research/run_robustness.py seed --workers 2
+```
+
+Thresholds are fixed in `run_robustness.py` and LOGBOOK (2026-11-10) before the runs.
 
 ## Build the Karachi road network, once (about 10 to 20 minutes)
 
