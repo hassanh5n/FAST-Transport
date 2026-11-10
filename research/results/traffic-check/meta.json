@@ -1,0 +1,28 @@
+{
+ "started_at": "2026-11-10T18:13:44+00:00",
+ "machine": {
+  "host": "DESKTOP-15B12RB",
+  "kernel": "6.18.54.1-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "cpus": 4,
+  "cpu": "Intel(R) Core(TM) i5-7300U CPU @ 2.60GHz",
+  "ortools": "9.15.6755"
+ },
+ "check": "traffic",
+ "quick": false,
+ "setup": "unlimited",
+ "budget_s": 60,
+ "workers": 2,
+ "factors": [
+  1.0,
+  1.3,
+  1.5
+ ],
+ "seeds": [
+  2026,
+  2027,
+  2028,
+  2029
+ ],
+ "code_version": "9b9633951df7f10db81f6ffd3cccd7565bdf4cc3"
+}
