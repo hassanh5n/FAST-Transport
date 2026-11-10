@@ -1,0 +1,241 @@
+{
+ "generated_at": "2026-11-10T18:28:32+00:00",
+ "meta": {
+  "started_at": "2026-11-10T18:28:19+00:00",
+  "machine": {
+   "host": "DESKTOP-15B12RB",
+   "kernel": "6.18.54.1-microsoft-standard-WSL2",
+   "python": "3.12.3",
+   "cpus": 4,
+   "cpu": "Intel(R) Core(TM) i5-7300U CPU @ 2.60GHz",
+   "ortools": "9.15.6755"
+  },
+  "check": "traffic",
+  "quick": true,
+  "setup": "unlimited",
+  "budget_s": 5,
+  "workers": 2,
+  "factors": [
+   1.0,
+   1.3,
+   1.5
+  ],
+  "seeds": [
+   2026,
+   2027,
+   2028,
+   2029
+  ],
+  "code_version": "a467aea7c8903ba94f97cfefa98b6467497068bd"
+ },
+ "check": "traffic",
+ "thresholds": {
+  "judged": "x1.5 traffic",
+  "min_improvement_pct": 15.0,
+  "feasibility": "no dropped stop and no student over 90 min",
+  "rule": "worst run"
+ },
+ "cells": [
+  {
+   "contractor": "Jadoon",
+   "setup": "traffic x1.0",
+   "runs": 1,
+   "judged": false,
+   "current_routes_ride_min": 40200,
+   "current_routes_over_90": 0,
+   "ride_min": 36366,
+   "improvement_pct": 9.54,
+   "worst_improvement_pct": 9.54,
+   "longest_ride_min": 89.9,
+   "runs_over_90": 0,
+   "runs_with_dropped_stops": 0
+  },
+  {
+   "contractor": "Jadoon",
+   "setup": "traffic x1.5",
+   "runs": 1,
+   "judged": true,
+   "current_routes_ride_min": 57256,
+   "current_routes_over_90": 8,
+   "ride_min": 49924,
+   "improvement_pct": 12.81,
+   "worst_improvement_pct": 12.81,
+   "longest_ride_min": 90.0,
+   "runs_over_90": 0,
+   "runs_with_dropped_stops": 0
+  },
+  {
+   "contractor": "Nadeem",
+   "setup": "traffic x1.0",
+   "runs": 1,
+   "judged": false,
+   "current_routes_ride_min": 37281,
+   "current_routes_over_90": 0,
+   "ride_min": 33758,
+   "improvement_pct": 9.45,
+   "worst_improvement_pct": 9.45,
+   "longest_ride_min": 89.8,
+   "runs_over_90": 0,
+   "runs_with_dropped_stops": 0
+  },
+  {
+   "contractor": "Nadeem",
+   "setup": "traffic x1.5",
+   "runs": 1,
+   "judged": true,
+   "current_routes_ride_min": 53180,
+   "current_routes_over_90": 2,
+   "ride_min": 46017,
+   "improvement_pct": 13.47,
+   "worst_improvement_pct": 13.47,
+   "longest_ride_min": 89.5,
+   "runs_over_90": 0,
+   "runs_with_dropped_stops": 0
+  }
+ ],
+ "verdict": {
+  "improvement": "fail",
+  "feasibility": "pass",
+  "complete": true
+ },
+ "chips": [
+  {
+   "label": "At least 15% better than current routes (x1.5 traffic)",
+   "result": "fail"
+  },
+  {
+   "label": "Nobody over 90 min, no stop dropped (x1.5 traffic)",
+   "result": "pass"
+  }
+ ],
+ "runs_done": 4,
+ "runs_total": 4,
+ "runs_failed": 0,
+ "remaining_s": 0,
+ "rows": [
+  {
+   "key": "Jadoon-x1.0-r1",
+   "setup": "traffic x1.0",
+   "status": "ok",
+   "students": 906,
+   "baseline_total_student_ride_min": 40200,
+   "total_student_ride_min": 36366,
+   "improvement_pct": 9.54,
+   "longest_ride_min": 89.9,
+   "stops_over_90_min": 0,
+   "dropped_stops": 0,
+   "check": "traffic",
+   "contractor": "Jadoon",
+   "factor": 1.0,
+   "seed": 2026,
+   "repeat": 1,
+   "started_at": "2026-11-10T18:28:22+00:00",
+   "budget_s": 5,
+   "solve_wall_s": 5.1,
+   "solve_cpu_s": 5.0,
+   "baseline_longest_ride_min": 78.7,
+   "baseline_stops_over_90_min": 0,
+   "buses_used": 27,
+   "freeflow_plan_x1.3": {
+    "total_student_ride_min": 45773,
+    "longest_ride_min": 112.2,
+    "stops_over_90_min": 12,
+    "improvement_pct": 9.24
+   },
+   "freeflow_plan_x1.5": {
+    "total_student_ride_min": 52043,
+    "longest_ride_min": 127.2,
+    "stops_over_90_min": 21,
+    "improvement_pct": 9.1
+   },
+   "code_version": "a467aea7c8903ba94f97cfefa98b6467497068bd"
+  },
+  {
+   "key": "Jadoon-x1.5-r1",
+   "setup": "traffic x1.5",
+   "status": "ok",
+   "students": 906,
+   "baseline_total_student_ride_min": 57256,
+   "total_student_ride_min": 49924,
+   "improvement_pct": 12.81,
+   "longest_ride_min": 90.0,
+   "stops_over_90_min": 0,
+   "dropped_stops": 0,
+   "check": "traffic",
+   "contractor": "Jadoon",
+   "factor": 1.5,
+   "seed": 2026,
+   "repeat": 1,
+   "started_at": "2026-11-10T18:28:22+00:00",
+   "budget_s": 5,
+   "solve_wall_s": 5.1,
+   "solve_cpu_s": 5.0,
+   "baseline_longest_ride_min": 109.6,
+   "baseline_stops_over_90_min": 8,
+   "buses_used": 27,
+   "code_version": "a467aea7c8903ba94f97cfefa98b6467497068bd"
+  },
+  {
+   "key": "Nadeem-x1.0-r1",
+   "setup": "traffic x1.0",
+   "status": "ok",
+   "students": 900,
+   "baseline_total_student_ride_min": 37281,
+   "total_student_ride_min": 33758,
+   "improvement_pct": 9.45,
+   "longest_ride_min": 89.8,
+   "stops_over_90_min": 0,
+   "dropped_stops": 0,
+   "check": "traffic",
+   "contractor": "Nadeem",
+   "factor": 1.0,
+   "seed": 2026,
+   "repeat": 1,
+   "started_at": "2026-11-10T18:28:27+00:00",
+   "budget_s": 5,
+   "solve_wall_s": 5.0,
+   "solve_cpu_s": 5.0,
+   "baseline_longest_ride_min": 65.6,
+   "baseline_stops_over_90_min": 0,
+   "buses_used": 26,
+   "freeflow_plan_x1.3": {
+    "total_student_ride_min": 42572,
+    "longest_ride_min": 113.0,
+    "stops_over_90_min": 9,
+    "improvement_pct": 9.07
+   },
+   "freeflow_plan_x1.5": {
+    "total_student_ride_min": 48449,
+    "longest_ride_min": 128.6,
+    "stops_over_90_min": 17,
+    "improvement_pct": 8.9
+   },
+   "code_version": "a467aea7c8903ba94f97cfefa98b6467497068bd"
+  },
+  {
+   "key": "Nadeem-x1.5-r1",
+   "setup": "traffic x1.5",
+   "status": "ok",
+   "students": 900,
+   "baseline_total_student_ride_min": 53180,
+   "total_student_ride_min": 46017,
+   "improvement_pct": 13.47,
+   "longest_ride_min": 89.5,
+   "stops_over_90_min": 0,
+   "dropped_stops": 0,
+   "check": "traffic",
+   "contractor": "Nadeem",
+   "factor": 1.5,
+   "seed": 2026,
+   "repeat": 1,
+   "started_at": "2026-11-10T18:28:27+00:00",
+   "budget_s": 5,
+   "solve_wall_s": 5.0,
+   "solve_cpu_s": 5.0,
+   "baseline_longest_ride_min": 91.1,
+   "baseline_stops_over_90_min": 2,
+   "buses_used": 26,
+   "code_version": "a467aea7c8903ba94f97cfefa98b6467497068bd"
+  }
+ ]
+}
