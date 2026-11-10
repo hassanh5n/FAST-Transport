@@ -4,7 +4,8 @@
  "question": "Can good shuttle routes be planned, and re-planned when a road is blocked, within free-tier compute limits (512 MB RAM, 0.1 CPU)?",
  "caveats": [
   "Students are synthetic (bus loads 65 to 90 percent of capacity), not real registrations.",
-  "Travel times are free-flow OSRM times with no traffic; real morning times are higher."
+  "Travel times are free-flow OSRM times with no traffic; real morning times are higher.",
+  "Rerouting scope for FYP-1: morning runs to campus only, one bus rerouted at a time."
  ],
  "phases": [
   {
@@ -14,7 +15,12 @@
      "title": "Optimization",
      "question": "Can all-stop routes be built from a travel-time matrix within free-tier CPU and memory limits, and how do they compare with the current hand-made routes?",
      "status": "in progress",
-     "experiments": ["time-budget"]
+     "experiments": [
+      "time-budget",
+      "query-budget",
+      "traffic-check",
+      "seed-check"
+     ]
     },
     {
      "title": "Rerouting",
@@ -45,19 +51,24 @@
  "planned_experiments": [
   {
    "title": "Road-block test",
-   "question": "Does OSRM really route around a road when its speed is set to 0, and how long does re-customizing take?"
+   "question": "Does OSRM really route around a road when its speed is set to 0, does a slowed road (not fully blocked) work too, and how long does re-customizing take?"
   },
   {
    "title": "Walking-radius sweep",
-   "question": "For walking limits from 0 m (visit every stop) to 800 m, how many minutes does letting students walk to a nearby point save after a block?"
+   "question": "For walking limits from 0 m (visit every stop) to 800 m, how many minutes does letting students walk to a nearby point save after a block? Run on the frozen closure scenarios, against the patched published route (simplest fix) and the no-time-limit oracle."
   },
   {
    "title": "Must-serve stops",
-   "question": "How many minutes do must-stop rules (accessibility, unsafe walking after dark) add to a reroute?"
+   "question": "How many minutes do must-stop rules (accessibility, unsafe walking after dark) add to a reroute, on the same scenarios and baselines?"
   }
  ],
  "next_steps": [
-  "Confirm with the supervisor that the new rerouting question replaces the old SQ1/SQ2 wording in the proposal.",
-  "Build the rerouting pieces: walking graph, covering-path solver, H3 corridor pruning."
+  "Write the optimization chapter from LOGBOOK runs B1 and Q1. Standard search budget from now on: 300 s (60 s is the minimum).",
+  "Run the traffic check and the seed check from the hub (about 15 minutes together; rules fixed in LOGBOOK 2026-11-10) and add them to the chapter.",
+  "Freeze a set of road-closure scenarios on or near shuttle routes, including the Shahrah-e-Faisal protest closure and University Road flooding.",
+  "Fix the rerouting baselines and scores in the logbook before any run: patched published route, no-time-limit oracle; delay against the oracle, students asked to walk, extra walking distance.",
+  "Road-block test: set a road's speed to 0, and to a slow speed, in OSRM and time the re-customize (needs Docker).",
+  "Build the rerouting pieces: walking graph, covering-path solver, H3 corridor pruning. After a block, re-query only nearest-neighbour travel times and estimate the rest on the high side (run Q1).",
+  "For every new experiment: push the logbook entry with the pass/fail rule before the first run, and judge on the worst repeat as well as the median."
  ]
 }

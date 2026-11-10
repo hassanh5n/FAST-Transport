@@ -11,6 +11,7 @@ import argparse
 import ctypes
 import functools
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -70,10 +71,33 @@ def wsl(script, timeout=120):
         return 124, "WSL did not answer in time."
 
 
+def _git_candidates():
+    """git on PATH first, then the usual Git for Windows / Git Bash install folders (per-machine and per-user)."""
+    roots = [os.environ.get(v) for v in ("ProgramFiles", "ProgramFiles(x86)", "ProgramW6432")]
+    local = os.environ.get("LOCALAPPDATA")
+    if local:
+        roots.append(os.path.join(local, "Programs"))
+    roots += ["C:\\", "D:\\", "E:\\"]                          # Git installed at the top of a drive, e.g. D:\\Git
+    found = [os.path.join(r, "Git", sub, "git.exe") for r in roots if r for sub in ("cmd", "bin", "mingw64\\bin")]
+    extra = os.environ.get("FLEETCENTRIC_GIT")                 # set this if git lives somewhere else
+    return ([extra] if extra else []) + ["git"] + [f for f in found if os.path.exists(f)]
+
+
+GIT_CANDIDATES = _git_candidates()
+
+
 def git(*args, timeout=60):
-    r = subprocess.run(["git", "-C", str(REPO), *args], capture_output=True, text=True, timeout=timeout,
-                       creationflags=NO_WINDOW)
-    return r.returncode, (r.stdout + r.stderr).strip()
+    """Run git in the repo. Never raises: a missing git must not stop an experiment from starting."""
+    for exe in GIT_CANDIDATES:
+        try:
+            r = subprocess.run([exe, "-C", str(REPO), *args], capture_output=True, text=True, timeout=timeout,
+                               creationflags=NO_WINDOW)
+            return r.returncode, (r.stdout + r.stderr).strip()
+        except FileNotFoundError:
+            continue
+        except (OSError, subprocess.SubprocessError) as exc:
+            return 1, f"git failed: {exc}"
+    return 127, "git not found: install Git for Windows (git-scm.com) to publish."
 
 
 def code_version():
@@ -353,7 +377,9 @@ _publish_lock = threading.Lock()
 def git_status(force=False):
     if not force and _git_cache["value"] and time.time() - _git_cache["at"] < 10:
         return _git_cache["value"]
-    _, branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    rc, branch = git("rev-parse", "--abbrev-ref", "HEAD")
+    if rc == 127:                                   # git not installed: say so once, not as a branch name
+        return {"branch": None, "changes": 0, "ahead": 0, "pages_url": None, "error": branch}
     _, porcelain = git("status", "--porcelain", "--", "research")
     rc, ahead = git("rev-list", "--count", "@{u}..HEAD")
     info = {"branch": branch, "changes": len([l for l in porcelain.splitlines() if l.strip()]),

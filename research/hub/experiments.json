@@ -17,14 +17,19 @@
  {
   "id": "query-budget",
   "title": "Query-budget experiment",
-  "kind": "query",
+  "kind": "query-budget",
   "main": true,
-  "dir": "results/query",
-  "script": "research/run_query.py",
-  "args": [],
-  "runs_total": 30,
-  "question": "How few real travel-time lookups still give routes within 2% of the full-matrix plan?",
-  "design": "Real times only to each stop's K nearest stops (K = 5, 10, 20, 40, full), the rest estimated from straight-line distance. Free-tier limits, 300 s, 3 repeats per contractor: 30 runs, about 2.7 hours. Plans scored on the full real matrix."
+  "dir": "results/query-budget",
+  "script": "research/run_query_budget.py",
+  "args": [
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 72,
+  "question": "How few real travel-time queries (each stop's K nearest stops plus its leg to campus, the rest estimated) still give routes within 3% of the full matrix?",
+  "design": "K = 0, 3, 5, 10, 20, 40 with two estimators (straight-line fit, shortest path through queried legs) plus the full matrix as control; 2 contractors, 3 repeats, 60 s unlimited search. Plans are scored on real OSRM times. 72 runs, about 40 minutes on 2 cores."
  },
  {
   "id": "time-budget-quick",
@@ -44,16 +49,94 @@
  },
  {
   "id": "query-budget-quick",
-  "title": "Query pipeline test",
-  "kind": "query",
+  "title": "Query-budget pipeline test",
+  "kind": "query-budget",
   "main": false,
-  "dir": "results/query-quick",
-  "script": "research/run_query.py",
+  "dir": "results/query-budget-quick",
+  "script": "research/run_query_budget.py",
   "args": [
-   "--quick"
+   "--quick",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
   ],
-  "runs_total": 10,
-  "question": "Does the query-budget pipeline work? 10 s runs, about 3 minutes. Not a reported result.",
-  "design": "One 10 s run per K and contractor."
+  "runs_total": 6,
+  "question": "Does the query-budget pipeline work? 5 s runs, about 20 seconds. Not a reported result.",
+  "design": "K = 10 with both estimators plus the full matrix, 1 repeat."
+ },
+ {
+  "id": "traffic-check",
+  "title": "Traffic check",
+  "kind": "robustness",
+  "main": true,
+  "dir": "results/traffic-check",
+  "script": "research/run_robustness.py",
+  "args": [
+   "traffic",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 18,
+  "question": "If every travel time is 1.3 or 1.5 times longer (morning traffic), can the optimizer still keep every student under 90 minutes, and does it still beat the current routes?",
+  "design": "Travel times x1.0 (control), x1.3 and x1.5, stop times unchanged. Each contractor planned and scored on the scaled times, 3 repeats, 60 s unlimited. 18 runs, about 10 minutes. Judged at x1.5 on the worst run."
+ },
+ {
+  "id": "seed-check",
+  "title": "Seed check",
+  "kind": "robustness",
+  "main": true,
+  "dir": "results/seed-check",
+  "script": "research/run_robustness.py",
+  "args": [
+   "seed",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 8,
+  "question": "With the synthetic students redrawn from other seeds, is the improvement over the current routes still there?",
+  "design": "Seed 2026 (the frozen dataset, control) plus students redrawn with seeds 2027, 2028 and 2029; same stops, routes, buses and travel times. One 60 s unlimited run per contractor and seed. 8 runs, about 5 minutes. Judged on the new seeds, worst run."
+ },
+ {
+  "id": "traffic-check-quick",
+  "title": "Traffic check pipeline test",
+  "kind": "robustness",
+  "main": false,
+  "dir": "results/traffic-check-quick",
+  "script": "research/run_robustness.py",
+  "args": [
+   "traffic",
+   "--quick",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 4,
+  "question": "Does the traffic-check pipeline work? 5 s runs, about 15 seconds. Not a reported result.",
+  "design": "x1.0 and x1.5 only, 1 repeat."
+ },
+ {
+  "id": "seed-check-quick",
+  "title": "Seed check pipeline test",
+  "kind": "robustness",
+  "main": false,
+  "dir": "results/seed-check-quick",
+  "script": "research/run_robustness.py",
+  "args": [
+   "seed",
+   "--quick",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 4,
+  "question": "Does the seed-check pipeline work? 5 s runs, about 15 seconds. Not a reported result.",
+  "design": "Seeds 2026 and 2027 only."
  }
 ]

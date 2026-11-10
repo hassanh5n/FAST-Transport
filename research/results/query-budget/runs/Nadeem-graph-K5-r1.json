@@ -1,0 +1,1983 @@
+{
+ "run_id": "Nadeem-graph-K5-r1",
+ "instance": "fall2026-v1",
+ "time_limit_s": 60,
+ "model": {
+  "deadline": "08:00",
+  "max_ride_min": 90,
+  "stop_time": "60 s + 5 s/student",
+  "objective": "total student ride time, driving time as tie-breaker",
+  "matrix": "graph, K=5; scored on real times"
+ },
+ "contractors": {
+  "Nadeem": {
+   "baseline": {
+    "buses_used": 25,
+    "total_student_ride_min": 37280,
+    "mean_ride_min": 41.4,
+    "longest_ride_min": 65.6,
+    "stops_over_90_min": 0,
+    "bus_driving_min": 1025
+   },
+   "solve_wall_s": 60.0,
+   "solve_cpu_s": 60.0,
+   "peak_rss_mb": null,
+   "progress": [
+    [
+     0.25,
+     2790338
+    ],
+    [
+     0.27,
+     2789786
+    ],
+    [
+     0.29,
+     2785617
+    ],
+    [
+     0.3,
+     2783558
+    ],
+    [
+     0.32,
+     2782888
+    ],
+    [
+     0.32,
+     2775918
+    ],
+    [
+     0.35,
+     2761793
+    ],
+    [
+     0.38,
+     2755623
+    ],
+    [
+     0.4,
+     2753744
+    ],
+    [
+     0.42,
+     2742084
+    ],
+    [
+     0.43,
+     2732604
+    ],
+    [
+     0.45,
+     2724926
+    ],
+    [
+     0.48,
+     2722891
+    ],
+    [
+     0.48,
+     2721712
+    ],
+    [
+     0.5,
+     2721538
+    ],
+    [
+     0.53,
+     2721447
+    ],
+    [
+     0.55,
+     2714551
+    ],
+    [
+     0.56,
+     2712297
+    ],
+    [
+     0.57,
+     2707213
+    ],
+    [
+     0.58,
+     2706699
+    ],
+    [
+     0.61,
+     2704705
+    ],
+    [
+     0.61,
+     2699800
+    ],
+    [
+     0.62,
+     2697018
+    ],
+    [
+     0.62,
+     2696545
+    ],
+    [
+     0.64,
+     2695728
+    ],
+    [
+     0.64,
+     2693731
+    ],
+    [
+     0.65,
+     2690726
+    ],
+    [
+     0.67,
+     2683930
+    ],
+    [
+     0.68,
+     2681480
+    ],
+    [
+     0.7,
+     2679796
+    ],
+    [
+     0.71,
+     2670072
+    ],
+    [
+     0.73,
+     2666770
+    ],
+    [
+     0.74,
+     2660333
+    ],
+    [
+     0.76,
+     2657254
+    ],
+    [
+     0.78,
+     2650438
+    ],
+    [
+     0.8,
+     2637855
+    ],
+    [
+     0.81,
+     2625646
+    ],
+    [
+     0.82,
+     2623121
+    ],
+    [
+     0.84,
+     2619446
+    ],
+    [
+     0.86,
+     2581195
+    ],
+    [
+     0.88,
+     2579376
+    ],
+    [
+     0.89,
+     2578870
+    ],
+    [
+     0.91,
+     2577484
+    ],
+    [
+     0.94,
+     2575841
+    ],
+    [
+     0.95,
+     2573747
+    ],
+    [
+     0.99,
+     2573338
+    ],
+    [
+     1.0,
+     2571797
+    ],
+    [
+     1.06,
+     2513509
+    ],
+    [
+     1.08,
+     2512409
+    ],
+    [
+     1.09,
+     2511886
+    ],
+    [
+     1.1,
+     2511665
+    ],
+    [
+     1.12,
+     2469055
+    ],
+    [
+     1.14,
+     2465260
+    ],
+    [
+     1.16,
+     2436774
+    ],
+    [
+     1.19,
+     2436235
+    ],
+    [
+     1.2,
+     2436136
+    ],
+    [
+     1.22,
+     2435480
+    ],
+    [
+     1.27,
+     2433920
+    ],
+    [
+     1.27,
+     2409462
+    ],
+    [
+     1.29,
+     2409186
+    ],
+    [
+     1.32,
+     2408000
+    ],
+    [
+     1.35,
+     2382863
+    ],
+    [
+     1.36,
+     2381704
+    ],
+    [
+     1.4,
+     2374395
+    ],
+    [
+     1.41,
+     2374195
+    ],
+    [
+     1.42,
+     2370369
+    ],
+    [
+     1.43,
+     2367282
+    ],
+    [
+     1.45,
+     2354906
+    ],
+    [
+     1.46,
+     2344749
+    ],
+    [
+     1.48,
+     2343432
+    ],
+    [
+     1.5,
+     2336179
+    ],
+    [
+     1.51,
+     2334417
+    ],
+    [
+     1.53,
+     2331720
+    ],
+    [
+     1.54,
+     2319980
+    ],
+    [
+     1.55,
+     2319091
+    ],
+    [
+     1.57,
+     2318464
+    ],
+    [
+     1.62,
+     2314940
+    ],
+    [
+     1.64,
+     2307378
+    ],
+    [
+     1.66,
+     2306053
+    ],
+    [
+     1.66,
+     2304130
+    ],
+    [
+     1.73,
+     2272313
+    ],
+    [
+     1.76,
+     2272163
+    ],
+    [
+     1.77,
+     2272101
+    ],
+    [
+     1.79,
+     2271917
+    ],
+    [
+     1.82,
+     2271125
+    ],
+    [
+     1.87,
+     2268641
+    ],
+    [
+     1.89,
+     2253634
+    ],
+    [
+     1.91,
+     2227348
+    ],
+    [
+     1.95,
+     2226410
+    ],
+    [
+     1.97,
+     2226409
+    ],
+    [
+     1.99,
+     2225904
+    ],
+    [
+     2.01,
+     2225442
+    ],
+    [
+     2.02,
+     2223228
+    ],
+    [
+     2.05,
+     2222781
+    ],
+    [
+     2.08,
+     2219607
+    ],
+    [
+     2.1,
+     2219021
+    ],
+    [
+     2.12,
+     2213632
+    ],
+    [
+     2.14,
+     2200547
+    ],
+    [
+     2.17,
+     2199186
+    ],
+    [
+     2.18,
+     2199177
+    ],
+    [
+     2.22,
+     2192787
+    ],
+    [
+     2.24,
+     2191888
+    ],
+    [
+     2.26,
+     2185729
+    ],
+    [
+     2.3,
+     2185427
+    ],
+    [
+     2.32,
+     2179780
+    ],
+    [
+     2.34,
+     2174420
+    ],
+    [
+     2.36,
+     2173543
+    ],
+    [
+     2.38,
+     2171792
+    ],
+    [
+     2.4,
+     2171188
+    ],
+    [
+     2.46,
+     2159749
+    ],
+    [
+     2.48,
+     2155224
+    ],
+    [
+     2.51,
+     2147735
+    ],
+    [
+     2.52,
+     2140226
+    ],
+    [
+     2.57,
+     2139649
+    ],
+    [
+     2.6,
+     2138837
+    ],
+    [
+     2.62,
+     2138492
+    ],
+    [
+     2.65,
+     2135785
+    ],
+    [
+     2.65,
+     2134046
+    ],
+    [
+     2.7,
+     2133421
+    ],
+    [
+     2.73,
+     2130583
+    ],
+    [
+     2.75,
+     2120735
+    ],
+    [
+     2.8,
+     2119749
+    ],
+    [
+     2.84,
+     2117603
+    ],
+    [
+     2.87,
+     2117563
+    ],
+    [
+     2.88,
+     2117167
+    ],
+    [
+     2.92,
+     2114597
+    ],
+    [
+     2.93,
+     2113109
+    ],
+    [
+     2.95,
+     2112399
+    ],
+    [
+     2.98,
+     2101035
+    ],
+    [
+     2.99,
+     2100073
+    ],
+    [
+     3.01,
+     2097555
+    ],
+    [
+     3.06,
+     2096649
+    ],
+    [
+     3.07,
+     2095583
+    ],
+    [
+     3.09,
+     2094064
+    ],
+    [
+     3.09,
+     2093794
+    ],
+    [
+     3.11,
+     2093119
+    ],
+    [
+     3.13,
+     2092400
+    ],
+    [
+     3.15,
+     2091125
+    ],
+    [
+     3.17,
+     2090517
+    ],
+    [
+     3.19,
+     2088053
+    ],
+    [
+     3.2,
+     2084654
+    ],
+    [
+     3.22,
+     2082548
+    ],
+    [
+     3.26,
+     2076472
+    ],
+    [
+     3.28,
+     2074390
+    ],
+    [
+     3.29,
+     2074196
+    ],
+    [
+     3.3,
+     2074012
+    ],
+    [
+     3.35,
+     2069848
+    ],
+    [
+     3.39,
+     2068778
+    ],
+    [
+     3.42,
+     2067336
+    ],
+    [
+     3.43,
+     2062580
+    ],
+    [
+     3.46,
+     2060996
+    ],
+    [
+     3.48,
+     2057012
+    ],
+    [
+     3.51,
+     2056742
+    ],
+    [
+     3.58,
+     2053436
+    ],
+    [
+     3.61,
+     2053429
+    ],
+    [
+     3.63,
+     2053251
+    ],
+    [
+     3.66,
+     2053214
+    ],
+    [
+     3.68,
+     2052191
+    ],
+    [
+     3.81,
+     2052099
+    ],
+    [
+     3.85,
+     2051859
+    ],
+    [
+     3.91,
+     2051311
+    ],
+    [
+     3.94,
+     2051131
+    ],
+    [
+     3.98,
+     2050173
+    ],
+    [
+     4.04,
+     2049567
+    ],
+    [
+     4.04,
+     2048956
+    ],
+    [
+     4.08,
+     2045800
+    ],
+    [
+     4.09,
+     2044672
+    ],
+    [
+     4.1,
+     2043445
+    ],
+    [
+     4.15,
+     2041819
+    ],
+    [
+     4.19,
+     2041253
+    ],
+    [
+     4.25,
+     2035839
+    ],
+    [
+     4.31,
+     2033659
+    ],
+    [
+     4.33,
+     2030899
+    ],
+    [
+     4.33,
+     2030613
+    ],
+    [
+     4.35,
+     2030076
+    ],
+    [
+     4.38,
+     2027160
+    ],
+    [
+     4.4,
+     2026945
+    ],
+    [
+     4.43,
+     2026852
+    ],
+    [
+     4.46,
+     2026680
+    ],
+    [
+     4.47,
+     2025784
+    ],
+    [
+     4.48,
+     2025213
+    ],
+    [
+     4.49,
+     2022709
+    ],
+    [
+     4.51,
+     2021956
+    ],
+    [
+     4.55,
+     2020559
+    ],
+    [
+     4.57,
+     2017115
+    ],
+    [
+     4.59,
+     2006760
+    ],
+    [
+     4.65,
+     2006589
+    ],
+    [
+     4.68,
+     1999244
+    ],
+    [
+     4.7,
+     1997519
+    ],
+    [
+     4.73,
+     1997023
+    ],
+    [
+     4.78,
+     1992776
+    ],
+    [
+     4.82,
+     1990784
+    ],
+    [
+     4.83,
+     1990513
+    ],
+    [
+     4.84,
+     1987992
+    ],
+    [
+     4.87,
+     1985804
+    ],
+    [
+     4.88,
+     1982163
+    ],
+    [
+     4.9,
+     1981766
+    ],
+    [
+     4.92,
+     1979979
+    ],
+    [
+     4.97,
+     1979145
+    ],
+    [
+     5.0,
+     1978673
+    ],
+    [
+     5.02,
+     1978387
+    ],
+    [
+     5.04,
+     1976987
+    ],
+    [
+     5.08,
+     1976005
+    ],
+    [
+     5.1,
+     1971748
+    ],
+    [
+     5.11,
+     1971553
+    ],
+    [
+     5.13,
+     1971409
+    ],
+    [
+     5.18,
+     1969504
+    ],
+    [
+     5.2,
+     1966216
+    ],
+    [
+     5.22,
+     1965256
+    ],
+    [
+     5.24,
+     1962005
+    ],
+    [
+     5.29,
+     1961140
+    ],
+    [
+     5.32,
+     1958091
+    ],
+    [
+     5.34,
+     1955088
+    ],
+    [
+     5.36,
+     1954889
+    ],
+    [
+     5.43,
+     1953608
+    ],
+    [
+     5.46,
+     1953521
+    ],
+    [
+     5.48,
+     1953017
+    ],
+    [
+     5.53,
+     1952456
+    ],
+    [
+     5.54,
+     1951454
+    ],
+    [
+     5.6,
+     1949144
+    ],
+    [
+     5.69,
+     1948200
+    ],
+    [
+     5.73,
+     1947715
+    ],
+    [
+     5.8,
+     1947126
+    ],
+    [
+     5.81,
+     1947103
+    ],
+    [
+     6.05,
+     1946463
+    ],
+    [
+     6.11,
+     1946341
+    ],
+    [
+     6.15,
+     1944440
+    ],
+    [
+     6.19,
+     1944174
+    ],
+    [
+     6.29,
+     1944069
+    ],
+    [
+     6.29,
+     1943942
+    ],
+    [
+     6.3,
+     1943673
+    ],
+    [
+     6.34,
+     1942668
+    ],
+    [
+     6.38,
+     1938515
+    ],
+    [
+     6.42,
+     1936714
+    ],
+    [
+     6.45,
+     1936155
+    ],
+    [
+     6.49,
+     1935711
+    ],
+    [
+     6.53,
+     1929504
+    ],
+    [
+     6.58,
+     1927905
+    ],
+    [
+     6.6,
+     1927697
+    ],
+    [
+     6.65,
+     1927055
+    ],
+    [
+     6.68,
+     1926275
+    ],
+    [
+     6.73,
+     1925635
+    ],
+    [
+     6.75,
+     1924690
+    ],
+    [
+     6.84,
+     1923512
+    ],
+    [
+     6.88,
+     1922082
+    ],
+    [
+     6.95,
+     1922023
+    ],
+    [
+     6.99,
+     1921459
+    ],
+    [
+     7.04,
+     1921001
+    ],
+    [
+     7.14,
+     1918715
+    ],
+    [
+     7.16,
+     1918403
+    ],
+    [
+     7.3,
+     1917882
+    ],
+    [
+     7.33,
+     1917669
+    ],
+    [
+     7.37,
+     1917322
+    ],
+    [
+     7.46,
+     1916918
+    ],
+    [
+     7.69,
+     1916089
+    ],
+    [
+     7.75,
+     1914956
+    ],
+    [
+     7.98,
+     1914885
+    ],
+    [
+     8.04,
+     1913659
+    ],
+    [
+     8.06,
+     1913070
+    ],
+    [
+     8.25,
+     1912891
+    ],
+    [
+     8.27,
+     1912882
+    ],
+    [
+     8.29,
+     1911402
+    ],
+    [
+     8.31,
+     1911373
+    ],
+    [
+     8.43,
+     1910819
+    ],
+    [
+     8.45,
+     1910734
+    ],
+    [
+     8.57,
+     1910142
+    ],
+    [
+     8.6,
+     1909683
+    ],
+    [
+     8.79,
+     1909401
+    ],
+    [
+     9.26,
+     1908877
+    ],
+    [
+     9.41,
+     1908042
+    ],
+    [
+     9.82,
+     1907600
+    ],
+    [
+     9.92,
+     1907480
+    ],
+    [
+     10.11,
+     1907210
+    ],
+    [
+     10.18,
+     1907112
+    ],
+    [
+     10.19,
+     1907079
+    ],
+    [
+     10.26,
+     1906646
+    ],
+    [
+     10.39,
+     1905557
+    ],
+    [
+     10.42,
+     1904549
+    ],
+    [
+     10.91,
+     1902477
+    ],
+    [
+     11.18,
+     1902474
+    ],
+    [
+     12.13,
+     1902282
+    ],
+    [
+     12.28,
+     1901178
+    ],
+    [
+     12.29,
+     1899903
+    ],
+    [
+     12.48,
+     1898367
+    ],
+    [
+     12.61,
+     1898024
+    ],
+    [
+     12.66,
+     1897883
+    ],
+    [
+     12.68,
+     1897766
+    ],
+    [
+     12.88,
+     1896042
+    ],
+    [
+     13.38,
+     1896040
+    ],
+    [
+     13.72,
+     1894514
+    ],
+    [
+     13.78,
+     1894171
+    ],
+    [
+     15.14,
+     1893816
+    ],
+    [
+     15.7,
+     1893165
+    ],
+    [
+     17.33,
+     1892871
+    ],
+    [
+     17.34,
+     1891907
+    ],
+    [
+     17.48,
+     1891904
+    ],
+    [
+     17.84,
+     1891893
+    ],
+    [
+     18.25,
+     1891580
+    ],
+    [
+     18.27,
+     1891294
+    ],
+    [
+     18.3,
+     1890302
+    ],
+    [
+     18.39,
+     1889308
+    ],
+    [
+     20.33,
+     1889298
+    ],
+    [
+     25.73,
+     1905990
+    ],
+    [
+     25.74,
+     1905646
+    ],
+    [
+     25.77,
+     1903533
+    ],
+    [
+     25.85,
+     1899520
+    ],
+    [
+     26.11,
+     1899369
+    ],
+    [
+     26.34,
+     1899340
+    ],
+    [
+     26.37,
+     1897750
+    ],
+    [
+     26.49,
+     1897305
+    ],
+    [
+     26.52,
+     1895486
+    ],
+    [
+     26.53,
+     1894964
+    ],
+    [
+     26.56,
+     1894499
+    ],
+    [
+     26.57,
+     1894418
+    ],
+    [
+     26.66,
+     1893824
+    ],
+    [
+     26.7,
+     1892945
+    ],
+    [
+     26.71,
+     1892729
+    ],
+    [
+     26.85,
+     1891864
+    ],
+    [
+     26.9,
+     1891496
+    ],
+    [
+     26.96,
+     1891496
+    ],
+    [
+     27.22,
+     1890534
+    ],
+    [
+     29.48,
+     1890511
+    ],
+    [
+     30.36,
+     1889985
+    ],
+    [
+     30.38,
+     1889789
+    ],
+    [
+     30.55,
+     1889599
+    ],
+    [
+     30.57,
+     1889550
+    ],
+    [
+     30.63,
+     1889426
+    ],
+    [
+     30.66,
+     1889391
+    ],
+    [
+     30.85,
+     1889323
+    ],
+    [
+     30.9,
+     1889197
+    ],
+    [
+     32.49,
+     1889126
+    ],
+    [
+     32.51,
+     1888962
+    ],
+    [
+     32.64,
+     1888887
+    ],
+    [
+     34.34,
+     1888763
+    ],
+    [
+     34.36,
+     1888559
+    ],
+    [
+     34.49,
+     1888182
+    ],
+    [
+     34.57,
+     1888128
+    ],
+    [
+     39.47,
+     1889836
+    ],
+    [
+     39.53,
+     1889680
+    ],
+    [
+     39.55,
+     1889426
+    ],
+    [
+     39.91,
+     1889273
+    ],
+    [
+     40.0,
+     1889229
+    ],
+    [
+     40.05,
+     1888182
+    ],
+    [
+     40.31,
+     1888128
+    ],
+    [
+     42.28,
+     1888128
+    ],
+    [
+     47.3,
+     1894353
+    ],
+    [
+     47.31,
+     1894022
+    ],
+    [
+     47.31,
+     1893141
+    ],
+    [
+     47.32,
+     1892537
+    ],
+    [
+     47.35,
+     1891768
+    ],
+    [
+     47.57,
+     1891262
+    ],
+    [
+     47.58,
+     1888570
+    ],
+    [
+     47.65,
+     1888128
+    ],
+    [
+     47.74,
+     1888128
+    ],
+    [
+     56.33,
+     1960650
+    ],
+    [
+     56.34,
+     1960188
+    ],
+    [
+     56.36,
+     1957353
+    ],
+    [
+     56.37,
+     1954488
+    ],
+    [
+     56.41,
+     1954584
+    ],
+    [
+     56.41,
+     1953290
+    ],
+    [
+     56.43,
+     1947269
+    ],
+    [
+     56.44,
+     1940847
+    ],
+    [
+     56.44,
+     1940464
+    ],
+    [
+     56.46,
+     1939515
+    ],
+    [
+     56.48,
+     1939247
+    ],
+    [
+     56.53,
+     1934008
+    ],
+    [
+     56.54,
+     1934008
+    ],
+    [
+     56.55,
+     1910258
+    ],
+    [
+     56.56,
+     1910258
+    ],
+    [
+     56.89,
+     1907774
+    ],
+    [
+     56.96,
+     1906215
+    ],
+    [
+     56.97,
+     1905831
+    ],
+    [
+     57.0,
+     1903471
+    ],
+    [
+     57.0,
+     1900867
+    ],
+    [
+     57.02,
+     1900571
+    ],
+    [
+     57.06,
+     1900063
+    ],
+    [
+     57.12,
+     1897518
+    ],
+    [
+     57.13,
+     1894592
+    ],
+    [
+     57.22,
+     1893911
+    ],
+    [
+     57.23,
+     1891257
+    ],
+    [
+     57.35,
+     1891229
+    ],
+    [
+     57.71,
+     1890509
+    ],
+    [
+     57.74,
+     1890505
+    ],
+    [
+     57.99,
+     1889284
+    ],
+    [
+     58.5,
+     1889200
+    ],
+    [
+     58.51,
+     1889191
+    ],
+    [
+     58.91,
+     1888891
+    ]
+   ],
+   "baseline_routes": [
+    [
+     "Malir Cantt Askari-V",
+     "Check Post 5",
+     "Check Post 6",
+     "Tank Chowk Malir"
+    ],
+    [
+     "Sector J Malir Cantt",
+     "Sector G Malir Cantt",
+     "Malir Cantt Phase-I",
+     "Sector H Malir Cantt",
+     "Tariq Bin Zaid Society",
+     "Security Printing Press"
+    ],
+    [
+     "Soldier Bazar",
+     "Guru Mandir",
+     "Islamia College",
+     "Stadium Road"
+    ],
+    [
+     "Khudadad Colony",
+     "Kashmir Road",
+     "Sir Syed Road",
+     "Khalid Bin Waleed Road",
+     "Tariq Road",
+     "Tipu Sultan Road"
+    ],
+    [
+     "Usman Memorial",
+     "Essa Nagri",
+     "Stadium",
+     "Dalmia",
+     "Millennium Mall"
+    ],
+    [
+     "Old Sabzi Mandi",
+     "Sharfabad",
+     "Bahadurabad",
+     "Rangoon Wala Hall",
+     "Karsaz Pankha Stop",
+     "NHS-IV"
+    ],
+    [
+     "Forum Shopping Mall",
+     "Gizri",
+     "DHA Phase IV",
+     "Sunset Club",
+     "United Bakery",
+     "KFC Phase II"
+    ],
+    [
+     "Saba Avenue Imambargah",
+     "Khayaban-e-Bukhari",
+     "Bukhari Commercial",
+     "Misri Shah",
+     "Khayaban-e-Muhafiz",
+     "Rahat Park"
+    ],
+    [
+     "Bilawal Chowrangi",
+     "Hyperstar",
+     "Florida Homes B-Street",
+     "Kamal Mart",
+     "KFC Badar",
+     "Khayaban-e-Bahria",
+     "Shell Petrol Pump",
+     "NADRA Mega Center"
+    ],
+    [
+     "Hassan Square",
+     "Mumtaz Manzil",
+     "Bait-ul-Mukarram",
+     "Urdu Science College",
+     "Aziz Bhatti Park"
+    ],
+    [
+     "Tower",
+     "Jang Press",
+     "Sindh Secretariat",
+     "Atrium Mall",
+     "Lucky Star",
+     "FTC",
+     "Shahrah-e-Faisal Nursery"
+    ],
+    [
+     "Falcon Malir Cantt",
+     "CMH Malir Cantt",
+     "X-20 Malir Cantt",
+     "Cantt Bazar Malir",
+     "Check Post 2",
+     "Jinnah Garden",
+     "Kazimabad"
+    ],
+    [
+     "Jahangirabad",
+     "Golimar Chowrangi",
+     "Urdu Bazar Nazimabad",
+     "Inquiry Office",
+     "Naz Petrol Pump",
+     "Sona Chandi Lawn",
+     "Liaquatabad Erum Bakery"
+    ],
+    [
+     "KPT Bridge Kababjees",
+     "Iqra University",
+     "Diamond",
+     "Manzoor Colony",
+     "PAF Chapter"
+    ],
+    [
+     "Tyre Company",
+     "Boat Basin",
+     "26 Street",
+     "Badar Commercial",
+     "Khayaban-e-Sehar",
+     "Nexus College",
+     "Khayaban-e-Shahbaz"
+    ],
+    [
+     "Liaquatabad 10 No",
+     "Usman Memorial",
+     "Saylani Chowk",
+     "Zubaida Hospital",
+     "M. Ali Society"
+    ],
+    [
+     "Korangi Crossing",
+     "Nasir Jump",
+     "Korangi No 2",
+     "Korangi No 5",
+     "Landhi No 4",
+     "Landhi 89"
+    ],
+    [
+     "Teen Talwar",
+     "Race Course",
+     "Cantt Station",
+     "Askari II & III",
+     "NMC"
+    ],
+    [
+     "Police Headquarter Garden",
+     "Uncle Sariya",
+     "Mobile Market",
+     "Naz Plaza",
+     "Numaish",
+     "Islamia College",
+     "New Town Chandni Chowk"
+    ],
+    [
+     "Ram Swami",
+     "Garden Zoo",
+     "Ali Bhai",
+     "Garden Jamat Khana",
+     "Fatmi Blood Bank",
+     "Khurasan",
+     "Numaish",
+     "Khudadad Colony",
+     "Noorani Kabab",
+     "Allah Wali Chowrangi"
+    ],
+    [
+     "Bacha Party",
+     "Punjab Chowrangi PSO Pump",
+     "Chandio Village",
+     "Altamash"
+    ],
+    [
+     "Perfume Chowk Johar",
+     "Hilltop",
+     "Johar More",
+     "Drigh Road",
+     "Colony Gate",
+     "Star Gate",
+     "Wireless Gate",
+     "Kala Board",
+     "Hafiz Sweets Malir 15"
+    ],
+    [
+     "Matka Stop",
+     "Aladin Park",
+     "Lal Flat"
+    ],
+    [
+     "Green Mosque Bahria Town",
+     "Bahria Adventure Land",
+     "Bahria International Hospital",
+     "Bahria Town Apartments Tower 15",
+     "Bahria Town Apartments Tower 20",
+     "Bahria Town Main Gate"
+    ],
+    [
+     "Jamshed Road",
+     "Yadgar Fish",
+     "New Town Chandni Chowk",
+     "Askari IV"
+    ]
+   ],
+   "optimized": {
+    "buses_used": 26,
+    "total_student_ride_min": 30495,
+    "mean_ride_min": 33.9,
+    "longest_ride_min": 57.9,
+    "stops_over_90_min": 0,
+    "bus_driving_min": 994,
+    "dropped_stops": []
+   },
+   "routes": [
+    [
+     "Rahat Park",
+     "DHA Phase IV",
+     "Altamash",
+     "Forum Shopping Mall",
+     "Chandio Village"
+    ],
+    [
+     "Hyperstar",
+     "Florida Homes B-Street",
+     "Kamal Mart",
+     "KFC Badar",
+     "Khayaban-e-Sehar",
+     "Khayaban-e-Shahbaz",
+     "Khayaban-e-Bahria",
+     "Shell Petrol Pump"
+    ],
+    [
+     "Green Mosque Bahria Town",
+     "Bahria Town Apartments Tower 20",
+     "Bahria Town Apartments Tower 15",
+     "Bahria International Hospital",
+     "Bahria Adventure Land",
+     "Bahria Town Main Gate"
+    ],
+    [
+     "Naz Petrol Pump",
+     "Inquiry Office",
+     "Liaquatabad 10 No",
+     "Liaquatabad Erum Bakery",
+     "Usman Memorial"
+    ],
+    [
+     "Tariq Bin Zaid Society",
+     "Tank Chowk Malir",
+     "Malir Cantt Askari-V",
+     "Sector H Malir Cantt",
+     "Check Post 5",
+     "Check Post 6"
+    ],
+    [
+     "Hassan Square",
+     "Bait-ul-Mukarram",
+     "Urdu Science College",
+     "Dalmia",
+     "Star Gate"
+    ],
+    [
+     "Sona Chandi Lawn",
+     "Urdu Bazar Nazimabad",
+     "Jahangirabad",
+     "Hafiz Sweets Malir 15"
+    ],
+    [
+     "Sindh Secretariat",
+     "Tower",
+     "Jang Press",
+     "Atrium Mall",
+     "Lucky Star"
+    ],
+    [
+     "Diamond",
+     "Manzoor Colony",
+     "Drigh Road",
+     "Colony Gate"
+    ],
+    [
+     "26 Street",
+     "Khayaban-e-Muhafiz",
+     "Nexus College",
+     "Misri Shah",
+     "Khayaban-e-Bukhari",
+     "Bukhari Commercial"
+    ],
+    [
+     "Essa Nagri",
+     "Mumtaz Manzil",
+     "Aziz Bhatti Park",
+     "Lal Flat",
+     "Matka Stop"
+    ],
+    [
+     "Aladin Park",
+     "Johar More",
+     "Askari IV",
+     "Millennium Mall",
+     "Hilltop",
+     "Perfume Chowk Johar",
+     "Wireless Gate"
+    ],
+    [
+     "Malir Cantt Phase-I",
+     "Sector G Malir Cantt",
+     "Sector J Malir Cantt",
+     "X-20 Malir Cantt"
+    ],
+    [
+     "Noorani Kabab",
+     "Shahrah-e-Faisal Nursery",
+     "FTC",
+     "NMC"
+    ],
+    [
+     "Karsaz Pankha Stop",
+     "Kala Board",
+     "Landhi No 4",
+     "Landhi 89"
+    ],
+    [
+     "Race Course",
+     "Askari II & III",
+     "Cantt Station",
+     "Teen Talwar",
+     "Bacha Party",
+     "Punjab Chowrangi PSO Pump"
+    ],
+    [
+     "Tyre Company",
+     "Boat Basin",
+     "Bilawal Chowrangi",
+     "NADRA Mega Center"
+    ],
+    [
+     "Police Headquarter Garden",
+     "Golimar Chowrangi",
+     "Soldier Bazar",
+     "Mobile Market",
+     "Numaish"
+    ],
+    [
+     "Naz Plaza",
+     "Uncle Sariya",
+     "Allah Wali Chowrangi",
+     "Khurasan",
+     "Guru Mandir",
+     "Islamia College",
+     "Khudadad Colony"
+    ],
+    [
+     "Yadgar Fish",
+     "Sir Syed Road",
+     "Kashmir Road",
+     "Khalid Bin Waleed Road",
+     "Tariq Road",
+     "NHS-IV"
+    ],
+    [
+     "Falcon Malir Cantt",
+     "CMH Malir Cantt",
+     "Cantt Bazar Malir",
+     "Check Post 2",
+     "Jinnah Garden",
+     "Kazimabad",
+     "Security Printing Press"
+    ],
+    [
+     "Old Sabzi Mandi",
+     "New Town Chandni Chowk",
+     "Rangoon Wala Hall",
+     "Stadium",
+     "Stadium Road"
+    ],
+    [
+     "Badar Commercial",
+     "Saba Avenue Imambargah",
+     "Nasir Jump",
+     "Korangi No 2",
+     "Korangi No 5"
+    ],
+    [
+     "Ram Swami",
+     "Garden Zoo",
+     "Ali Bhai",
+     "Garden Jamat Khana",
+     "Fatmi Blood Bank",
+     "Jamshed Road"
+    ],
+    [
+     "Gizri",
+     "Korangi Crossing",
+     "Iqra University",
+     "Sunset Club",
+     "United Bakery",
+     "KFC Phase II",
+     "KPT Bridge Kababjees"
+    ],
+    [
+     "Bahadurabad",
+     "Sharfabad",
+     "Saylani Chowk",
+     "Zubaida Hospital",
+     "M. Ali Society",
+     "Tipu Sultan Road",
+     "PAF Chapter"
+    ]
+   ]
+  }
+ }
+}

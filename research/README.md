@@ -30,7 +30,7 @@ when the plan changes). Everything below is what the hub runs for you, for refer
 | Phase | Question |
 | --- | --- |
 | FYP-1 | **Optimization:** can all-stop routes be built from a travel-time matrix within free-tier CPU and query limits, and how do they compare with the current hand-made routes? |
-| FYP-1 | **Rerouting:** when a road is blocked, which road and which stops (keep, skip, merge) give the lowest student delay? |
+| FYP-1 | **Rerouting:** when a road is blocked, which road and which stops (keep, skip, or let students walk to a nearby point) give the lowest student delay? Morning runs, one bus at a time. |
 | FYP-2 | **Context:** how much real incidents slow shuttle routes, recorded on an H3 grid. |
 | FYP-2 | **Prediction:** whether that context predicts travel times better than the timetable and the router. |
 
@@ -46,8 +46,9 @@ when the plan changes). Everything below is what the hub runs for you, for refer
 | `data/matrix_fall2026_v1.json` | Travel times and distances, campus plus every stop, per contractor |
 | `optimize.py` | OR-Tools optimizer: plans all-stop routes and scores them against the current routes |
 | `run_budget.py` | Time-budget experiment: optimizer under free-tier limits vs no limits |
-| `run_query.py` | Query-budget experiment: real times only to each stop's K nearest stops, the rest estimated |
-| `results/` | Run reports (`opt-*.json/html`); `results/budget/` and `results/query/` hold the experiments |
+| `run_query_budget.py` | Query-budget experiment: K nearest real travel times, the rest estimated |
+| `run_robustness.py` | Traffic check and seed check on the optimization results |
+| `results/` | Run reports (`opt-*.json/html`); `results/budget/` holds the time-budget experiment |
 | `literature/` | Literature notes |
 
 ## Dataset rules (3 Nov 2026)
@@ -136,6 +137,38 @@ cd $REPO
 - Output: `results/budget/summary.html` (chart and table) and `summary.json`; per-run JSON and logs.
 - Pass/fail thresholds are fixed in `run_budget.py` and LOGBOOK (2026-11-04) before any run.
 - Keep the laptop plugged in, stop Windows from sleeping, and run nothing heavy alongside.
+
+## Query-budget experiment
+
+How few real travel-time queries still give good routes? Each run "queries" only each stop's leg to
+campus and its K nearest stops (K = 0, 3, 5, 10, 20, 40), estimates the rest (straight-line fit, or
+shortest path through the queried legs), plans on that matrix and scores the plan on the full OSRM
+matrix. The full matrix is the control. 72 runs, 60 s each, about 40 minutes with `--workers 2`.
+No limits and no OSRM needed: it uses the saved matrices.
+
+```bash
+cd $REPO
+~/fc-research-venv/bin/python research/run_query_budget.py --quick --workers 2   # about 20 s pipeline test
+~/fc-research-venv/bin/python research/run_query_budget.py --workers 2           # the real run, resumable
+~/fc-research-venv/bin/python research/run_query_budget.py --summarize           # print the results table
+```
+
+Thresholds are fixed in `run_query_budget.py` and LOGBOOK (2026-11-09) before the runs.
+
+## Traffic check and seed check
+
+Two short checks on the optimization results, both re-runs on the saved data (no limits, no OSRM).
+The traffic check multiplies every travel time by 1.0, 1.3 and 1.5 and plans again (18 runs, about
+10 minutes). The seed check redraws the synthetic students with three other seeds (8 runs, about 5 minutes).
+
+```bash
+cd $REPO
+~/fc-research-venv/bin/python research/run_robustness.py traffic --quick --workers 2   # pipeline test
+~/fc-research-venv/bin/python research/run_robustness.py traffic --workers 2           # the real run, resumable
+~/fc-research-venv/bin/python research/run_robustness.py seed --workers 2
+```
+
+Thresholds are fixed in `run_robustness.py` and LOGBOOK (2026-11-10) before the runs.
 
 ## Build the Karachi road network, once (about 10 to 20 minutes)
 
