@@ -1,0 +1,1020 @@
+{
+ "run_id": "Jadoon-seed2026",
+ "instance": "fall2026-v1",
+ "time_limit_s": 5,
+ "model": {
+  "deadline": "08:00",
+  "max_ride_min": 90,
+  "stop_time": "60 s + 5 s/student",
+  "objective": "total student ride time, driving time as tie-breaker",
+  "matrix": "travel times x1.0; students seed 2026"
+ },
+ "contractors": {
+  "Jadoon": {
+   "baseline": {
+    "buses_used": 27,
+    "total_student_ride_min": 40200,
+    "mean_ride_min": 44.4,
+    "longest_ride_min": 78.7,
+    "stops_over_90_min": 0,
+    "bus_driving_min": 1129
+   },
+   "solve_wall_s": 5.1,
+   "solve_cpu_s": 5.0,
+   "peak_rss_mb": null,
+   "progress": [
+    [
+     0.41,
+     2703739
+    ],
+    [
+     0.45,
+     2683216
+    ],
+    [
+     0.48,
+     2663340
+    ],
+    [
+     0.51,
+     2651054
+    ],
+    [
+     0.53,
+     2647712
+    ],
+    [
+     0.55,
+     2645437
+    ],
+    [
+     0.58,
+     2638457
+    ],
+    [
+     0.61,
+     2637990
+    ],
+    [
+     0.63,
+     2637840
+    ],
+    [
+     0.63,
+     2636122
+    ],
+    [
+     0.65,
+     2632910
+    ],
+    [
+     0.67,
+     2631853
+    ],
+    [
+     0.69,
+     2631169
+    ],
+    [
+     0.72,
+     2626246
+    ],
+    [
+     0.74,
+     2618963
+    ],
+    [
+     0.77,
+     2616193
+    ],
+    [
+     0.79,
+     2609700
+    ],
+    [
+     0.81,
+     2608219
+    ],
+    [
+     0.83,
+     2607614
+    ],
+    [
+     0.87,
+     2606739
+    ],
+    [
+     0.89,
+     2606589
+    ],
+    [
+     0.93,
+     2598339
+    ],
+    [
+     0.95,
+     2597174
+    ],
+    [
+     0.97,
+     2596775
+    ],
+    [
+     1.0,
+     2596332
+    ],
+    [
+     1.02,
+     2584414
+    ],
+    [
+     1.04,
+     2584330
+    ],
+    [
+     1.06,
+     2583386
+    ],
+    [
+     1.09,
+     2582571
+    ],
+    [
+     1.14,
+     2578437
+    ],
+    [
+     1.17,
+     2572241
+    ],
+    [
+     1.19,
+     2569499
+    ],
+    [
+     1.21,
+     2567835
+    ],
+    [
+     1.23,
+     2566709
+    ],
+    [
+     1.27,
+     2566156
+    ],
+    [
+     1.29,
+     2566065
+    ],
+    [
+     1.32,
+     2564634
+    ],
+    [
+     1.34,
+     2559157
+    ],
+    [
+     1.36,
+     2557819
+    ],
+    [
+     1.38,
+     2557756
+    ],
+    [
+     1.45,
+     2557216
+    ],
+    [
+     1.47,
+     2556291
+    ],
+    [
+     1.51,
+     2555681
+    ],
+    [
+     1.52,
+     2555564
+    ],
+    [
+     1.55,
+     2555239
+    ],
+    [
+     1.57,
+     2555066
+    ],
+    [
+     1.63,
+     2552177
+    ],
+    [
+     1.65,
+     2550074
+    ],
+    [
+     1.66,
+     2549723
+    ],
+    [
+     1.67,
+     2549427
+    ],
+    [
+     1.69,
+     2548484
+    ],
+    [
+     1.71,
+     2547932
+    ],
+    [
+     1.77,
+     2545372
+    ],
+    [
+     1.79,
+     2543791
+    ],
+    [
+     1.81,
+     2542055
+    ],
+    [
+     1.84,
+     2541606
+    ],
+    [
+     1.86,
+     2540227
+    ],
+    [
+     1.89,
+     2539169
+    ],
+    [
+     1.94,
+     2476045
+    ],
+    [
+     1.95,
+     2474549
+    ],
+    [
+     1.99,
+     2474373
+    ],
+    [
+     2.02,
+     2474340
+    ],
+    [
+     2.15,
+     2474247
+    ],
+    [
+     2.17,
+     2473694
+    ],
+    [
+     2.2,
+     2473667
+    ],
+    [
+     2.23,
+     2473336
+    ],
+    [
+     2.25,
+     2471639
+    ],
+    [
+     2.26,
+     2471400
+    ],
+    [
+     2.32,
+     2468454
+    ],
+    [
+     2.34,
+     2468270
+    ],
+    [
+     2.38,
+     2467890
+    ],
+    [
+     2.41,
+     2467105
+    ],
+    [
+     2.46,
+     2464435
+    ],
+    [
+     2.57,
+     2462513
+    ],
+    [
+     2.65,
+     2460975
+    ],
+    [
+     2.67,
+     2459512
+    ],
+    [
+     2.7,
+     2459296
+    ],
+    [
+     2.71,
+     2459247
+    ],
+    [
+     2.76,
+     2458180
+    ],
+    [
+     2.79,
+     2458135
+    ],
+    [
+     2.82,
+     2457662
+    ],
+    [
+     2.91,
+     2457304
+    ],
+    [
+     2.97,
+     2456953
+    ],
+    [
+     3.0,
+     2456528
+    ],
+    [
+     3.14,
+     2414450
+    ],
+    [
+     3.17,
+     2409855
+    ],
+    [
+     3.22,
+     2404408
+    ],
+    [
+     3.26,
+     2404312
+    ],
+    [
+     3.3,
+     2400896
+    ],
+    [
+     3.31,
+     2400272
+    ],
+    [
+     3.33,
+     2389443
+    ],
+    [
+     3.41,
+     2388117
+    ],
+    [
+     3.44,
+     2387414
+    ],
+    [
+     3.47,
+     2386994
+    ],
+    [
+     3.5,
+     2386352
+    ],
+    [
+     3.6,
+     2386330
+    ],
+    [
+     3.64,
+     2382262
+    ],
+    [
+     3.72,
+     2381829
+    ],
+    [
+     3.76,
+     2379444
+    ],
+    [
+     3.78,
+     2379055
+    ],
+    [
+     3.81,
+     2378678
+    ],
+    [
+     3.84,
+     2378543
+    ],
+    [
+     3.87,
+     2378375
+    ],
+    [
+     3.91,
+     2377880
+    ],
+    [
+     3.93,
+     2377603
+    ],
+    [
+     3.96,
+     2374346
+    ],
+    [
+     4.05,
+     2373977
+    ],
+    [
+     4.07,
+     2372600
+    ],
+    [
+     4.09,
+     2370547
+    ],
+    [
+     4.13,
+     2369056
+    ],
+    [
+     4.26,
+     2367904
+    ],
+    [
+     4.28,
+     2366650
+    ],
+    [
+     4.31,
+     2322232
+    ],
+    [
+     4.33,
+     2321965
+    ],
+    [
+     4.35,
+     2321831
+    ],
+    [
+     4.42,
+     2320133
+    ],
+    [
+     4.44,
+     2320033
+    ],
+    [
+     4.46,
+     2319807
+    ],
+    [
+     4.49,
+     2319539
+    ],
+    [
+     4.55,
+     2319376
+    ],
+    [
+     4.58,
+     2319242
+    ],
+    [
+     4.65,
+     2318212
+    ],
+    [
+     4.68,
+     2300310
+    ],
+    [
+     4.71,
+     2279990
+    ],
+    [
+     4.75,
+     2279200
+    ],
+    [
+     4.93,
+     2275761
+    ],
+    [
+     4.97,
+     2273993
+    ],
+    [
+     4.99,
+     2273726
+    ],
+    [
+     5.02,
+     2273464
+    ]
+   ],
+   "baseline_routes": [
+    [
+     "Hyderi Super Mart KDA",
+     "Ziauddin",
+     "Landi Kotal",
+     "Tahir Villas",
+     "Ayesha Manzil More",
+     "Naseerabad"
+    ],
+    [
+     "Karimabad",
+     "Ayesha Manzil More",
+     "Bhaijan Chowk",
+     "8.5 Number",
+     "Gulshan-e-Shamim"
+    ],
+    [
+     "7 No Nazimabad",
+     "Abbasi Hospital",
+     "Khilafat Chowk",
+     "Board Office"
+    ],
+    [
+     "Gawalia",
+     "K.U. Society",
+     "PCSIR",
+     "Quetta Town",
+     "G3 Stop",
+     "KBACHS Society / Sachal",
+     "Shahmir Colony Gate",
+     "Makhdoom Bilawal",
+     "Chapal Bungalows",
+     "Memon Medical Hospital",
+     "Roofi Bungalows",
+     "Sunlay Bungalows",
+     "Safoora"
+    ],
+    [
+     "Rana Lawn",
+     "Tank Chowk",
+     "Kazimabad",
+     "Model More",
+     "RCD Ground",
+     "Baraf Khana",
+     "Kala Board"
+    ],
+    [
+     "Orangi Town 5",
+     "Abdullah College",
+     "Katti Pahari",
+     "Ali Asghar Stadium",
+     "Star House",
+     "LDA"
+    ],
+    [
+     "Javed Nihari",
+     "Bhaijan Chowk",
+     "Mukka Chowk",
+     "13D 8-1/2",
+     "Rab Medical"
+    ],
+    [
+     "Lala Zar NIPA",
+     "Safari Park",
+     "Samama",
+     "Continental",
+     "KESC",
+     "Johar Chowrangi"
+    ],
+    [
+     "Kamran Chowrangi",
+     "Munawar Chowrangi",
+     "Darul Sehat",
+     "Rado Center"
+    ],
+    [
+     "Al-Hira",
+     "Puncture Shop Saadi Road",
+     "Amroha Society",
+     "Saadi Town",
+     "Police Society",
+     "Falcon",
+     "6 No Check Post"
+    ],
+    [
+     "Malik Society",
+     "KDA",
+     "PCSIR",
+     "Quetta Town",
+     "Sumaira Chowk",
+     "Anara Garden",
+     "Noman Garden",
+     "Al Azhar"
+    ],
+    [
+     "NED",
+     "Karachi University",
+     "Commander CNG",
+     "G-10 Gul House"
+    ],
+    [
+     "Fariya Chowk",
+     "Khatm-e-Nabuwat",
+     "Kaneez Fatima",
+     "Madras Chowk",
+     "Dow Medical",
+     "Mosamiyat",
+     "Johar Complex (Bin Hashim)",
+     "Safoora",
+     "Check Post 5"
+    ],
+    [
+     "Dentist Society",
+     "Officers Society",
+     "Teachers Society",
+     "Madras Chowk",
+     "Suchal",
+     "Furniture Market",
+     "Rizvia",
+     "Gulshan-e-Umair",
+     "Saima"
+    ],
+    [
+     "Saleem Bank",
+     "Rabia City",
+     "Al Habib University",
+     "Pehlwan Goth",
+     "Sindh Baloch",
+     "Commander City",
+     "Gul Chowrangi"
+    ],
+    [
+     "POB Eye Hospital",
+     "Gate 3 PIA",
+     "Nawaz Sharif School",
+     "Bismillah Tower (PIA)",
+     "Magsi Chowk",
+     "Saima Flats"
+    ],
+    [
+     "Chishti Nagar",
+     "Kamran Chowrangi",
+     "Tyre Puncture Shop",
+     "Munawar Chowrangi",
+     "Sardar CNG",
+     "Nawabish"
+    ],
+    [
+     "Maymar Gate",
+     "Al Habib Restaurant",
+     "Jamali Pul",
+     "Al Asif",
+     "Abbas Town",
+     "Paradise Bakery"
+    ],
+    [
+     "Maskan",
+     "Disco Bakery",
+     "Rimjhim Hall",
+     "Gulshan Turn",
+     "Dhaka Sweets"
+    ],
+    [
+     "Saima Arabian",
+     "4K Stop",
+     "2 Minute",
+     "Power House",
+     "Saleem Center",
+     "UP More",
+     "Nagan (Dahli Hall)",
+     "Alnoor Edhi Center"
+    ],
+    [
+     "Dolmen Mall",
+     "5 Star",
+     "Farooq-e-Azam",
+     "Gulberg",
+     "Fazal Mill",
+     "Lucky One",
+     "Moti Mahal"
+    ],
+    [
+     "Ajmer Nagri",
+     "Bombay Bakery",
+     "Oxford School",
+     "Bara Dari",
+     "Babul Islam",
+     "Disco More",
+     "Anda More",
+     "Cafe Al Habib",
+     "Cafe 2 Days",
+     "Namak Bank",
+     "Shafiq More",
+     "Power House",
+     "Alnoor"
+    ],
+    [
+     "Haider Food",
+     "Qalandria",
+     "DC Office",
+     "Peoples Chowrangi",
+     "Cafe Piyala",
+     "Raheem Hospital",
+     "Water Pump More",
+     "KIHD",
+     "16 No Chowrangi",
+     "Moti Mahal"
+    ],
+    [
+     "Esa Lab 5 Star",
+     "Donesil",
+     "Landi Kotal",
+     "Tahir Villas",
+     "Shadab Masjid",
+     "Gulberg Thana",
+     "Shahzad Store"
+    ],
+    [
+     "2K Stop",
+     "Mateen Food",
+     "Dental College",
+     "Green House"
+    ],
+    [
+     "Naya Nazimabad",
+     "Nusrat Bhutto Colony",
+     "Shadman 1",
+     "Shadman 2"
+    ],
+    [
+     "Masjid Khairul Bashir",
+     "CNG Pump",
+     "Usman Ghani Masjid",
+     "Mochi Gali",
+     "Shipowner",
+     "Lady Bird",
+     "Imam Clinic"
+    ]
+   ],
+   "optimized": {
+    "buses_used": 27,
+    "total_student_ride_min": 36573,
+    "mean_ride_min": 40.4,
+    "longest_ride_min": 89.9,
+    "stops_over_90_min": 0,
+    "bus_driving_min": 1318,
+    "dropped_stops": []
+   },
+   "routes": [
+    [
+     "Karachi University",
+     "Dow Medical",
+     "Mosamiyat"
+    ],
+    [
+     "G-10 Gul House",
+     "Abbasi Hospital",
+     "Khilafat Chowk",
+     "Orangi Town 5",
+     "Abdullah College",
+     "Board Office",
+     "Alnoor",
+     "Masjid Khairul Bashir",
+     "Fazal Mill",
+     "Lucky One"
+    ],
+    [
+     "Rabia City",
+     "7 No Nazimabad",
+     "Amroha Society",
+     "Police Society",
+     "Saadi Town"
+    ],
+    [
+     "4K Stop",
+     "Saima Arabian",
+     "Maymar Gate",
+     "Jamali Pul",
+     "Chishti Nagar",
+     "Bismillah Tower (PIA)",
+     "Magsi Chowk"
+    ],
+    [
+     "Kaneez Fatima",
+     "Al Habib Restaurant",
+     "Abbas Town",
+     "KESC",
+     "Johar Chowrangi",
+     "Al Habib University",
+     "Saleem Bank"
+    ],
+    [
+     "Furniture Market",
+     "K.U. Society",
+     "KDA",
+     "Oxford School",
+     "Khatm-e-Nabuwat",
+     "Malik Society",
+     "Fariya Chowk",
+     "NED",
+     "Samama",
+     "Continental",
+     "Darul Sehat"
+    ],
+    [
+     "Anara Garden",
+     "Shadman 1",
+     "Naya Nazimabad",
+     "Cafe Piyala",
+     "16 No Chowrangi",
+     "Shahzad Store",
+     "KIHD",
+     "Rado Center",
+     "Kazimabad",
+     "Model More"
+    ],
+    [
+     "Memon Medical Hospital",
+     "Anda More",
+     "Gulberg",
+     "Naseerabad",
+     "Al Asif",
+     "Suchal",
+     "Safoora",
+     "Gulshan-e-Umair",
+     "Nawabish",
+     "Commander City",
+     "Munawar Chowrangi"
+    ],
+    [
+     "Bara Dari",
+     "Qalandria",
+     "Haider Food",
+     "Tahir Villas",
+     "Ayesha Manzil More",
+     "Safari Park",
+     "Kala Board"
+    ],
+    [
+     "Nusrat Bhutto Colony",
+     "Saleem Center",
+     "Ali Asghar Stadium",
+     "Karimabad",
+     "Rab Medical",
+     "Sardar CNG",
+     "Nawaz Sharif School",
+     "Commander CNG",
+     "Tank Chowk",
+     "Baraf Khana"
+    ],
+    [
+     "Usman Ghani Masjid",
+     "Javed Nihari",
+     "Katti Pahari",
+     "Shipowner",
+     "UP More",
+     "Nagan (Dahli Hall)",
+     "Alnoor Edhi Center",
+     "Peoples Chowrangi",
+     "Gulshan Turn",
+     "Moti Mahal",
+     "Lala Zar NIPA",
+     "Disco Bakery",
+     "Tyre Puncture Shop"
+    ],
+    [
+     "Johar Complex (Bin Hashim)",
+     "Sunlay Bungalows",
+     "Roofi Bungalows",
+     "Teachers Society",
+     "Madras Chowk",
+     "Sindh Baloch",
+     "Kamran Chowrangi"
+    ],
+    [
+     "Star House",
+     "Shadab Masjid",
+     "Gulberg Thana",
+     "Maskan",
+     "Paradise Bakery"
+    ],
+    [
+     "Dentist Society",
+     "Officers Society",
+     "Sumaira Chowk",
+     "Chapal Bungalows",
+     "PCSIR",
+     "Saima Flats",
+     "Gul Chowrangi"
+    ],
+    [
+     "Babul Islam",
+     "Disco More",
+     "2 Minute",
+     "Power House",
+     "DC Office"
+    ],
+    [
+     "Hyderi Super Mart KDA",
+     "Ziauddin",
+     "Esa Lab 5 Star",
+     "Mochi Gali",
+     "Farooq-e-Azam",
+     "Shadman 2",
+     "Cafe 2 Days"
+    ],
+    [
+     "Noman Garden",
+     "Shahmir Colony Gate",
+     "POB Eye Hospital",
+     "Gate 3 PIA",
+     "Pehlwan Goth"
+    ],
+    [
+     "2K Stop",
+     "Lady Bird",
+     "Water Pump More"
+    ],
+    [
+     "Gawalia",
+     "Quetta Town",
+     "Al Azhar",
+     "RCD Ground"
+    ],
+    [
+     "Saima",
+     "Puncture Shop Saadi Road",
+     "Al-Hira",
+     "6 No Check Post"
+    ],
+    [
+     "Bhaijan Chowk",
+     "Mukka Chowk",
+     "8.5 Number",
+     "Gulshan-e-Shamim",
+     "13D 8-1/2"
+    ],
+    [
+     "Falcon",
+     "Check Post 5",
+     "Rana Lawn"
+    ],
+    [
+     "KBACHS Society / Sachal",
+     "G3 Stop",
+     "Makhdoom Bilawal",
+     "Rizvia"
+    ],
+    [
+     "Bombay Bakery",
+     "Ajmer Nagri",
+     "Rimjhim Hall",
+     "Dhaka Sweets"
+    ],
+    [
+     "Cafe Al Habib",
+     "Namak Bank",
+     "Shafiq More",
+     "CNG Pump"
+    ],
+    [
+     "Raheem Hospital",
+     "Green House",
+     "Donesil",
+     "Landi Kotal"
+    ],
+    [
+     "LDA",
+     "Dolmen Mall",
+     "Imam Clinic",
+     "5 Star",
+     "Mateen Food",
+     "Dental College"
+    ]
+   ]
+  }
+ }
+}
