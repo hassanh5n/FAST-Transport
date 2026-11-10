@@ -6,10 +6,25 @@
   "main": true,
   "dir": "results/budget",
   "script": "research/run_budget.py",
-  "args": ["--code-version", "{code_version}"],
+  "args": [
+   "--code-version",
+   "{code_version}"
+  ],
   "runs_total": 50,
   "question": "On a free-tier server (512 MB, no swap, 0.1 CPU), how close does the optimizer get to the best known plan, and how fast?",
   "design": "Each contractor solved at 10, 60, 300 and 600 s, 3 repeats, limited and unlimited, plus one 30-minute unlimited reference. 50 runs, about 4.5 hours. Limits applied with systemd cgroups in WSL."
+ },
+ {
+  "id": "query-budget",
+  "title": "Query-budget experiment",
+  "kind": "query",
+  "main": true,
+  "dir": "results/query",
+  "script": "research/run_query.py",
+  "args": [],
+  "runs_total": 30,
+  "question": "How few real travel-time lookups still give routes within 2% of the full-matrix plan?",
+  "design": "Real times only to each stop's K nearest stops (K = 5, 10, 20, 40, full), the rest estimated from straight-line distance. Free-tier limits, 300 s, 3 repeats per contractor: 30 runs, about 2.7 hours. Plans scored on the full real matrix."
  },
  {
   "id": "time-budget-quick",
@@ -18,9 +33,27 @@
   "main": false,
   "dir": "results/budget-quick",
   "script": "research/run_budget.py",
-  "args": ["--quick", "--code-version", "{code_version}"],
+  "args": [
+   "--quick",
+   "--code-version",
+   "{code_version}"
+  ],
   "runs_total": 6,
   "question": "Does the whole experiment pipeline work? 5 s runs, about 1 minute. Not a reported result.",
   "design": "One 5 s run per contractor and setup, plus a 10 s reference."
+ },
+ {
+  "id": "query-budget-quick",
+  "title": "Query pipeline test",
+  "kind": "query",
+  "main": false,
+  "dir": "results/query-quick",
+  "script": "research/run_query.py",
+  "args": [
+   "--quick"
+  ],
+  "runs_total": 10,
+  "question": "Does the query-budget pipeline work? 10 s runs, about 3 minutes. Not a reported result.",
+  "design": "One 10 s run per K and contractor."
  }
 ]

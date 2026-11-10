@@ -30,6 +30,39 @@ MAX_RIDE_S = 90 * 60
 STOP_BASE_S, STOP_PER_STUDENT_S = 60, 5
 
 
+def sparse_estimate(T, points, k):
+    """Query experiment: keep real times only for each stop to its k nearest stops (by straight line)
+    and to campus; estimate every other pair as a + b * straight-line metres, fitted on the kept pairs.
+    Returns the matrix the optimizer plans on and what it cost. T itself is never changed."""
+    import math
+    n = len(T)
+    rad = math.pi / 180
+
+    def dist(i, j):
+        (la1, lo1), (la2, lo2) = points[i], points[j]
+        x = (lo2 - lo1) * rad * math.cos((la1 + la2) * rad / 2)
+        return 6371000 * math.hypot(x, (la2 - la1) * rad)
+
+    D = [[dist(i, j) for j in range(n)] for i in range(n)]
+    queried = {(i, 0) for i in range(1, n)}                        # every stop to campus
+    for i in range(1, n):
+        near = sorted((j for j in range(1, n) if j != i), key=lambda j: D[i][j])[:k]
+        queried.update((i, j) for j in near)
+    xs = [D[i][j] for i, j in queried]
+    ys = [T[i][j] for i, j in queried]
+    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+    b = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
+    a = my - b * mx
+    M = [[T[i][j] if (i, j) in queried or i == j else a + b * D[i][j] for j in range(n)] for i in range(n)]
+    errs = sorted(abs(M[i][j] - T[i][j]) / T[i][j] for i in range(1, n) for j in range(1, n)
+                  if i != j and (i, j) not in queried and T[i][j] > 0)
+    info = {"k": k, "queried_cells": len(queried), "full_cells": n * (n - 1),
+            "query_share": round(len(queried) / (n * (n - 1)), 4),
+            "fit_s": {"a": round(a, 1), "b_per_km": round(b * 1000, 1)},
+            "estimate_median_abs_error_pct": round(100 * errs[len(errs) // 2], 1) if errs else 0.0}
+    return M, info
+
+
 def stop_time(students):
     return STOP_BASE_S + STOP_PER_STUDENT_S * students if students else 0
 
@@ -129,6 +162,9 @@ def main():
     ap.add_argument("--out-dir", type=Path, default=RESULTS, help="where to write the run files")
     ap.add_argument("--run-id", default=None, help="fixed run id instead of a timestamp (used by run_budget.py)")
     ap.add_argument("--no-html", action="store_true", help="write only the JSON")
+    ap.add_argument("--k", type=int, default=0,
+                    help="query experiment: plan on real times to the k nearest stops only, the rest estimated "
+                         "(0 = full real matrix). Plans are always scored on the full real matrix.")
     args = ap.parse_args()
     if args.render:
         run = Path(args.render)
@@ -162,16 +198,23 @@ def main():
         baseline = score(baseline_routes, T, q)
 
         cpu0, wall0 = time.process_time(), time.perf_counter()
-        result, progress = solve(T, q, caps, args.time_limit)
+        if args.k:
+            points = [(inst["campus"]["lat"], inst["campus"]["lng"])] + \
+                     [(by_name[n]["lat"], by_name[n]["lng"]) for n in nodes[1:]]
+            T_plan, matrix_info = sparse_estimate(T, points, args.k)
+        else:
+            T_plan, matrix_info = T, {"k": 0, "queried_cells": len(T) * (len(T) - 1),
+                                      "full_cells": len(T) * (len(T) - 1), "query_share": 1.0}
+        result, progress = solve(T_plan, q, caps, args.time_limit)
         cpu, wall = time.process_time() - cpu0, time.perf_counter() - wall0
         entry = {"baseline": baseline, "solve_wall_s": round(wall, 1), "solve_cpu_s": round(cpu, 1),
                  "peak_rss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024),
-                 "progress": progress}
+                 "progress": progress, "matrix": matrix_info}
         if result is None:
             entry["optimized"] = None
             print(f"{cname}: no feasible plan found in {args.time_limit} s")
         else:
-            opt = score(result["routes"], T, q)
+            opt = score(result["routes"], T, q)          # always the real matrix
             opt["dropped_stops"] = [nodes[i] for i in result["dropped"]]
             entry["optimized"] = opt
             entry["routes"] = [[nodes[i] for i in r] for r in result["routes"] if r]

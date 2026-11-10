@@ -139,3 +139,49 @@ Logged 2026-11-04 from the result file; machine not recorded, not resource-limit
   (2) peak memory under 400 MB in every limited run, none killed.
 - Also recorded: time from launch to first valid plan, wall and CPU time, machine details (`meta.json`).
 - Caveats carried over: free-flow travel times, synthetic students.
+
+## 2026-11-09: Time-budget experiment results
+
+### Run B1: time budget (`results/budget/`, ran 2026-11-04 to 2026-11-06)
+
+Machine: Intel i7-3770 (8 threads), 3.8 GB RAM visible to WSL2, OR-Tools 9.15. Limits verified by the kernel
+before runs (memory.max 512 MB, swap 0, cpu.max 10%). 50 runs, all completed, none killed.
+Median of 3 repeats. Gap = extra total student ride time vs best known plan (the 1,800 s reference in both cases).
+
+| Budget | Jadoon limited | Jadoon unlimited | Nadeem limited | Nadeem unlimited |
+| --- | --- | --- | --- | --- |
+| 10 s | 21.0% | 2.2% | 19.2% | 2.0% |
+| 60 s | **3.7%** | 0.2% | **2.6%** | 0.9% |
+| 300 s | 0.5% | 0.1% | 1.1% | 0.4% |
+| 600 s | 0.2% | 0.1% | 0.9% | 0.3% |
+
+- Best known plans: Jadoon 31,447 student-min, Nadeem 29,639. Current routes are 27.8% and 25.8% worse.
+- Time to first valid plan: 3.5 to 4.9 s limited, 0.6 to 1.2 s unlimited.
+- Peak memory 57 to 65 MB in every run (limit 512 MB).
+- **Threshold 1 (within 5% at 60 s, limited): pass** (3.7%, 2.6%).
+- **Threshold 2 (peak memory under 400 MB, none killed): pass.**
+
+Findings:
+- Memory is not a constraint: about 13% of the 512 MB cap. CPU is the only binding limit.
+- At 0.1 CPU the search gets one tenth of the computing, so a limited run tracks an unlimited run of one tenth the
+  time (limited 60 s, 6 s CPU: 3.7% gap; unlimited 10 s, 10 s CPU: 2.2%). Quality depends on CPU seconds, not wall time.
+- 10 s on a free-tier server is not enough (about 20% gap). 60 s is acceptable, 300 s near-optimal.
+- Even the 60 s limited plan beats the current routes by about 19% (Jadoon) and 18% (Nadeem) in total student ride time.
+- Caveats unchanged: free-flow travel times, synthetic students, one machine.
+
+## 2026-11-09: Query-budget experiment planned (fixed before any run)
+
+- Question: how few real travel-time lookups still give good routes? A full matrix needs n x (n - 1) lookups
+  (29,412 for Jadoon, 20,592 for Nadeem); a paid or rate-limited router charges per lookup.
+- Design (`run_query.py`, `optimize.py --k`): the optimizer plans on real times only from each stop to its
+  K nearest stops (straight line) and from every stop to campus; all other pairs are estimated as
+  a + b x straight-line distance, fitted by least squares on the real pairs. The resulting plan is always
+  scored on the full real matrix (M1), so no new router calls are needed.
+- K = 5, 10, 20, 40 and full. Free-tier limits (512 MB, no swap, 0.1 CPU), 300 s search, 3 repeats,
+  per contractor: 30 runs, about 2.7 h. Median over repeats.
+- Recorded per K: lookups used, share of the full matrix, median error of the estimated pairs, total
+  student ride, longest ride, stops over 90 min, peak memory.
+- **Threshold, fixed now:** the smallest K whose plan is within 2% (total student ride time) of the
+  full-matrix plan from the same setup, for both contractors, with all runs completing.
+- Development check (5 s, Jadoon, unlimited, not a result): K = 5 used 3.5% of lookups, estimated pairs off by
+  13% (median), plan 4.0% worse than the full matrix at that budget.

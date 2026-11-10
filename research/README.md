@@ -46,7 +46,8 @@ when the plan changes). Everything below is what the hub runs for you, for refer
 | `data/matrix_fall2026_v1.json` | Travel times and distances, campus plus every stop, per contractor |
 | `optimize.py` | OR-Tools optimizer: plans all-stop routes and scores them against the current routes |
 | `run_budget.py` | Time-budget experiment: optimizer under free-tier limits vs no limits |
-| `results/` | Run reports (`opt-*.json/html`); `results/budget/` holds the time-budget experiment |
+| `run_query.py` | Query-budget experiment: real times only to each stop's K nearest stops, the rest estimated |
+| `results/` | Run reports (`opt-*.json/html`); `results/budget/` and `results/query/` hold the experiments |
 | `literature/` | Literature notes |
 
 ## Dataset rules (3 Nov 2026)
