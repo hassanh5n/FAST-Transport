@@ -63,8 +63,7 @@
   }
  ],
  "next_steps": [
-  "Write the optimization chapter from LOGBOOK runs B1 and Q1. Standard search budget from now on: 300 s (60 s is the minimum).",
-  "Run the traffic check and the seed check from the hub (about 15 minutes together; rules fixed in LOGBOOK 2026-11-10) and add them to the chapter.",
+  "Write the optimization chapter from LOGBOOK runs B1, Q1, T1 (traffic check) and S1 (seed check); all four passed. Standard search budget from now on: 300 s (60 s is the minimum).",
   "Freeze a set of road-closure scenarios on or near shuttle routes, including the Shahrah-e-Faisal protest closure and University Road flooding.",
   "Fix the rerouting baselines and scores in the logbook before any run: patched published route, no-time-limit oracle; delay against the oracle, students asked to walk, extra walking distance.",
   "Road-block test: set a road's speed to 0, and to a slow speed, in OSRM and time the re-customize (needs Docker).",
