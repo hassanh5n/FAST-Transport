@@ -539,3 +539,49 @@ graph error from the time limit; results per route with the worst route named; s
 
 **Caveats carried over**: synthetic students; OSRM free-flow times as truth; limits simulated with
 cgroups on a laptop; the bus is assumed to be at a stop when the closure is reported.
+
+## 2026-11-17: Scaling runs planned (optimizer OS1, rerouting RS1 "stops"), fixed before either runs
+
+Code: `54a55f2` (solver, road graph, offline builders, runner and optimizer scaling, with 450 unit tests).
+Neither run has a pass or fail threshold; both report curves (work plan Section 8.6; entry of 2026-11-16).
+
+**Machine for both runs.** This entry is written on a Windows 10 laptop (Intel Core i7 third generation,
+4 cores / 8 threads, 8 GB) that cannot start WSL (virtualization is off in the firmware). So the runs below
+have no free-tier limits, and peak memory is Windows' peak working set (`psutil`), not Linux `ru_maxrss`.
+The two are close for a single Python process but are not the same measure; figures from this machine
+are not pooled with the WSL runs B1, Q1, T1 and S1.
+
+**OS1: optimizer scaling (`run_scale.py`, `results/optimizer-scale/`).**
+
+- Instances: Jadoon (171 stops, 27 buses) and Nadeem (143 stops, 26 buses) as in B1; and Jadoon-doubled
+  and Nadeem-doubled, where every stop is copied 30 s from its original with the same students, and
+  every bus is copied too. The doubled instances test model size (342 and 286 stops), not geography.
+- The plan's combined instances (All, 311 stops; All-doubled, 622) need `data/matrix_fall2026_v1_all.json`,
+  which needs OSRM. They are recorded as skipped here and are run on the Docker laptop when the matrix exists;
+  the doubled contractor instances stand in for size until then.
+- Lookups: `callback` (every recorded result so far) and `matrix` (tables given to OR-Tools once).
+  300 s each, one run per instance and lookup, no limits, one at a time, each in a fresh process.
+- Measured: build time, time to first plan, peak memory, the best plan's cost at 10, 60 and 300 s,
+  improvements, solve CPU time.
+- Known before the run: `build_s` is not comparable between lookups. The callback lookup computes arc costs
+  lazily during the search, so its cost shows up in `first_plan_s` and the search; the matrix lookup pays it
+  inside `build_s`. Both are reported side by side. At 10 s on Nadeem (pipeline test) the default path gave
+  29,989 student-min before and after the change, so the lookup option does not alter existing results.
+
+**RS1 part "stops": rerouting solver against problem size (`run_reroute.py scale --only stops`).**
+
+- Synthetic problems on one bus: 4, 8, 12, 16 and 20 stops; 1, 2 and 4 extra boarding candidates per stop;
+  seeds 1 to 3 (45 problems). Stops uniform in a 2 km square, driving at 10 m/s, straight-line walking,
+  limit 400 m. Real routes are not joined because the scenario tables hold no times between routes.
+- Measured: CPU and wall time and peak memory of R2 and of R3 run to the end, R2's arrival minus R3's.
+  Above 16 stops R3 is not run (the cap fixed on 2026-11-16) and the gap to the lower bound is reported.
+- Unlimited only on this machine. The limited setup, the graph part (needs the Karachi graph), the buses
+  part (needs the scenario file) and the slices part on frozen scenarios run on the WSL machine.
+
+**R3 design change, recorded before any result.** Review found that R3 as planned (one search over
+(set of boarded stops, last point), then merging repeated visits to a point) is not exact: on 34 of 800
+small random problems the merged plan arrived later than brute force, because a merged visit's boarding
+time is paid after the bus waits for walkers. R3 now has a second, exact phase: when the merged plan does
+not reach the search's value, a label search over (set of boarded stops, last point, points visited) with
+dominance and lower-bound pruning finds the best plan. It matches brute force on all 800 problems and on
+every test. Both phases can be paused and resumed. The oracle remains "the best plan in this model".
