@@ -1289,7 +1289,9 @@ def cmd_scale(args: argparse.Namespace) -> None:
     cases = load_cases(scen_path, args.walk) if scen_path.exists() else None
     if cases is None:
         print(f"{scen_path} is missing: the slices and buses parts are skipped")
-    jobs = scale_jobs(args.quick, args.only, cases, limits_ok=not args.quick)
+    # A "limited" measurement only means something under real limits: with --no-limits only the
+    # unlimited setup runs, and the limited rows are added later by a run on a machine with systemd.
+    jobs = scale_jobs(args.quick, args.only, cases, limits_ok=not args.quick and limits == "systemd")
     (out_dir / "work").mkdir(parents=True, exist_ok=True)
     _write_meta(out_dir, args, scen_path if scen_path.exists() else None, len(jobs), limits=limits,
                 limits_check=check, only=args.only, cap_s=CAP_S, slice_masks=SLICE_MASKS)

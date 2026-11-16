@@ -386,3 +386,29 @@ class RobustnessTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ScaleNoLimitsTests(unittest.TestCase):
+    """--no-limits must not create 'limited' scaling measurements that ran without limits."""
+
+    def test_no_limits_runs_only_the_unlimited_setup(self):
+        import argparse
+        import tempfile
+        from unittest import mock
+        import run_reroute
+        seen = {}
+
+        def fake_jobs(quick, only, cases, limits_ok):
+            seen["limits_ok"] = limits_ok
+            return []
+
+        with tempfile.TemporaryDirectory() as tmp:
+            args = argparse.Namespace(summarize=False, quick=False, no_limits=True, sudo=False, only="stops",
+                                      scenarios=Path(tmp) / "missing.json", walk=None, graph=Path(tmp) / "g",
+                                      corridors=Path(tmp) / "c", instance=None, out_dir=Path(tmp), code_version="x", command="scale")
+            with mock.patch.object(run_reroute, "scale_jobs", fake_jobs), \
+                    mock.patch.object(run_reroute, "summarize", lambda out_dir: None):
+                run_reroute.cmd_scale(args)
+        self.assertIs(seen["limits_ok"], False)
+        self.assertEqual([j["setup"] for j in run_reroute.scale_jobs(False, "stops", None, False)][:1], ["unlimited"])
+        self.assertNotIn("limited", {j["setup"] for j in run_reroute.scale_jobs(False, "stops", None, False)})
