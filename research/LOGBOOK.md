@@ -460,3 +460,82 @@ OR-Tools 9.15.6755), 2 runs in parallel, 60 s unlimited search each. All runs fi
 
 **Optimization part of FYP-1: experiments B1 and Q1 and both robustness checks are done, all passed.**
 Next: write the optimization chapter, then the road-block test and rerouting.
+
+## 2026-11-16: Rerouting: problem, methods and rules (fixed before any scenario exists)
+
+Plan: `research/plans/2026-11-15-rerouting-plan.md` (version 2); implementation plans in `research/plans/`.
+This entry fixes what the experiments will judge. It is written before the scenario file is built, so no
+delay has been seen. The values the draft left open were set to the proposed values (walkers start 60 s after
+the decision at 1.2 m/s; thresholds below). They are not changed after any result exists.
+
+**Problem (one bus, morning run)**
+
+- Given: bus position and time; remaining stops with students, a walking limit and a must-serve flag;
+  candidate boarding points (the remaining stops plus other known stops within 800 m walk); walking
+  distances from OSRM's foot profile; one or more closures; points already committed to.
+- Decide: which candidates to visit, in what order, and where each stop's students board.
+- Rules: every stop boards at one visited point within its walking limit; a must-serve stop boards at
+  itself; stop time 60 s per visited point plus 5 s per student; walkers start 60 s after the decision at
+  1.2 m/s; the bus does not leave a point before its walkers arrive.
+- Reachability: a point inside a full-block closure cannot be visited, in both travel-time sources.
+  A stop with no boarding point in range is `unserved` and counts as a failure.
+- Objective: earliest arrival at campus. Total walking breaks ties between plans the solver holds with
+  equal arrival; the exact method guarantees the earliest arrival, not the least walking.
+
+**Methods**
+
+- R0: published order, every remaining stop visited, detour around the closure. Baseline.
+- R2: greedy (add the point that boards the most students per second of detour, then try removals).
+- R3: exact, by dynamic programming over (set of boarded stops, last point). On true travel times with
+  no time limit this is the oracle: the best plan in this model, not a bound on any possible reroute.
+  Run only for 16 or fewer stops plus committed points.
+
+**Two travel-time sources**
+
+- Truth: OSRM 5.27.1 re-customized with the closure, each time from an untouched copy of its files.
+  Used only to build the scenario file and to score plans.
+- Under test: a road graph built from the same map file, searched in memory on a corridor around the
+  route. Plans made on it are scored on the truth. `backend/apps/transport/corridor.py` already holds
+  a greedy covering-path heuristic for drawing route lines on the public Valhalla server; R2 here is
+  a separate implementation for a blocked network.
+
+**Scenarios**
+
+- Synthetic: for each current route with at least 3 stops, two full-block closures, each a 200 m circle
+  at the middle of a leg between two stops: leg ceil(n/3) and leg ceil(2n/3). Two bus positions each:
+  at the first stop with nothing served, and at the last stop before the closure.
+- Historical, reported separately and never pooled: Shahrah-e-Faisal between Karsaz and FTC, full
+  block; University Road between Hasan Square and NIPA, slowed to 10 km/h.
+- This narrows the 10 November wording "on or near shuttle routes" to closures on routes; a 200 m
+  circle also closes the side roads beside them.
+- Judged set: scenarios with at least 2 remaining stops where R0 loses at least 60 s. The share outside
+  it is reported.
+
+**Thresholds, fixed now, judged on synthetic scenarios in the judged set**
+
+Quality pass (true times, no time limit; walking limits 0, 400, 800 m):
+1. Closure-specific gain at 400 m, that is (R0 minus R3 with the closure) minus (R0 minus R3 with no
+   closure): median at least 60 s.
+2. R2's delay within 60 s of R3's in at least 90% of scenarios, and on the median of every route.
+3. No run has a student walking beyond the limit or unserved where a boarding point exists, and R3
+   never arrives later than R0.
+
+Limits pass (512 MB, no swap, 0.1 CPU; graph loaded; plans made on the graph; 3 repeats; worst repeat):
+4. A valid plan within 5 s in at least 95% of scenarios.
+5. At 30 s, delay within 60 s of the oracle's in at least 90% of scenarios.
+6. Peak memory under 400 MB including the graph.
+
+Reported, not judged: must-serve stops (25% of remaining stops, fixed draw); the two arms that separate
+graph error from the time limit; results per route with the worst route named; scaling runs.
+
+**Gate rules for week 1, fixed now**
+
+- Graph calibration against matrix M1: median absolute error at most 15%, median signed error not
+  negative. One factor first; one factor per road class if that fails.
+- Graph timing on the longest route's corridor under the limits: the 14 rows R0 needs in at most 5 s,
+  31 rows in at most 30 s.
+- If either fails: the limits pass plans on saved pre-closure times, reports solver-only time, and the
+  travel-time source is stated as a limitation.
+
+**Caveats carried over**: synthetic students; OSRM free-flow times as truth; limits simulated with
+cgroups on a laptop; the bus is assumed to be at a stop when the closure is reported.
