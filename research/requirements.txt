@@ -1,2 +1,9 @@
 ortools==9.15.6755
 h3
+# Rerouting solver (R3) and the road graph
+numpy
+scipy
+# Offline road-graph build only (build_graph.py reads the .osm.pbf map file)
+osmium
+# Peak memory on Windows (Linux uses the standard library's resource module)
+psutil

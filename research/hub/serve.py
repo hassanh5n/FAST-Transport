@@ -243,7 +243,11 @@ class Job:
                     raise RuntimeError(f"Unknown experiment {kind}.")
                 title = exp["title"]
                 version = code_version()
-                args = " ".join(f"'{a.replace('{code_version}', version)}'" for a in exp.get("args", []))
+                if version == "unknown" and any("{code_version}" in a for a in exp.get("args", [])):
+                    # A run recorded with code version "unknown" cannot be traced back to its code.
+                    raise RuntimeError("Git could not report the code version, so this run would be recorded "
+                                       "as 'unknown'. Install Git for Windows (git-scm.com) and reopen the hub.")
+                args =" ".join(f"'{a.replace('{code_version}', version)}'" for a in exp.get("args", []))
                 script = f"cd '{WSL_REPO}' && {VENV_PY} -u '{exp['script']}' {args}"
             LOGS.mkdir(exist_ok=True)
             log_path = LOGS / f"{kind}-{datetime.now().strftime('%Y%m%d-%H%M%S')}.log"

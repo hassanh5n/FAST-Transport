@@ -28,7 +28,7 @@ FleetCentric.ai: a transport management system for FAST NUCES Karachi shuttles. 
 
 ### Things to know
 - Local dev points at the shared hosted Postgres; do not write test data without asking.
-- The research optimizer (School Bus Routing Problem solver) is not built yet; `route_plans.py` is where proposals would plug in.
+- The research optimizer (OR-Tools School Bus Routing Problem solver, `research/optimize.py`) and the rerouting solver (`research/reroute/`) live in `research/` and are not wired into the website yet; `route_plans.py` is where proposals would plug in. `research/LOGBOOK.md` is the source of truth for research results and `research/plans/PROGRESS.md` tracks what is done.
 
 ## graphify
 

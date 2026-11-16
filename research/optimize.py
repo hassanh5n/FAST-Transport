@@ -11,12 +11,16 @@ Model (decisions logged 2026-11-03 in LOGBOOK.md):
 - Objective: total student ride time (each student's minutes from pickup to campus),
   plus driving seconds as a small tie-breaker.
 
+Travel times reach OR-Tools one of two ways (`solve(..., lookup=...)`): "callback" (the default; every
+recorded result, B1, Q1, T1 and S1, used it) asks Python for each arc, "matrix" hands OR-Tools the
+whole table once (run_scale.py compares the two). Both truncate times to whole seconds the same way.
+
 Writes research/results/<run_id>.json (all numbers) and <run_id>.html (map + search progress).
-Research only: no Django, no website settings, no database.
+Research only: no Django, no website settings, no database. Imports on Linux and Windows.
 """
 import argparse
 import json
-import resource
+import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -28,39 +32,38 @@ DATA, RESULTS = ROOT / "data", ROOT / "results"
 DEADLINE = 3 * 3600          # 08:00, with time measured from 05:00
 MAX_RIDE_S = 90 * 60
 STOP_BASE_S, STOP_PER_STUDENT_S = 60, 5
+LOOKUPS = ("callback", "matrix")
+TO_DUMMY_S = 10 ** 7                 # no bus ever drives back to the dummy start node
+UNREACHABLE_S = 10 ** 7              # a None travel time (OSRM found no road): longer than any day, so never used
 
 
-def sparse_estimate(T, points, k):
-    """Query experiment: keep real times only for each stop to its k nearest stops (by straight line)
-    and to campus; estimate every other pair as a + b * straight-line metres, fitted on the kept pairs.
-    Returns the matrix the optimizer plans on and what it cost. T itself is never changed."""
-    import math
-    n = len(T)
-    rad = math.pi / 180
+def peak_memory_mb() -> int | None:
+    """Peak resident memory of this process in MB, or None where it cannot be read.
 
-    def dist(i, j):
-        (la1, lo1), (la2, lo2) = points[i], points[j]
-        x = (lo2 - lo1) * rad * math.cos((la1 + la2) * rad / 2)
-        return 6371000 * math.hypot(x, (la2 - la1) * rad)
+    Linux: resource.getrusage (ru_maxrss is in KB; bytes on macOS), the figure every recorded run used.
+    Windows: psutil's peak working set. The two are close but not identical measures.
+    """
+    try:
+        import resource                       # Unix only, so imported here and not at the top
+        kb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+        return round(kb / (1024 * 1024 if sys.platform == "darwin" else 1024))   # macOS reports bytes
+    except ImportError:
+        pass
+    try:
+        import psutil
+        info = psutil.Process().memory_info()
+        peak = getattr(info, "peak_wset", None) or getattr(info, "rss", None)
+        return round(peak / 2 ** 20) if peak else None
+    except (ImportError, OSError):
+        return None
 
-    D = [[dist(i, j) for j in range(n)] for i in range(n)]
-    queried = {(i, 0) for i in range(1, n)}                        # every stop to campus
-    for i in range(1, n):
-        near = sorted((j for j in range(1, n) if j != i), key=lambda j: D[i][j])[:k]
-        queried.update((i, j) for j in near)
-    xs = [D[i][j] for i, j in queried]
-    ys = [T[i][j] for i, j in queried]
-    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
-    b = sum((x - mx) * (y - my) for x, y in zip(xs, ys)) / sum((x - mx) ** 2 for x in xs)
-    a = my - b * mx
-    M = [[T[i][j] if (i, j) in queried or i == j else a + b * D[i][j] for j in range(n)] for i in range(n)]
-    errs = sorted(abs(M[i][j] - T[i][j]) / T[i][j] for i in range(1, n) for j in range(1, n)
-                  if i != j and (i, j) not in queried and T[i][j] > 0)
-    info = {"k": k, "queried_cells": len(queried), "full_cells": n * (n - 1),
-            "query_share": round(len(queried) / (n * (n - 1)), 4),
-            "fit_s": {"a": round(a, 1), "b_per_km": round(b * 1000, 1)},
-            "estimate_median_abs_error_pct": round(100 * errs[len(errs) // 2], 1) if errs else 0.0}
-    return M, info
+
+def arc_s(seconds: float | None) -> int:
+    """A travel time as the solver sees it: truncated to whole seconds, UNREACHABLE_S for None.
+
+    build_matrix.py stores pairs OSRM cannot route as None. UNREACHABLE_S exceeds the Time dimension's
+    capacity (DEADLINE), so no route can use that arc and a stop with no usable arc is dropped."""
+    return UNREACHABLE_S if seconds is None else int(seconds)
 
 
 def stop_time(students):
@@ -92,30 +95,63 @@ def score(routes, T, q):
             "bus_driving_min": round(drive / 60)}
 
 
-def solve(T, q, capacities, time_limit):
+def transit_tables(T, q):
+    """Node-indexed tables for lookup="matrix": (drive, time, demand), with the dummy start node at len(T).
+
+    Same rules as the callbacks in solve: nothing from the dummy, TO_DUMMY_S to it, otherwise the travel
+    time truncated to whole seconds (arc_s, as the callback does); the time table adds the stop time of
+    the node being left unless it is campus or the dummy. Demand is 0 at campus and the dummy."""
+    n = len(T)
+    dummy = n
+    drive = [[0] * (n + 1) for _ in range(n + 1)]                 # row dummy: all zero
+    for a in range(n):
+        drive[a] = [arc_s(T[a][b]) for b in range(n)] + [TO_DUMMY_S]
+    timed = [[d + (stop_time(q[a]) if a not in (0, dummy) else 0) for d in drive[a]] for a in range(n + 1)]
+    demand = [0] + [q[i] for i in range(1, n)] + [0]
+    return drive, timed, demand
+
+
+def solve(T, q, capacities, time_limit, lookup="callback", timings=False):
+    """Plan routes on matrix T (node 0 campus) for stops with q students and buses with these capacities.
+
+    lookup: "callback" (default, every recorded result) or "matrix" (tables handed to OR-Tools once).
+    A None in T (no road) makes that arc unusable; a stop no bus can reach in time ends up in "dropped".
+    Returns (result, progress), or (result, progress, {"build_s", "first_plan_s"}) when timings is true.
+    result is {"routes", "dropped"} or None; progress is [(seconds since search start, cost), ...].
+    build_s is the model construction before SolveWithParameters; first_plan_s is from entering solve.
+    """
+    if lookup not in LOOKUPS:
+        raise ValueError(f"lookup must be one of {LOOKUPS}, not {lookup!r}")
+    entered = time.perf_counter()
     n = len(T)                       # node 0 campus, 1..n-1 stops
     dummy, size, buses = n, n + 1, len(capacities)
     manager = pywrapcp.RoutingIndexManager(size, buses, [dummy] * buses, [0] * buses)
     routing = pywrapcp.RoutingModel(manager)
 
-    def drive(i, j):
-        a, b = manager.IndexToNode(i), manager.IndexToNode(j)
-        if a == dummy:
-            return 0
-        if b == dummy:
-            return 10 ** 7
-        return int(T[a][b])
+    if lookup == "callback":
+        def drive(i, j):
+            a, b = manager.IndexToNode(i), manager.IndexToNode(j)
+            if a == dummy:
+                return 0
+            if b == dummy:
+                return TO_DUMMY_S
+            return arc_s(T[a][b])
 
-    def transit(i, j):
-        a = manager.IndexToNode(i)
-        return drive(i, j) + (stop_time(q[a]) if a not in (0, dummy) else 0)
+        def transit(i, j):
+            a = manager.IndexToNode(i)
+            return drive(i, j) + (stop_time(q[a]) if a not in (0, dummy) else 0)
 
-    drive_cb = routing.RegisterTransitCallback(drive)
-    time_cb = routing.RegisterTransitCallback(transit)
+        drive_cb = routing.RegisterTransitCallback(drive)
+        time_cb = routing.RegisterTransitCallback(transit)
+        demand_cb = routing.RegisterUnaryTransitCallback(
+            lambda i: 0 if manager.IndexToNode(i) in (0, dummy) else q[manager.IndexToNode(i)])
+    else:
+        # OR-Tools 9.15 indexes these tables by node and maps routing indices itself
+        drive_m, time_m, demand_v = transit_tables(T, q)
+        drive_cb = routing.RegisterTransitMatrix(drive_m)
+        time_cb = routing.RegisterTransitMatrix(time_m)
+        demand_cb = routing.RegisterUnaryTransitVector(demand_v)
     routing.SetArcCostEvaluatorOfAllVehicles(drive_cb)
-
-    demand_cb = routing.RegisterUnaryTransitCallback(
-        lambda i: 0 if manager.IndexToNode(i) in (0, dummy) else q[manager.IndexToNode(i)])
     routing.AddDimensionWithVehicleCapacity(demand_cb, 0, capacities, True, "Load")
 
     routing.AddDimension(time_cb, 0, DEADLINE, False, "Time")   # no waiting mid-route
@@ -137,9 +173,12 @@ def solve(T, q, capacities, time_limit):
     params.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
     params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     params.time_limit.FromSeconds(time_limit)
+    build_s = time.perf_counter() - entered
     solution = routing.SolveWithParameters(params)
+    times = {"build_s": round(build_s, 3),
+             "first_plan_s": round(t0 - entered + progress[0][0], 2) if progress else None}
     if solution is None:
-        return None, progress
+        return (None, progress, times) if timings else (None, progress)
     routes = []
     for v in range(buses):
         idx, stops = routing.Start(v), []
@@ -150,7 +189,8 @@ def solve(T, q, capacities, time_limit):
             idx = solution.Value(routing.NextVar(idx))
         routes.append(stops)
     visited = {s for r in routes for s in r}
-    return {"routes": routes, "dropped": [i for i in range(1, n) if i not in visited]}, progress
+    result = {"routes": routes, "dropped": [i for i in range(1, n) if i not in visited]}
+    return (result, progress, times) if timings else (result, progress)
 
 
 def main():
@@ -162,9 +202,6 @@ def main():
     ap.add_argument("--out-dir", type=Path, default=RESULTS, help="where to write the run files")
     ap.add_argument("--run-id", default=None, help="fixed run id instead of a timestamp (used by run_budget.py)")
     ap.add_argument("--no-html", action="store_true", help="write only the JSON")
-    ap.add_argument("--k", type=int, default=0,
-                    help="query experiment: plan on real times to the k nearest stops only, the rest estimated "
-                         "(0 = full real matrix). Plans are always scored on the full real matrix.")
     args = ap.parse_args()
     if args.render:
         run = Path(args.render)
@@ -198,18 +235,10 @@ def main():
         baseline = score(baseline_routes, T, q)
 
         cpu0, wall0 = time.process_time(), time.perf_counter()
-        if args.k:
-            points = [(inst["campus"]["lat"], inst["campus"]["lng"])] + \
-                     [(by_name[n]["lat"], by_name[n]["lng"]) for n in nodes[1:]]
-            T_plan, matrix_info = sparse_estimate(T, points, args.k)
-        else:
-            T_plan, matrix_info = T, {"k": 0, "queried_cells": len(T) * (len(T) - 1),
-                                      "full_cells": len(T) * (len(T) - 1), "query_share": 1.0}
-        result, progress = solve(T_plan, q, caps, args.time_limit)
+        result, progress = solve(T, q, caps, args.time_limit)
         cpu, wall = time.process_time() - cpu0, time.perf_counter() - wall0
         entry = {"baseline": baseline, "solve_wall_s": round(wall, 1), "solve_cpu_s": round(cpu, 1),
-                 "peak_rss_mb": round(resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024),
-                 "progress": progress, "matrix": matrix_info}
+                 "peak_rss_mb": peak_memory_mb(), "progress": progress}
         if result is None:
             entry["optimized"] = None
             print(f"{cname}: no feasible plan found in {args.time_limit} s")

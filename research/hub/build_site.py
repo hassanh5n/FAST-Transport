@@ -20,6 +20,7 @@ WEB = HUB / "web"
 sys.path.insert(0, str(RESEARCH))
 import run_budget  # noqa: E402  (stdlib only at import time)
 import run_query_budget  # noqa: E402  (stdlib only at import time)
+import run_reroute  # noqa: E402  (stdlib only at import time)
 import run_robustness  # noqa: E402  (stdlib only at import time)
 
 def load_experiments():
@@ -133,6 +134,8 @@ def build(out, git_info=None):
                 summary = run_query_budget.build_summary(d)
             elif exp.get("kind") == "robustness":
                 summary = run_robustness.build_summary(d)
+            elif exp.get("kind") == "reroute":
+                summary = run_reroute.build_summary(d)
             else:
                 summary = generic_summary(d, exp)
         rows = {r["key"]: r for r in (summary or {}).get("rows", [])}

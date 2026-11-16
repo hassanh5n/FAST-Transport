@@ -1,0 +1,310 @@
+{
+ "version": "reroute-toy",
+ "instance": null,
+ "graph": null,
+ "built_at": null,
+ "note": "Hand-made toy scenarios for --quick runs; written by run_reroute.py make-toy.",
+ "closures": [
+  {
+   "id": "T-L1",
+   "kind": "synthetic",
+   "contractor": "T",
+   "route": "T",
+   "leg": 1,
+   "factor": 0.0,
+   "circles": [
+    [
+     24.9,
+     67.0,
+     200.0
+    ]
+   ],
+   "points": [
+    0,
+    1,
+    2
+   ],
+   "closed_points": [],
+   "pre": [
+    [
+     0,
+     100,
+     300,
+     650
+    ],
+    [
+     100,
+     0,
+     200,
+     590
+    ],
+    [
+     300,
+     200,
+     0,
+     500
+    ],
+    [
+     null,
+     null,
+     null,
+     0
+    ]
+   ],
+   "post": [
+    [
+     0,
+     100,
+     300,
+     650
+    ],
+    [
+     100,
+     0,
+     400,
+     590
+    ],
+    [
+     300,
+     400,
+     0,
+     700
+    ],
+    [
+     null,
+     null,
+     null,
+     0
+    ]
+   ],
+   "segments": 0,
+   "leaks": 0,
+   "customize_s": 0.0
+  },
+  {
+   "id": "T-L2",
+   "kind": "synthetic",
+   "contractor": "T",
+   "route": "T",
+   "leg": 2,
+   "factor": 0.0,
+   "circles": [
+    [
+     24.9,
+     67.0,
+     200.0
+    ]
+   ],
+   "points": [
+    10,
+    11,
+    12
+   ],
+   "closed_points": [],
+   "pre": [
+    [
+     0,
+     100,
+     300,
+     650
+    ],
+    [
+     100,
+     0,
+     200,
+     590
+    ],
+    [
+     300,
+     200,
+     0,
+     500
+    ],
+    [
+     null,
+     null,
+     null,
+     0
+    ]
+   ],
+   "post": [
+    [
+     0,
+     100,
+     300,
+     650
+    ],
+    [
+     100,
+     0,
+     400,
+     590
+    ],
+    [
+     300,
+     400,
+     0,
+     700
+    ],
+    [
+     null,
+     null,
+     null,
+     0
+    ]
+   ],
+   "segments": 0,
+   "leaks": 0,
+   "customize_s": 0.0
+  },
+  {
+   "id": "T-L3",
+   "kind": "synthetic",
+   "contractor": "T",
+   "route": "T",
+   "leg": 3,
+   "factor": 0.0,
+   "circles": [
+    [
+     24.9,
+     67.0,
+     200.0
+    ]
+   ],
+   "points": [
+    20,
+    21,
+    22
+   ],
+   "closed_points": [
+    22
+   ],
+   "pre": [
+    [
+     0,
+     100,
+     300,
+     650
+    ],
+    [
+     100,
+     0,
+     200,
+     590
+    ],
+    [
+     300,
+     200,
+     0,
+     500
+    ],
+    [
+     null,
+     null,
+     null,
+     0
+    ]
+   ],
+   "post": [
+    [
+     0,
+     100,
+     null,
+     650
+    ],
+    [
+     100,
+     0,
+     null,
+     590
+    ],
+    [
+     null,
+     null,
+     0,
+     null
+    ],
+    [
+     null,
+     null,
+     null,
+     0
+    ]
+   ],
+   "segments": 0,
+   "leaks": 0,
+   "customize_s": 0.0
+  }
+ ],
+ "scenarios": [
+  {
+   "id": "T-L1-late",
+   "closure": "T-L1",
+   "trigger": "late",
+   "position": 0,
+   "remaining": [
+    1,
+    2
+   ],
+   "students": {
+    "1": 4,
+    "2": 2
+   },
+   "candidates": [],
+   "tags": {
+    "remaining": 2,
+    "closure_contains_stop": false
+   }
+  },
+  {
+   "id": "T-L2-late",
+   "closure": "T-L2",
+   "trigger": "late",
+   "position": 10,
+   "remaining": [
+    11,
+    12
+   ],
+   "students": {
+    "11": 4,
+    "12": 2
+   },
+   "candidates": [],
+   "tags": {
+    "remaining": 2,
+    "closure_contains_stop": false
+   }
+  },
+  {
+   "id": "T-L3-late",
+   "closure": "T-L3",
+   "trigger": "late",
+   "position": 20,
+   "remaining": [
+    21,
+    22
+   ],
+   "students": {
+    "21": 4,
+    "22": 2
+   },
+   "candidates": [],
+   "tags": {
+    "remaining": 2,
+    "closure_contains_stop": true
+   }
+  }
+ ],
+ "walk": [
+  [
+   2,
+   1,
+   240.0
+  ],
+  [
+   22,
+   21,
+   240.0
+  ]
+ ]
+}

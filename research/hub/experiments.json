@@ -138,5 +138,104 @@
   "runs_total": 4,
   "question": "Does the seed-check pipeline work? 5 s runs, about 15 seconds. Not a reported result.",
   "design": "Seeds 2026 and 2027 only."
+ },
+ {
+  "id": "optimizer-scale",
+  "title": "Optimizer scaling",
+  "kind": "scale",
+  "main": true,
+  "dir": "results/optimizer-scale",
+  "script": "research/run_scale.py",
+  "args": [
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 8,
+  "question": "How do the optimizer's build time, memory and plan quality grow as stops and buses grow, and does handing OR-Tools the travel times as a matrix instead of a Python callback change that?",
+  "design": "Instances Jadoon (171 stops), Nadeem (143), All (311, both fleets) and All-doubled (622, every stop copied 30 s from its original, so it tests model size, not geography); lookups callback and matrix; 300 s each, no limits, each run a fresh process. 8 runs, about 40 minutes. No pass/fail threshold: it reports curves. All and All-doubled need the combined matrix and are recorded as skipped without it."
+ },
+ {
+  "id": "reroute-quality",
+  "title": "Rerouting quality pass",
+  "kind": "reroute",
+  "main": true,
+  "dir": "results/reroute-quality",
+  "script": "research/run_reroute.py",
+  "args": [
+   "quality",
+   "--workers",
+   "2",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": null,
+  "question": "When a road on a bus's route is closed, how much does letting students walk to another stop gain over the patched published route, beyond what skipping a stop saves on a normal day, and is the fast greedy method close to the exact one?",
+  "design": "Every frozen scenario (about 210: two 200 m full-block closures per route, two bus positions each, plus the historical Shahrah-e-Faisal block and University Road ponding, reported apart) x walking limits 0, 400 and 800 m x R0 (patched route), R2 (greedy) and R3 (exact) on true OSRM times with no time limit. At 400 m two more arms: the no-closure control (same solve on unblocked times) and must-serve (25% of stops, fixed draw). Judged on synthetic scenarios with at least 2 remaining stops where R0 loses at least 60 s: median closure-specific gain at least 60 s; R2 within 60 s of R3 in 90% of scenarios and on every route's median; no failed run. runs_total is set by the script from the scenario file (5 rows per scenario)."
+ },
+ {
+  "id": "reroute-limits",
+  "title": "Rerouting limits pass",
+  "kind": "reroute",
+  "main": true,
+  "dir": "results/reroute-limits",
+  "script": "research/run_reroute.py",
+  "args": [
+   "limits",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": null,
+  "question": "On a free-tier server (512 MB, no swap, 0.1 CPU), with the road graph already loaded, how fast does the rerouter have a valid plan, and how close to the oracle is it at 30 s?",
+  "design": "Every scenario at 400 m. One worker process per route, arm and repeat loads the graph once and solves that route's scenarios in turn. Arms: plan on the road graph under the limits with a 30 s cap (3 repeats, judged); plan on the graph with no limits (graph error alone); plan on true times under the limits (time limit alone). Every plan is scored on true times against the oracle (R3 on true times, no limit). Judged on the worst repeat: a valid plan within 5 s in 95% of judged scenarios; within 60 s of the oracle at 30 s in 90%; peak memory under 400 MB including the graph. Limits applied with systemd cgroups in WSL; runs_total is set by the script (7 rows per scenario)."
+ },
+ {
+  "id": "reroute-scale",
+  "title": "Rerouting scaling",
+  "kind": "reroute",
+  "main": true,
+  "dir": "results/reroute-scale",
+  "script": "research/run_reroute.py",
+  "args": [
+   "scale",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 109,
+  "question": "How do decision time and memory grow with stops on one bus, with the size of the road graph searched, and with the number of buses one closure hits at once, and what does solving in slices cost?",
+  "design": "Stops: synthetic problems with 4 to 20 remaining stops and 1, 2 or 4 extra boarding points per stop, 3 seeds, limited and unlimited (R3 not run above 16 stops; a lower bound instead). Graph: 10, 30 and 60 points on the longest route's corridor and on the whole city, limited and unlimited. Buses: the Shahrah-e-Faisal closure hitting 1, 5, 10 and 20 buses in one limited process sharing the row cache. Slices: the three largest judged scenarios solved 256 masks at a time, with plan quality and saved-state size after each slice. Each measurement runs in a fresh process. No pass/fail threshold: it reports curves."
+ },
+ {
+  "id": "reroute-quality-quick",
+  "title": "Rerouting quality pipeline test",
+  "kind": "reroute",
+  "main": false,
+  "dir": "results/reroute-quality-quick",
+  "script": "research/run_reroute.py",
+  "args": [
+   "quality",
+   "--quick",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 15,
+  "question": "Does the rerouting quality pipeline work? Three hand-checkable toy scenarios, a few seconds. Not a reported result.",
+  "design": "data/scenarios_toy.json (written by 'run_reroute.py make-toy'): the plan's toy, the same with no walking pair, and one with a stop inside the closure. 15 rows."
+ },
+ {
+  "id": "reroute-limits-quick",
+  "title": "Rerouting limits pipeline test",
+  "kind": "reroute",
+  "main": false,
+  "dir": "results/reroute-limits-quick",
+  "script": "research/run_reroute.py",
+  "args": [
+   "limits",
+   "--quick",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 3,
+  "question": "Does the rerouting limits pipeline work? Toy scenarios, plans on true times only (the toy file has no road graph), a few seconds. Not a reported result.",
+  "design": "The truth_limited arm on the three toy scenarios, one repeat, inside the systemd limits (needs WSL with systemd; on another machine run it by hand with --no-limits)."
  }
 ]

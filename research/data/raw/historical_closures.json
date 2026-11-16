@@ -1,0 +1,6 @@
+[{"id": "shahrah-e-faisal-2024-02-24", "name": "Shahrah-e-Faisal, Karsaz to FTC", "factor": 0.0,
+  "from": {"lat": null, "lng": null}, "to": {"lat": null, "lng": null}, "both_directions": true,
+  "source": "Aaj English TV, 24 Feb 2024; see the literature note, reference 76"},
+ {"id": "university-road-ponding", "name": "University Road, Hasan Square to NIPA", "factor": 0.25,
+  "from": {"lat": null, "lng": null}, "to": {"lat": null, "lng": null}, "both_directions": true,
+  "source": "Hussain, Ahmed and Ali 2018; see the literature note, reference 75"}]
