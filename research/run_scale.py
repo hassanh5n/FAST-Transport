@@ -3,7 +3,7 @@
     python research/run_scale.py --quick       # pipeline test: Nadeem, 10 s, both lookups, results/optimizer-scale-quick/
     python research/run_scale.py               # the run: 4 instances x 2 lookups x 300 s, about 40 min, resumable
     python research/run_scale.py --summarize   # print the table of finished runs
-    python research/run_scale.py --instances Nadeem-doubled --out-dir results/optimizer-scale-extra
+    python research/run_scale.py --instances Nadeem-doubled --out-dir research/results/optimizer-scale-extra
 
 Instances (scale_instances.py): Jadoon (171 stops), Nadeem (143), All (311 stops, both fleets) and
 All-doubled (622: every stop and bus twice, each copy 30 s from its original, so it tests model size,

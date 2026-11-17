@@ -172,7 +172,7 @@
   ],
   "runs_total": null,
   "question": "When a road on a bus's route is closed, how much does letting students walk to another stop gain over the patched published route, beyond what skipping a stop saves on a normal day, and is the fast greedy method close to the exact one?",
-  "design": "Every frozen scenario (about 210: two 200 m full-block closures per route, two bus positions each, plus the historical Shahrah-e-Faisal block and University Road ponding, reported apart) x walking limits 0, 400 and 800 m x R0 (patched route), R2 (greedy) and R3 (exact) on true OSRM times with no time limit. At 400 m two more arms: the no-closure control (same solve on unblocked times) and must-serve (25% of stops, fixed draw). Judged on synthetic scenarios with at least 2 remaining stops where R0 loses at least 60 s: median closure-specific gain at least 60 s; R2 within 60 s of R3 in 90% of scenarios and on every route's median; no failed run. runs_total is set by the script from the scenario file (5 rows per scenario)."
+  "design": "Every frozen scenario (about 210: two 200 m full-block closures per route, two bus positions each, plus the historical Shahrah-e-Faisal block and University Road ponding, reported apart) x walking limits 0, 400 and 800 m x R0 (patched route), R2 (greedy, then improvement rounds) and R3 (exact) on true OSRM times with no time limit. At 400 m two more arms: the no-closure control (same solve on unblocked times) and must-serve (25% of stops, fixed draw). Judged on synthetic scenarios with at least 2 remaining stops where R0 loses at least 60 s: median closure-specific gain at least 60 s; R2 within 60 s of R3 in 90% of scenarios and on every route's median; no failed run. runs_total is set by the script from the scenario file (5 rows per scenario)."
  },
  {
   "id": "reroute-limits",
@@ -272,5 +272,26 @@
   "runs_total": 4,
   "question": "Does the rerouting scaling pipeline work? A few seconds. Not a reported result.",
   "design": "Stops at 4 and 8 on synthetic problems without limits, and solving in slices on the two judged toy scenarios."
+ },
+ {
+  "id": "reroute-scale-r2-insertion",
+  "title": "Rerouting scaling, first run (greedy-only R2)",
+  "kind": "reroute",
+  "main": false,
+  "dir": "results/reroute-scale-r2-insertion",
+  "script": "research/run_reroute.py",
+  "args": [
+   "scale",
+   "--only",
+   "stops",
+   "--no-limits",
+   "--out-dir",
+   "research/results/reroute-scale-r2-insertion",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 45,
+  "question": "Evidence kept from the first RS1 'stops' run, before R2 gained its improvement rounds (logbook, 17 November). Superseded by Rerouting scaling.",
+  "design": "Synthetic problems, 4 to 20 stops, 1, 2 or 4 candidates per stop, 3 seeds, unlimited, on code 7299036. Do not rerun: the current code gives the rerun's results."
  }
 ]

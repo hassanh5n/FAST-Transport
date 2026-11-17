@@ -19,12 +19,12 @@ on OSRM yet. Section 7 lists those runs in order.
 | --- | --- |
 | Optimization: experiments | done (B1, Q1, T1, S1 all passed and are logged) |
 | Optimization: chapter | draft committed; references, figures and the Nadeem bus-count point still open |
-| Optimization: scaling run | in progress: code done; planned entry committed (`c4c13f5`); run OS1 on Jadoon, Nadeem and their doubled instances is running on the lead's laptop, results pending; All and All-doubled blocked (need the combined matrix, so OSRM) |
+| Optimization: scaling run | in progress: run OS1 on Jadoon, Nadeem and their doubled instances done on the lead's laptop and logged (8 of 12 runs; code `7299036`, logged in `c1a9f8a`); All and All-doubled blocked (need the combined matrix, so OSRM) and run on the Docker laptop into `results/optimizer-scale-wsl/` |
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
-| Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (217 in `reroute/tests`, 235 in `tests`, all passing); commits `54a55f2` and `7299036` |
+| Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
 | Rerouting: data (graph, walking distances, scenarios) | blocked: needs the Docker laptop and the N1 map file (Section 7) |
-| Rerouting: experiments | quick pipeline tests are running and RS1 "stops" without limits is running or queued on the lead's laptop, results pending; quality, limits and the rest of scaling blocked on the data |
-| Rerouting: chapter | not started |
+| Rerouting: experiments | quick pipeline tests pass (logged 17 Nov, rerun on code `c1a9f8a`); RS1 "stops" without limits run twice and logged: first with the greedy-only R2 (`results/reroute-scale-r2-insertion/`, code `7299036`, logged in `c1a9f8a`), then with the improved R2 (`results/reroute-scale/`, code `c1a9f8a`, logged in `e59d26f`). Quality, limits, the limited "stops" rows and the graph, buses and slices parts blocked on the data and WSL; they run into `results/reroute-scale-wsl/` |
+| Rerouting: chapter | draft committed (`9132c3d`) from the plans and rules; updated 17 Nov (not yet committed) with the R2 change and the RS1 "stops" results; OS1 is in the optimization chapter (Section 7.6). Other results marked pending until each run is logged |
 | Website integration | design only (work plan Section 12); nothing to build before 6 December. `reroute.wire` is the request and proposal contract |
 
 ## 2. Done
@@ -67,11 +67,27 @@ then fixed.
   `build_matrix.py --combined` (17 Nov, `54a55f2`). Tested against a fake OSRM, not a real one
 - [x] Experiment runner code, Tasks 1 to 6: `reroute_cases.py`, `run_reroute.py`, `data/scenarios_toy.json`,
   hub entries and their `-quick` variants, `build_site.py` summary branch (17 Nov, `54a55f2`, `7299036`).
-  The quick tests of Tasks 3 to 6 are running, results pending (Section 3, Week 2)
+  The quick tests of Tasks 3 to 6 pass without limits (logged 17 Nov; rerun on `c1a9f8a`)
+- [x] R2 improved after RS1's first run: reorder, remove, nearest point, add and swap rounds until nothing
+  changes, with tests that no single move improves the final plan (17 Nov, `723f4c8`; Section 5)
 - [x] Optimizer scaling code, Tasks 1 to 3: `optimize.py` `lookup="callback"|"matrix"` and `timings=True`,
   portable peak memory, `scale_instances.py`, `run_scale.py`, hub entry `optimizer-scale` (17 Nov, `54a55f2`)
 - [x] Logbook entry planning OS1 and RS1 "stops" (17 Nov, `c4c13f5`, committed, not pushed); limits verdict
-  rules (17 Nov, `7299036`)
+  rules (17 Nov, `7299036`); entry on the rules settled during the build, with the README, hub plan, this
+  tracker and the rerouting chapter draft (17 Nov, `9132c3d`)
+
+### Rerouting and optimizer: first results (17 Nov, lead's Windows laptop, no limits)
+
+- [x] Quick pipeline tests: quality, limits without limits, rerouting scale and `run_scale.py --quick`, all ok
+  (code `7299036`, logged in `c1a9f8a`; rerun on code `c1a9f8a`, logged in `e59d26f`)
+- [x] Run OS1, contractor part: Jadoon, Nadeem, Jadoon-doubled, Nadeem-doubled x callback and matrix, 300 s
+  each, 8 of 12 runs (code `7299036`, logged 17 Nov in `c1a9f8a`, `results/optimizer-scale/`). The callback lookup stays the
+  default. Left: All and All-doubled on the Docker laptop (Section 7, item 9)
+- [x] Run RS1 part "stops" without limits, first run with the greedy-only R2 (code `7299036`, logged 17 Nov in `c1a9f8a`,
+  `results/reroute-scale-r2-insertion/`). It showed R2 far from R3, which led to the R2 change
+- [x] Run RS1 part "stops" without limits, rerun with the improved R2 (code `c1a9f8a`, logged 17 Nov in `e59d26f`,
+  `results/reroute-scale/`). Left: the limited "stops" rows and the graph, buses and slices parts in WSL
+  (Section 7, item 12)
 
 ## 3. Left to do
 
@@ -110,7 +126,7 @@ Names are not assigned yet.
 | [ ] blocked (needs a person, the map and the unblocked OSRM server); file committed with null coordinates | A | Historical closure end points pinned on the map | offline-builders, Task 5 | Sun 22 |
 | [ ] code done; run blocked (needs Docker laptop and map file; the limited mode also needs WSL with systemd) | B | Timings under limits, logged (L5) | road-graph, Task 7 | Sun 22 |
 | [x] (17 Nov) | C | Ladder with resumable solve | solver-core, Task 5 | Sun 22 |
-| [ ] not started | C | Chapter sections 1, 2, 3, 7 | logbook-and-chapter | Sun 22 |
+| [ ] drafted (`9132c3d`), R2 change added 17 Nov (not yet committed); not yet reviewed | C | Chapter sections 1, 2, 3, 7 | logbook-and-chapter | Sun 22 |
 
 **Gate G1 (Sun 22 Nov).** All five must be true, or follow the work plan's Section 11:
 
@@ -133,22 +149,22 @@ Names are not assigned yet.
 | [x] (17 Nov) | C | Summaries and verdict rules | experiment-runner, Task 2 | Wed 25 |
 | [ ] code done; run blocked (needs Docker laptop and map file) | A | Full scenario build; no leaks; file frozen and logged (L6) | offline-builders, Task 6 steps 3 to 5 | Thu 26 |
 | [ ] code done; run blocked (needs Docker laptop and map file) | A | Combined 311-stop matrix | offline-builders, Task 7 | Thu 26 |
-| [ ] code done; quick test running, result pending | C | Quality pass and toy file | experiment-runner, Task 3 | Thu 26 |
-| [ ] code done; quick test running without limits, result pending; `run_budget.py --check` needs WSL with systemd | C | Limits pass | experiment-runner, Task 4 | Fri 27 |
-| [ ] code done; quick tests running, results pending; the limited quick test needs WSL with systemd | C | Hub entries; both quick tests pass from the hub on the run machine | experiment-runner, Task 6 | Fri 27 |
+| [x] (17 Nov, `c1a9f8a`): `quality --quick` 15 of 15 rows ok, toy verdicts pass | C | Quality pass and toy file | experiment-runner, Task 3 | Thu 26 |
+| [ ] code done; quick test passes without limits (17 Nov, `c1a9f8a`); `run_budget.py --check` and the limited quick test need WSL with systemd | C | Limits pass | experiment-runner, Task 4 | Fri 27 |
+| [ ] code done; quick tests pass on the lead's laptop (17 Nov); still to do from the hub on the run machine, and the limited quick test needs WSL with systemd | C | Hub entries; both quick tests pass from the hub on the run machine | experiment-runner, Task 6 | Fri 27 |
 | [x] (17 Nov) | B | Reuse of pre-closure rows (first in the cut order) | road-graph, Task 8 | Fri 27 |
 | [x] (17 Nov) | B | Optimizer matrix lookup | optimizer-scaling, Task 1 | Fri 27 |
 | [ ] blocked (needs the frozen scenario file) | all | Quality pass run and logged the same day (L8) | experiment-runner, Task 7 | Sun 29 |
-| [ ] not started | all | Chapter sections 4, 5, 6 | logbook-and-chapter | Sun 29 |
+| [ ] section 6 drafted (`9132c3d`; R2 and RS1 timings updated 17 Nov, not yet committed); sections 4 and 5 drafted with results pending entries L2 to L6 | all | Chapter sections 4, 5, 6 | logbook-and-chapter | Sun 29 |
 
 ### Week 3, 30 Nov to 6 Dec. Run freeze Wed 2; draft Fri 4; done Sun 6
 
 | Done | Track | Task | Plan and task | Due |
 | --- | --- | --- | --- | --- |
-| [ ] code done; quick test running, result pending | C | Scaling runs coded | experiment-runner, Task 5 | Mon 30 |
-| [ ] code done and entry L7 committed (`c4c13f5`); push pending; quick test (`run_scale.py --quick`) running, result pending | B | Optimizer instances and scaling script; entry L7 pushed | optimizer-scaling, Tasks 2 to 3 | Mon 30 |
+| [x] (17 Nov): `scale --quick` 4 of 4 ok; part "stops" run without limits | C | Scaling runs coded | experiment-runner, Task 5 | Mon 30 |
+| [ ] code done, entry L7 committed (`c4c13f5`, committed minutes before OS1 started) and quick test ok (17 Nov, 2 of 2); the plan asks for L7 pushed before the run, but it was only committed: push pending | B | Optimizer instances and scaling script; entry L7 pushed | optimizer-scaling, Tasks 2 to 3 | Mon 30 |
 | [ ] blocked (needs the frozen scenario file and WSL with systemd) | all | Limits pass run and logged the same day (L9) | experiment-runner, Task 7 | Tue 1 |
-| [ ] in progress: OS1 contractor part running and RS1 "stops" without limits running or queued, results pending; the rest blocked (Section 7) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
+| [ ] in progress: OS1 contractor part (8 of 12 runs) and RS1 "stops" without limits (run twice, the second with the improved R2) done and logged 17 Nov; left: OS1 All and All-doubled, RS1 limited "stops" rows and the graph, buses and slices parts, on the Docker laptop into the `-wsl` folders (Section 7) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
 | [ ] | all | **Run freeze**: no new runs after Wed 2 Dec | - | Wed 2 |
 | [ ] | all | Chapter sections 8, 9, 10; references checked | logbook-and-chapter | Fri 4 |
 | [ ] | all | Internal review of the chapter by a second person | logbook-and-chapter | Fri 4 |
@@ -175,7 +191,8 @@ Names are not assigned yet.
 | Threshold 6 (memory) is judged on every `graph_limited` row, since memory is per process | before the limits pass | taken by the lead (17 Nov, `7299036`); team to confirm |
 | Quality pass: the worst route is the one with the largest median R2 minus R3; an unserved stop with a boarding point in range is a violation of rule 3 | before the quality pass | taken by the lead (17 Nov); team to confirm |
 | Doubled contractor instances stand in for All and All-doubled until the combined matrix exists | before OS1 is logged | taken by the lead (17 Nov, `c4c13f5`); team to confirm |
-| Whether the OS1 rows from the lead's laptop (no WSL, Windows peak memory) are reported beside the All rows from the Docker laptop, or the contractor instances are rerun there | before L10 | open |
+| Whether the OS1 rows from the lead's laptop (no WSL, Windows peak memory) are reported beside the All rows from the Docker laptop, or the contractor instances are rerun there | before L10 | taken (17 Nov, logbook rules entry, `9132c3d`): rows from the two machines are never pooled. Runs on the Docker laptop write to their own folders with `--out-dir` (`results/optimizer-scale-wsl/`, `results/reroute-scale-wsl/`), and each result entry names its machine |
+| R2 improves its greedy plan in rounds (reorder, remove, nearest point, add, swap); the L1 description of R2 is extended, thresholds unchanged | before the quality pass | taken by the lead (17 Nov, `723f4c8`), after RS1's first run and before any quality run; team to confirm |
 | A proposal with status `failed` must not be acted on (it may still carry a plan for information); a committed point that becomes unreachable reports "campus unreachable" for now | before any website build | taken by the lead (17 Nov); team to confirm |
 
 ## 5. Changes made while writing the implementation plans
@@ -219,6 +236,14 @@ These differ from the wording of the work plan. Each is stated in the plan that 
 | Unreachable pairs (`None`) become 10**7 s arcs | `optimize.py` | The stop is dropped instead of crashing the solver |
 | Quick result folders are published like the other `-quick` folders; per-job `work/` and `logs/` folders are gitignored | `research/results/`, `research/.gitignore` | Pipeline tests stay visible; intermediates stay out of git |
 | The hub refuses to start a run when git cannot give the code version | `research/hub/serve.py` | No run is recorded with code version `unknown` |
+| OS1 and RS1 "stops" ran from the command line, not from the hub as optimizer-scaling Task 3 Step 5 and experiment-runner Task 7 Step 3 say; each run's `meta.json` still records the code version | `run_scale.py`, `run_reroute.py` | The hub's Run buttons start the scripts in WSL, which the lead's laptop cannot start |
+| Runs on the Docker laptop write to their own folders with `--out-dir`: `results/optimizer-scale-wsl/` and `results/reroute-scale-wsl/` | `run_scale.py`, `run_reroute.py`; logbook rules entry (`9132c3d`) | Rows from the Windows laptop (no limits, Windows peak working set) are never pooled with WSL rows |
+
+### Changes made after the first results (17 Nov)
+
+| Change | Where | Why |
+| --- | --- | --- |
+| R2 keeps its greedy construction and fallback to R0, then improves the plan in rounds until nothing changes: reorder (move one point or reverse a segment), remove points, move stops to their nearest visited point, then add the one point, or failing that swap the one pair, that lowers the arrival most. Tests check that no single one of these moves improves the final plan. The L1 description of R2 ("greedy, then try removals") is extended; the thresholds do not change | `reroute/ladder.py` (`723f4c8`); logbook entry of 17 Nov | RS1's first run (`results/reroute-scale-r2-insertion/`) put the greedy-only R2 a median 68 to 285 s behind R3 (the table's group medians; the entry's text says 70), against the 60 s threshold 2 asks for. The rerun (`results/reroute-scale/`) has R2 within 60 s of R3 on 30 of 36 synthetic problems, largest gap 108 s, at most 0.5 CPU-s. Threshold 2 is still judged only in the quality pass |
 
 ## 6. Cuts taken
 
@@ -239,7 +264,8 @@ When a cut is taken: write it here with the date, and write logbook entry L11.
 
 The lead's laptop has no Docker, no OSRM, no Karachi `.osm.pbf` and cannot start WSL (virtualization is
 off). Everything below needs the Docker laptop and the N1 map file; items 4, 11 and 12 also need WSL
-with systemd. Run in this order, from the repository root unless stated. Log each
+with systemd. Results from that machine go to their own folders (`results/optimizer-scale-wsl/`,
+`results/reroute-scale-wsl/`) and are never pooled with the Windows laptop's rows. Run in this order, from the repository root unless stated. Log each
 result the same day.
 
 1. **A1: map file and OSRM.** Find the map file from run N1 (the plans call it `karachi.osm.pbf` and expect
@@ -265,13 +291,16 @@ result the same day.
 8. **Combined matrix.** With the untouched car server on port 5000:
    `python research/build_matrix.py --combined` (set `OSRM_URL` if the server is elsewhere). It checks the
    Jadoon and Nadeem pairs against `matrix_fall2026_v1.json` unless `--no-check` is given.
-9. **Optimizer All and All-doubled (OS1, L10).** `python research/run_scale.py --instances All,All-doubled`,
-   or the `optimizer-scale` entry in the hub, which runs the skipped instances once the matrix exists.
+9. **Optimizer All and All-doubled (OS1, L10).**
+   `python research/run_scale.py --instances All,All-doubled --out-dir research/results/optimizer-scale-wsl`.
+   Use the command, not the `optimizer-scale` hub entry: the hub writes to `results/optimizer-scale/`, which
+   holds the Windows laptop's rows, and the two machines' rows are never pooled.
 10. **Quality pass (L8).** `python research/run_reroute.py quality --workers 2`, or `reroute-quality` in the hub.
 11. **Limits pass (L9).** In WSL, plugged in, nothing else running: `python research/run_budget.py --check`
     must print `OK`; then `python research/run_reroute.py limits` (add `--sudo` if needed), or
     `reroute-limits` in the hub. The limited quick test (`python research/run_reroute.py limits --quick`)
     also belongs here.
-12. **Rerouting scaling, remaining parts (L10).** In WSL: `python research/run_reroute.py scale --only graph`,
-    `--only buses`, `--only slices`, and `--only stops` for the limited rows (the unlimited "stops" rows are
-    running or queued on the lead's laptop now).
+12. **Rerouting scaling, remaining parts (L10).** In WSL, each with `--out-dir research/results/reroute-scale-wsl`:
+    `python research/run_reroute.py scale --only graph`, `--only buses`, `--only slices`, and `--only stops`
+    for the limited rows. The unlimited "stops" rows from the lead's laptop are done and logged
+    (`results/reroute-scale/`, 17 Nov) and are not pooled with these.

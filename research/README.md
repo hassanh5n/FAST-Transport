@@ -54,7 +54,7 @@ the Windows environment below.
 | `run_robustness.py` | Traffic check and seed check on the optimization results |
 | `scale_instances.py` | Optimizer instances of growing size: one contractor, all 311 stops, and "doubled" copies |
 | `run_scale.py` | Optimizer scaling run: build time, memory and plan quality as stops and buses grow |
-| `reroute/` | The rerouting solver package. `model.py` (the problem for one bus, plans, scoring), `ladder.py` (R0 patched route, R2 greedy, R3 exact, run in that order), `wire.py` (request and proposal formats), `roadnet.py` (road tables from map ways), `closure.py` (closures matched to roads by geometry), `graph.py` (road graph at run time: corridors, closures, travel-time rows). Tests in `reroute/tests/` |
+| `reroute/` | The rerouting solver package. `model.py` (the problem for one bus, plans, scoring), `ladder.py` (R0 patched route, R2 greedy with improvement rounds, R3 exact, run in that order), `wire.py` (request and proposal formats), `roadnet.py` (road tables from map ways), `closure.py` (closures matched to roads by geometry), `graph.py` (road graph at run time: corridors, closures, travel-time rows). Tests in `reroute/tests/` |
 | `reroute_cases.py` | From a closure scenario to a solver problem, and plans scored on true travel times |
 | `run_reroute.py` | Rerouting experiments: quality pass, limits pass, scaling runs |
 | `build_graph.py` | Builds the compact road graph (`data/graph_karachi_v1/`) from the map file |
@@ -161,7 +161,7 @@ cd research
 ```
 
 In WSL, the same two commands with `~/fc-research-venv/bin/python`. Neither needs OSRM, Docker,
-the map file or the limits. On 17 Nov 2026: 217 and 235 tests, all passing.
+the map file or the limits. On 17 Nov 2026: 221 and 237 tests, all passing.
 
 ## Limits without Docker (systemd cgroups)
 
@@ -239,25 +239,32 @@ Thresholds are fixed in `run_robustness.py` and LOGBOOK (2026-11-10) before the 
 How do build time, memory and plan quality grow with stops and buses, and does handing OR-Tools the
 travel times as a matrix (`lookup="matrix"`) instead of a Python callback change that? Instances
 Jadoon (171 stops), Nadeem (143), All (311, both fleets) and All-doubled (622: every stop and bus
-twice, each copy 30 s from its original, so it tests model size, not geography), both lookups,
+twice, each copy 30 s from its original, so it tests model size, not geography), plus
+Jadoon-doubled (342) and Nadeem-doubled (286) standing in for size until All exists; both lookups,
 300 s each, no limits, each run a fresh process. No pass/fail threshold: it reports curves.
 
 ```bash
 cd $REPO
 ~/fc-research-venv/bin/python research/run_scale.py --quick       # pipeline test: Nadeem, 10 s, both lookups
-~/fc-research-venv/bin/python research/run_scale.py               # the run: 4 instances x 2 lookups x 300 s, about 40 min
-~/fc-research-venv/bin/python research/run_scale.py --summarize   # print the table of finished runs
-~/fc-research-venv/bin/python research/run_scale.py --instances Jadoon,Nadeem,Jadoon-doubled,Nadeem-doubled
+~/fc-research-venv/bin/python research/run_scale.py --instances Jadoon,Nadeem,All,All-doubled,Jadoon-doubled,Nadeem-doubled   # run OS1: 6 instances x 2 lookups x 300 s, results/optimizer-scale/
+~/fc-research-venv/bin/python research/run_scale.py --instances All,All-doubled --out-dir research/results/optimizer-scale-wsl   # Docker laptop, once the combined matrix exists
+~/fc-research-venv/bin/python research/run_scale.py --summarize --out-dir research/results/optimizer-scale-wsl   # print the table of finished runs
 ```
+
+Without `--instances` the script runs Jadoon, Nadeem, All and All-doubled only.
 
 - `--instances` takes comma-separated names; `<name>-doubled` works for any instance.
 - All and All-doubled need the combined matrix `data/matrix_fall2026_v1_all.json`
   (`build_matrix.py --combined`, Docker laptop). Without it they are recorded as `skipped` and run
   on the next start once the file exists. Until then Jadoon-doubled and Nadeem-doubled stand in.
-- Resumable: finished runs are in `results/optimizer-scale/runs.jsonl`.
+- Resumable: finished runs are in `<out-dir>/runs.jsonl` (default `results/optimizer-scale/`).
+- Runs on the Docker laptop go to `results/optimizer-scale-wsl/` with `--out-dir` (a path from
+  where the command runs, so `research/results/...` from `$REPO`). The default folder holds run OS1
+  from the Windows laptop; rows from the two machines are never pooled.
 - `build_s` is not comparable between the two lookups (the callback is lazy).
-- Run OS1 (Jadoon, Nadeem and both doubled, both lookups, 300 s) is running on 17 Nov 2026.
-  Results: pending.
+- Run OS1 (17 Nov 2026, Windows laptop, no limits; 8 of 12 runs, All and All-doubled pending): the
+  matrix lookup is never better than the callback at 300 s, so the callback stays the default. See
+  LOGBOOK, 2026-11-17, scaling results.
 
 ## Rerouting experiments
 
@@ -289,8 +296,8 @@ stop when the scenario file is missing; the scaling run skips the parts whose fi
 ```bash
 ~/fc-research-venv/bin/python research/run_reroute.py quality --workers 2           # results/reroute-quality/
 ~/fc-research-venv/bin/python research/run_reroute.py limits                        # WSL with systemd; add --sudo if needed
-~/fc-research-venv/bin/python research/run_reroute.py scale                         # or --only stops|graph|buses|slices
-~/fc-research-venv/bin/python research/run_reroute.py scale --only stops --no-limits   # unlimited rows only
+~/fc-research-venv/bin/python research/run_reroute.py scale --out-dir research/results/reroute-scale-wsl   # Docker laptop; or --only stops|graph|buses|slices
+~/fc-research-venv/bin/python research/run_reroute.py scale --only stops --no-limits   # unlimited rows only, results/reroute-scale/
 ~/fc-research-venv/bin/python research/run_reroute.py quality --summarize           # rebuild summary.json from finished runs
 ```
 
@@ -304,9 +311,13 @@ stop when the scenario file is missing; the scaling run skips the parts whose fi
   finished runs and retries `failed` and `skipped` ones. `ok` and `infeasible` are counted results;
   any other status is a failure.
 - `--summarize` works with every pass.
-- On 17 Nov 2026 the quick pipeline tests and run RS1 `stops` part, unlimited (4 to 20 stops x 1, 2
-  and 4 candidates x 3 seeds), are running. Results: pending. Nothing has been run on Karachi
-  scenarios yet: the scenario file does not exist.
+- Runs on the Docker laptop go to `results/reroute-scale-wsl/` with `--out-dir` (pass the same
+  option to `--summarize`); rows from the Windows laptop are never pooled with them.
+- Run RS1 `stops` part (17 Nov 2026, Windows laptop, unlimited, 4 to 20 stops x 1, 2 and 4
+  candidates x 3 seeds), rerun after R2 gained its improvement rounds: R2 within 60 s of R3 on 30 of
+  36 synthetic problems. See LOGBOOK, 2026-11-17, RS1 "stops" rerun; the first run is in
+  `results/reroute-scale-r2-insertion/`. Nothing has been run on Karachi scenarios yet: the scenario
+  file does not exist.
 
 ## Build the Karachi road network, once (about 10 to 20 minutes)
 
@@ -466,6 +477,10 @@ the contract a caller would use:
   for presence.
 - `reroute.Ladder` runs R0, R2 and R3 in that order and keeps the best plan, so a plan exists as
   soon as R0 and R2 have run. R3 runs in slices and its state can be saved between them.
+- R2 builds a plan greedily (falling back to R0), then improves it in rounds until nothing changes:
+  reorder (move one point, or reverse a segment), remove points, move stops to their nearest
+  visited point, then add the one point, or failing that swap the one pair of points, that lowers
+  the arrival most. It takes at most 0.5 CPU-s at 20 stops and 100 points (LOGBOOK, 2026-11-17).
 - `to_proposal(request, plan, compute_s, baseline_arrival_s=None, revision=1, state=None)` gives
   the proposal: `schema`, `status`, `reason`, `revision`, `method`, `visit`, `stops` (one entry per
   remaining stop with `action` `keep`, `walk` or `unserved`, `board_at` and `walk_m`), `arrival`,

@@ -1,6 +1,7 @@
 # Route Optimization under Free-Tier Limits
 
-Draft of 15 November 2026, written from `research/LOGBOOK.md` (runs D1, N1, M1, O0, O1, B1, Q1, T1, S1).
+Draft of 15 November 2026, updated 17 November 2026, written from `research/LOGBOOK.md` (runs D1, N1, M1,
+O0, O1, B1, Q1, T1, S1, OS1).
 Every number in this chapter is in the logbook or in the result files under `research/results/`.
 
 ## 1. Introduction
@@ -201,7 +202,9 @@ query-budget experiments keep the median rule they were run under.
 
 **Machines.** All runs were on team laptops under WSL2 with OR-Tools 9.15.6755. The time-budget
 experiment ran on an Intel i7-3770, the query-budget experiment on an i5-4310U, and the two robustness
-checks on an i5-7300U. Each experiment's machine details are saved with its results.
+checks on an i5-7300U. Each experiment's machine details are saved with its results. The scaling run
+OS1 (Section 7.6) is the exception: it ran on a Windows laptop without WSL, has no threshold and is not
+counted in the table below.
 
 | Experiment | Runs | Search budget | Setup | Threshold |
 | --- | --- | --- | --- | --- |
@@ -375,6 +378,41 @@ per contractor and seed. Seed 2026, the frozen dataset, is the control.
 against a threshold of 15%, and no run has a student over 90 minutes or leaves a stop out. The
 improvement is not specific to seed 2026.
 
+### 7.6 Model size and arc lookup (run OS1)
+
+This run asks how build time, memory and plan quality grow with the number of stops and buses, and
+whether handing OR-Tools the travel times as tables (`matrix` lookup) beats the Python callback every
+other run used (`callback` lookup). Besides Jadoon and Nadeem it uses doubled instances, where every
+stop and bus is copied, each copy 30 s from its original with the same students. They test model size,
+not geography. Each instance ran once per lookup for 300 s, in a fresh process. It has no threshold and
+reports curves (logbook, 17 November 2026, scaling results).
+
+| Instance | Stops / buses | Peak memory, callback / matrix (MB) | Cost at 10 s, callback / matrix | Cost at 300 s, callback / matrix | Scored at 300 s, callback / matrix (student-min) |
+| --- | --- | --- | --- | --- | --- |
+| Nadeem | 143 / 26 | 52 / 54 | 30,945 / 31,003 | 30,647 / 30,697 | 29,723 / 29,752 |
+| Jadoon | 171 / 27 | 53 / 55 | 32,730 / 33,012 | 32,474 / 32,474 | 31,472 / 31,472 |
+| Nadeem-doubled | 286 / 52 | 61 / 67 | 60,948 / 64,318 | 59,355 / 59,460 | 57,704 / 57,780 |
+| Jadoon-doubled | 342 / 54 | 63 / 73 | 66,211 / 68,997 | 63,447 / 63,547 | 61,614 / 61,698 |
+
+"Cost" is the solver's own objective divided by 60 (student-minutes plus a small driving tie-breaker);
+"scored" is the returned plan's total student ride time, scored as in B1. No run left a stop out.
+
+- **Size is cheap.** Doubling the stops and buses raised peak memory by 9 to 18 MB, and building the
+  model stayed under 0.1 s.
+- **The search converges at this size.** With the callback, the 60 s plan is within 0.16% of the 300 s
+  plan at 342 stops (0.02% for Jadoon, 0.30% for Nadeem), so the 300 s budget chosen after B1 still holds
+  for the current fleet.
+- **The matrix lookup does not help.** It is never better at 300 s (equal for Jadoon, 0.16 to 0.18% worse
+  elsewhere), is 0.2 to 5.5% worse at 10 s, and uses 2 to 10 MB more. The callback stays the default.
+
+The caveats are larger than for the other experiments. The run was on a Windows laptop (Intel Core i7
+third generation, 4 cores, 8 GB) where WSL cannot start, so it had no free-tier limits, and peak memory
+is Windows' peak working set rather than Linux's `ru_maxrss`; its figures are not pooled with B1, Q1, T1
+or S1. Only 8 of the 12 planned runs exist: the combined instances All (311 stops, both fleets in one
+model) and All-doubled (622) need a combined travel-time matrix that needs OSRM, and they run on the
+Docker laptop together with timings under the limits. The run was interrupted once and resumed, with
+light other work on the laptop during the resumed part.
+
 ## 8. Discussion
 
 **What the results say about the research question.** On this dataset, all-stop routes can be built
@@ -496,6 +534,7 @@ travel-time matrices are in the repository, so OSRM is not needed.
 | Query budget (Q1) | `python research/run_query_budget.py --workers 2` | `research/results/query-budget/` |
 | Traffic check (T1) | `python research/run_robustness.py traffic --workers 2` | `research/results/traffic-check/` |
 | Seed check (S1) | `python research/run_robustness.py seed --workers 2` | `research/results/seed-check/` |
+| Scaling (OS1, Windows) | `python research/run_scale.py --instances Jadoon,Nadeem,Jadoon-doubled,Nadeem-doubled` | `research/results/optimizer-scale/` |
 
 Each results folder holds `meta.json` (machine and settings), `runs.jsonl` (one line per run),
 `summary.json` (the tables above) and one file per run with its routes. Charts and maps of every run

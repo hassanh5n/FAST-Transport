@@ -1,16 +1,19 @@
 # Rerouting a Shuttle around a Blocked Road
 
 Draft of 17 November 2026, written from `research/LOGBOOK.md` (entries of 10 November, the rules entry
-L1 of 16 November, and the scaling-runs entry of 17 November), the work plan
-`research/plans/2026-11-15-rerouting-plan.md` (version 2), the implementation plans in `research/plans/`,
-the code in `research/reroute/` and the lead's implementation notes of 17 November.
-No rerouting experiment has run on the Karachi map or on OSRM yet. Every number that needs such a run
+L1 of 16 November, and four entries of 17 November: the scaling runs planned, the rules settled while
+building the code, the scaling results with the change to R2, and the RS1 "stops" rerun), the work plan
+`research/plans/2026-11-15-rerouting-plan.md` (version 2), the implementation plans in `research/plans/`
+and the code in `research/reroute/`.
+No rerouting experiment has run on the Karachi map or on OSRM yet. The only rerouting results so far
+are the RS1 "stops" runs on synthetic problems (Section 8.4). Every number that needs a run on the map
 is marked **[pending: entry Ln]**, where Ln is the logbook entry that will hold it (see the logbook
 plan, `research/plans/2026-11-16-logbook-and-chapter.md`).
 
-<!-- Lead: entries L2 to L6 and L8 to L11 do not exist yet (the scaling-runs entry of 17 November
-takes the place of L7). When an entry is written, replace its [pending] marks and delete this
-comment. Sections 8 to 11 are a frame only. -->
+<!-- Lead: entries L2 to L6, L8, L9 and L11 do not exist yet. The scaling-runs entry of 17 November
+takes the place of L7; the 17 November results and rerun entries hold the first part of L10 (RS1
+"stops", unlimited). When an entry is written, replace its [pending] marks and delete this comment.
+Sections 8.1 to 8.3 and 9 to 11 are a frame only. -->
 
 ## 1. Introduction
 
@@ -43,7 +46,9 @@ The optimization work left three findings that shaped the design. A reroute need
 bus) and a method that always has an answer ready. After a block, travel times that cannot have
 changed should be reused. And when a travel time must be guessed, it is safer to guess high.
 
-The main results are **[pending: entries L8, L9, L10]**.
+The quality and limits results are **[pending: entries L8, L9]**. The first scaling results, on
+synthetic problems with no limits, are in Section 8.4; the rest of the scaling runs are
+**[pending: entry L10]**.
 
 ## 2. Background
 
@@ -418,15 +423,43 @@ whose own point lies inside a full block boards at the reachable point in range 
 inserted where it adds the least driving time. R0 needs one row per visited point and one for the bus
 position: 14 rows for a 13-stop route.
 
-### 6.2 R2: greedy
+### 6.2 R2: greedy construction, then improvement
 
-R2 starts from the committed points, then repeatedly inserts the unvisited point with the largest ratio
-of students it can board (from stops not yet assigned) to the driving time it adds plus 60 s of stop
-time. Those stops board there. It then tries removing each visited point that is not committed, moving
-its stops to the nearest visited point in range, and keeps a removal that makes the plan better; this
-repeats until a pass changes nothing. Last, each stop is moved to its nearest visited point if that
-does not make the plan worse. If R0 arrives earlier, R2 returns R0's plan. R2 needs a row from every
-useful point: up to 31 rows for 30 points.
+R2 builds a plan greedily and then improves it in rounds.
+
+**Construction.** R2 starts from the committed points, then repeatedly inserts the unvisited point with
+the largest ratio of students it can board (from stops not yet assigned) to the driving time it adds
+plus 60 s of stop time, at the position where it adds the least driving. Those stops board there. A
+stop left over boards at the nearest visited point.
+
+**Improvement.** R2 then repeats a round of four steps until a round changes nothing (at most 25
+rounds). "Better" means the order of Section 3: earlier arrival, then less walking.
+
+1. **Reorder.** Move one point to another position, or reverse a segment of the order, while that
+   makes the plan better. Every reversal is scored, because waiting for walkers makes a reversed
+   segment's time differ from the original's.
+2. **Remove.** Drop a visited point that is not committed and move its stops to their nearest visited
+   point in range, while that makes the plan better.
+3. **Nearest boarding.** Move every stop to its nearest visited point, if that does not make the plan
+   worse.
+4. **Add or swap.** Add the one unvisited point, at the position, that makes the plan best; a stop
+   moves to it only if that shortens its walk. Adding a point can help even when it adds driving,
+   because it can cut the time the bus waits for walkers. If no addition helps, swap one visited,
+   non-committed point for one unvisited point: the pair that makes the plan best.
+
+Last, if R0 arrives earlier, R2 returns R0's plan. Unit tests check that R2's final plan cannot be
+improved by any single one of these moves. R2 needs a row from every useful point: up to 31 rows for
+30 points. Each reorder pass scores every move of one point and every reversal, and a swap scores
+every pair of points at every position, so R2's work grows quickly with the number of points; in run
+RS1 it still took at most 0.5 CPU-seconds at 20 stops and 100 points (Section 8.4).
+
+**Why the improvement rounds.** Entry L1 described R2 as "greedy, then try removals", and that version
+ran first. In the first RS1 "stops" run (logbook, 17 November, scaling results) it arrived a median 68
+to 285 s later than R3 across the groups of 4 to 16 stops, against the 60 s that threshold 2 asks for
+on real scenarios. Its plans showed why: R2 only inserted points greedily. It never improved the order,
+never added a point to cut the wait for walkers, and never swapped one point for another. The rounds
+above were added in commit `723f4c8`, before any quality-pass run; the thresholds did not change. On
+the rerun with the new R2, R2 was within 60 s of R3 on 30 of 36 problems (Section 8.4).
 
 `backend/apps/transport/corridor.py` already holds a greedy covering-path heuristic, used to draw route
 lines on the public Valhalla server. R2 is a separate implementation for a blocked network.
@@ -467,14 +500,13 @@ entries of 20 bytes (two 8-byte floats and two 2-byte parent indices): for 16 bi
 is about 39 MB. Phase 2 has no useful bound in theory, since its labels also carry the set of visited
 points; in practice dominance and the lower bound keep it small.
 
-Development measurements on the unthrottled Windows laptop (lead's notes, 17 November; not a logged
-run): R3 with 16 stops and 30 points took about 7 CPU-seconds, and with 800 m walking limits the repair
-phase took 16 to 32 CPU-seconds at 15 stops. If the tenfold slowdown of the optimization chapter holds
-here, these are 70 s and several minutes at 0.1 CPU. Run RS1 gives the logged figures
-**[pending: entry L10]**.
-
-<!-- Lead: the 7 CPU-s and 16-32 CPU-s figures come from your notes only. They should go into the
-logbook (or be replaced by RS1's numbers) before this section is final. -->
+Development timings on the Windows laptop at full CPU are in the logbook entry of 17 November on the
+rules settled while building the code: 13 stops and 30 points took about 0.9 CPU-seconds, 16 stops and
+30 points about 7 CPU-seconds, and with an 800 m walking limit the repair took 16 to 32 CPU-seconds on
+some 15-stop problems. Run RS1 measured the curve on synthetic problems (Section 8.4): a median of
+7.4 to 8.9 CPU-seconds at 16 stops, and about 61 s for one 12-stop problem that needed the repair.
+Under 0.1 CPU a 16-stop R3 takes over a minute, which is why the ladder hands out R0 and R2 at once
+and R3 only improves on them.
 
 The work plan asked for R3 to be vectorised per layer (all masks of the same size together). It is
 vectorised per mask instead. This is enough for the ladder, because R0 and R2 always give a plan first.
@@ -484,7 +516,9 @@ vectorised per mask instead. This is enough for the ladder, because R0 and R2 al
 Above 16 bits R3 is not run, and the ladder reports a lower bound instead: the direct time from the bus
 to campus, plus 60 s for the fewest points that could board every servable stop (the stop count divided
 by the most stops any single point can board, rounded up), plus 5 s per student. The gap of R2 to this
-bound is reported. Like R3, the bound holds on tables that satisfy the triangle inequality.
+bound is reported. Like R3, the bound holds on tables that satisfy the triangle inequality. Run RS1
+found it weak: at 20 stops R2 was a median 685 to 773 s above it (Section 8.4), so the bound is
+reported but not used to judge R2.
 
 ### 6.5 The ladder
 
@@ -503,8 +537,8 @@ The whole ladder, including both phases of R3, can be saved to JSON after any st
 (`Ladder.to_json`, `Ladder.from_json`), with the search tables stored as base64 strings. A stopped and
 resumed solve returns the same plan as an uninterrupted one; this is a unit test. At 16 bits and 30
 points the phase 1 tables alone are about 39 MB, or about 52 MB once base64-encoded, which matters
-for where a website keeps the state between slices (Section 9). The measured state sizes are in run
-RS1 **[pending: entry L10]**.
+for where a website keeps the state between slices (Section 9). The measured state sizes come from
+the `slices` part of run RS1 **[pending: entry L10]**.
 
 ### 6.6 R1, and what was not built
 
@@ -523,13 +557,14 @@ was committed (`50ab71b`) before the scenario file was built, so nobody had seen
 thresholds were set. The thresholds are also constants in `run_reroute.py`. Thresholds are judged on the
 worst repeat as well as the median, the rule the team adopted on 10 November.
 
-Some details of how the thresholds are judged were settled while the runner was written, before any
-quality or limits run (commit `7299036` and the lead's notes of 17 November). They are listed in Section
-7.5.
+Some details of how the thresholds are judged were settled while the code was written, before any
+quality or limits run (commit `7299036`), and logged in the entry of 17 November on the rules settled
+while building the code. They change no threshold of L1 and are listed in Section 7.5. The same entry
+records that the team may still overrule any of them before the first quality run.
 
-<!-- Lead: the judging details in Section 7.5 (your decisions 5 to 7) are in the code and your notes
-but not yet in the logbook. Log them, and push, before the first quality or limits run, so the order
-can be shown from the history. -->
+R2 was changed after the first scaling run and before any quality-pass run (Section 6.2; logbook,
+17 November, scaling results). The change extends L1's description of R2 and leaves the thresholds as
+they were.
 
 ### 7.2 Quality pass (run RQ1)
 
@@ -592,7 +627,7 @@ These report curves and have no pass or fail rule.
 
 | Part | What grows | Recorded | Where it runs |
 | --- | --- | --- | --- |
-| `stops` | 4, 8, 12, 16, 20 stops; 1, 2, 4 candidates per stop; seeds 1 to 3 (45 problems) | CPU and wall time and peak memory of R2 and of R3 to the end; R2 minus R3; above 16 stops the gap to the lower bound | Windows laptop, no limits (entry of 17 November); limited part on the WSL machine |
+| `stops` | 4, 8, 12, 16, 20 stops; 1, 2, 4 candidates per stop; seeds 1 to 3 (45 problems) | CPU and wall time and peak memory of R2 and of R3 to the end; R2 minus R3; above 16 stops the gap to the lower bound | Windows laptop, no limits (done, Section 8.4); limited part on the WSL machine |
 | `graph` | 10, 30, 60 points, corridor and whole city | CPU-seconds per row, searches, memory with memory-mapped arrays | WSL machine |
 | `buses` | The Shahrah-e-Faisal closure with 1, 5, 10, 20 buses in one limited process | Seconds until every bus has a valid plan and its final plan; searches; cache hits | WSL machine |
 | `slices` | The three largest judged scenarios | Plan after each slice of 256 masks; size of the saved state | WSL machine |
@@ -607,7 +642,8 @@ Optimizer scaling (OS1) belongs with the optimization chapter but was planned in
 the optimizer on Jadoon, Nadeem and doubled copies of each (every stop copied 30 s from its original),
 with two ways of giving travel times to OR-Tools (a Python callback, as in every earlier run, and a
 matrix given once), 300 s each and no limits. The combined 311-stop instances need a matrix from OSRM
-and wait for it; the doubled instances stand in for size until then.
+and wait for it; the doubled instances stand in for size until then. Eight of its twelve runs are done
+and are reported in the optimization chapter (Section 8.5).
 
 ### 7.5 How the verdicts are computed
 
@@ -638,7 +674,9 @@ generation, 4 cores and 8 threads, 8 GB) that cannot start WSL, because virtuali
 firmware. It runs the parts with no limits. Peak memory there is Windows' peak working set, not Linux's
 `ru_maxrss`; the two are close for one Python process but are not the same measure, so figures from it
 are not pooled with WSL runs. The limits pass and the limited scaling parts need a machine with WSL and
-systemd **[pending: entries L9, L10]**.
+systemd **[pending: entries L9, L10]**. Runs on that machine write to their own folders
+(`results/reroute-scale-wsl/` and `results/optimizer-scale-wsl/`, through `--out-dir`), and their
+logbook entries name the machine.
 
 Every pass has a pipeline test (`--quick`) on a small toy file of three scenarios
 (`data/scenarios_toy.json`, written by `run_reroute.py make-toy`), with results in a separate `-quick`
@@ -649,6 +687,7 @@ folder. These are checks that the code runs end to end, not reported results.
 | Change | Reason |
 | --- | --- |
 | R3 has a second, exact phase | The planned single search was not exact on 34 of 800 problems (Section 6.3) |
+| R2 improves its greedy plan in rounds (reorder, remove, nearest boarding, add or swap) | Greedy insertion alone was a median 68 to 285 s behind R3 in the first RS1 run (Section 6.2) |
 | R3 vectorised per mask, not per layer | The ladder gives R0 and R2 at once; per mask was enough |
 | A plain grid, not H3, indexes road segments | Same job, one dependency fewer |
 | No separate reverse search from campus | Every row the solver asks for already includes the time to campus |
@@ -708,17 +747,62 @@ Rows requested, searched and reused; corridors that widened: [pending].
 
 ### 8.4 Scaling (run RS1)
 
-[pending: entry L10]. One table per part: R2 and R3 time and memory against stops and candidates, with
-the largest problem solved in 5 s and in 30 s; seconds per row against points, corridor and city; time
+**Part `stops`, no limits.** The part ran twice on the Windows laptop of Section 7.6, one problem at a
+time, each in a fresh process: first with R2 as L1 described it (greedy insertion, then removals), and
+again after R2 gained its improvement rounds (Section 6.2). Both runs solved 45 of 45 problems. The
+problems are synthetic (Section 7.4), so these figures describe the methods' cost and the gap between
+them, not the quality of a reroute on a real route.
+
+*First run* (logbook, 17 November, scaling results; code `7299036`; `results/reroute-scale-r2-insertion/`).
+Medians over the 3 seeds; c is the number of extra candidates per stop.
+
+| Stops | Points (c = 1 / 2 / 4) | R2 CPU (max) | R3 CPU median, c = 1 / 2 / 4 (s) | R3 CPU max (s) | R3 peak (MB) | R2 minus R3, median c = 1 / 2 / 4 (s) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 4 | 8 / 12 / 20 | < 0.02 s | 0.13 / 0.11 / 0.09 | 0.14 | 38 | 201 / 161 / 109 |
+| 8 | 16 / 24 / 40 | < 0.02 s | 0.14 / 0.14 / 0.14 | 0.17 | 38 | 68 / 134 / 233 |
+| 12 | 24 / 36 / 60 | < 0.02 s | 0.55 / 0.58 / 0.63 | 60.9 | 120 | 180 / 170 / 285 |
+| 16 | 32 / 48 / 80 | < 0.02 s | 7.3 / 7.8 / 8.8 | 9.2 | 135 | 196 / 249 / 242 |
+| 20 | 40 / 60 / 100 | < 0.02 s | not run (over 16) | - | - | R2 is 816 to 968 s above the lower bound (median) |
+
+*Rerun with the improved R2* (logbook, 17 November, RS1 "stops" rerun; code `c1a9f8a`, R2 from
+`723f4c8`; `results/reroute-scale/`). The last column gives R2 minus R3 for each problem, seeds 1 to 3
+in turn.
+
+| Stops | R2 CPU, max (s) | R3 CPU median / max (s) | R3 peak (MB) | R2 minus R3 per problem, c = 1 / 2 / 4, seeds 1 to 3 (s) |
+| --- | --- | --- | --- | --- |
+| 4 | 0.02 | 0.11 to 0.14 / 0.17 | 38 | 20, 0, 0 / 41, 0, 67 / 0, 0, 0 |
+| 8 | 0.06 | 0.13 to 0.14 / 0.23 | 38 | 0, 0, 0 / 0, 0, 0 / 97, 52, 54 |
+| 12 | 0.11 | 0.55 to 0.64 / 61.4 | 120 | 2, 97, 0 / 87, 0, 0 / 52, 0, 0 |
+| 16 | 0.42 | 7.4 to 8.9 / 9.3 | 136 | 9, 45, 0 / 0, 42, 108 / 79, 16, 22 |
+| 20 | 0.50 | not run (over 16 stops) | - | R2 is 685 to 773 s above the lower bound (median) |
+
+What the two runs show:
+
+- **R3's cost follows $2^n$.** Its time grows about 13 times from 12 to 16 stops and is otherwise flat
+  in the number of candidates. One 12-stop problem with 4 candidates per stop needed the exact repair
+  and took about 61 s in both runs. Memory stays under 140 MB. Under 0.1 CPU a 16-stop R3 takes over
+  a minute, so on the free tier R3 is a later improvement, never the first answer.
+- **The greedy R2 was the weak point, and the improvement rounds closed most of the gap.** In the first
+  run no group had a median gap to R3 under 68 s. After the change R2 is within 60 s of R3 on 30 of 36
+  problems (83%) and equal on 19; the largest gap is 108 s. This is not threshold 2, which is judged on
+  real scenarios in the quality pass. If the quality pass fails threshold 2, the per-route results will
+  show whether random-looking geometry or the method is to blame.
+- **R2 stays cheap.** It costs at most 0.5 CPU-seconds, about 5 s under 0.1 CPU, while R0's plan is
+  already out. R3's times and memory did not change between the runs.
+- **The lower bound above 16 stops is weak.** R2 is a median 685 to 773 s above it at 20 stops, so it
+  is reported and not used to judge R2.
+
+**Still to run [pending: entry L10].** The `stops` part under the limits, and the `graph`, `buses` and
+`slices` parts, run on the WSL machine into `results/reroute-scale-wsl/`. To report: the largest problem
+solved in 5 s and in 30 s under the limits; seconds per row against points, corridor and city; time
 until every bus has a plan against buses, with cache hits; plan quality and state size per slice.
 
 ### 8.5 Optimizer scaling (run OS1)
 
-[pending: entry L10]. Build time, time to first plan, peak memory and plan cost at 10, 60 and 300 s,
-for each instance and lookup. Model build times are not comparable between the two lookups, because
-the callback computes costs during the search and the matrix pays for them while building.
-
-<!-- Lead: OS1 may read better as a section of the optimization chapter. -->
+Run OS1 belongs to the optimizer, so its results are reported in the optimization chapter, from the
+logbook entry of 17 November (scaling results). Eight of its twelve runs are done; the combined All and
+All-doubled instances wait for the combined matrix and will run on the WSL machine into
+`results/optimizer-scale-wsl/`.
 
 ## 9. Discussion and what it means for the website
 
@@ -846,6 +930,11 @@ Results-dependent limitations will be added from entries L8 to L10 **[pending]**
   probes of its first draft and keeps them here as untested options.
 - **Machines differ.** Some runs are on a Windows laptop without limits and some on WSL with limits;
   their memory figures are different measures and are not pooled.
+- **The scaling problems are synthetic.** The `stops` part places stops at random in a 2 km square with
+  straight-line walking, which looks less like a route than a real one does. Its gaps between R2 and R3
+  are not evidence for threshold 2 either way.
+- **Above 16 stops R2's quality is not known.** R3 is not run there and the lower bound is weak
+  (Section 8.4).
 - **Cuts from the work plan:** none so far **[pending: entry L11]**.
 
 <!-- Lead: the Valhalla claim comes from the work plan, not from a source in the literature note.
@@ -962,26 +1051,32 @@ experiments need only the repository's data files.
 | Scenarios (L6) | `python build_scenarios.py` | `data/scenarios_reroute_v1.json` |
 | Quality pass (L8) | `python run_reroute.py quality --workers 2` | `results/reroute-quality/` |
 | Limits pass (L9) | `python run_reroute.py limits` (WSL) | `results/reroute-limits/` |
-| Rerouting scaling (L10) | `python run_reroute.py scale` | `results/reroute-scale/` |
-| Optimizer scaling (L10) | `python run_scale.py` | `results/optimizer-scale/` |
+| Rerouting scaling, `stops`, first run (17 November, code `7299036`) | `python run_reroute.py scale --only stops --no-limits` | written to `results/reroute-scale/`, then renamed to `results/reroute-scale-r2-insertion/` before the rerun |
+| Rerouting scaling, `stops`, rerun (17 November, code `c1a9f8a`) | `python run_reroute.py scale --only stops --no-limits` | `results/reroute-scale/` |
+| Rerouting scaling, other parts and limited (L10) | `python run_reroute.py scale --out-dir results/reroute-scale-wsl` (WSL) | `results/reroute-scale-wsl/` |
+| Optimizer scaling (OS1) | `python run_scale.py --instances Jadoon,Nadeem,All,All-doubled,Jadoon-doubled,Nadeem-doubled` | `results/optimizer-scale/` |
+| Optimizer scaling, All and All-doubled | `python run_scale.py --instances All,All-doubled --out-dir results/optimizer-scale-wsl` (WSL) | `results/optimizer-scale-wsl/` |
 
 Each pass also runs from the research hub, which records the code version with every run. Every pass
 has a `--quick` variant on the toy file; its folder ends in `-quick` and holds no reported result.
 
 ## Appendix B. Notes for the authors (remove before submission)
 
-- **Sources of numbers.** Apart from the logbook, this draft uses the lead's notes of 17 November for:
-  the R3 development timings (Section 6.3), the 34-of-800 count (also in the logbook), the row cache's
-  byte cap, and the judging details of Section 7.5. The straight-line walking shares (30% and 65%) are
-  from the work plan, Section 4. Put each of these in the logbook, or replace it with a logged figure,
-  before the chapter is final.
+- **Sources of numbers.** Every number is from the logbook, except the straight-line walking shares
+  (30% and 65%), which are from the work plan, Section 4. The R3 development timings, the row cache's
+  byte cap and the judging details of Section 7.5 are in the entry of 17 November on the rules settled
+  while building the code; the 34-of-800 count is in the scaling-runs entry of the same day. Put the
+  walking shares in the logbook, or replace them with entry L4's figures, before the chapter is final.
+- **The first RS1 run's gap.** The logbook's text says R2 was "a median 70 to 285 s later" than R3,
+  while its table's smallest group median is 68 s. This draft uses the table (68 to 285 s).
 - **References.** Every reference is taken from the literature note and is marked [V] there. None was
   re-opened while writing this draft and none is cited from memory. Check the DOI of [14] (unverified
   in the note) and add a source for the Held-Karp name if it is used. The Valhalla statement in
   Section 10 has no source in the note.
-- **Arithmetic, not measurement.** The 39 MB and 52 MB state sizes (Section 6.3, 6.5), the walkers'
-  ready times (Section 3) and the "70 s at 0.1 CPU" estimate (Section 6.3) are computed from the code
-  or from earlier results, not measured.
+- **Arithmetic, not measurement.** The 39 MB and 52 MB state sizes (Section 6.3, 6.5) and the walkers'
+  ready times (Section 3) are computed from the code, not measured. The times "under 0.1 CPU" in
+  Sections 6.3 and 8.4 (over a minute for a 16-stop R3, about 5 s for R2) are the logbook's estimates
+  from unthrottled runs, not runs under the limits.
 - **Figures.** None embedded. Suggested once runs exist: delay by method and walking limit (RQ1); gap to
   the oracle against time, per arm (RL1), which is the anytime profile the literature note recommends;
   R3 time against stops (RS1); time until every bus has a plan against buses (RS1).

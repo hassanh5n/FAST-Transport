@@ -69,9 +69,9 @@
   "Docker laptop: build the road graph from the map file and log its counts; run the road-block test and log it; build the walking distances and log the three statistics.",
   "Docker laptop: calibrate the graph against the saved matrix, build the route corridors, and time the graph inside the limits (gate G1).",
   "Pin the end points of the two historical closures (Shahrah-e-Faisal, University Road) on the map by hand; then build the closure scenarios (one route first, then all) at the block speed the road-block test chose, and freeze the file.",
-  "Docker laptop: build the combined 311-stop matrix, then finish the optimizer scaling run with All and All-doubled.",
-  "Run the rerouting quality pass and the limits pass on the frozen scenarios (limits in WSL with systemd), then the remaining scaling parts (graph, buses, slices, limited rows). Log each result against the thresholds fixed on 16 Nov.",
+  "Docker laptop: build the combined 311-stop matrix, then finish the optimizer scaling run with All and All-doubled, written with --out-dir to results/optimizer-scale-wsl/ (the Windows laptop's 8 runs in results/optimizer-scale/ are never pooled with them).",
+  "Run the rerouting quality pass and the limits pass on the frozen scenarios (limits in WSL with systemd), then the remaining scaling parts (graph, buses, slices, limited stops rows) with --out-dir to results/reroute-scale-wsl/. Log each result against the thresholds fixed on 16 Nov.",
   "Write the rerouting chapter from the logged results.",
-  "Optimization chapter: finish the references, figures and the Nadeem bus-count point, and add the scaling curves once run OS1 is logged."
+  "Optimization chapter: finish the references, figures and the Nadeem bus-count point, and add the scaling curves from run OS1 (contractor part logged 17 Nov; All and All-doubled still to run)."
  ]
 }

@@ -743,3 +743,13 @@ Pipeline tests rerun on the same code: quality 15/15, limits 3/3 (no limits), sc
 - R2 costs at most 0.5 CPU-s (about 5 s under 0.1 CPU) and R3's times and memory are unchanged from the
   first run, including the one 12-stop problem whose exact repair takes about 61 s.
 - The lower bound above 16 stops is still weak and is reported, not used to judge R2.
+
+## 2026-11-17: Corrections to today's entries
+
+- The scaling-results entry says the greedy-only R2 was "a median 70 to 285 s later" than R3; its own table's
+  smallest group median is 68 s (8 stops, one candidate per stop). The range is 68 to 285 s.
+- The first RS1 "stops" run was written to `results/reroute-scale/` and renamed to
+  `results/reroute-scale-r2-insertion/` before the rerun; its `meta.json` carries a note saying so.
+- Both scaling runs were started from the command line, not from the hub. The planning entry (`c4c13f5`) was
+  committed before the runs but pushed only afterwards, with this day's other commits.
+- Test counts at `c1a9f8a` and later: 221 solver and graph tests, 237 other tests, all passing.
