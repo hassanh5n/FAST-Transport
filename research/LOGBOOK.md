@@ -371,3 +371,102 @@ saved data: no OSRM, no limits. Search 60 s unlimited per run (B1: 60 s unlimite
   not reported results).
 - Caveats: a single multiplier is not real traffic (it slows every road equally); the redraw varies who boards
   where, not the stops or routes.
+
+## 2026-11-11: Traffic check and seed check results
+
+Both checks ran on 2026-11-10 on DESKTOP-15B12RB (Intel i5-7300U, 4 threads, WSL2, Python 3.12.3, OR-Tools 9.15.6755),
+60 s unlimited search, 2 runs in parallel. Thresholds were committed in `a055729` (22:39 PKT) before the first main run
+(23:13 PKT), so git shows the order this time. Code: `9b96339` (traffic), `71b858f` (seed).
+The pipeline tests (`traffic-check-quick`, `seed-check-quick`) were run after the main runs, at 23:28 and 23:29 PKT.
+They are not reported results and did not affect the main runs, but the order is recorded here as it happened.
+
+### Run T1: traffic check (`run_robustness.py traffic`, `results/traffic-check/`)
+
+- 18 of 18 runs `ok`, 2026-11-10 18:13 to 18:22 UTC.
+
+**Total student ride time, median of 3 repeats (worst repeat's improvement in brackets)**
+
+| Contractor | Factor | Current routes (student-min) | Optimized (student-min) | Improvement | Longest ride, optimized (min) | Longest ride, current (min) | Current-route stops over 90 min |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Jadoon | x1.0 | 40,200 | 31,736 | 21.1% (20.7%) | 53.9 to 56.3 | 78.7 | 0 |
+| Jadoon | x1.3 | 50,433 | 39,987 | 20.7% (20.6%) | 69.4 to 70.3 | 97.2 | 2 |
+| Jadoon | x1.5 | 57,256 | 45,210 | 21.0% (20.5%) | 77.3 to 79.4 | 109.6 | 8 |
+| Nadeem | x1.0 | 37,281 | 29,924 | 19.7% (19.7%) | 56.6 | 65.6 | 0 |
+| Nadeem | x1.3 | 46,817 | 37,661 | 19.6% (19.6%) | 71.0 | 80.9 | 0 |
+| Nadeem | x1.5 | 53,180 | 42,653 | 19.8% (19.8%) | 83.6 | 91.1 | 2 |
+
+- No run dropped a stop or had a student over 90 min. Buses used: 27 (Jadoon), 26 (Nadeem) in every run.
+- Current-route totals differ from B1 by 1 student-min (40,200 vs 40,201; 37,281 vs 37,280): rounding of the summed score, not a data change.
+
+**Verdict against the thresholds fixed on 2026-11-10 (judged at x1.5, worst run)**
+
+1. Every x1.5 run at least 15% below the current routes, both contractors: **pass** (worst Jadoon 20.5%, Nadeem 19.8%).
+2. No x1.5 run drops a stop or has a student over 90 min: **pass** (0 of 6).
+
+**Recorded, not judged: free-flow plan re-scored in traffic** (the x1.0 plans scored on x1.3 and x1.5 times)
+
+| Contractor | Re-scored at | Free-flow plan (median) | Plan made on scaled times (median) | Difference | Longest ride, free-flow plan |
+| --- | --- | --- | --- | --- | --- |
+| Jadoon | x1.3 | 39,913 | 39,987 | -0.2% | 66.9 to 69.8 |
+| Jadoon | x1.5 | 45,366 | 45,210 | +0.3% | 75.6 to 78.8 |
+| Nadeem | x1.3 | 37,660 | 37,661 | 0.0% | 71.0 |
+| Nadeem | x1.5 | 42,819 | 42,653 | +0.4% | 80.7 |
+
+**Observations for the report**
+
+- The improvement does not shrink with traffic: about 21% (Jadoon) and 20% (Nadeem) at every factor.
+- Traffic exposes the current routes, not the optimized ones. At x1.5 the current routes put 8 Jadoon stops and
+  2 Nadeem stops over 90 min (longest 109.6 and 91.1 min); the optimized plans stay under 90 min with 10.6 and 6.4 min to spare.
+- A plan made on free-flow times is within 0.4% of a plan made on the scaled times, and stays under 90 min.
+  Reason: multiplying every leg by the same factor keeps the relative cost of legs almost unchanged (only the fixed
+  stop times do not scale), so the best plan barely moves. This check therefore tests the 90-minute limit and the size
+  of the gain, not whether traffic-aware planning helps. That question needs uneven, time-of-day travel times and stays
+  open (FYP-2, with the context data).
+- The Nadeem margin is the thinnest result: 83.6 min at x1.5 leaves 6.4 min. A factor of about 1.6 or more, or a
+  bad corridor, could break the 90-minute limit. Not tested.
+- Machine note: the x1.0 control here gave Jadoon 31,603 to 31,884 (median 31,736), about 0.7% above the 31,519 that
+  B1 and Q1 got at 60 s unlimited on other machines. The solver limit is wall-clock (2026-11-10 plan review), so a slower
+  CPU searches less in 60 s. This supports the 300 s standard budget. Nadeem matched within 0.1%.
+
+### Run S1: seed check (`run_robustness.py seed`, `results/seed-check/`)
+
+- 8 of 8 runs `ok`, 2026-11-10 18:23 to 18:27 UTC. One run per contractor and seed.
+
+| Contractor | Seed | Students | Current routes (student-min) | Optimized (student-min) | Improvement | Longest ride, optimized / current (min) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Jadoon | 2026 (frozen, control) | 906 | 40,200 | 31,792 | 20.9% | 53.9 / 78.7 |
+| Jadoon | 2027 | 946 | 41,675 | 33,117 | 20.5% | 60.2 / 79.1 |
+| Jadoon | 2028 | 984 | 45,871 | 34,617 | 24.5% | 59.0 / 78.7 |
+| Jadoon | 2029 | 941 | 43,175 | 32,974 | 23.6% | 56.2 / 79.4 |
+| Nadeem | 2026 (frozen, control) | 900 | 37,281 | 29,921 | 19.7% | 56.6 / 65.6 |
+| Nadeem | 2027 | 923 | 37,695 | 30,629 | 18.8% | 56.7 / 66.5 |
+| Nadeem | 2028 | 890 | 36,670 | 29,307 | 20.1% | 59.7 / 64.9 |
+| Nadeem | 2029 | 913 | 39,594 | 30,685 | 22.5% | 52.5 / 66.5 |
+
+**Verdict against the thresholds fixed on 2026-11-10 (new seeds, worst run)**
+
+1. Every run at least 15% below the current routes, both contractors: **pass** (worst: Nadeem seed 2027, 18.8%).
+2. No run drops a stop or has a student over 90 min: **pass** (0 of 6).
+
+**Observations for the report**
+
+- Across the four draws the gain is 20.5 to 24.5% (Jadoon) and 18.8 to 22.5% (Nadeem). The frozen seed 2026 is near
+  the low end for Jadoon and in the middle for Nadeem, so the headline figure is not a lucky draw.
+- The gain is largest where the current routes do worst for that draw (Jadoon seed 2028: highest current total,
+  largest gain). Hand-made routes cannot adapt to where students live; the optimizer can.
+- One run per seed, so repeat-to-repeat noise (up to about 1% for Jadoon at 60 s) is inside these spreads.
+- The redraw varies who boards where, not the stops, routes or travel times.
+
+## 2026-11-11: Optimization part of FYP-1 closed
+
+- All four optimization experiments are done and every threshold passed: B1 time budget, Q1 query budget, T1 traffic,
+  S1 seed. Status set to done in `hub/project.json`.
+- Summary for the chapter: on a free-tier budget (0.1 CPU, 512 MB) the optimizer plans all-stop routes that cut total
+  student ride time by about 20% against the current hand-made routes (best known: -21.8% Jadoon, -20.5% Nadeem),
+  cut the longest ride from 78.7 to 53.0 min (Jadoon) and 65.6 to 56.6 min (Nadeem), and stay under the 90-minute limit
+  at x1.5 traffic, where the current routes do not. It needs about 7% of the full travel-time matrix and 65 MB of memory.
+- Deferred, not done: traffic-aware planning with uneven, time-of-day travel times (the "traffic-aware matrix"
+  sub-question in the 3 Nov plan). T1 cannot answer it because it scales every road equally. Moved to FYP-2.
+- Caveats for the chapter: free-flow OSRM times, synthetic students, limits simulated with cgroups on team laptops,
+  and current routes may follow rules the model cannot see (narrow roads, driver areas, student requests).
+- Next: rerouting, starting with the road-block test.
