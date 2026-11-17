@@ -1,0 +1,27 @@
+{
+ "started_at": "2026-11-16T21:11:21+00:00",
+ "machine": {
+  "host": "DESKTOP-VIQC8PE",
+  "system": "Windows",
+  "kernel": "10",
+  "python": "3.14.6",
+  "cpus": 8,
+  "cpu": "Intel64 Family 6 Model 58 Stepping 9, GenuineIntel",
+  "numpy": "2.5.5",
+  "scipy": "1.18.1"
+ },
+ "pass": "scale",
+ "quick": true,
+ "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49",
+ "scenarios": {
+  "file": "scenarios_toy.json",
+  "sha256": "4847dc525d3b6956660d0c0b7109e6fe0938d99f664c75619e0233ad9775bb1b",
+  "version": "reroute-toy"
+ },
+ "limits": "none",
+ "limits_check": null,
+ "only": null,
+ "cap_s": 30.0,
+ "slice_masks": 256,
+ "runs_total": 4
+}

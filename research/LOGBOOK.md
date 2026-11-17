@@ -635,3 +635,89 @@ instead of crashing the solve. `ride_300s` includes a plan found just after the 
 **Machines.** Rows from this Windows laptop (no limits, Windows peak working set) are never pooled with WSL
 rows. Runs that need the Docker laptop write to their own folders with `--out-dir`
 (`results/optimizer-scale-wsl/`, `results/reroute-scale-wsl/`), and the result entry names the machine.
+
+## 2026-11-17: Scaling results (OS1 optimizer; RS1 "stops", first run) and a change to R2
+
+Machine: the Windows laptop named in the planning entry of today (no limits; Windows peak working set).
+Code: `7299036` for every row below. Runs one at a time, each in a fresh process.
+
+### Pipeline tests (not reported results)
+
+`quality --quick` 15 of 15 rows ok, all three toy verdicts pass; `limits --quick --no-limits` 3 of 3 ok;
+`scale --quick` 4 of 4 ok; `run_scale.py --quick` 2 of 2 ok (Nadeem, 10 s: 30,945 callback, 30,981 matrix).
+
+### Run OS1: optimizer scaling (`run_scale.py`, `results/optimizer-scale/`)
+
+- 8 of 12 runs, 300 s each. All and All-doubled skipped (no combined matrix yet). The first three runs ran
+  2026-11-16 21:11 to 21:26 UTC; the run was cut off by the session ending and resumed 2026-11-17 12:00 to
+  12:25 UTC (the interrupted Nadeem-matrix run was redone from the start). During the resumed part other
+  light work ran on the laptop (editing documents, a background code-graph rebuild after commits).
+- "Ride" is the solver's cost / 60 (student-minutes plus the small driving tie-breaker); "scored" is total
+  student ride time of the returned plan scored as in B1. No run dropped a stop.
+
+| Instance | Stops / buses | Lookup | Build (s) | First plan (s) | Peak (MB) | Ride 10 s | Ride 60 s | Ride 300 s | Scored 300 s (student-min) | Longest ride (min) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Nadeem | 143 / 26 | callback | 0.016 | 0.05 | 52 | 30,945 | 30,738 | 30,647 | 29,723 | 56.6 |
+| Nadeem | 143 / 26 | matrix | 0.139 | 0.23 | 54 | 31,003 | 30,753 | 30,697 | 29,752 | 54.6 |
+| Jadoon | 171 / 27 | callback | 0.017 | 0.07 | 53 | 32,730 | 32,482 | 32,474 | 31,472 | 53.7 |
+| Jadoon | 171 / 27 | matrix | 0.037 | 0.06 | 55 | 33,012 | 32,522 | 32,474 | 31,472 | 53.7 |
+| Nadeem-doubled | 286 / 52 | callback | 0.018 | 0.14 | 61 | 60,948 | 59,460 | 59,355 | 57,704 | 54.1 |
+| Nadeem-doubled | 286 / 52 | matrix | 0.062 | 0.15 | 67 | 64,318 | 60,000 | 59,460 | 57,780 | 54.1 |
+| Jadoon-doubled | 342 / 54 | callback | 0.019 | 0.18 | 63 | 66,211 | 63,547 | 63,447 | 61,614 | 51.3 |
+| Jadoon-doubled | 342 / 54 | matrix | 0.078 | 0.21 | 73 | 68,997 | 65,003 | 63,547 | 61,698 | 52.4 |
+
+Observations:
+
+- Size is cheap. Doubling the stops (and buses) raised peak memory by 9 to 18 MB and kept building the
+  model under 0.1 s; memory is far from binding, as the 21 October calculation said.
+- Search converges at this size. With the callback lookup the 60 s plan is within 0.16% of the 300 s plan
+  even at 342 stops (0.02% for Jadoon, 0.30% for Nadeem). Under 0.1 CPU this laptop's 60 s is about 600 s of
+  wall time, so the standard 300 s budget fixed after B1 still holds for the current fleet.
+- The matrix lookup does not help. It is never better at 300 s (equal for Jadoon, 0.16 to 0.18% worse
+  elsewhere), is 0.2 to 5.5% worse at 10 s, and uses 2 to 10 MB more. The callback stays the default; the
+  matrix lookup is kept only as an option. Its `build_s` includes building the tables, the callback's does
+  not (its arcs are computed during the search), so the build column is not a fair comparison either way.
+  The Nadeem-matrix build of 0.139 s, against 0.025 s in the pipeline test, is the resumed run's first
+  process and is probably noise.
+- The number of students does not change the model's size; only stops and buses do. The doubled
+  instances test size, not geography (copies are 30 s from their originals).
+
+What it does not show: the combined 311-stop and 622-stop problems (both fleets in one model) and any
+timing under the free-tier limits; both run on the Docker laptop into `results/optimizer-scale-wsl/`.
+
+### Run RS1, part "stops", first run (`results/reroute-scale-r2-insertion/`)
+
+45 of 45 synthetic problems ok (4 to 20 stops, 1, 2 or 4 extra candidates per stop, 3 seeds), unlimited.
+Medians over 3 seeds unless marked.
+
+| Stops | Points (c = 1 / 2 / 4) | R2 CPU (max) | R3 CPU median, c = 1 / 2 / 4 (s) | R3 CPU max (s) | R3 peak (MB) | R2 minus R3, median c = 1 / 2 / 4 (s) |
+| --- | --- | --- | --- | --- | --- | --- |
+| 4 | 8 / 12 / 20 | < 0.02 s | 0.13 / 0.11 / 0.09 | 0.14 | 38 | 201 / 161 / 109 |
+| 8 | 16 / 24 / 40 | < 0.02 s | 0.14 / 0.14 / 0.14 | 0.17 | 38 | 68 / 134 / 233 |
+| 12 | 24 / 36 / 60 | < 0.02 s | 0.55 / 0.58 / 0.63 | 60.9 | 120 | 180 / 170 / 285 |
+| 16 | 32 / 48 / 80 | < 0.02 s | 7.3 / 7.8 / 8.8 | 9.2 | 135 | 196 / 249 / 242 |
+| 20 | 40 / 60 / 100 | < 0.02 s | not run (over 16) | - | - | R2 is 816 to 968 s above the lower bound (median) |
+
+Observations:
+
+- R3's time grows about 13 times from 12 to 16 stops, as 2^n predicts, and is otherwise flat in the number of
+  candidates; one 12-stop problem with 4 candidates per stop needed the exact repair and took 60.9 s.
+  Memory stays under 140 MB. Under 0.1 CPU a 16-stop R3 takes over a minute, so on the free tier R3 is
+  a later improvement, never the first answer.
+- **R2 as built was far from R3**: a median 70 to 285 s later, against the 60 s that threshold 2 asks for on
+  real scenarios. Looking at the plans: R2 only inserted points greedily. It never improved the order, never
+  added a point to cut the wait for walkers, and never swapped one point for another. Synthetic stops are
+  scattered at random, which is harder than a real route, but the gap was too large to put down to that.
+- The lower bound used above 16 stops is weak (R2 is 816 to 968 s above it), so beyond 16 stops it says
+  little about R2's quality.
+
+### Change to R2, made before any quality-pass run (`723f4c8`)
+
+R2 keeps its greedy construction and its fallback to R0, and now improves the plan in rounds until nothing
+changes: reorder (move one point, or reverse a segment), remove points (as before), move stops to their
+nearest visited point, then add the one point, or failing that swap the one pair of points, that lowers the
+arrival most. Tests check that R2's final plan cannot be improved by any single one of these moves. On a
+spot check of the synthetic problems (seeds 1 to 3), R2's gap to R3 fell to 0 in most cases (largest 87 s),
+and R2 takes at most 0.5 CPU-s at 20 stops and 100 points (about 5 s under 0.1 CPU, while R0's plan is
+already out). The L1 description of R2 ("greedy, then try removals") is extended by this entry; the
+thresholds do not change. RS1 "stops" is rerun with the new R2 into `results/reroute-scale/`.

@@ -1,0 +1,236 @@
+{
+ "generated_at": "2026-11-16T21:11:24+00:00",
+ "meta": {
+  "started_at": "2026-11-16T21:11:21+00:00",
+  "machine": {
+   "host": "DESKTOP-VIQC8PE",
+   "system": "Windows",
+   "kernel": "10",
+   "python": "3.14.6",
+   "cpus": 8,
+   "cpu": "Intel64 Family 6 Model 58 Stepping 9, GenuineIntel",
+   "numpy": "2.5.5",
+   "scipy": "1.18.1"
+  },
+  "pass": "scale",
+  "quick": true,
+  "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49",
+  "scenarios": {
+   "file": "scenarios_toy.json",
+   "sha256": "4847dc525d3b6956660d0c0b7109e6fe0938d99f664c75619e0233ad9775bb1b",
+   "version": "reroute-toy"
+  },
+  "limits": "none",
+  "limits_check": null,
+  "only": null,
+  "cap_s": 30.0,
+  "slice_masks": 256,
+  "runs_total": 4
+ },
+ "pass": "scale",
+ "thresholds": {
+  "note": "curves only, no pass or fail"
+ },
+ "verdict": {},
+ "chips": [],
+ "runs_done": 4,
+ "runs_total": 4,
+ "runs_failed": 0,
+ "remaining_s": 0,
+ "rows": [
+  {
+   "key": "stops-n4-c1-s1-unlimited",
+   "setup": "unlimited",
+   "status": "ok",
+   "part": "stops",
+   "n_stops": 4,
+   "per_stop": 1,
+   "seed": 1,
+   "points": 8,
+   "r2_cpu_s": 0.0,
+   "r2_wall_s": 0.0,
+   "r2_peak_mb": 29.8,
+   "base_mb": 29.8,
+   "r2_arrival_s": 972.0,
+   "r3_ran": true,
+   "r3_done": true,
+   "r3_cpu_s": 0.109,
+   "r3_wall_s": 0.151,
+   "r3_peak_mb": 38.2,
+   "r3_arrival_s": 919.2,
+   "r2_minus_r3_s": 52.9,
+   "limits": "none",
+   "started_at": "2026-11-16T21:11:22+00:00",
+   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+  },
+  {
+   "key": "stops-n8-c1-s1-unlimited",
+   "setup": "unlimited",
+   "status": "ok",
+   "part": "stops",
+   "n_stops": 8,
+   "per_stop": 1,
+   "seed": 1,
+   "points": 16,
+   "r2_cpu_s": 0.0,
+   "r2_wall_s": 0.001,
+   "r2_peak_mb": 29.8,
+   "base_mb": 29.8,
+   "r2_arrival_s": 1461.1,
+   "r3_ran": true,
+   "r3_done": true,
+   "r3_cpu_s": 0.172,
+   "r3_wall_s": 0.226,
+   "r3_peak_mb": 38.2,
+   "r3_arrival_s": 1174.9,
+   "r2_minus_r3_s": 286.2,
+   "limits": "none",
+   "started_at": "2026-11-16T21:11:22+00:00",
+   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+  },
+  {
+   "key": "slices-T-L1-late",
+   "setup": "unlimited",
+   "status": "ok",
+   "part": "slices",
+   "scenario": "T-L1-late",
+   "points": 2,
+   "remaining": 2,
+   "n_slices": 3,
+   "max_state_bytes": 221,
+   "final_delay_s": -10.0,
+   "slices": [
+    {
+     "stage": "R0",
+     "method": "R0",
+     "delay_s": 400.0,
+     "cpu_s": 0.0,
+     "state_bytes": 211
+    },
+    {
+     "stage": "R2",
+     "method": "R2",
+     "delay_s": -10.0,
+     "cpu_s": 0.0,
+     "state_bytes": 219
+    },
+    {
+     "stage": "R3",
+     "method": "R2",
+     "delay_s": -10.0,
+     "cpu_s": 0.0,
+     "state_bytes": 221
+    }
+   ],
+   "limits": "none",
+   "started_at": "2026-11-16T21:11:23+00:00",
+   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+  },
+  {
+   "key": "slices-T-L2-late",
+   "setup": "unlimited",
+   "status": "ok",
+   "part": "slices",
+   "scenario": "T-L2-late",
+   "points": 2,
+   "remaining": 2,
+   "n_slices": 3,
+   "max_state_bytes": 219,
+   "final_delay_s": 400.0,
+   "slices": [
+    {
+     "stage": "R0",
+     "method": "R0",
+     "delay_s": 400.0,
+     "cpu_s": 0.0,
+     "state_bytes": 217
+    },
+    {
+     "stage": "R2",
+     "method": "R0",
+     "delay_s": 400.0,
+     "cpu_s": 0.0,
+     "state_bytes": 217
+    },
+    {
+     "stage": "R3",
+     "method": "R0",
+     "delay_s": 400.0,
+     "cpu_s": 0.0,
+     "state_bytes": 219
+    }
+   ],
+   "limits": "none",
+   "started_at": "2026-11-16T21:11:24+00:00",
+   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+  }
+ ],
+ "cells": [
+  {
+   "part": "stops",
+   "setup": "unlimited",
+   "n_stops": 4,
+   "per_stop": 1,
+   "runs": 1,
+   "median_r2_cpu_s": 0.0,
+   "median_r3_cpu_s": 0.1,
+   "worst_r3_wall_s": 0.2,
+   "r3_done": 1,
+   "peak_mb": 38.2
+  },
+  {
+   "part": "stops",
+   "setup": "unlimited",
+   "n_stops": 8,
+   "per_stop": 1,
+   "runs": 1,
+   "median_r2_cpu_s": 0.0,
+   "median_r3_cpu_s": 0.2,
+   "worst_r3_wall_s": 0.2,
+   "r3_done": 1,
+   "peak_mb": 38.2
+  },
+  {
+   "part": "stops",
+   "setup": "unlimited",
+   "largest_solved_within_s": 5,
+   "n_stops": 8,
+   "basis": "CPU-seconds x 10"
+  },
+  {
+   "part": "stops",
+   "setup": "unlimited",
+   "largest_solved_within_s": 30.0,
+   "n_stops": 8,
+   "basis": "CPU-seconds x 10"
+  },
+  {
+   "key": "slices-T-L1-late",
+   "setup": "unlimited",
+   "status": "ok",
+   "part": "slices",
+   "scenario": "T-L1-late",
+   "points": 2,
+   "remaining": 2,
+   "n_slices": 3,
+   "max_state_bytes": 221,
+   "final_delay_s": -10.0,
+   "limits": "none"
+  },
+  {
+   "key": "slices-T-L2-late",
+   "setup": "unlimited",
+   "status": "ok",
+   "part": "slices",
+   "scenario": "T-L2-late",
+   "points": 2,
+   "remaining": 2,
+   "n_slices": 3,
+   "max_state_bytes": 219,
+   "final_delay_s": 400.0,
+   "limits": "none"
+  }
+ ],
+ "per_route": {},
+ "judged_share": null
+}
