@@ -64,6 +64,8 @@
   }
  ],
  "next_steps": [
+  "Write the optimization chapter from LOGBOOK runs B1, Q1, T1 (traffic check) and S1 (seed check); all four passed. Standard search budget from now on: 300 s (60 s is the minimum).",
+  "Freeze a set of road-closure scenarios on or near shuttle routes, including the Shahrah-e-Faisal protest closure and University Road flooding.",
   "Write the optimization chapter from LOGBOOK runs B1, Q1, T1 and S1 (summary in the 2026-11-11 entry). Standard search budget from now on: 300 s (60 s is the minimum).",
   "Road-block test: set a road's speed to 0, and to a slow speed, in OSRM and time the re-customize (needs Docker). Do this first: if a 0 speed does not block the road, the closure method changes.",
   "Freeze a set of road-closure scenarios on or near shuttle routes, including the Shahrah-e-Faisal protest closure and University Road flooding, with closures injected at different points of the trip.",
