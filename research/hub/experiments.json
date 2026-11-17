@@ -147,12 +147,14 @@
   "dir": "results/optimizer-scale",
   "script": "research/run_scale.py",
   "args": [
+   "--instances",
+   "Jadoon,Nadeem,All,All-doubled,Jadoon-doubled,Nadeem-doubled",
    "--code-version",
    "{code_version}"
   ],
-  "runs_total": 8,
+  "runs_total": 12,
   "question": "How do the optimizer's build time, memory and plan quality grow as stops and buses grow, and does handing OR-Tools the travel times as a matrix instead of a Python callback change that?",
-  "design": "Instances Jadoon (171 stops), Nadeem (143), All (311, both fleets) and All-doubled (622, every stop copied 30 s from its original, so it tests model size, not geography); lookups callback and matrix; 300 s each, no limits, each run a fresh process. 8 runs, about 40 minutes. No pass/fail threshold: it reports curves. All and All-doubled need the combined matrix and are recorded as skipped without it."
+  "design": "Instances Jadoon (171 stops), Nadeem (143), All (311, both fleets), All-doubled (622), and Jadoon-doubled (342) and Nadeem-doubled (286); a doubled instance copies every stop 30 s from its original and every bus, so it tests model size, not geography. Lookups callback and matrix; 300 s each, no limits, each run a fresh process: 12 runs, about an hour. No pass/fail threshold: it reports curves. All and All-doubled need the combined matrix (OSRM) and are recorded as skipped without it; the doubled contractor instances stand in for size until then. Peak memory is the OS's figure for the machine that ran it (Linux ru_maxrss, Windows peak working set)."
  },
  {
   "id": "reroute-quality",
@@ -237,5 +239,38 @@
   "runs_total": 3,
   "question": "Does the rerouting limits pipeline work? Toy scenarios, plans on true times only (the toy file has no road graph), a few seconds. Not a reported result.",
   "design": "The truth_limited arm on the three toy scenarios, one repeat, inside the systemd limits (needs WSL with systemd; on another machine run it by hand with --no-limits)."
+ },
+ {
+  "id": "optimizer-scale-quick",
+  "title": "Optimizer scaling pipeline test",
+  "kind": "scale",
+  "main": false,
+  "dir": "results/optimizer-scale-quick",
+  "script": "research/run_scale.py",
+  "args": [
+   "--quick",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 2,
+  "question": "Does the optimizer scaling pipeline work? Nadeem only, 10 s, both lookups. Not a reported result.",
+  "design": "Nadeem x callback and matrix, 10 s each, about half a minute."
+ },
+ {
+  "id": "reroute-scale-quick",
+  "title": "Rerouting scaling pipeline test",
+  "kind": "reroute",
+  "main": false,
+  "dir": "results/reroute-scale-quick",
+  "script": "research/run_reroute.py",
+  "args": [
+   "scale",
+   "--quick",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 4,
+  "question": "Does the rerouting scaling pipeline work? A few seconds. Not a reported result.",
+  "design": "Stops at 4 and 8 on synthetic problems without limits, and solving in slices on the two judged toy scenarios."
  }
 ]

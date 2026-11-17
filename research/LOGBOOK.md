@@ -585,3 +585,53 @@ time is paid after the bus waits for walkers. R3 now has a second, exact phase: 
 not reach the search's value, a label search over (set of boarded stops, last point, points visited) with
 dominance and lower-bound pruning finds the best plan. It matches brute force on all 800 problems and on
 every test. Both phases can be paused and resumed. The oracle remains "the best plan in this model".
+
+## 2026-11-17: Rerouting: rules settled while building the code (fixed before any quality or limits run)
+
+The code for every rerouting plan is written and tested (`54a55f2`, `7299036`; 217 solver and graph tests,
+235 other tests). Each module was reviewed by a second agent, who had to show every bug with a failing test;
+the bugs found were fixed. These rules were settled on the way. They change no threshold of 2026-11-16 and
+no result exists for them yet. The team may still overrule any of them before the first quality run.
+
+**Statuses and what counts.**
+- `infeasible`: on true post-closure times the patched route (R0) never reaches campus or serves no stop, or
+  the no-closure baseline is unreachable. `ok` and `infeasible` are counted results; every other status
+  (`failed`, `invalid_on_truth`, `killed_memory`, `skipped`) is a failure.
+- `invalid_on_truth`: a plan made on the road graph that true times make impossible, or that leaves a stop
+  unserved although true times give it a boarding point in range.
+- Threshold 3 also fails on any unserved stop that had a boarding point in range, and on any synthetic row
+  whose status is not `ok` or `infeasible`.
+- Threshold 4, "a valid plan within 5 s", means the plan held at 5 s is valid on true times, not only finite
+  on the graph it was planned on.
+- Threshold 6, memory, is judged on every `graph_limited` row (memory belongs to the worker process, which
+  also handles unjudged and historical scenarios), as soon as any scenario is judged.
+- The worst route in the quality pass is the one with the largest median R2 minus R3.
+
+**Limits pass.** `graph_unlimited` runs once per scenario (planning without a cap is deterministic and its
+timing is not judged); `graph_limited` and `truth_limited` run 3 repeats. A worker killed for memory keeps the
+rows it finished; the scenarios it had not reached are `killed_memory`.
+
+**Exact method (R3).** As recorded on 2026-11-17 (scaling entry), R3 is a search that allows a point to be
+visited twice, then an exact repair when merging repeats loses time. Development timings on this laptop, at
+full CPU: 13 stops and 30 points about 0.9 CPU-s; 16 stops and 30 points about 7 CPU-s; with an 800 m limit
+the repair took 16 to 32 CPU-s on some 15-stop problems. Under 0.1 CPU that is minutes, which is why the
+ladder hands out R0 and R2 at once and R3 only improves on them. RS1 will give the measured curve.
+
+**Road graph.** The row cache holds at most 256 rows and at most 128 MiB: a row searched over the whole city
+is about 1.6 MB, so 256 of them would not fit in 512 MB. A corridor's identity is its key plus a hash of its
+nodes, so two corridors of the same name never share rows, and a corridor file built for another graph
+version is refused.
+
+**Scenario builder.** Historical stretches are covered by 60 m circles every 100 m, using the plan's count
+max(2, round(L / 100) + 1); it leaves small gaps only on stretches of 121 to 149 m and 241 to 249 m, and the
+real stretches are kilometres long. The leak check looks at route vertices inside the circles, so a long
+straight segment crossing a circle without a vertex inside would be missed; any leak found stops the build.
+A stretch first met on the last-stop-to-campus leg gets only the early trigger. A closure circle that holds
+campus is reported.
+
+**Optimizer.** A pair OSRM cannot route (null in a matrix) becomes a 10^7 s arc, so the stop is dropped
+instead of crashing the solve. `ride_300s` includes a plan found just after the nominal limit.
+
+**Machines.** Rows from this Windows laptop (no limits, Windows peak working set) are never pooled with WSL
+rows. Runs that need the Docker laptop write to their own folders with `--out-dir`
+(`results/optimizer-scale-wsl/`, `results/reroute-scale-wsl/`), and the result entry names the machine.

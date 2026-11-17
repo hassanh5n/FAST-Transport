@@ -19,14 +19,19 @@
       "time-budget",
       "query-budget",
       "traffic-check",
-      "seed-check"
+      "seed-check",
+      "optimizer-scale"
      ]
     },
     {
      "title": "Rerouting",
      "question": "When a road is blocked, which road and which stops (keep, skip, or let students walk to a nearby point) give the lowest student delay, within the same limits?",
-     "status": "not started",
-     "experiments": []
+     "status": "in progress",
+     "experiments": [
+      "reroute-quality",
+      "reroute-limits",
+      "reroute-scale"
+     ]
     }
    ]
   },
@@ -54,20 +59,18 @@
    "question": "Does OSRM really route around a road when its speed is set to 0, does a slowed road (not fully blocked) work too, and how long does re-customizing take?"
   },
   {
-   "title": "Walking-radius sweep",
-   "question": "For walking limits from 0 m (visit every stop) to 800 m, how many minutes does letting students walk to a nearby point save after a block? Run on the frozen closure scenarios, against the patched published route (simplest fix) and the no-time-limit oracle."
-  },
-  {
-   "title": "Must-serve stops",
-   "question": "How many minutes do must-stop rules (accessibility, unsafe walking after dark) add to a reroute, on the same scenarios and baselines?"
+   "title": "Road-graph timing (gate G1)",
+   "question": "On one route's corridor, inside the free-tier limits, does the rerouter's own road graph answer the 14 travel-time rows R0 needs within 5 s and 31 rows within 30 s on the worst repeat, and how close are its times to OSRM after calibration?"
   }
  ],
  "next_steps": [
-  "Write the optimization chapter from LOGBOOK runs B1, Q1, T1 (traffic check) and S1 (seed check); all four passed. Standard search budget from now on: 300 s (60 s is the minimum).",
-  "Freeze a set of road-closure scenarios on or near shuttle routes, including the Shahrah-e-Faisal protest closure and University Road flooding.",
-  "Fix the rerouting baselines and scores in the logbook before any run: patched published route, no-time-limit oracle; delay against the oracle, students asked to walk, extra walking distance.",
-  "Road-block test: set a road's speed to 0, and to a slow speed, in OSRM and time the re-customize (needs Docker).",
-  "Build the rerouting pieces: walking graph, covering-path solver, H3 corridor pruning. After a block, re-query only nearest-neighbour travel times and estimate the rest on the high side (run Q1).",
-  "For every new experiment: push the logbook entry with the pass/fail rule before the first run, and judge on the worst repeat as well as the median."
+  "Docker laptop: find the map file of run N1, log its SHA-256, keep an untouched copy of the OSRM car build, and confirm Docker runs the OSRM image.",
+  "Docker laptop: build the road graph from the map file and log its counts; run the road-block test and log it; build the walking distances and log the three statistics.",
+  "Docker laptop: calibrate the graph against the saved matrix, build the route corridors, and time the graph inside the limits (gate G1).",
+  "Pin the end points of the two historical closures (Shahrah-e-Faisal, University Road) on the map by hand; then build the closure scenarios (one route first, then all) at the block speed the road-block test chose, and freeze the file.",
+  "Docker laptop: build the combined 311-stop matrix, then finish the optimizer scaling run with All and All-doubled.",
+  "Run the rerouting quality pass and the limits pass on the frozen scenarios (limits in WSL with systemd), then the remaining scaling parts (graph, buses, slices, limited rows). Log each result against the thresholds fixed on 16 Nov.",
+  "Write the rerouting chapter from the logged results.",
+  "Optimization chapter: finish the references, figures and the Nadeem bus-count point, and add the scaling curves once run OS1 is logged."
  ]
 }
