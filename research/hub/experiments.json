@@ -4,6 +4,7 @@
   "title": "Time-budget experiment",
   "kind": "budget",
   "main": true,
+  "needs": "linux",
   "dir": "results/budget",
   "script": "research/run_budget.py",
   "args": [
@@ -36,6 +37,7 @@
   "title": "Pipeline test",
   "kind": "budget",
   "main": false,
+  "needs": "linux",
   "dir": "results/budget-quick",
   "script": "research/run_budget.py",
   "args": [
@@ -179,6 +181,7 @@
   "title": "Rerouting limits pass",
   "kind": "reroute",
   "main": true,
+  "needs": "linux",
   "dir": "results/reroute-limits",
   "script": "research/run_reroute.py",
   "args": [
@@ -197,6 +200,7 @@
   "main": true,
   "dir": "results/reroute-scale",
   "script": "research/run_reroute.py",
+  "needs": "linux",
   "args": [
    "scale",
    "--code-version",
@@ -228,6 +232,7 @@
   "title": "Rerouting limits pipeline test",
   "kind": "reroute",
   "main": false,
+  "needs": "linux",
   "dir": "results/reroute-limits-quick",
   "script": "research/run_reroute.py",
   "args": [

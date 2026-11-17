@@ -143,4 +143,18 @@ pre.log{background:var(--top);color:#d1d5db;border-radius:8px;padding:12px;max-h
 .schedform input{font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink)}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--top);color:var(--top-ink);padding:10px 16px;border-radius:10px;font-size:13px;z-index:2000;box-shadow:0 6px 24px rgba(0,0,0,.25)}
 .empty{padding:28px;text-align:center;color:var(--muted)}
+
+/* experiment pages: verdict lists, warnings, highlighted rows */
+.verdicts li{align-items:flex-start}
+.verdicts li>.chip{min-width:64px;justify-content:center;margin-top:1px}
+.banner{background:var(--warn-bg);color:var(--ink);border:1px solid var(--warn);border-radius:10px;padding:10px 14px;margin:0 0 14px;font-size:13px}
+.banner strong{color:var(--warn)}
+tr.worst td{background:var(--warn-bg)}
 @media(max-width:600px){.top{gap:10px;padding:10px 14px}.mode{margin-left:0}main{padding:16px 12px 32px}}
+/* plan map legend marks and the picker */
+.legend i.dash{background:none;border-top:2px dashed var(--muted);height:0}
+.legend i.ring{width:10px;height:10px;border-radius:50%;border:2px solid;background:none}
+.legend i.dotm{width:9px;height:9px;border-radius:50%}
+.legend i.dotm.hollow{border:1.5px solid var(--muted);background:none}
+.pick select{font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);max-width:100%}
+.map-msg{border:1px dashed var(--line);border-radius:10px}

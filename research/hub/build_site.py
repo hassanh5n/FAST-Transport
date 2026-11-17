@@ -27,8 +27,11 @@ def load_experiments():
     """The experiments the hub knows, from hub/experiments.json.
 
     To add one, add an entry there. Contract for any experiment script:
-    - it is run from the repository root in WSL as `python -u <script> <args>`
-      ("{code_version}" in args is replaced with the current git commit);
+    - it is run from the repository root as `python -u <script> <args>`, in WSL when WSL works, else on
+      Windows with research/.venv ("{code_version}" in args is replaced with the current git commit);
+    - "needs": "linux" marks an experiment that cannot run without WSL (the free-tier limits come from
+      systemd cgroups): serve.py refuses it on a PC without WSL and the page greys it out. Leave it out
+      for scripts that also run on Windows;
     - it appends one JSON line per finished run to <dir>/runs.jsonl, with at least
       "key", "status" ("ok" or a failure word) and "started_at";
     - it writes <dir>/meta.json once (machine, settings); it may set "runs_total";
@@ -92,6 +95,48 @@ def run_summary(run_id, report, source, row=None):
     return s
 
 
+REROUTE_MAP = "data/reroute_map.json"
+
+
+def reroute_map_data(scen_path, instance_path):
+    """What the quality page's plan map draws, from the frozen scenario file, or ``None`` without one.
+
+    Per scenario: the closure's circles ``[lat, lng, metres]``, the bus position, the remaining stops,
+    the candidate boarding points, the closed points and the route order (the route's stops in order,
+    from the scenario of its closure with the most remaining stops: the early trigger has them all).
+    Coordinates are kept once per point under ``points`` (``id -> [lat, lng, name]``); campus is
+    point -1, the scenario file's id for it. The pre/post tables are left out, so the file stays small.
+    """
+    scen_path = Path(scen_path)
+    if not scen_path.exists():
+        return None
+    data = read_json(scen_path)
+    inst = read_json(instance_path)
+    closures = {c["id"]: c for c in data.get("closures", [])}
+    route_of = {}
+    for sc in data.get("scenarios", []):
+        stops = [sc["position"]] + [s for s in sc["remaining"] if s != sc["position"]]
+        if len(stops) > len(route_of.get(sc["closure"], [])):
+            route_of[sc["closure"]] = stops
+    used, scenarios = set(), {}
+    for sc in data.get("scenarios", []):
+        c = closures.get(sc["closure"], {})
+        order = route_of.get(sc["closure"], [])
+        scenarios[sc["id"]] = {"closure": sc["closure"], "route": f"{c.get('contractor')}-{c.get('route')}",
+                               "kind": c.get("kind"), "trigger": sc.get("trigger"),
+                               "circles": c.get("circles", []), "closed_points": c.get("closed_points", []),
+                               "position": sc["position"], "remaining": sc["remaining"],
+                               "candidates": sc.get("candidates", []), "route_order": order,
+                               "students": sc.get("students", {})}
+        used.update([sc["position"], *sc["remaining"], *sc.get("candidates", []), *order])
+    stops = inst["stops"]
+    points = {str(i): [stops[i]["lat"], stops[i]["lng"], stops[i]["name"]] for i in sorted(used)
+              if isinstance(i, int) and 0 <= i < len(stops)}
+    campus = inst["campus"]
+    points["-1"] = [campus["lat"], campus["lng"], campus["name"]]
+    return {"version": data.get("version"), "instance": data.get("instance"), "points": points, "scenarios": scenarios}
+
+
 def build(out, git_info=None):
     out = Path(out)
     if out.exists():
@@ -143,13 +188,23 @@ def build(out, git_info=None):
             report = read_json(f)
             runs.append(run_summary(f.stem, report, exp["id"], rows.get(f.stem)))
             shutil.copy2(f, out / "data" / "runs" / f.name)
-        info = {k: exp.get(k) for k in ("id", "title", "kind", "main", "question", "design", "runs_total")}
+        info = {k: exp.get(k) for k in ("id", "title", "kind", "main", "question", "design", "runs_total", "needs")}
         if summary is None:
             info["state"] = "not started"
+            rr_pass = (exp.get("args") or [None])[0]
+            if exp.get("kind") == "reroute" and rr_pass in run_reroute.PASSES:
+                # thresholds and pending chips, so a pass with no runs still shows what it will judge
+                chips, thresholds = run_reroute.pass_rules(rr_pass)
+                info["pending"] = {"pass": rr_pass, "chips": chips, "thresholds": thresholds}
         else:
             info["state"] = "complete" if summary["runs_done"] >= summary["runs_total"] else "partial"
             info["summary"] = summary
         experiments.append(info)
+
+    # the quality page's plan map: only once the frozen scenario file exists (the toy has no coordinates)
+    plan_map = reroute_map_data(run_reroute.SCENARIOS, RESEARCH / "data" / "instance_fall2026_v1.json")
+    if plan_map is not None:
+        (out / REROUTE_MAP).write_text(json.dumps(plan_map), encoding="utf-8")
 
     docs = [{"id": "logbook", "title": "Logbook", "group": "Records", "file": "docs/LOGBOOK.md"},
             {"id": "readme", "title": "How to run (README)", "group": "Records", "file": "docs/README.md"}]
@@ -173,6 +228,7 @@ def build(out, git_info=None):
                        "memory_threshold_mb": run_budget.MEMORY_THRESHOLD_MB},
         "dataset": dataset,
         "experiments": experiments,
+        "reroute_map": REROUTE_MAP if plan_map is not None else None,
         "runs": sorted(runs, key=lambda r: r.get("started_at") or "", reverse=True),
         "logbook": logbook_entries((RESEARCH / "LOGBOOK.md").read_text(encoding="utf-8")),
         "docs": docs,

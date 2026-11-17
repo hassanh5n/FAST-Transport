@@ -119,6 +119,35 @@ class QualityRowsTests(unittest.TestCase):
         self.assertTrue(all(r["judged"] for r in rows.values()))       # copied from the main row at 400 m
         self.assertTrue(main["r3_differs_from_r0"] and main["r3_ran"])
 
+    def test_main_rows_store_the_three_plans(self):
+        rows = rows_by_key(run_reroute.quality_rows(TOY_SCENARIO, TOY_CLOSURE, WALK))
+        plans = rows["T-L1-late-L400-main"]["plans"]
+        self.assertEqual(sorted(plans), ["R0", "R2", "R3"])
+        # R0 patches the published order; at 400 m stop 2's students walk 240 m to stop 1 (arrives 940 s)
+        self.assertEqual(plans["R0"], {"visit": [1, 2], "board_at": [[1, 1], [2, 2]], "unserved": [], "arrival_s": 1350.0})
+        self.assertEqual(plans["R3"], {"visit": [1], "board_at": [[1, 1], [2, 1]], "unserved": [], "arrival_s": 940.0})
+        self.assertEqual(rows["T-L1-late-L0-main"]["plans"]["R3"]["board_at"], [[1, 1], [2, 2]])   # nobody may walk
+        for lim in (0, 400, 800):
+            self.assertIn("plans", rows[f"T-L1-late-L{lim}-main"])
+        self.assertNotIn("plans", rows["T-L1-late-L400-control"])          # only the main arm, one per limit
+        self.assertNotIn("plans", rows["T-L1-late-L400-must_serve"])
+        back = json.loads(json.dumps(list(rows.values()), allow_nan=False))
+        self.assertEqual(back[1]["plans"]["R2"]["visit"], [1])
+
+    def test_infeasible_rows_keep_their_plans_with_no_arrival(self):
+        cut = dict(TOY_CLOSURE, post=[[0, 100, 300, INF], [100, 0, 400, INF], [300, 400, 0, INF], [INF, INF, INF, 0]])
+        main = rows_by_key(run_reroute.quality_rows(TOY_SCENARIO, cut, WALK))["T-L1-late-L400-main"]
+        self.assertEqual(main["status"], "infeasible")
+        self.assertIsNone(main["plans"]["R0"]["arrival_s"])
+        self.assertEqual(sorted(s for s, _ in main["plans"]["R0"]["board_at"]), [1, 2])
+        json.dumps(main, allow_nan=False)
+
+    def test_plan_json_is_json_types_only(self):
+        from reroute.model import Plan
+        plan = Plan("R2", (3, 1), {1: 1, 2: 3}, (4,), INF, 0.0)
+        self.assertEqual(run_reroute.plan_json(plan),
+                         {"visit": [3, 1], "board_at": [[1, 1], [2, 3]], "unserved": [4], "arrival_s": None})
+
     def test_every_stop_unservable_is_infeasible_not_a_crash(self):
         # the bus sits at point 0; stops 1 and 2 are inside the closure and nobody can walk anywhere
         closed = dict(TOY_CLOSURE, closed_points=[1, 2],

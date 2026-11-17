@@ -329,12 +329,22 @@ def truth_feasible(scenario: dict, closure: dict, walk: Mapping, limit_m: float 
     return _feasible(solve_r0(problem), len(problem.stops))
 
 
+def plan_json(plan) -> dict:
+    """What the hub's plan map needs of one plan, JSON types only: the visit order (point ids, campus
+    implied last), ``board_at`` as ``[stop, point]`` pairs, the unserved stops and the planned arrival
+    (seconds from the trigger; ``None`` when infinite)."""
+    return {"visit": [int(p) for p in plan.visit],
+            "board_at": [[int(s), int(p)] for s, p in sorted(plan.board_at.items())],
+            "unserved": [int(s) for s in plan.unserved], "arrival_s": _num(float(plan.arrival_s))}
+
+
 def quality_rows(scenario: dict, closure: dict, walk: Mapping) -> list[dict]:
     """The five rows of one scenario: ``main`` at 0, 400 and 800 m, ``control`` and ``must_serve`` at 400 m.
 
     A row whose plans never reach campus or serve no stop at all is ``infeasible``; a plan the
     scoring table makes invalid gives ``invalid_on_truth``. ``judged`` comes from the main row at
-    400 m and is copied to the others.
+    400 m and is copied to the others. Main rows of every status also carry ``plans``: R0, R2 and
+    R3 as :func:`plan_json`, for the hub's map of one scenario.
     """
     from reroute_cases import baseline_arrival, build_problem, must_serve_draw, score_on_truth
     head = _scenario_head(scenario, closure)
@@ -352,6 +362,8 @@ def quality_rows(scenario: dict, closure: dict, walk: Mapping) -> list[dict]:
                "limit_m": limit, "arm": arm, "remaining": len(scenario["remaining"]),
                "must_serve": list(must), "closure_contains_stop": bool(tags.get("closure_contains_stop")),
                "r3_ran": plans["r3_ran"]}
+        if arm == "main":
+            row["plans"] = {m: plan_json(plans[m]) for m in ("R0", "R2", "R3")}
         n = len(problem.stops)
         if not math.isfinite(baseline) or not all(_feasible(plans[m], n) for m in ("R0", "R3")):
             row.update(status="infeasible", unserved=len(plans["R3"].unserved))
@@ -1050,6 +1062,37 @@ def _scale_cells(rows: Sequence[dict]) -> list[dict]:
     return cells
 
 
+def pass_rules(kind: str, verdict: Mapping | None = None) -> tuple[list[dict], dict]:
+    """The pass/fail chips and the thresholds of one pass; with no verdict every chip is pending (``None``).
+
+    The hub shows these for a pass with no runs yet, so its thresholds are visible before it runs.
+    """
+    v = verdict or {}
+    if kind == "quality":
+        chips = [
+            {"label": f"Walking gains at least {GAIN_MIN_S} s net of the no-closure control (400 m, median)",
+             "result": v.get("gain")},
+            {"label": f"Greedy within {NEAR_ORACLE_S} s of the exact plan in {NEAR_ORACLE_SHARE:.0%} of scenarios "
+                      f"and on every route's median (400 m)", "result": v.get("near_oracle")},
+            {"label": "No failed run, no avoidable unserved stop, exact never later than the patched route",
+             "result": v.get("no_violations")}]
+        thresholds = {"gain_min_s": GAIN_MIN_S, "near_oracle_s": NEAR_ORACLE_S,
+                      "near_oracle_share": NEAR_ORACLE_SHARE, "judged_limit_m": JUDGED_LIMIT_M}
+    elif kind == "limits":
+        chips = [
+            {"label": f"A valid plan within {FIRST_PLAN_S} s in {FIRST_PLAN_SHARE:.0%} of scenarios (graph, limited, "
+                      f"worst repeat)", "result": v.get("first_plan")},
+            {"label": f"At 30 s within {NEAR_ORACLE_S} s of the oracle in {AT_30_SHARE:.0%} of scenarios "
+                      f"(graph, limited, worst repeat)", "result": v.get("at_30")},
+            {"label": f"Peak memory under {MEMORY_MB} MB including the graph, none killed",
+             "result": v.get("memory")}]
+        thresholds = {"first_plan_s": FIRST_PLAN_S, "first_plan_share": FIRST_PLAN_SHARE,
+                      "near_oracle_s": NEAR_ORACLE_S, "at_30_share": AT_30_SHARE, "memory_mb": MEMORY_MB}
+    else:
+        chips, thresholds = [], {"note": "curves only, no pass or fail"}
+    return chips, thresholds
+
+
 def build_summary(out_dir: Path) -> dict | None:
     """The hub summary of one pass's folder (``meta.json["pass"]`` says which), or ``None`` without runs."""
     out_dir = Path(out_dir)
@@ -1065,31 +1108,14 @@ def build_summary(out_dir: Path) -> dict | None:
     failed = sum(1 for r in rows if r.get("status") not in RESULT_STATUSES)      # infeasible is a counted result
     if kind == "quality":
         verdict = quality_verdict(rows)
-        chips = [
-            {"label": f"Walking gains at least {GAIN_MIN_S} s net of the no-closure control (400 m, median)",
-             "result": verdict["gain"]},
-            {"label": f"Greedy within {NEAR_ORACLE_S} s of the exact plan in {NEAR_ORACLE_SHARE:.0%} of scenarios "
-                      f"and on every route's median (400 m)", "result": verdict["near_oracle"]},
-            {"label": "No failed run, no avoidable unserved stop, exact never later than the patched route",
-             "result": verdict["no_violations"]}]
         cells, per_route, per_run_s = _quality_cells(rows), _quality_per_route(rows), 2.0
-        thresholds = {"gain_min_s": GAIN_MIN_S, "near_oracle_s": NEAR_ORACLE_S,
-                      "near_oracle_share": NEAR_ORACLE_SHARE, "judged_limit_m": JUDGED_LIMIT_M}
     elif kind == "limits":
         verdict = limits_verdict(rows)
-        chips = [
-            {"label": f"A valid plan within {FIRST_PLAN_S} s in {FIRST_PLAN_SHARE:.0%} of scenarios (graph, limited, "
-                      f"worst repeat)", "result": verdict["first_plan"]},
-            {"label": f"At 30 s within {NEAR_ORACLE_S} s of the oracle in {AT_30_SHARE:.0%} of scenarios "
-                      f"(graph, limited, worst repeat)", "result": verdict["at_30"]},
-            {"label": f"Peak memory under {MEMORY_MB} MB including the graph, none killed",
-             "result": verdict["memory"]}]
         cells, per_route, per_run_s = _limits_cells(rows), _limits_per_route(rows), 15.0
-        thresholds = {"first_plan_s": FIRST_PLAN_S, "first_plan_share": FIRST_PLAN_SHARE,
-                      "near_oracle_s": NEAR_ORACLE_S, "at_30_share": AT_30_SHARE, "memory_mb": MEMORY_MB}
     else:
-        verdict, chips, thresholds = {}, [], {"note": "curves only, no pass or fail"}
+        verdict = {}
         cells, per_route, per_run_s = _scale_cells(rows), {}, 20.0
+    chips, thresholds = pass_rules(kind, verdict)
     if verdict:
         verdict["complete"] = len(done) >= total and failed == 0
     judged_main = [r for r in rows if r.get("arm") in ("main", "graph_limited")]

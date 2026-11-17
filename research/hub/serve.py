@@ -1,9 +1,11 @@
-"""Research hub: the research site plus buttons to run experiments in WSL and publish results.
+"""Research hub: the research site plus buttons to run experiments and publish results.
 
     Double-click research/Research Hub.bat, or run:  python research/hub/serve.py
 
 Runs on Windows, listens on 127.0.0.1 only, standard library only. Experiments (listed in
-hub/experiments.json) run in WSL. Jobs can start now or at a set time, and can publish their
+hub/experiments.json) run in WSL when WSL works (~/fc-research-venv). Without WSL they run on this
+PC with research/.venv (or the Python running the hub when that is missing), except those marked
+"needs": "linux", which are refused. Jobs can start now or at a set time, and can publish their
 results when they finish. Publishing commits and pushes the research/ folder only. Nothing here
 touches the website, its backend, settings or database.
 """
@@ -37,6 +39,7 @@ import build_site  # noqa: E402
 import run_budget  # noqa: E402
 
 VENV_PY = "~/fc-research-venv/bin/python"
+NATIVE_VENV = RESEARCH / ".venv"
 PORTS = range(8765, 8781)
 NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
@@ -128,15 +131,29 @@ _site_lock = threading.Lock()
 _site = {"sig": None, "version": 0}
 
 
+SKIP_TOP = {".venv", "venv", ".git"}          # Python environments (the native runner's .venv) are not site inputs
+SKIP_DIRS = {"logs", "__pycache__"}
+SKIP_HUB = {"_site", "_site_new", "_logs"}
+
+
 def signature():
+    """A hash of every site input under research/ (path, mtime, size). Run on each status poll, so it prunes
+    research/.venv, the built site and logs instead of walking them."""
     items = []
-    for p in RESEARCH.rglob("*"):
-        parts = p.relative_to(RESEARCH).parts
-        if parts[:2] in (("hub", "_site"), ("hub", "_site_new"), ("hub", "_logs")) or "logs" in parts or "__pycache__" in parts:
-            continue
-        if p.is_file():
-            st = p.stat()
-            items.append((str(p), st.st_mtime_ns, st.st_size))
+    for dirpath, dirnames, filenames in os.walk(RESEARCH):
+        rel = Path(dirpath).relative_to(RESEARCH).parts
+        dirnames[:] = [d for d in dirnames
+                       if d not in SKIP_DIRS
+                       and not (not rel and d in SKIP_TOP)
+                       and not (rel == ("hub",) and d in SKIP_HUB)
+                       and not (Path(dirpath, d) / "pyvenv.cfg").exists()]
+        for name in filenames:
+            p = os.path.join(dirpath, name)
+            try:
+                st = os.stat(p)
+            except OSError:
+                continue
+            items.append((p, st.st_mtime_ns, st.st_size))
     return hash(tuple(sorted(items)))
 
 
@@ -171,20 +188,100 @@ def script_names():
     return sorted({Path(e["script"]).name for e in build_site.load_experiments()} | {"optimize.py"})
 
 
+def native_venv_python(venv=NATIVE_VENV):
+    return venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+
+
+def native_python():
+    """research/.venv's Python when it exists, else the Python running the hub."""
+    py = native_venv_python()
+    return str(py) if py.exists() else sys.executable
+
+
+def pick_runner(env):
+    """'wsl' when the last setup check found a working WSL, else 'native' (this PC, no WSL)."""
+    return "wsl" if env and env.get("wsl") else "native"
+
+
+def runner():
+    return pick_runner(ENV["value"])
+
+
+def needs_linux(exp):
+    return (exp or {}).get("needs") == "linux"
+
+
+def linux_refusal(exp):
+    return (f"{exp['title']} needs Linux: its free-tier limits come from systemd cgroups, which this PC "
+            "can only provide through WSL, and WSL is not working here. Install WSL with systemd "
+            "(see research/README.md), then press Check setup.")
+
+
+def experiment_command(exp, run_with, version, python=None):
+    """The command line that runs an experiment: through WSL, or natively from the repository root."""
+    args = [a.replace("{code_version}", version) for a in exp.get("args", [])]
+    if run_with == "wsl":
+        quoted = " ".join(f"'{a}'" for a in args)
+        return ["wsl.exe", "-e", "bash", "-lc", f"cd '{WSL_REPO}' && {VENV_PY} -u '{exp['script']}' {quoted}"]
+    if needs_linux(exp):
+        raise RuntimeError(linux_refusal(exp))
+    return [python or native_python(), "-u", str(REPO / exp["script"]), *args]
+
+
+INSTALL_NATIVE = (
+    "import os, subprocess, sys\n"
+    "venv, req = sys.argv[1], sys.argv[2]\n"
+    "py = os.path.join(venv, 'Scripts', 'python.exe') if os.name == 'nt' else os.path.join(venv, 'bin', 'python')\n"
+    "if not os.path.exists(py):\n"
+    "    print('Creating', venv, flush=True)\n"
+    "    subprocess.check_call([sys.executable, '-m', 'venv', venv])\n"
+    "subprocess.check_call([py, '-m', 'pip', 'install', '-r', req])\n"
+    "print('INSTALL-DONE')\n")
+
+
+def install_command(run_with):
+    if run_with == "wsl":
+        return ["wsl.exe", "-e", "bash", "-lc", f"python3 -m venv ~/fc-research-venv && {VENV_PY} -m pip install -r "
+                f"'{WSL_REPO}/research/requirements.txt' && echo INSTALL-DONE"]
+    base = getattr(sys, "_base_executable", None) or sys.executable    # not the venv's own Python
+    return [base, "-u", "-c", INSTALL_NATIVE, str(NATIVE_VENV), str(RESEARCH / "requirements.txt")]
+
+
+def check_native(env):
+    """Fill env for running on this PC: research/.venv and OR-Tools; no limits without WSL."""
+    py = native_python()
+    env.update(runner="native", venv=native_venv_python().exists(), python=py, limits=None)
+    try:
+        r = subprocess.run([py, "-c", "import ortools; print('ORTOOLS=' + ortools.__version__)"], capture_output=True,
+                           timeout=120, creationflags=NO_WINDOW)
+        out = clean(r.stdout)
+    except (OSError, subprocess.SubprocessError):
+        out = ""
+    m = re.search(r"ORTOOLS=(\S+)", out)
+    env["ortools"] = m.group(1) if m else None
+    if not env["venv"] or not env["ortools"]:
+        env["message"] = ("WSL is not available, so experiments run on this PC, but the research Python environment "
+                          "(research/.venv with OR-Tools) is not set up yet. Press Install.")
+    return env
+
+
 def check_env():
     script = (f"echo WSL=ok; if [ -x {VENV_PY} ]; then echo VENV=ok; "
               f"{VENV_PY} -c 'import ortools; print(\"ORTOOLS=\" + ortools.__version__)' 2>/dev/null || echo ORTOOLS=; "
               f"cd '{WSL_REPO}' && {VENV_PY} research/run_budget.py --check 2>&1 | tail -3; else echo VENV=no; fi")
     rc, out = wsl(script, timeout=180)
-    env = {"checked_at": now(), "wsl": "WSL=ok" in out, "venv": "VENV=ok" in out, "ortools": None, "limits": None}
+    env = {"checked_at": now(), "wsl": "WSL=ok" in out, "venv": "VENV=ok" in out, "ortools": None, "limits": None,
+           "runner": "wsl"}
+    if not env["wsl"]:
+        env["wsl_error"] = " ".join(out.split())[:300]
+        ENV["value"] = check_native(env)
+        return env
     m = re.search(r"ORTOOLS=(\S*)", out)
     env["ortools"] = (m.group(1) or None) if m else None
     lim = next((l for l in out.splitlines() if l.startswith("limits:")), None)
     if lim:
         env["limits"] = lim.rstrip().endswith(" OK")
-    if not env["wsl"]:
-        env["message"] = "WSL did not start: " + " ".join(out.split())[:300]
-    elif not env["venv"]:
+    if not env["venv"]:
         env["message"] = "The research Python environment is not set up yet. Press Install."
     elif env["limits"] is False:
         env["message"] = ("The free-tier limits are not applied, so limited runs would mean nothing. "
@@ -193,13 +290,59 @@ def check_env():
     return env
 
 
-def wsl_busy():
-    """True if an experiment script is running in WSL (also one started outside the hub)."""
-    rc, out = wsl("pgrep -af '[r]esearch/.*[.]py'; true", timeout=30)
+def experiment_lines(lines, names):
+    """The process lines that are experiment runs (not --check or --summarize)."""
+    return [l for l in lines if any(n in l for n in names) and "--check" not in l and "--summarize" not in l]
+
+
+def native_processes():
+    """(pid, command line) of every Python process on this PC, except the hub itself."""
+    if os.name == "nt":
+        cmd = ["powershell.exe", "-NoProfile", "-NonInteractive", "-Command",
+               "Get-CimInstance Win32_Process -Filter \"Name like 'python%'\" | "
+               "ForEach-Object { \"$($_.ProcessId) $($_.CommandLine)\" }"]
+    else:
+        cmd = ["pgrep", "-af", "python"]
+    try:
+        r = subprocess.run(cmd, capture_output=True, timeout=60, creationflags=NO_WINDOW)
+    except (OSError, subprocess.SubprocessError):
+        return []
+    out = []
+    for line in clean(r.stdout).splitlines():
+        pid, _, rest = line.strip().partition(" ")
+        if pid.isdigit() and int(pid) != os.getpid():
+            out.append((int(pid), rest))
+    return out
+
+
+def native_runs():
     names = script_names()
-    runs = [l for l in out.splitlines() if any(n in l for n in names) and "--check" not in l and "--summarize" not in l]
-    WSL_BUSY["value"] = bool(runs)
+    return [(pid, cmd) for pid, cmd in native_processes() if experiment_lines([cmd], names)]
+
+
+def wsl_busy():
+    """True if an experiment script is running (in WSL, or on this PC without WSL), also one started outside the hub."""
+    if ENV["value"] is None:                  # not checked yet: do not guess which runner to ask
+        return WSL_BUSY["value"]
+    if runner() == "native":
+        WSL_BUSY["value"] = bool(native_runs())
+        return WSL_BUSY["value"]
+    rc, out = wsl("pgrep -af '[r]esearch/.*[.]py'; true", timeout=30)
+    WSL_BUSY["value"] = bool(experiment_lines(out.splitlines(), script_names()))
     return WSL_BUSY["value"]
+
+
+def kill_tree(pid):
+    """End a process and everything it started (run_scale and run_reroute start worker processes)."""
+    if os.name == "nt":
+        subprocess.run(["taskkill", "/T", "/F", "/PID", str(pid)], capture_output=True, timeout=30,
+                       creationflags=NO_WINDOW)
+    else:
+        subprocess.run(["pkill", "-TERM", "-P", str(pid)], capture_output=True, timeout=30)
+        try:
+            os.kill(pid, 15)
+        except OSError:
+            pass
 
 
 def watch_wsl():
@@ -214,49 +357,67 @@ def watch_wsl():
 
 # ---------------------------------------------------------------- jobs
 
+def runner_line(run_with, cmd):
+    """First log line of a job: where it runs and the command (the install script shortened)."""
+    where = "in WSL" if run_with == "wsl" else "on this PC (no WSL)"
+    return f"Runs {where}: " + " ".join(c if len(c) < 200 else c.split("\n")[0] + " ..." for c in cmd)
+
+
 class Job:
     def __init__(self):
         self.lock = threading.Lock()
         self.state, self.kind, self.title = "idle", None, None
         self.started_at = self.finished_at = self.exit_code = None
         self.publish_after, self.publish_result, self.stopped = False, None, False
-        self.proc, self.tail = None, deque(maxlen=40)
+        self.proc, self.tail, self.run_with = None, deque(maxlen=40), None
 
     def info(self):
         return {"state": self.state, "experiment": self.kind, "title": self.title, "started_at": self.started_at,
                 "finished_at": self.finished_at, "exit_code": self.exit_code, "log_tail": list(self.tail),
-                "publish_after": self.publish_after, "publish_result": self.publish_result, "stopped": self.stopped}
+                "publish_after": self.publish_after, "publish_result": self.publish_result, "stopped": self.stopped,
+                "runner": self.run_with}
 
     def start(self, kind, publish_after=False):
         with self.lock:
             if self.state == "running":
                 raise RuntimeError(f"{self.title} is already running.")
+            if ENV["value"] is None:
+                check_env()
+            run_with = runner()
             if wsl_busy():
-                raise RuntimeError("An experiment is already running in WSL (started outside this hub). Stop it first.")
+                where = "in WSL" if run_with == "wsl" else "on this PC"
+                raise RuntimeError(f"An experiment is already running {where} (started outside this hub). Stop it first.")
             if kind == "install":
                 title, publish_after = "Install the research Python environment", False
-                script = (f"python3 -m venv ~/fc-research-venv && {VENV_PY} -m pip install -r "
-                          f"'{WSL_REPO}/research/requirements.txt' && echo INSTALL-DONE")
+                cmd = install_command(run_with)
             else:
                 exp = experiment(kind)
                 if exp is None:
                     raise RuntimeError(f"Unknown experiment {kind}.")
                 title = exp["title"]
+                if run_with == "native" and needs_linux(exp):
+                    raise RuntimeError(linux_refusal(exp))
                 version = code_version()
                 if version == "unknown" and any("{code_version}" in a for a in exp.get("args", [])):
                     # A run recorded with code version "unknown" cannot be traced back to its code.
                     raise RuntimeError("Git could not report the code version, so this run would be recorded "
                                        "as 'unknown'. Install Git for Windows (git-scm.com) and reopen the hub.")
-                args =" ".join(f"'{a.replace('{code_version}', version)}'" for a in exp.get("args", []))
-                script = f"cd '{WSL_REPO}' && {VENV_PY} -u '{exp['script']}' {args}"
+                cmd = experiment_command(exp, run_with, version)
             LOGS.mkdir(exist_ok=True)
             log_path = LOGS / f"{kind}-{datetime.now().strftime('%Y%m%d-%H%M%S')}.log"
-            self.proc = subprocess.Popen(["wsl.exe", "-e", "bash", "-lc", script], stdout=subprocess.PIPE,
-                                         stderr=subprocess.STDOUT, creationflags=NO_WINDOW)
+            if run_with == "wsl":
+                self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, creationflags=NO_WINDOW)
+            else:
+                # UTF-8 output whatever the console code page, so the log reads as it does from WSL.
+                child_env = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}
+                self.proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=str(REPO),
+                                             env=child_env, creationflags=NO_WINDOW)
+            self.run_with = run_with
             self.state, self.kind, self.title = "running", kind, title
             self.started_at, self.finished_at, self.exit_code = now(), None, None
             self.publish_after, self.publish_result, self.stopped = bool(publish_after), None, False
             self.tail.clear()
+            self.tail.append(runner_line(run_with, cmd))
             WSL_BUSY["value"] = True
             threading.Thread(target=self._watch, args=(self.proc, log_path), daemon=True).start()
 
@@ -264,6 +425,7 @@ class Job:
         keep_awake(True)
         try:
             with open(log_path, "w", encoding="utf-8") as log:
+                log.write("".join(t + "\n" for t in self.tail))    # the runner line written by start()
                 for raw in iter(proc.stdout.readline, b""):
                     line = clean(raw).rstrip()
                     if line:
@@ -287,9 +449,14 @@ class Job:
         with self.lock:
             proc = self.proc if self.state == "running" else None
             self.stopped = True
-        # Stop the Linux processes as well: ending wsl.exe alone can leave them running.
-        kills = "; ".join(f"pkill -f '[r]esearch/{n}'" for n in script_names())
-        wsl(kills + "; true", timeout=30)
+        if (self.run_with if proc else runner()) == "native":
+            # The job's whole process tree, then any run started outside the hub.
+            for pid in ([proc.pid] if proc else []) + [pid for pid, _ in native_runs()]:
+                kill_tree(pid)
+        else:
+            # Stop the Linux processes as well: ending wsl.exe alone can leave them running.
+            kills = "; ".join(f"pkill -f '[r]esearch/{n}'" for n in script_names())
+            wsl(kills + "; true", timeout=30)
         if proc:
             proc.terminate()
             try:
@@ -326,6 +493,11 @@ class Schedule:
         exp = experiment(exp_id)
         if exp is None:
             raise RuntimeError(f"Unknown experiment {exp_id}.")
+        if needs_linux(exp):
+            if ENV["value"] is None:          # the startup check may still be running: check now, do not guess
+                check_env()
+            if runner() == "native":
+                raise RuntimeError(linux_refusal(exp))
         m = re.match(r"^(\d{1,2}):(\d{2})$", hhmm or "")
         if not m or int(m.group(1)) > 23 or int(m.group(2)) > 59:
             raise RuntimeError("Give the start time as HH:MM.")
@@ -441,6 +613,7 @@ class Handler(SimpleHTTPRequestHandler):
 
     def status(self):
         return {"local": True, "site_version": ensure_site(), "job": JOB.info(), "env": ENV["value"],
+                "runner": runner() if ENV["value"] else None,
                 "wsl_busy": JOB.state != "running" and WSL_BUSY["value"], "git": git_status(),
                 "schedule": SCHEDULE.info()}
 
