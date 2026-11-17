@@ -1,7 +1,7 @@
 {
- "generated_at": "2026-11-16T21:11:24+00:00",
+ "generated_at": "2026-11-17T12:39:33+00:00",
  "meta": {
-  "started_at": "2026-11-16T21:11:21+00:00",
+  "started_at": "2026-11-17T12:39:31+00:00",
   "machine": {
    "host": "DESKTOP-VIQC8PE",
    "system": "Windows",
@@ -14,7 +14,7 @@
   },
   "pass": "scale",
   "quick": true,
-  "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49",
+  "code_version": "c1a9f8a3c670e0423dc8154b643ec84ffd48c941",
   "scenarios": {
    "file": "scenarios_toy.json",
    "sha256": "4847dc525d3b6956660d0c0b7109e6fe0938d99f664c75619e0233ad9775bb1b",
@@ -48,20 +48,20 @@
    "seed": 1,
    "points": 8,
    "r2_cpu_s": 0.0,
-   "r2_wall_s": 0.0,
-   "r2_peak_mb": 29.8,
-   "base_mb": 29.8,
-   "r2_arrival_s": 972.0,
+   "r2_wall_s": 0.001,
+   "r2_peak_mb": 30.3,
+   "base_mb": 30.3,
+   "r2_arrival_s": 939.1,
    "r3_ran": true,
    "r3_done": true,
-   "r3_cpu_s": 0.109,
-   "r3_wall_s": 0.151,
-   "r3_peak_mb": 38.2,
+   "r3_cpu_s": 0.078,
+   "r3_wall_s": 0.142,
+   "r3_peak_mb": 37.7,
    "r3_arrival_s": 919.2,
-   "r2_minus_r3_s": 52.9,
+   "r2_minus_r3_s": 19.9,
    "limits": "none",
-   "started_at": "2026-11-16T21:11:22+00:00",
-   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+   "started_at": "2026-11-17T12:39:31+00:00",
+   "code_version": "c1a9f8a3c670e0423dc8154b643ec84ffd48c941"
   },
   {
    "key": "stops-n8-c1-s1-unlimited",
@@ -72,21 +72,21 @@
    "per_stop": 1,
    "seed": 1,
    "points": 16,
-   "r2_cpu_s": 0.0,
-   "r2_wall_s": 0.001,
-   "r2_peak_mb": 29.8,
-   "base_mb": 29.8,
-   "r2_arrival_s": 1461.1,
+   "r2_cpu_s": 0.016,
+   "r2_wall_s": 0.016,
+   "r2_peak_mb": 30.3,
+   "base_mb": 30.3,
+   "r2_arrival_s": 1174.9,
    "r3_ran": true,
    "r3_done": true,
-   "r3_cpu_s": 0.172,
-   "r3_wall_s": 0.226,
-   "r3_peak_mb": 38.2,
+   "r3_cpu_s": 0.156,
+   "r3_wall_s": 0.181,
+   "r3_peak_mb": 37.7,
    "r3_arrival_s": 1174.9,
-   "r2_minus_r3_s": 286.2,
+   "r2_minus_r3_s": 0.0,
    "limits": "none",
-   "started_at": "2026-11-16T21:11:22+00:00",
-   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+   "started_at": "2026-11-17T12:39:31+00:00",
+   "code_version": "c1a9f8a3c670e0423dc8154b643ec84ffd48c941"
   },
   {
    "key": "slices-T-L1-late",
@@ -123,8 +123,8 @@
     }
    ],
    "limits": "none",
-   "started_at": "2026-11-16T21:11:23+00:00",
-   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+   "started_at": "2026-11-17T12:39:32+00:00",
+   "code_version": "c1a9f8a3c670e0423dc8154b643ec84ffd48c941"
   },
   {
    "key": "slices-T-L2-late",
@@ -161,8 +161,8 @@
     }
    ],
    "limits": "none",
-   "started_at": "2026-11-16T21:11:24+00:00",
-   "code_version": "7299036836f2f1cbe07cf3e4d548209115f8fd49"
+   "started_at": "2026-11-17T12:39:33+00:00",
+   "code_version": "c1a9f8a3c670e0423dc8154b643ec84ffd48c941"
   }
  ],
  "cells": [
@@ -174,9 +174,9 @@
    "runs": 1,
    "median_r2_cpu_s": 0.0,
    "median_r3_cpu_s": 0.1,
-   "worst_r3_wall_s": 0.2,
+   "worst_r3_wall_s": 0.1,
    "r3_done": 1,
-   "peak_mb": 38.2
+   "peak_mb": 37.7
   },
   {
    "part": "stops",
@@ -188,7 +188,7 @@
    "median_r3_cpu_s": 0.2,
    "worst_r3_wall_s": 0.2,
    "r3_done": 1,
-   "peak_mb": 38.2
+   "peak_mb": 37.7
   },
   {
    "part": "stops",

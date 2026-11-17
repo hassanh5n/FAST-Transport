@@ -721,3 +721,25 @@ spot check of the synthetic problems (seeds 1 to 3), R2's gap to R3 fell to 0 in
 and R2 takes at most 0.5 CPU-s at 20 stops and 100 points (about 5 s under 0.1 CPU, while R0's plan is
 already out). The L1 description of R2 ("greedy, then try removals") is extended by this entry; the
 thresholds do not change. RS1 "stops" is rerun with the new R2 into `results/reroute-scale/`.
+
+## 2026-11-17: RS1 "stops" rerun with the improved R2 (`results/reroute-scale/`)
+
+Same machine and problems as the first run; code `c1a9f8a` (R2 from `723f4c8`). 45 of 45 ok, unlimited.
+Pipeline tests rerun on the same code: quality 15/15, limits 3/3 (no limits), scale 4/4, all ok.
+
+| Stops | R2 CPU, max (s) | R3 CPU median / max (s) | R3 peak (MB) | R2 minus R3 per problem, c = 1 / 2 / 4, seeds 1 to 3 (s) |
+| --- | --- | --- | --- | --- |
+| 4 | 0.02 | 0.11 to 0.14 / 0.17 | 38 | 20, 0, 0 / 41, 0, 67 / 0, 0, 0 |
+| 8 | 0.06 | 0.13 to 0.14 / 0.23 | 38 | 0, 0, 0 / 0, 0, 0 / 97, 52, 54 |
+| 12 | 0.11 | 0.55 to 0.64 / 61.4 | 120 | 2, 97, 0 / 87, 0, 0 / 52, 0, 0 |
+| 16 | 0.42 | 7.4 to 8.9 / 9.3 | 136 | 9, 45, 0 / 0, 42, 108 / 79, 16, 22 |
+| 20 | 0.50 | not run (over 16 stops) | - | R2 is 685 to 773 s above the lower bound (median) |
+
+- R2 is now within 60 s of R3 on 30 of 36 synthetic problems (83%) and equal on 19; the largest gap is 108 s.
+  Before the change no group had a median under 68 s. This is not threshold 2, which is judged on real
+  scenarios in the quality pass; it says the greedy method is no longer the obvious weak point. If the
+  quality pass fails threshold 2, the per-route results will show whether random-looking geometry or the
+  method is to blame.
+- R2 costs at most 0.5 CPU-s (about 5 s under 0.1 CPU) and R3's times and memory are unchanged from the
+  first run, including the one 12-stop problem whose exact repair takes about 61 s.
+- The lower bound above 16 stops is still weak and is reported, not used to judge R2.
