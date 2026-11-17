@@ -62,3 +62,83 @@ class R2Tests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OrderImprovementTests(unittest.TestCase):
+    """R2 ends with a visiting order that no single relocation or segment reversal improves."""
+
+    def _neighbours(self, order):
+        n = len(order)
+        for i in range(n):                                   # move one point elsewhere
+            rest = order[:i] + order[i + 1:]
+            for j in range(len(rest) + 1):
+                cand = rest[:j] + [order[i]] + rest[j:]
+                if cand != order:
+                    yield cand
+        for i in range(n - 1):                               # reverse a segment
+            for j in range(i + 2, n + 1):
+                cand = order[:i] + order[i:j][::-1] + order[j:]
+                if cand != order:
+                    yield cand
+
+    def test_r2_order_is_locally_optimal(self):
+        for seed in range(12):
+            for n_stops, extra in ((6, 4), (9, 6)):
+                p = random_problem(seed, n_stops, extra)
+                plan = solve_r2(p)
+                if plan.visit == solve_r0(p).visit or plan.arrival_s == float("inf"):
+                    continue                                 # R0's plan was kept as it is
+                key = (plan.arrival_s, plan.walk_m)
+                for cand in self._neighbours(list(plan.visit)):
+                    k = evaluate(p, cand, plan.board_at, plan.unserved)
+                    self.assertGreaterEqual(k[0], key[0] - 1e-6, (seed, n_stops, cand))
+
+
+class AddPointTests(unittest.TestCase):
+    """R2 ends where adding one more unvisited point (with stops moved to it when that shortens
+    their walk) does not lower the key."""
+
+    def test_no_single_added_point_improves_r2(self):
+        from reroute.ladder import _options
+        for seed in range(10):
+            p = random_problem(seed, 8, 6)
+            plan = solve_r2(p)
+            if plan.arrival_s == float("inf"):
+                continue
+            key = (plan.arrival_s, plan.walk_m)
+            opts = _options(p)
+            for pid in p.points:
+                if pid in plan.visit:
+                    continue
+                board = dict(plan.board_at)
+                for sid, at in plan.board_at.items():
+                    walks = {q: d for d, q in opts[sid]}
+                    if pid in walks and walks[pid] < walks.get(at, float("inf")):
+                        board[sid] = pid
+                for pos in range(len(plan.visit) + 1):
+                    visit = list(plan.visit[:pos]) + [pid] + list(plan.visit[pos:])
+                    k = evaluate(p, visit, board, plan.unserved)
+                    self.assertGreaterEqual(k, key, (seed, pid, pos))
+
+
+class SwapPointTests(unittest.TestCase):
+    """R2 ends where swapping one visited point for an unvisited one does not lower the key."""
+
+    def test_no_single_swap_improves_r2(self):
+        from reroute.ladder import _options, _swap_point
+        for seed in range(10):
+            p = random_problem(seed, 8, 6)
+            plan = solve_r2(p)
+            if plan.arrival_s == float("inf") or plan.visit == solve_r0(p).visit:
+                continue
+            key = (plan.arrival_s, plan.walk_m)
+            _, _, k, changed = _swap_point(p, _options(p), list(plan.visit), dict(plan.board_at), plan.unserved, key)
+            self.assertFalse(changed, (seed, k, key))
+
+    def test_swap_finds_the_two_point_change(self):
+        """On a synthetic case where greedy R2 visited a wasteful point, the result is no later than
+        before the moves existed (148.9 s behind R3 with insertion and reordering only)."""
+        from run_reroute import synthetic_problem
+        from reroute.ladder import solve_r3
+        p = synthetic_problem(12, 2, 1)
+        self.assertLess(solve_r2(p).arrival_s - solve_r3(p).arrival_s, 148.9)

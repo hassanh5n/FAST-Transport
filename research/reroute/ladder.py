@@ -16,6 +16,8 @@ from typing import TYPE_CHECKING
 from reroute.model import Plan, Problem, StopNeed, evaluate, make_plan
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping, Sequence
+
     import numpy
 
 MAX_EXACT_BITS = 16
@@ -133,10 +135,16 @@ def solve_r2(problem: Problem) -> Plan:
        the students of unassigned stops that can board there (a zero-student stop counts as one)
        and cost is the added driving time plus ``stop_base_s``; those stops board there. Stops
        left over can board only at points already visited and go to the nearest one.
-    3. Try removing each non-committed visited point, moving its stops to the nearest visited
-       point in range; keep a removal that lowers the key. Repeat until a pass changes nothing.
-    4. Move every stop to its nearest visited point if that does not make the key worse.
-    5. Fall back to R0's plan (method ``"R2"``) if R0 arrives earlier.
+    3. Improve, in rounds, until a round changes nothing (at most ``_R2_MAX_ROUNDS``):
+       a. the visiting order by local search (:func:`_improve_order`: move one point, or reverse
+          a segment, while that lowers the key);
+       b. removals (:func:`_remove_points`): drop a non-committed visited point and move its
+          stops to the nearest visited point in range, while that lowers the key;
+       c. move every stop to its nearest visited point if that does not make the key worse;
+       d. one addition (:func:`_add_point`): the unvisited point, position and boarders that
+          lower the key most; stops move to it only if it shortens their walk. If no addition
+          helps, one swap (:func:`_swap_point`): a visited point out, an unvisited one in.
+    4. Fall back to R0's plan (method ``"R2"``) if R0 arrives earlier.
     """
     options = _options(problem)
     by_id = {s.id: s for s in problem.stops}
@@ -178,7 +186,37 @@ def solve_r2(problem: Problem) -> Plan:
         board_at[sid] = _nearest_visited(options[sid], set(order))
 
     key = evaluate(problem, order, board_at, unserved)
-    changed = True
+    for _ in range(_R2_MAX_ROUNDS):
+        order, key = _improve_order(problem, order, board_at, unserved, key)
+        order, board_at, key, removed = _remove_points(problem, options, order, board_at, unserved, key)
+        visited = set(order)
+        nearest = {sid: _nearest_visited(options[sid], visited) for sid in board_at}
+        moved = False
+        if nearest != board_at:
+            near_key = evaluate(problem, order, nearest, unserved)
+            if near_key <= key:
+                board_at, key, moved = nearest, near_key, True
+        order, board_at, key, added = _add_point(problem, options, order, board_at, unserved, key)
+        if not added:
+            order, board_at, key, added = _swap_point(problem, options, order, board_at, unserved, key)
+        if not (removed or moved or added):
+            break
+
+    plan = make_plan(problem, "R2", order, board_at, unserved)
+    r0 = solve_r0(problem)
+    if r0.arrival_s < plan.arrival_s:
+        return dataclasses.replace(r0, method="R2")
+    return plan
+
+
+_R2_MAX_ROUNDS = 25
+
+
+def _remove_points(problem: Problem, options: Mapping[int, list[tuple[float, int]]], order: list[int],
+                   board_at: dict[int, int], unserved: Sequence[int], key: tuple[float, float]
+                   ) -> tuple[list[int], dict[int, int], tuple[float, float], bool]:
+    """Removal passes of R2 until one changes nothing; returns the plan and whether any point went."""
+    removed_any, changed = False, True
     while changed:
         changed = False
         for pid in list(order):
@@ -194,18 +232,112 @@ def solve_r2(problem: Problem) -> Plan:
                 continue
             trial_key = evaluate(problem, trial_order, trial_board, unserved)
             if trial_key < key:
-                order, board_at, key, changed = trial_order, trial_board, trial_key, True
+                order, board_at, key, changed, removed_any = trial_order, trial_board, trial_key, True, True
+    return order, board_at, key, removed_any
 
+
+def _add_point(problem: Problem, options: Mapping[int, list[tuple[float, int]]], order: list[int],
+               board_at: dict[int, int], unserved: Sequence[int], key: tuple[float, float]
+               ) -> tuple[list[int], dict[int, int], tuple[float, float], bool]:
+    """The best single addition of an unvisited point, if it lowers the key.
+
+    A stop moves to the new point only when that shortens its walk; a point that would board
+    nobody is not tried (it only adds stop time). Every position is scored, because adding a
+    point can cut the time the bus waits for walkers even when it adds driving. O(U x n^2) for U
+    candidate points and n visited points.
+    """
     visited = set(order)
-    nearest = {sid: _nearest_visited(options[sid], visited) for sid in board_at}
-    if nearest != board_at and evaluate(problem, order, nearest, unserved) <= key:
-        board_at = nearest
+    walk_of = {sid: {q: d for d, q in opts} for sid, opts in options.items()}
+    best = None
+    for pid in sorted({q for opts in options.values() for _, q in opts} - visited):
+        board = dict(board_at)
+        for sid, at in board_at.items():
+            w = walk_of[sid]
+            if pid in w and w[pid] < w.get(at, _INF):
+                board[sid] = pid
+        if board == board_at:
+            continue
+        for pos in range(len(order) + 1):
+            visit = order[:pos] + [pid] + order[pos:]
+            k = evaluate(problem, visit, board, unserved)
+            if k < key and (best is None or k < best[0]):
+                best = (k, visit, board)
+    if best is None:
+        return order, board_at, key, False
+    return best[1], best[2], best[0], True
 
-    plan = make_plan(problem, "R2", order, board_at, unserved)
-    r0 = solve_r0(problem)
-    if r0.arrival_s < plan.arrival_s:
-        return dataclasses.replace(r0, method="R2")
-    return plan
+
+def _swap_point(problem: Problem, options: Mapping[int, list[tuple[float, int]]], order: list[int],
+                board_at: dict[int, int], unserved: Sequence[int], key: tuple[float, float]
+                ) -> tuple[list[int], dict[int, int], tuple[float, float], bool]:
+    """The best single swap of a visited, non-committed point for an unvisited one, if it lowers
+    the key. The new point takes the position of the old one or any other; the old point's stops
+    move to their nearest remaining visited point, and any stop moves to the new point when that
+    shortens its walk. O(V x U x n^2) evaluations of :func:`evaluate`.
+    """
+    walk_of = {sid: {q: d for d, q in opts} for sid, opts in options.items()}
+    unvisited = sorted({q for opts in options.values() for _, q in opts} - set(order))
+    best = None
+    for out in order:
+        if out in problem.committed:
+            continue
+        rest = [q for q in order if q != out]
+        for pid in unvisited:
+            keep = set(rest) | {pid}
+            board = {}
+            for sid, at in board_at.items():
+                target = at if at != out else _nearest_visited(options[sid], keep)
+                if target is None:
+                    break
+                w = walk_of[sid]
+                if pid in w and w[pid] < w.get(target, _INF):
+                    target = pid
+                board[sid] = target
+            else:
+                if pid not in board.values():
+                    continue
+                for pos in range(len(rest) + 1):
+                    visit = rest[:pos] + [pid] + rest[pos:]
+                    k = evaluate(problem, visit, board, unserved)
+                    if k < key and (best is None or k < best[0]):
+                        best = (k, visit, board)
+    if best is None:
+        return order, board_at, key, False
+    return best[1], best[2], best[0], True
+
+
+def _improve_order(problem: Problem, order: list[int], board_at: Mapping[int, int],
+                   unserved: Sequence[int], key: tuple[float, float],
+                   max_passes: int = 50) -> tuple[list[int], tuple[float, float]]:
+    """Local search on the visiting order with the boarding points fixed.
+
+    Neighbours: move one point to another position (or-opt of length 1) and reverse a segment
+    (2-opt; with the waits for walkers the table is not symmetric in time, so every reversal is
+    scored). The first neighbour that lowers the key is taken and the pass starts again; it stops
+    when a pass finds nothing, or after ``max_passes`` improvements. Each neighbour is scored with
+    :func:`evaluate`, so a pass costs O(n^3) for n visited points (n is at most a few dozen).
+    Greedy insertion alone left R2 a median 70 to 285 s behind R3 on synthetic problems
+    (logbook, 2026-11-17).
+    """
+    n = len(order)
+    if n < 2 or key[0] == _INF:
+        return order, key
+    for _ in range(max_passes):
+        improved = False
+        candidates = []
+        for i in range(n):
+            rest = order[:i] + order[i + 1:]
+            candidates.extend(rest[:j] + [order[i]] + rest[j:] for j in range(n) if j != i)
+        for i in range(n - 1):
+            candidates.extend(order[:i] + order[i:j][::-1] + order[j:] for j in range(i + 2, n + 1))
+        for cand in candidates:
+            k = evaluate(problem, cand, board_at, unserved)
+            if k < key:
+                order, key, improved = cand, k, True
+                break
+        if not improved:
+            break
+    return order, key
 
 
 # --------------------------------------------------------------------------- R3
