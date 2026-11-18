@@ -149,6 +149,16 @@ MAP_STOP_WALK_M = int(os.environ.get('MAP_STOP_WALK_M', '500'))
 # Most locations the routing server takes in one request (the public Valhalla server allows 10).
 MAP_ROUTING_MAX_LOCATIONS = int(os.environ.get('MAP_ROUTING_MAX_LOCATIONS', '10'))
 # Stop ETAs count back from these when a route's campus stop has no time of its own.
+# Students can only sign up with these email domains (exact match, not
+# subdomains). Comma-separated in the environment. Faculty signup is not
+# restricted yet, and staff-created accounts (drivers, admins) never go
+# through signup.
+SIGNUP_EMAIL_DOMAINS = [
+    d.strip().lower().lstrip('@')
+    for d in os.environ.get('SIGNUP_EMAIL_DOMAINS', 'nu.edu.pk').split(',')
+    if d.strip()
+]
+
 CAMPUS_MORNING_ARRIVAL = os.environ.get('CAMPUS_MORNING_ARRIVAL', '08:00')
 CAMPUS_EVENING_DEPARTURE = os.environ.get('CAMPUS_EVENING_DEPARTURE', '16:00')
 MAP_GEOCODING_URL = os.environ.get('MAP_GEOCODING_URL', 'https://nominatim.openstreetmap.org').rstrip('/')

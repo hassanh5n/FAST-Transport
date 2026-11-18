@@ -197,6 +197,25 @@ def _semester_ended_response(registration):
     return None
 
 
+def _offer_expired_response(challan):
+    """
+    A 400 when the seat offer's payment deadline has passed, else None.
+
+    Checked where a payment starts (pay_challan, create_payment_intent), not
+    after Stripe has charged the card (confirm_stripe_payment, verify_payment_otp):
+    refusing there would take the money without the seat. Staff verify_fee is not
+    checked either, so the office can still accept a late payment on purpose.
+    The seat itself is released by offer_expiry.py.
+    """
+    if challan.is_expired:
+        return Response(
+            {"detail": "The payment deadline for this seat has passed, so it goes to the next "
+                       "student in the queue. Register again to rejoin the queue."},
+            status=400,
+        )
+    return None
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def pay_challan(request, pk):
@@ -214,6 +233,9 @@ def pay_challan(request, pk):
     ended = _semester_ended_response(challan.registration)
     if ended:
         return ended
+    expired = _offer_expired_response(challan)
+    if expired:
+        return expired
 
     challan.status = "paid"
     challan.save()
@@ -354,6 +376,9 @@ def create_payment_intent(request, pk):
 
     if challan.status == "paid":
         return Response({"detail": "Already paid"}, status=400)
+    expired = _offer_expired_response(challan)
+    if expired:
+        return expired
 
     stripe_key = getattr(settings, "STRIPE_SECRET_KEY", "")
     if stripe_key and stripe_key.startswith("sk_test_") and stripe_key != "sk_test_placeholder":

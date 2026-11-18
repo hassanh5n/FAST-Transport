@@ -76,10 +76,11 @@ class AdminAccessMiddleware:
 
 
 class SemesterRolloverMiddleware:
-    """Close ended semesters as API traffic arrives (the project has no scheduler).
+    """Time-based tidy-ups run as API traffic arrives (the project has no scheduler):
+    close ended semesters, and release held seats whose payment deadline passed.
 
-    Throttled inside close_ended_semesters_if_due(), so almost every request only
-    pays a clock read. Listed before AdminAccessMiddleware so the tidy-up is never
+    Each is throttled inside its *_if_due() function, so almost every request only
+    pays two clock reads. Listed before AdminAccessMiddleware so the tidy-up is never
     written to an admin's activity log.
     """
 
@@ -88,7 +89,9 @@ class SemesterRolloverMiddleware:
 
     def __call__(self, request):
         if request.path.startswith(API_PREFIX):
+            from .offer_expiry import expire_overdue_offers_if_due
             from .semester_lifecycle import close_ended_semesters_if_due
 
             close_ended_semesters_if_due()
+            expire_overdue_offers_if_due()
         return self.get_response(request)

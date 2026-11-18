@@ -8,7 +8,12 @@ export const validators = {
   phone: (v) => /^\+?\d[\d\s-]{7,}$/.test(String(v || "")),
   roll: (v) => /^[A-Za-z0-9-]{3,20}$/.test(String(v || "")),
   otp6: (v) => /^\d{6}$/.test(String(v || "")),
+  // Exact domain after the last "@"; the backend enforces the same rule (SIGNUP_EMAIL_DOMAINS).
+  emailDomain: (v, domain) => String(v || "").trim().toLowerCase().split("@").pop() === domain,
 };
+
+// Students sign up with a university email (faculty are not restricted yet).
+export const SIGNUP_EMAIL_DOMAIN = "nu.edu.pk";
 
 export function validateField(value, rules) {
   // rules: array of { check: 'required'|'email'|..., arg?: any, message: '...' }

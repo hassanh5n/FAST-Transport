@@ -103,9 +103,27 @@ class StudentProfileCreateSerializer(serializers.ModelSerializer):
             # Faculty have no roll number or batch.
             for field in ('roll_number', 'batch'):
                 attrs.pop(field, None)
-        elif not attrs.get('roll_number'):
-            raise serializers.ValidationError({'roll_number': 'Roll number is required.'})
+            # Faculty email rules are not decided yet, so any address is accepted for now.
+        else:
+            self._require_university_email(attrs.get('email', ''))
+            if not attrs.get('roll_number'):
+                raise serializers.ValidationError({'roll_number': 'Roll number is required.'})
         return attrs
+
+    @staticmethod
+    def _require_university_email(email):
+        """Students sign up with a university email (settings.SIGNUP_EMAIL_DOMAINS).
+
+        Exact domain after the last "@", so "x@nu.edu.pk.evil.com" and
+        "x@evilnu.edu.pk" are both refused.
+        """
+        from django.conf import settings
+
+        allowed = settings.SIGNUP_EMAIL_DOMAINS
+        if email.rsplit("@", 1)[-1].lower() not in allowed:
+            listed = " or ".join(f"@{d}" for d in allowed)
+            raise serializers.ValidationError(
+                {'email': f"Students must sign up with their university email ({listed})."})
 
     def validate_email(self, value):
         from django.contrib.auth.models import User

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { MeshGradient } from "@paper-design/shaders-react";
 import { signup } from "../../services/transportService";
-import { validateField } from "../../utils/validation";
+import { validateField, SIGNUP_EMAIL_DOMAIN } from "../../utils/validation";
 import { ErrorText } from "../../components/ui";
 
 import { BrandLockup } from "../../components/Brand";
@@ -46,6 +46,8 @@ function Signup() {
     const em = validateField(formData.email, [
       { check: "required", message: "Email is required" },
       { check: "email", message: "Enter a valid email" },
+      // Students only; faculty email rules are not decided yet.
+      ...(isFaculty ? [] : [{ check: "emailDomain", arg: SIGNUP_EMAIL_DOMAIN, message: `Students must use their university email (@${SIGNUP_EMAIL_DOMAIN})` }]),
     ]);
     if (em) nextErrors.email = em;
 
