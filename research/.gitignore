@@ -5,3 +5,7 @@ hub/_logs/
 # Per-job intermediates of the rerouting runs; the published results are runs.jsonl and summary.json.
 results/*/work/
 results/*/logs/
+# OSRM map files copied from WSL (hundreds of MB); only the README and the copy script are tracked.
+map/*
+!map/README.md
+!map/copy_from_wsl.sh

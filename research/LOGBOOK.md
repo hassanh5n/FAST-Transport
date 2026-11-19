@@ -753,3 +753,55 @@ Pipeline tests rerun on the same code: quality 15/15, limits 3/3 (no limits), sc
 - Both scaling runs were started from the command line, not from the hub. The planning entry (`c4c13f5`) was
   committed before the runs but pushed only afterwards, with this day's other commits.
 - Test counts at `c1a9f8a` and later: 221 solver and graph tests, 237 other tests, all passing.
+
+## 2026-11-19: A1, L2 and L3: map file, road graph and road-block test
+
+**Machine.** The laptop of runs N1 and M1 (`DESKTOP-15B12RB`), in WSL2 Ubuntu: kernel 6.18.58.1-microsoft-standard-WSL2,
+4 CPUs, 3.7 GB RAM, systemd on, cgroup v2. Docker 29.1.3, image `ghcr.io/project-osrm/osrm-backend:v5.27.1`,
+Python 3.12.3 (`~/fc-research-venv`). Code `7d6fb0a`, research code unchanged since. This machine can also run
+the limited passes (systemd is on), unlike the Windows laptop of 17 Nov.
+
+**Setup.** `scipy`, `osmium` and `psutil` added to the venv from `requirements.txt`. Tests in WSL: 221 in
+`reroute/tests` and 265 in `tests` (1 skipped), all passing; the 237 of 17 Nov grew with later commits.
+
+### A1: map file and OSRM
+
+- Map file `~/fleetcentric-osrm/karachi.osm.pbf`, 11,556,317 bytes, made 3 Nov for run N1.
+  SHA-256 `a99d2f81f722a3171966f55cb13840813651d0309fe97ec5a5ae3e264f9dc322`.
+- The N1 car build was owned by root (written by Docker); its owner was changed to the user and an untouched
+  copy made in `~/fleetcentric-osrm/car/`. A backup of the map file and the car build is in `research/map/`
+  (not in git), with every file's SHA-256 in `research/map/wsl_inventory.txt`.
+- Hand check of `osrm_tools`: fresh copy, plain customize 6.3 s, server on the copy, table between Saddar
+  (24.8607, 67.0298) and campus (24.8569, 67.2647): 1756.6 s there, 1713.1 s back. Pass.
+
+### L2: road graph `karachi_v1`
+
+| Nodes | Edges | Segments | Points kept as nodes | Source SHA-256 |
+| --- | --- | --- | --- | --- |
+| 195,557 | 543,461 | 927,766 | 312 (campus and 311 stops) | `a99d2f81...c9dc322` (same as A1) |
+
+- One point snapped more than 200 m from a road: Boat Basin, 224.4 m. Run M1 had the same stop as its largest
+  snap (224 m, kept), so the graph and OSRM agree on it.
+- Speed factor 1.0 until calibration (road-graph Task 6). Files: `data/graph_karachi_v1/`, 66 MB, largest file 7.4 MB.
+
+### L3: road-block test (`results/roadblock/result.json`)
+
+Leg: first leg of Jadoon R-10, Hyderi Super Mart KDA to Ziauddin, middle pair of map nodes 290257487 and 290257402.
+
+| Question | Answer | Evidence | Selects |
+| --- | --- | --- | --- |
+| Does speed 0 block a road? | blocks | 132.7 s to 155.9 s; new route avoids the pair | Scenarios close roads at 0 km/h (`--block-kmh 0`) |
+| Is a point on a closed segment moved to another road? | no route | Moved 0.0 m before; after the closure OSRM refuses the route (`NoRoute`) | Reachability rule confirmed (below) |
+| Does a segment slowed to 5 km/h change routes? | same route, longer | 132.7 s to 138.5 s | University Road case stays in |
+| Customize and reload | customize 6.66 s, start 1.80 s | Median of 5 | Scenario build time (below) |
+
+Timings, 5 repeats: copy 0.10 to 0.16 s, customize 6.56 to 6.90 s, server start 1.70 to 1.83 s, peak memory of
+the customize container 278 MB.
+
+- The plan expected `moved` or `not moved` for the second question. OSRM does neither: it keeps the point on
+  its closed road and reports no route. That is what the reachability rule of work plan Section 5 assumes (a
+  point on a closed segment cannot be visited and its students must walk). The scenario build reads OSRM
+  tables, where the same case should give `null`; the one-route check of the scenario build (offline-builders
+  Task 6, Step 1) will show it.
+- Scenario build time: about 106 customizations at about 8.5 s each (customize and start), so about 15 minutes
+  plus the table requests.

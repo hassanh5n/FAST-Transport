@@ -1,0 +1,125 @@
+{
+ "machine": {
+  "system": "Linux",
+  "release": "6.18.58.1-microsoft-standard-WSL2",
+  "machine": "x86_64",
+  "python": "3.12.3",
+  "cpus": 4,
+  "memory_gb": 3.7
+ },
+ "osrm_image": "ghcr.io/project-osrm/osrm-backend:v5.27.1",
+ "leg": {
+  "route": "Jadoon R-10",
+  "from_stop": "Hyderi Super Mart KDA",
+  "to_stop": "Ziauddin",
+  "from": [
+   24.929162,
+   67.04005
+  ],
+  "to": [
+   24.92406,
+   67.04525
+  ],
+  "pair": [
+   290257487,
+   290257402
+  ]
+ },
+ "block_kmh": 0,
+ "checks": [
+  {
+   "question": "Does a segment speed of 0 km/h block the road in OSRM?",
+   "answer": "blocks",
+   "evidence": {
+    "pair": [
+     290257487,
+     290257402
+    ],
+    "kmh": 0,
+    "duration_before_s": 132.7,
+    "duration_after_s": 155.9,
+    "nodes_before": 36,
+    "nodes_after": 31,
+    "after_uses_pair": false,
+    "selects": "scenarios close roads at 0 km/h"
+   }
+  },
+  {
+   "question": "Is a point on a closed segment moved to another road?",
+   "answer": "no route",
+   "evidence": {
+    "start": [
+     24.925589,
+     67.045563
+    ],
+    "closed_kmh": 0,
+    "moved_before_m": 0.0,
+    "error": "OSRM refused the request: NoRoute No route found between points (http://localhost:5002/route/v1/driving/67.045563,24.925589;67.045250,24.924060?overview=full&geometries=geojson)"
+   }
+  },
+  {
+   "question": "Does a segment slowed to 5 km/h change routes?",
+   "answer": "same route, longer",
+   "evidence": {
+    "pair": [
+     290257487,
+     290257402
+    ],
+    "kmh": 5,
+    "duration_before_s": 132.7,
+    "duration_after_s": 138.5,
+    "selects": "University Road case stays in"
+   }
+  },
+  {
+   "question": "How long do customizing and reloading take?",
+   "answer": "customize 6.66 s, server start 1.8 s (median of 5)",
+   "evidence": {
+    "copy_s": 0.11,
+    "peak_ram_mb": 277.8,
+    "selects": "scenario build time: about 106 customizations"
+   }
+  }
+ ],
+ "timings": {
+  "closed_kmh": 0,
+  "repeats": [
+   {
+    "copy_s": 0.16,
+    "customize_s": 6.78,
+    "start_s": 1.83,
+    "peak_ram_mb": 277.8
+   },
+   {
+    "copy_s": 0.12,
+    "customize_s": 6.56,
+    "start_s": 1.8,
+    "peak_ram_mb": 277.7
+   },
+   {
+    "copy_s": 0.11,
+    "customize_s": 6.9,
+    "start_s": 1.7,
+    "peak_ram_mb": 278.0
+   },
+   {
+    "copy_s": 0.1,
+    "customize_s": 6.66,
+    "start_s": 1.73,
+    "peak_ram_mb": 277.9
+   },
+   {
+    "copy_s": 0.11,
+    "customize_s": 6.63,
+    "start_s": 1.82,
+    "peak_ram_mb": 277.7
+   }
+  ],
+  "median": {
+   "copy_s": 0.11,
+   "customize_s": 6.66,
+   "start_s": 1.8,
+   "peak_ram_mb": 277.8
+  }
+ }
+}
