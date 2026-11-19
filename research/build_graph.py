@@ -4,7 +4,8 @@
     python research/build_graph.py PATH/map.osm --out data/graph_test --instance data/instance_fall2026_v1.json
 
 Reads the map with ``pyosmium`` (``.osm.pbf`` or ``.osm`` XML), keeps the ways a bus may use, snaps
-campus and every stop of the instance to the nearest map node on a kept way and keeps those nodes
+campus and every stop of the instance to the nearest map node on a kept way of the main network
+(the largest strongly connected part, as OSRM does) and keeps those nodes
 in the graph, then writes ``data/graph_karachi_v1/``: one ``.npy`` file per array of
 ``reroute.roadnet.build_tables`` (separate files, so they can be memory-mapped) and ``meta.json``:
 
@@ -86,14 +87,38 @@ def read_ways(pbf_path: str | Path) -> list[Way]:
     return ways
 
 
-def nearest_way_nodes(ways: Iterable[Way], points: Sequence[tuple[float, float]]) -> list[tuple[int, float]]:
-    """For each ``(lat, lng)`` point, the nearest map node on any of ``ways`` and its distance in metres."""
+def main_component_ids(ways: Iterable[Way]) -> set[int]:
+    """Map node ids of the largest strongly connected part of the road network of ``ways``.
+
+    From any of these nodes a vehicle can reach every other one and come back. Islands and one-way
+    traps (a parking aisle with no way back out) lie outside it.
+    """
+    from scipy.sparse import csr_matrix
+    from scipy.sparse.csgraph import connected_components
+
+    tables = build_tables(ways)
+    m = len(tables["seg_from"])
+    if m == 0:
+        return set()
+    ids, index = np.unique(np.concatenate([tables["seg_from"], tables["seg_to"]]), return_inverse=True)
+    adj = csr_matrix((np.ones(m, dtype=np.int8), (index[:m], index[m:])), shape=(len(ids), len(ids)))
+    _, label = connected_components(adj, directed=True, connection="strong")
+    return set(ids[label == int(np.argmax(np.bincount(label)))].tolist())
+
+
+def nearest_way_nodes(ways: Iterable[Way], points: Sequence[tuple[float, float]],
+                      allowed: set[int] | None = None) -> list[tuple[int, float]]:
+    """For each ``(lat, lng)`` point, the nearest map node on any of ``ways`` and its distance in metres.
+
+    With ``allowed``, only those map node ids are candidates (``build`` passes the main network).
+    """
     from scipy.spatial import cKDTree
 
     coords: dict[int, tuple[float, float]] = {}
     for w in ways:
         for nid, lat, lng in w.nodes:
-            coords.setdefault(nid, (lat, lng))
+            if allowed is None or nid in allowed:
+                coords.setdefault(nid, (lat, lng))
     if not coords:
         raise ValueError("no road nodes to snap to")
     ids = np.fromiter(coords, dtype=np.int64)
@@ -142,7 +167,9 @@ def build(map_path: str | Path, instance: Mapping, out_dir: str | Path, version:
     """Read the map, build and write the graph; returns the metadata written."""
     ways = read_ways(map_path)
     points = instance_points(instance)
-    snaps = nearest_way_nodes(ways, [(lat, lng) for _, lat, lng in points])
+    # Points snap to the main network only, as OSRM does (19 Nov: Hyperstar and FTC had snapped to a
+    # one-way parking aisle and a service-road scrap with no way back, so their legs had no path).
+    snaps = nearest_way_nodes(ways, [(lat, lng) for _, lat, lng in points], allowed=main_component_ids(ways))
     tables = build_tables(ways, keep_ids={nid for nid, _ in snaps})
     far = [[name, round(metres, 1)] for (name, _, _), (_, metres) in zip(points, snaps) if metres > FAR_SNAP_M]
     meta = {"version": version, "source_sha256": sha256_file(map_path),

@@ -22,7 +22,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | Optimization: scaling run | in progress: run OS1 on Jadoon, Nadeem and their doubled instances done on the lead's laptop and logged (8 of 12 runs; code `7299036`, logged in `c1a9f8a`); All and All-doubled blocked (need the combined matrix, so OSRM) and run on the Docker laptop into `results/optimizer-scale-wsl/` |
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
-| Rerouting: data (graph, walking distances, scenarios) | in progress: map file found and OSRM checked (A1), graph built (L2) and road-block test run (L3) on 19 Nov in WSL on the N1 laptop; commits pending. Calibration, corridors, walking distances and scenarios next (Section 7) |
+| Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures, scenarios and the combined matrix next (Section 7) |
 | Rerouting: experiments | quick pipeline tests pass (logged 17 Nov, rerun on code `c1a9f8a`); RS1 "stops" without limits run twice and logged: first with the greedy-only R2 (`results/reroute-scale-r2-insertion/`, code `7299036`, logged in `c1a9f8a`), then with the improved R2 (`results/reroute-scale/`, code `c1a9f8a`, logged in `e59d26f`). Quality, limits, the limited "stops" rows and the graph, buses and slices parts blocked on the data and WSL; they run into `results/reroute-scale-wsl/` |
 | Rerouting: chapter | draft committed (`9132c3d`) from the plans and rules; updated 17 Nov (not yet committed) with the R2 change and the RS1 "stops" results; OS1 is in the optimization chapter (Section 7.6). Other results marked pending until each run is logged |
 | Website integration | design only (work plan Section 12); nothing to build before 6 December. `reroute.wire` is the request and proposal contract |
@@ -111,20 +111,20 @@ Names are not assigned yet.
 | [x] (19 Nov) | A | Map file from run N1 found, SHA-256 logged; Docker runs OSRM | work plan A1 | Tue 17 |
 | [x] (19 Nov) | A | OSRM helper (the hand check in Step 5) | offline-builders, Task 1 | Tue 17 |
 | [x] (17 Nov) | B | Road tables from map ways | road-graph, Task 1 | Tue 17 |
-| [ ] built and logged (19 Nov); commit pending | B | Graph built from the map file and committed | road-graph, Task 2 | Wed 18 |
+| [ ] built and logged (19 Nov; rebuilt with the snapping rule, Section 5); commit pending | B | Graph built from the map file and committed | road-graph, Task 2 | Wed 18 |
 | [x] (17 Nov) | C | Solver model and scoring | solver-core, Task 1 | Wed 18 |
 | [x] (17 Nov) | C | R0 | solver-core, Task 2 | Wed 18 |
 | [ ] run and logged (19 Nov); commit pending | A | Road-block test run and logged (L3) | offline-builders, Task 2 | Fri 20 |
 | [x] (17 Nov) | B | Closures matched by geometry | road-graph, Task 3 | Thu 19 |
 | [x] (17 Nov) | C | R2 | solver-core, Task 3 | Thu 19 |
 | [x] (17 Nov) | B | Graph search, corridors, row cache | road-graph, Task 4 | Fri 20 |
-| [ ] code done; run blocked (needs Docker laptop and map file) | B | Corridors for the 52 routes | road-graph, Task 5 | Fri 20 |
-| [ ] code done; run blocked (needs Docker laptop and map file) | B | Calibration against matrix M1, logged | road-graph, Task 6 | Fri 20 |
+| [ ] built and logged (19 Nov, L5); commit pending | B | Corridors for the 52 routes | road-graph, Task 5 | Fri 20 |
+| [x] (19 Nov, L5): factor 1.2493, 8.05% | B | Calibration against matrix M1, logged | road-graph, Task 6 | Fri 20 |
 | [x] (17 Nov) | C | R3 and the lower bound | solver-core, Task 4 | Sat 21 |
-| [ ] code done; run blocked (needs Docker laptop and map file) | A | Walking distances built and logged (L4) | offline-builders, Task 3 | Sun 22 |
+| [x] (19 Nov, L4): detour 1.38; 17.2% / 48.0% within 400 / 800 m | A | Walking distances built and logged (L4) | offline-builders, Task 3 | Sun 22 |
 | [x] (17 Nov) | A | Scenario placement rules | offline-builders, Task 4 | Sun 22 |
 | [ ] blocked (needs a person, the map and the unblocked OSRM server); file committed with null coordinates | A | Historical closure end points pinned on the map | offline-builders, Task 5 | Sun 22 |
-| [ ] code done; run blocked (needs Docker laptop and map file; the limited mode also needs WSL with systemd) | B | Timings under limits, logged (L5) | road-graph, Task 7 | Sun 22 |
+| [x] (19 Nov, L5): limited, 14 rows 1.21 s, 31 rows 2.30 s | B | Timings under limits, logged (L5) | road-graph, Task 7 | Sun 22 |
 | [x] (17 Nov) | C | Ladder with resumable solve | solver-core, Task 5 | Sun 22 |
 | [ ] drafted (`9132c3d`), R2 change added 17 Nov (not yet committed); not yet reviewed | C | Chapter sections 1, 2, 3, 7 | logbook-and-chapter | Sun 22 |
 
@@ -132,11 +132,9 @@ Names are not assigned yet.
 
 - [x] Road-block answers logged (19 Nov): speed 0 blocks; a point on a closed road is not moved (OSRM
   reports no route); customize 6.7 s, server start 1.8 s
-- [ ] Walking file committed. Open: `build_walk.py` is written but needs the foot build of OSRM
-- [ ] Graph calibration passes: median absolute error at most 15%, not running fast. Open: needs the
-  graph built from the map file
-- [ ] On the corridor under limits: 14 rows in at most 5 s, 31 rows in at most 30 s. Open: needs the
-  graph and corridors, and WSL with systemd for the limits (the lead's laptop cannot start WSL)
+- [x] Walking file built (19 Nov, L4): 700 pairs, detour factor 1.38; committed with the L4 entry
+- [x] Graph calibration passes (19 Nov): median absolute error 8.05%, signed +3.05%
+- [x] On the corridor under limits (19 Nov): 14 rows in 1.21 s, 31 rows in 2.30 s (worst repeat)
 - [x] R3 matches brute force in the tests (17 Nov): exact on 800 of 800 random problems
 
 ### Week 2, 23 to 29 Nov. Scenarios frozen Thu 26; quick tests pass Fri 27
@@ -233,6 +231,7 @@ These differ from the wording of the work plan. Each is stated in the plan that 
 | `run_roadblock.py` answers 0 or 1 km/h as the block speed; `build_scenarios.py --block-kmh` follows it | `run_roadblock.py`, `build_scenarios.py` | The road-block test decides the speed, as the plan intends |
 | The doubled contractor instances (Jadoon-doubled, Nadeem-doubled) stand in for All and All-doubled until the combined matrix exists | `run_scale.py`, OS1 (`c4c13f5`) | The combined matrix needs OSRM, which this machine cannot run |
 | `build_s` is not comparable between lookups; `ride_Ns` at N = budget includes the plan found right at the limit | `run_scale.py` | The callback lookup computes arc costs lazily, inside the search |
+| Points snap only to the main road network (the largest strongly connected part), at build time and in `Graph.nearest_node` (19 Nov) | `build_graph.py`, `reroute/graph.py` | Hyperstar and FTC had snapped onto a one-way parking aisle and a service-road piece with no way back, so two corridor legs had no path; OSRM avoids such pieces |
 | Unreachable pairs (`None`) become 10**7 s arcs | `optimize.py` | The stop is dropped instead of crashing the solver |
 | Quick result folders are published like the other `-quick` folders; per-job `work/` and `logs/` folders are gitignored | `research/results/`, `research/.gitignore` | Pipeline tests stay visible; intermediates stay out of git |
 | The hub refuses to start a run when git cannot give the code version | `research/hub/serve.py` | No run is recorded with code version `unknown` |
@@ -263,7 +262,7 @@ When a cut is taken: write it here with the date, and write logbook entry L11.
 ## 7. Blocked on this machine
 
 The lead's laptop has no Docker, no OSRM, no Karachi `.osm.pbf` and cannot start WSL (virtualization is
-off). **Update 19 Nov:** the N1 laptop runs WSL with Docker and systemd; items 1 to 3 are done there (LOGBOOK, 2026-11-19). Everything below needs the Docker laptop and the N1 map file; items 4, 11 and 12 also need WSL
+off). **Update 19 Nov:** the N1 laptop runs WSL with Docker and systemd; items 1, 2, 3, 4 and 5 are done there (LOGBOOK, 2026-11-19, three entries); gate G1 is met. Everything below needs the Docker laptop and the N1 map file; items 4, 11 and 12 also need WSL
 with systemd. Results from that machine go to their own folders (`results/optimizer-scale-wsl/`,
 `results/reroute-scale-wsl/`) and are never pooled with the Windows laptop's rows. Run in this order, from the repository root unless stated. Log each
 result the same day.

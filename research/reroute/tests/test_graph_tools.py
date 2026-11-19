@@ -103,6 +103,18 @@ class BuildGraphRulesTests(unittest.TestCase):
         self.assertAlmostEqual(snaps[0][1], 11.1, delta=1.0)
         self.assertGreater(snaps[1][1], 4000)
 
+    # A point next to a one-way dead end (toy node 6: in from node 3, no way out) must snap to the
+    # main road network, as OSRM does; otherwise every leg to or from it has no path.
+    def test_main_component_ids_is_the_largest_strongly_connected_part(self):
+        self.assertEqual(build_graph.main_component_ids(TOY), {1, 2, 3, 4})
+
+    def test_nearest_way_nodes_keeps_to_allowed_nodes(self):
+        point = N[6]
+        self.assertEqual(build_graph.nearest_way_nodes(TOY, [point])[0][0], 6)
+        snap = build_graph.nearest_way_nodes(TOY, [point], allowed=build_graph.main_component_ids(TOY))[0]
+        self.assertEqual(snap[0], 3)
+        self.assertAlmostEqual(snap[1], 222.4, delta=1.0)
+
     def test_write_graph_writes_one_npy_per_array(self):
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             save_toy_graph(Path(tmp))
@@ -138,7 +150,8 @@ class BuildGraphOsmTests(unittest.TestCase):
             self.assertIn("Far", out.getvalue())
             meta = json.loads((tmp / "graph" / "meta.json").read_text())
             self.assertEqual((meta["version"], meta["keep_points"], meta["speed_factor"]), ("toy_v1", 4, 1.0))
-            self.assertEqual([name for name, _ in meta["far_snaps"]], ["Far"])
+            # The toy campus sits on the one-way dead end (node 6): it snaps to node 3, 222 m away.
+            self.assertEqual([name for name, _ in meta["far_snaps"]], ["Campus", "Far"])
             self.assertEqual(len(meta["source_sha256"]), 64)
             g = Graph.load(tmp / "graph")
             self.assertIn(2, g.node_id.tolist())               # the stop at node 2 stays a graph node
@@ -178,14 +191,19 @@ class BuildCorridorsTests(unittest.TestCase):
             self.assertEqual((route["key"], route["stops_outside"], route["unreachable_legs"]), ("Jadoon-R-1", [], []))
             g = Graph.load(tmp / "graph")
             c = load_corridor(tmp / "corr", "Jadoon-R-1")
-            self.assertEqual(sorted(g.node_id[c.nodes].tolist()), [2, 3, 4, 6])
+            # The toy campus sits on the one-way dead end (node 6), so it snaps to node 3.
+            self.assertEqual(sorted(g.node_id[c.nodes].tolist()), [2, 3, 4])
             self.assertEqual(route["nodes"], len(c.nodes))
             table = load_reuse(tmp / "corr", "Jadoon-R-1")
-            self.assertEqual([int(g.node_id[n]) for n in table.point_nodes], [2, 4, 6])
-            # A closure on 3-4 leaves node 2's row to campus reusable only if its paths avoid 3-4: they do not.
+            self.assertEqual([int(g.node_id[n]) for n in table.point_nodes], [2, 4, 3])
+            # A closure on the one-way stub 3-5-6 touches no path between the points: every row is reused.
+            tt = TravelTimes(g, c, [Closure("y", ((24.901, 67.002, 20.0),), 0.0)], reuse=table)
+            tt.rows(table.point_nodes.tolist(), targets=table.point_nodes.tolist())
+            self.assertEqual((tt.reused, tt.searches), (3, 0))
+            # A closure on 3-4 lies on a path from every point (they sit in a line 2-3-4): none is reused.
             tt = TravelTimes(g, c, [Closure("x", ((24.900, 67.0025, 20.0),), 0.0)], reuse=table)
             tt.rows(table.point_nodes.tolist(), targets=table.point_nodes.tolist())
-            self.assertEqual((tt.reused, tt.searches), (1, 2))         # campus is unaffected
+            self.assertEqual((tt.reused, tt.searches), (0, 3))
             self.assertIsNone(load_corridor(tmp / "corr", "Nadeem-R-9"))
             del g
 
@@ -248,7 +266,6 @@ class CalibrateTests(unittest.TestCase):
             durations.append(row)
         for i in range(3):
             durations[i][i] = 0
-        durations[0] = [0, 500, 500]                         # campus -> stops: the toy graph cannot (one-way)
         matrix = {"instance": "toy", "built_at": "now", "contractors": {"Jadoon": {"nodes": names,
                                                                                     "durations_s": durations}}}
         (tmp / "matrix.json").write_text(json.dumps(matrix))
@@ -267,7 +284,8 @@ class CalibrateTests(unittest.TestCase):
             cal = meta["calibration"]
             self.assertTrue(cal["pass"])
             self.assertAlmostEqual(cal["median_abs_error_pct"], 0.0, places=1)
-            self.assertAlmostEqual(cal["unreachable_share"], 2 / 6, places=3)
+            # The toy campus snaps off the one-way dead end onto node 3, so every pair has a path.
+            self.assertEqual(cal["unreachable_share"], 0.0)
             g = Graph.load(tmp / "graph")
             self.assertAlmostEqual(g.speed_factor, 1.25, places=3)
             del g

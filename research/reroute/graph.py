@@ -30,7 +30,7 @@ from typing import Any, Callable, Mapping, Sequence
 
 import numpy as np
 from scipy.sparse import csr_matrix
-from scipy.sparse.csgraph import dijkstra
+from scipy.sparse.csgraph import connected_components, dijkstra
 from scipy.spatial import cKDTree
 
 from reroute.closure import Closure, closure_key, edge_changes
@@ -103,6 +103,7 @@ class Graph:
         self._edge_seconds: np.ndarray | None = None
         self._profile_edge_s: np.ndarray | None = None
         self._city: tuple[csr_matrix, np.ndarray, np.ndarray] | None = None
+        self._main_nodes: np.ndarray | None = None
 
     @classmethod
     def load(cls, directory: str | Path, mmap: bool = True) -> Graph:
@@ -137,11 +138,32 @@ class Graph:
                               np.arange(self.n_edges, dtype=np.int64))
         return self._city
 
+    @property
+    def main_nodes(self) -> np.ndarray:
+        """Boolean mask of the nodes in the largest strongly connected part of the graph (cached).
+
+        From any of these nodes a vehicle can reach every other one and come back. Islands and
+        one-way traps (a parking aisle with no way back out) lie outside it.
+        """
+        if self._main_nodes is None:
+            if self.n_nodes == 0:
+                self._main_nodes = np.zeros(0, dtype=bool)
+            else:
+                u, v = np.asarray(self.edge_u, dtype=np.int64), np.asarray(self.edge_v, dtype=np.int64)
+                adj = csr_matrix((np.ones(len(u), dtype=np.int8), (u, v)), shape=(self.n_nodes, self.n_nodes))
+                _, label = connected_components(adj, directed=True, connection="strong")
+                self._main_nodes = label == int(np.argmax(np.bincount(label)))
+        return self._main_nodes
+
     def nearest_node(self, lat: float, lng: float) -> tuple[int, float]:
-        """Graph node index nearest to the point and its distance in metres."""
+        """Node index of the main road network (:attr:`main_nodes`) nearest to the point, and its
+        distance in metres. Like OSRM, a point is never snapped onto an island or a one-way trap,
+        where every leg to or from it would have no path.
+        """
         if self.n_nodes == 0:
             raise ValueError("the graph has no nodes")
         d = haversine_np(np.asarray(self.node_lat), np.asarray(self.node_lng), lat, lng)
+        d = np.where(self.main_nodes, d, np.inf)
         i = int(np.argmin(d))
         return i, float(d[i])
 

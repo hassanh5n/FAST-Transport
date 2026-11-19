@@ -805,3 +805,79 @@ the customize container 278 MB.
   Task 6, Step 1) will show it.
 - Scenario build time: about 106 customizations at about 8.5 s each (customize and start), so about 15 minutes
   plus the table requests.
+
+## 2026-11-19: L5: snapping rule, graph rebuilt, calibration, corridors and G1 timings
+
+Same machine as the entry above. Code: `71b9239` plus the snapping change below (not yet committed).
+
+### A change: points snap to the main road network only
+
+- The first corridor build had two legs with no path on the whole graph: Nadeem-16-B Bilawal Chowrangi to
+  Hyperstar, and Nadeem-21 Lucky Star to FTC. Calibration counted 0.57% of 50,004 pairs unreachable.
+- Cause: two stops snapped onto road pieces with no way back to the city. Hyperstar (2.8 m) was on a one-way
+  parking aisle (way 483398850, `service=parking_aisle`, `oneway=yes`); FTC (65.6 m) on a 9-node piece of
+  service road (way 1044817432) joined to the city only by one-way links. The other 310 points were in the
+  largest strongly connected part of the graph, which holds 99.6% of its nodes.
+- OSRM does not snap a point onto such a piece when a road of the main network is near, which is why the M1
+  matrix has times for both legs. The graph now does the same: `build_graph.py` snaps only to map nodes of
+  the largest strongly connected part (`main_component_ids`), and `Graph.nearest_node` returns only nodes of
+  that part (`Graph.main_nodes`). Three tests added; four toy tests whose campus sat on the toy map's one-way
+  dead end updated to the rule. 224 solver and graph tests pass.
+- New snaps: Hyperstar 6.9 m, FTC 77.5 m. Boat Basin is still the only point over 200 m (224.4 m).
+
+### Graph and calibration (graph rebuilt with the rule)
+
+| Nodes | Edges | Segments | Speed factor | Median abs. error | Median signed error | Unreachable pairs |
+| --- | --- | --- | --- | --- | --- | --- |
+| 195,556 | 543,459 | 927,766 | 1.2493 | 8.05% | +3.05% | 0.00% of 50,004 |
+
+Rule (work plan Section 6.2): median absolute error at most 15%, signed error not negative. **Pass** with one
+factor; `--per-class` not needed. Before the rule change: factor 1.2487, 8.08%, +3.07%, 0.57% unreachable.
+
+### Corridors (`data/corridors_fall2026_v1/`)
+
+52 corridors, 1500 m buffer: nodes smallest 9,728 (Jadoon-R-20), median 15,860, largest 26,737 (Jadoon-R-5),
+about 8% of the city graph. No stop outside its corridor and no unreachable leg.
+
+### G1 timings (`results/graph-timing/timing.json`)
+
+Route Jadoon-R-6 (13 stops, corridor 24,259 nodes). Limited: `MemoryMax=512M`, `MemorySwapMax=0`,
+`CPUQuota=10%`, read back from the kernel. Wall seconds, worst repeat:
+
+| Rows | Corridor, limited | City, limited | Corridor, no limits | G1 rule |
+| --- | --- | --- | --- | --- |
+| 1 | 0.60 | 4.30 | 0.04 | - |
+| 14 | 1.21 | 8.60 | 0.10 | at most 5 s on the corridor: **pass** |
+| 31 | 2.30 | 19.30 | 0.31 | at most 30 s on the corridor: **pass** |
+
+- Peak memory 213 MB in both modes (under the 512 MB limit); graph load 0.28 s limited.
+- Under 0.1 CPU the wall time is about 10 times the CPU time, as expected. The city-wide fallback is 7 to 8
+  times slower than the corridor and is not judged.
+- A first run on the graph before the rule change also passed (14 rows 0.81 s, 31 rows 1.60 s worst, limited);
+  the numbers above replace it.
+
+Gate G1 now stands at four of five: road-block answers, calibration, corridor timings and R3 exactness pass.
+The walking-distance file is left.
+
+## 2026-11-19: L4: walking distances between stops (`data/walk_fall2026_v1.json`)
+
+Same machine. Foot build of OSRM made from the same map file (`a99d2f81...c9dc322`) in
+`~/fleetcentric-osrm/foot/`: 420,108 nodes and 511,624 edges after extraction, peak memory 389 MB, about
+20 s for extract, partition and customize together.
+
+`build_walk.py`: one table call over the 311 stops with `annotations=distance`; pairs kept within 1,200 m
+in a straight line and 1,000 m of walking.
+
+| Statistic | Result | Expected (offline-builders, Task 3) |
+| --- | --- | --- |
+| Directed pairs kept | 700 (124 within 400 m, 458 within 800 m) | - |
+| Walk metres of kept pairs | 42 to 998, median 680 | - |
+| Detour factor (median walk / straight line, pairs within 800 m) | 1.38 | about 1.2 to 1.6; below 1.0 would mean distances and durations were mixed up |
+| Stop visits with a same-route stop within 400 m walk | 17.2% | below the straight-line 30% of 15 Nov |
+| Stop visits with a same-route stop within 800 m walk | 48.0% | below the straight-line 65% of 15 Nov |
+
+All three as expected. At the default 400 m limit fewer than one stop in five has a same-route neighbour to
+walk to, so the walking option will matter in a minority of scenarios; at 800 m it is about half. This bounds
+how much R2 and R3 can gain over R0 by moving students, before any closure is placed.
+
+With the walking file, gate G1 is met on all five items (the file is committed with this entry).

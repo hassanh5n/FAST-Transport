@@ -1,0 +1,1452 @@
+{
+ "graph_version": "karachi_v1",
+ "speed_factor": 1.249342,
+ "graph_nodes": 195556,
+ "buffer_m": 1500.0,
+ "reuse": true,
+ "built_at": "2026-11-19T16:13:05+00:00",
+ "routes": [
+  {
+   "key": "Jadoon-R-10",
+   "nodes": 17396,
+   "edges": 47865,
+   "path_nodes": 286,
+   "point_nodes": [
+    35429,
+    37147,
+    37108,
+    37045,
+    106785,
+    183710,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-10",
+   "stops": [
+    "Hyderi Super Mart KDA",
+    "Ziauddin",
+    "Landi Kotal",
+    "Tahir Villas",
+    "Ayesha Manzil More",
+    "Naseerabad"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-17",
+   "nodes": 15976,
+   "edges": 43901,
+   "path_nodes": 223,
+   "point_nodes": [
+    19484,
+    106785,
+    37062,
+    37086,
+    35834,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-17",
+   "stops": [
+    "Karimabad",
+    "Ayesha Manzil More",
+    "Bhaijan Chowk",
+    "8.5 Number",
+    "Gulshan-e-Shamim"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-18",
+   "nodes": 17019,
+   "edges": 46098,
+   "path_nodes": 236,
+   "point_nodes": [
+    50165,
+    19228,
+    55877,
+    20479,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-18",
+   "stops": [
+    "7 No Nazimabad",
+    "Abbasi Hospital",
+    "Khilafat Chowk",
+    "Board Office"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-2",
+   "nodes": 14189,
+   "edges": 38323,
+   "path_nodes": 357,
+   "point_nodes": [
+    167747,
+    88797,
+    47344,
+    99473,
+    170296,
+    33200,
+    133331,
+    64073,
+    11573,
+    185641,
+    10991,
+    48421,
+    191435,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-2",
+   "stops": [
+    "Gawalia",
+    "K.U. Society",
+    "PCSIR",
+    "Quetta Town",
+    "G3 Stop",
+    "KBACHS Society / Sachal",
+    "Shahmir Colony Gate",
+    "Makhdoom Bilawal",
+    "Chapal Bungalows",
+    "Memon Medical Hospital",
+    "Roofi Bungalows",
+    "Sunlay Bungalows",
+    "Safoora"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-20",
+   "nodes": 9728,
+   "edges": 26953,
+   "path_nodes": 195,
+   "point_nodes": [
+    135011,
+    10591,
+    17173,
+    110760,
+    50535,
+    50518,
+    17429,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-20",
+   "stops": [
+    "Rana Lawn",
+    "Tank Chowk",
+    "Kazimabad",
+    "Model More",
+    "RCD Ground",
+    "Baraf Khana",
+    "Kala Board"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-23",
+   "nodes": 21148,
+   "edges": 57939,
+   "path_nodes": 277,
+   "point_nodes": [
+    50871,
+    187192,
+    35577,
+    35962,
+    1493,
+    1473,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-23",
+   "stops": [
+    "Orangi Town 5",
+    "Abdullah College",
+    "Katti Pahari",
+    "Ali Asghar Stadium",
+    "Star House",
+    "LDA"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-23B",
+   "nodes": 15737,
+   "edges": 43370,
+   "path_nodes": 235,
+   "point_nodes": [
+    3163,
+    37062,
+    37051,
+    17996,
+    37094,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-23B",
+   "stops": [
+    "Javed Nihari",
+    "Bhaijan Chowk",
+    "Mukka Chowk",
+    "13D 8-1/2",
+    "Rab Medical"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-24",
+   "nodes": 14754,
+   "edges": 39935,
+   "path_nodes": 226,
+   "point_nodes": [
+    37075,
+    175715,
+    17,
+    25560,
+    24770,
+    175717,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-24",
+   "stops": [
+    "Lala Zar NIPA",
+    "Safari Park",
+    "Samama",
+    "Continental",
+    "KESC",
+    "Johar Chowrangi"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-24B",
+   "nodes": 13504,
+   "edges": 36588,
+   "path_nodes": 202,
+   "point_nodes": [
+    179515,
+    25291,
+    116571,
+    25622,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-24B",
+   "stops": [
+    "Kamran Chowrangi",
+    "Munawar Chowrangi",
+    "Darul Sehat",
+    "Rado Center"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-25",
+   "nodes": 12259,
+   "edges": 33170,
+   "path_nodes": 223,
+   "point_nodes": [
+    48356,
+    165493,
+    99363,
+    36081,
+    177076,
+    165556,
+    184652,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-25",
+   "stops": [
+    "Al-Hira",
+    "Puncture Shop Saadi Road",
+    "Amroha Society",
+    "Saadi Town",
+    "Police Society",
+    "Falcon",
+    "6 No Check Post"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-25B",
+   "nodes": 15321,
+   "edges": 41453,
+   "path_nodes": 283,
+   "point_nodes": [
+    48847,
+    64511,
+    47344,
+    99473,
+    27321,
+    72355,
+    186621,
+    183397,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-25B",
+   "stops": [
+    "Malik Society",
+    "KDA",
+    "PCSIR",
+    "Quetta Town",
+    "Sumaira Chowk",
+    "Anara Garden",
+    "Noman Garden",
+    "Al Azhar"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-26",
+   "nodes": 16606,
+   "edges": 44528,
+   "path_nodes": 273,
+   "point_nodes": [
+    183306,
+    112193,
+    27002,
+    25959,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-26",
+   "stops": [
+    "NED",
+    "Karachi University",
+    "Commander CNG",
+    "G-10 Gul House"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-26B",
+   "nodes": 15877,
+   "edges": 42503,
+   "path_nodes": 297,
+   "point_nodes": [
+    34178,
+    89524,
+    48896,
+    4473,
+    170472,
+    170239,
+    26112,
+    191435,
+    57563,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-26B",
+   "stops": [
+    "Fariya Chowk",
+    "Khatm-e-Nabuwat",
+    "Kaneez Fatima",
+    "Madras Chowk",
+    "Dow Medical",
+    "Mosamiyat",
+    "Johar Complex (Bin Hashim)",
+    "Safoora",
+    "Check Post 5"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-27",
+   "nodes": 16018,
+   "edges": 43340,
+   "path_nodes": 323,
+   "point_nodes": [
+    72397,
+    178445,
+    99565,
+    4473,
+    105931,
+    11008,
+    37996,
+    32815,
+    177849,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-27",
+   "stops": [
+    "Dentist Society",
+    "Officers Society",
+    "Teachers Society",
+    "Madras Chowk",
+    "Suchal",
+    "Furniture Market",
+    "Rizvia",
+    "Gulshan-e-Umair",
+    "Saima"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-27B",
+   "nodes": 13139,
+   "edges": 35666,
+   "path_nodes": 246,
+   "point_nodes": [
+    25709,
+    24560,
+    183389,
+    172773,
+    25834,
+    189835,
+    25800,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-27B",
+   "stops": [
+    "Saleem Bank",
+    "Rabia City",
+    "Al Habib University",
+    "Pehlwan Goth",
+    "Sindh Baloch",
+    "Commander City",
+    "Gul Chowrangi"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-3",
+   "nodes": 14578,
+   "edges": 39497,
+   "path_nodes": 233,
+   "point_nodes": [
+    25289,
+    179506,
+    194037,
+    26053,
+    26364,
+    25868,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-3",
+   "stops": [
+    "POB Eye Hospital",
+    "Gate 3 PIA",
+    "Nawaz Sharif School",
+    "Bismillah Tower (PIA)",
+    "Magsi Chowk",
+    "Saima Flats"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-3B",
+   "nodes": 15937,
+   "edges": 42963,
+   "path_nodes": 276,
+   "point_nodes": [
+    25925,
+    179515,
+    51313,
+    25291,
+    25656,
+    69068,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-3B",
+   "stops": [
+    "Chishti Nagar",
+    "Kamran Chowrangi",
+    "Tyre Puncture Shop",
+    "Munawar Chowrangi",
+    "Sardar CNG",
+    "Nawabish"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-4",
+   "nodes": 23279,
+   "edges": 63793,
+   "path_nodes": 378,
+   "point_nodes": [
+    46897,
+    183415,
+    23865,
+    187038,
+    64350,
+    147363,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-4",
+   "stops": [
+    "Maymar Gate",
+    "Al Habib Restaurant",
+    "Jamali Pul",
+    "Al Asif",
+    "Abbas Town",
+    "Paradise Bakery"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-4B",
+   "nodes": 14500,
+   "edges": 39366,
+   "path_nodes": 198,
+   "point_nodes": [
+    190447,
+    37103,
+    37078,
+    2023,
+    32977,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-4B",
+   "stops": [
+    "Maskan",
+    "Disco Bakery",
+    "Rimjhim Hall",
+    "Gulshan Turn",
+    "Dhaka Sweets"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-5",
+   "nodes": 26737,
+   "edges": 74682,
+   "path_nodes": 344,
+   "point_nodes": [
+    65944,
+    120636,
+    46542,
+    11305,
+    11250,
+    11252,
+    61346,
+    89950,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-5",
+   "stops": [
+    "Saima Arabian",
+    "4K Stop",
+    "2 Minute",
+    "Power House",
+    "Saleem Center",
+    "UP More",
+    "Nagan (Dahli Hall)",
+    "Alnoor Edhi Center"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-5B",
+   "nodes": 18727,
+   "edges": 51256,
+   "path_nodes": 305,
+   "point_nodes": [
+    17862,
+    55537,
+    1282,
+    37238,
+    190856,
+    186439,
+    1671,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-5B",
+   "stops": [
+    "Dolmen Mall",
+    "5 Star",
+    "Farooq-e-Azam",
+    "Gulberg",
+    "Fazal Mill",
+    "Lucky One",
+    "Moti Mahal"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-6",
+   "nodes": 24259,
+   "edges": 67556,
+   "path_nodes": 519,
+   "point_nodes": [
+    23328,
+    23354,
+    46353,
+    23139,
+    38432,
+    23133,
+    23497,
+    11265,
+    52493,
+    94636,
+    36053,
+    11305,
+    52369,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-6",
+   "stops": [
+    "Ajmer Nagri",
+    "Bombay Bakery",
+    "Oxford School",
+    "Bara Dari",
+    "Babul Islam",
+    "Disco More",
+    "Anda More",
+    "Cafe Al Habib",
+    "Cafe 2 Days",
+    "Namak Bank",
+    "Shafiq More",
+    "Power House",
+    "Alnoor"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-6B",
+   "nodes": 17998,
+   "edges": 49704,
+   "path_nodes": 319,
+   "point_nodes": [
+    36315,
+    80895,
+    182414,
+    2579,
+    38110,
+    3131,
+    2964,
+    106835,
+    55489,
+    1671,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-6B",
+   "stops": [
+    "Haider Food",
+    "Qalandria",
+    "DC Office",
+    "Peoples Chowrangi",
+    "Cafe Piyala",
+    "Raheem Hospital",
+    "Water Pump More",
+    "KIHD",
+    "16 No Chowrangi",
+    "Moti Mahal"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-7",
+   "nodes": 16604,
+   "edges": 45736,
+   "path_nodes": 270,
+   "point_nodes": [
+    190234,
+    37162,
+    37108,
+    37045,
+    3050,
+    181993,
+    112305,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-7",
+   "stops": [
+    "Esa Lab 5 Star",
+    "Donesil",
+    "Landi Kotal",
+    "Tahir Villas",
+    "Shadab Masjid",
+    "Gulberg Thana",
+    "Shahzad Store"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-8",
+   "nodes": 17262,
+   "edges": 47579,
+   "path_nodes": 231,
+   "point_nodes": [
+    66489,
+    190250,
+    37138,
+    37109,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-8",
+   "stops": [
+    "2K Stop",
+    "Mateen Food",
+    "Dental College",
+    "Green House"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-8B",
+   "nodes": 20262,
+   "edges": 55580,
+   "path_nodes": 289,
+   "point_nodes": [
+    191133,
+    113589,
+    23565,
+    23534,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-8B",
+   "stops": [
+    "Naya Nazimabad",
+    "Nusrat Bhutto Colony",
+    "Shadman 1",
+    "Shadman 2"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Jadoon-R-9B",
+   "nodes": 21016,
+   "edges": 57176,
+   "path_nodes": 354,
+   "point_nodes": [
+    60202,
+    145991,
+    2576,
+    35949,
+    193393,
+    2539,
+    181455,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Jadoon",
+   "code": "R-9B",
+   "stops": [
+    "Masjid Khairul Bashir",
+    "CNG Pump",
+    "Usman Ghani Masjid",
+    "Mochi Gali",
+    "Shipowner",
+    "Lady Bird",
+    "Imam Clinic"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-1",
+   "nodes": 10440,
+   "edges": 28431,
+   "path_nodes": 158,
+   "point_nodes": [
+    27139,
+    57563,
+    33207,
+    111566,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "1",
+   "stops": [
+    "Malir Cantt Askari-V",
+    "Check Post 5",
+    "Check Post 6",
+    "Tank Chowk Malir"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-1-B",
+   "nodes": 10801,
+   "edges": 29340,
+   "path_nodes": 260,
+   "point_nodes": [
+    186995,
+    162624,
+    27053,
+    83010,
+    67019,
+    150223,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "1-B",
+   "stops": [
+    "Sector J Malir Cantt",
+    "Sector G Malir Cantt",
+    "Malir Cantt Phase-I",
+    "Sector H Malir Cantt",
+    "Tariq Bin Zaid Society",
+    "Security Printing Press"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-11",
+   "nodes": 17385,
+   "edges": 46973,
+   "path_nodes": 211,
+   "point_nodes": [
+    68217,
+    111651,
+    1847,
+    36613,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "11",
+   "stops": [
+    "Soldier Bazar",
+    "Guru Mandir",
+    "Islamia College",
+    "Stadium Road"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-12",
+   "nodes": 15433,
+   "edges": 42023,
+   "path_nodes": 269,
+   "point_nodes": [
+    72932,
+    11453,
+    15607,
+    194485,
+    15682,
+    9096,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "12",
+   "stops": [
+    "Khudadad Colony",
+    "Kashmir Road",
+    "Sir Syed Road",
+    "Khalid Bin Waleed Road",
+    "Tariq Road",
+    "Tipu Sultan Road"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-13",
+   "nodes": 15842,
+   "edges": 42802,
+   "path_nodes": 272,
+   "point_nodes": [
+    182573,
+    78930,
+    82913,
+    22585,
+    61419,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "13",
+   "stops": [
+    "Usman Memorial",
+    "Essa Nagri",
+    "Stadium",
+    "Dalmia",
+    "Millennium Mall"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-14",
+   "nodes": 16635,
+   "edges": 44898,
+   "path_nodes": 297,
+   "point_nodes": [
+    22092,
+    3285,
+    195451,
+    9503,
+    941,
+    9121,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "14",
+   "stops": [
+    "Old Sabzi Mandi",
+    "Sharfabad",
+    "Bahadurabad",
+    "Rangoon Wala Hall",
+    "Karsaz Pankha Stop",
+    "NHS-IV"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-15",
+   "nodes": 12830,
+   "edges": 34459,
+   "path_nodes": 212,
+   "point_nodes": [
+    116875,
+    179309,
+    218,
+    18819,
+    41323,
+    48584,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "15",
+   "stops": [
+    "Forum Shopping Mall",
+    "Gizri",
+    "DHA Phase IV",
+    "Sunset Club",
+    "United Bakery",
+    "KFC Phase II"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-16",
+   "nodes": 12731,
+   "edges": 33777,
+   "path_nodes": 224,
+   "point_nodes": [
+    185263,
+    22971,
+    191439,
+    42351,
+    51502,
+    184237,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "16",
+   "stops": [
+    "Saba Avenue Imambargah",
+    "Khayaban-e-Bukhari",
+    "Bukhari Commercial",
+    "Misri Shah",
+    "Khayaban-e-Muhafiz",
+    "Rahat Park"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-16-B",
+   "nodes": 22029,
+   "edges": 58331,
+   "path_nodes": 343,
+   "point_nodes": [
+    115938,
+    42436,
+    121062,
+    51649,
+    190861,
+    185147,
+    42402,
+    186355,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "16-B",
+   "stops": [
+    "Bilawal Chowrangi",
+    "Hyperstar",
+    "Florida Homes B-Street",
+    "Kamal Mart",
+    "KFC Badar",
+    "Khayaban-e-Bahria",
+    "Shell Petrol Pump",
+    "NADRA Mega Center"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-19",
+   "nodes": 14522,
+   "edges": 39104,
+   "path_nodes": 232,
+   "point_nodes": [
+    106796,
+    17955,
+    71468,
+    116749,
+    175739,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "19",
+   "stops": [
+    "Hassan Square",
+    "Mumtaz Manzil",
+    "Bait-ul-Mukarram",
+    "Urdu Science College",
+    "Aziz Bhatti Park"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-21",
+   "nodes": 19650,
+   "edges": 52893,
+   "path_nodes": 268,
+   "point_nodes": [
+    190932,
+    4531,
+    107069,
+    192311,
+    192305,
+    42390,
+    14461,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "21",
+   "stops": [
+    "Tower",
+    "Jang Press",
+    "Sindh Secretariat",
+    "Atrium Mall",
+    "Lucky Star",
+    "FTC",
+    "Shahrah-e-Faisal Nursery"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-29",
+   "nodes": 10741,
+   "edges": 29103,
+   "path_nodes": 281,
+   "point_nodes": [
+    56623,
+    6440,
+    162647,
+    41636,
+    190888,
+    17228,
+    17173,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "29",
+   "stops": [
+    "Falcon Malir Cantt",
+    "CMH Malir Cantt",
+    "X-20 Malir Cantt",
+    "Cantt Bazar Malir",
+    "Check Post 2",
+    "Jinnah Garden",
+    "Kazimabad"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-30",
+   "nodes": 19573,
+   "edges": 53386,
+   "path_nodes": 387,
+   "point_nodes": [
+    20134,
+    33268,
+    50000,
+    27608,
+    11348,
+    6738,
+    18968,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "30",
+   "stops": [
+    "Jahangirabad",
+    "Golimar Chowrangi",
+    "Urdu Bazar Nazimabad",
+    "Inquiry Office",
+    "Naz Petrol Pump",
+    "Sona Chandi Lawn",
+    "Liaquatabad Erum Bakery"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-31",
+   "nodes": 11568,
+   "edges": 31676,
+   "path_nodes": 200,
+   "point_nodes": [
+    191062,
+    7967,
+    179679,
+    7700,
+    40953,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "31",
+   "stops": [
+    "KPT Bridge Kababjees",
+    "Iqra University",
+    "Diamond",
+    "Manzoor Colony",
+    "PAF Chapter"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-32",
+   "nodes": 15567,
+   "edges": 41056,
+   "path_nodes": 301,
+   "point_nodes": [
+    187665,
+    165804,
+    42609,
+    51646,
+    18777,
+    41743,
+    40860,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "32",
+   "stops": [
+    "Tyre Company",
+    "Boat Basin",
+    "26 Street",
+    "Badar Commercial",
+    "Khayaban-e-Sehar",
+    "Nexus College",
+    "Khayaban-e-Shahbaz"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-33",
+   "nodes": 17303,
+   "edges": 46654,
+   "path_nodes": 306,
+   "point_nodes": [
+    19097,
+    182573,
+    3282,
+    1000,
+    9326,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "33",
+   "stops": [
+    "Liaquatabad 10 No",
+    "Usman Memorial",
+    "Saylani Chowk",
+    "Zubaida Hospital",
+    "M. Ali Society"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-34",
+   "nodes": 14238,
+   "edges": 40866,
+   "path_nodes": 346,
+   "point_nodes": [
+    190063,
+    11916,
+    24453,
+    86732,
+    10919,
+    158306,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "34",
+   "stops": [
+    "Korangi Crossing",
+    "Nasir Jump",
+    "Korangi No 2",
+    "Korangi No 5",
+    "Landhi No 4",
+    "Landhi 89"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-35",
+   "nodes": 14029,
+   "edges": 37507,
+   "path_nodes": 207,
+   "point_nodes": [
+    190395,
+    182521,
+    58271,
+    112937,
+    51236,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "35",
+   "stops": [
+    "Teen Talwar",
+    "Race Course",
+    "Cantt Station",
+    "Askari II & III",
+    "NMC"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-36",
+   "nodes": 18469,
+   "edges": 49687,
+   "path_nodes": 300,
+   "point_nodes": [
+    71653,
+    174038,
+    14220,
+    107210,
+    11353,
+    1847,
+    45895,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "36",
+   "stops": [
+    "Police Headquarter Garden",
+    "Uncle Sariya",
+    "Mobile Market",
+    "Naz Plaza",
+    "Numaish",
+    "Islamia College",
+    "New Town Chandni Chowk"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-37",
+   "nodes": 20540,
+   "edges": 55798,
+   "path_nodes": 338,
+   "point_nodes": [
+    10081,
+    166430,
+    14257,
+    9915,
+    4844,
+    6295,
+    11353,
+    72932,
+    9733,
+    166671,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "37",
+   "stops": [
+    "Ram Swami",
+    "Garden Zoo",
+    "Ali Bhai",
+    "Garden Jamat Khana",
+    "Fatmi Blood Bank",
+    "Khurasan",
+    "Numaish",
+    "Khudadad Colony",
+    "Noorani Kabab",
+    "Allah Wali Chowrangi"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-38",
+   "nodes": 12483,
+   "edges": 33717,
+   "path_nodes": 165,
+   "point_nodes": [
+    9936,
+    183937,
+    111726,
+    182027,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "38",
+   "stops": [
+    "Bacha Party",
+    "Punjab Chowrangi PSO Pump",
+    "Chandio Village",
+    "Altamash"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-39",
+   "nodes": 13074,
+   "edges": 35657,
+   "path_nodes": 247,
+   "point_nodes": [
+    65159,
+    24752,
+    520,
+    938,
+    10490,
+    190859,
+    71003,
+    17429,
+    110972,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "39",
+   "stops": [
+    "Perfume Chowk Johar",
+    "Hilltop",
+    "Johar More",
+    "Drigh Road",
+    "Colony Gate",
+    "Star Gate",
+    "Wireless Gate",
+    "Kala Board",
+    "Hafiz Sweets Malir 15"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-40",
+   "nodes": 11816,
+   "edges": 31993,
+   "path_nodes": 150,
+   "point_nodes": [
+    24548,
+    185057,
+    30471,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "40",
+   "stops": [
+    "Matka Stop",
+    "Aladin Park",
+    "Lal Flat"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-41",
+   "nodes": 13913,
+   "edges": 36924,
+   "path_nodes": 255,
+   "point_nodes": [
+    186531,
+    59213,
+    150744,
+    61631,
+    61625,
+    179453,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "41",
+   "stops": [
+    "Green Mosque Bahria Town",
+    "Bahria Adventure Land",
+    "Bahria International Hospital",
+    "Bahria Town Apartments Tower 15",
+    "Bahria Town Apartments Tower 20",
+    "Bahria Town Main Gate"
+   ],
+   "stops_outside": []
+  },
+  {
+   "key": "Nadeem-42",
+   "nodes": 15957,
+   "edges": 42955,
+   "path_nodes": 235,
+   "point_nodes": [
+    11397,
+    11393,
+    45895,
+    190939,
+    46414
+   ],
+   "unreachable_legs": [],
+   "contractor": "Nadeem",
+   "code": "42",
+   "stops": [
+    "Jamshed Road",
+    "Yadgar Fish",
+    "New Town Chandni Chowk",
+    "Askari IV"
+   ],
+   "stops_outside": []
+  }
+ ]
+}

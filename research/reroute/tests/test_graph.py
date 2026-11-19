@@ -54,6 +54,16 @@ class GraphTests(unittest.TestCase):
         self.assertEqual(int(g.node_id[idx]), 2)
         self.assertAlmostEqual(metres, 11.1, delta=1.0)
 
+    # A point on a one-way dead end (node 6: no way back to the city) snaps to the main road network,
+    # as OSRM does, so legs to and from it have a path.
+    def test_nearest_node_keeps_to_the_main_road_network(self):
+        g = graph()
+        idx, metres = g.nearest_node(24.902, 67.002)            # exactly on node 6
+        self.assertEqual(int(g.node_id[idx]), 3)
+        self.assertAlmostEqual(metres, 222.4, delta=1.0)
+        # Node 2 is a pass-through and not kept here; 5 and 6 are the one-way stub, 7 and 8 an island.
+        self.assertEqual(sorted(int(g.node_id[i]) for i in np.flatnonzero(g.main_nodes)), [1, 3, 4])
+
     def test_corridor_keeps_only_nearby_nodes(self):
         g = graph(); path = shortest_path_nodes(g, node(g, 1), node(g, 6))
         self.assertEqual([int(g.node_id[i]) for i in path], [1, 3, 6])
@@ -114,7 +124,7 @@ class ReviewFocusTests(unittest.TestCase):
         g = graph()
         idx, metres = g.nearest_node(24.950, 67.002)          # about 5 km north of the toy roads
         self.assertGreater(metres, 4000)
-        self.assertIn(int(g.node_id[idx]), (7, 8))
+        self.assertIn(int(g.node_id[idx]), (1, 2, 3, 4))       # the main network, not the 7-8 island
 
     # Review focus 2: a closure that touches no road.
     def test_closure_touching_no_road_leaves_searches_unchanged(self):

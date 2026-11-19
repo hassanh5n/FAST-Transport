@@ -1,0 +1,28 @@
+{
+ "version": "karachi_v1",
+ "source_sha256": "a99d2f81f722a3171966f55cb13840813651d0309fe97ec5a5ae3e264f9dc322",
+ "built_at": "2026-11-19T16:12:16+00:00",
+ "speed_factor": 1.249342,
+ "keep_points": 312,
+ "far_snaps": [
+  [
+   "Boat Basin",
+   224.4
+  ]
+ ],
+ "nodes": 195556,
+ "edges": 543459,
+ "segments": 927766,
+ "calibration": {
+  "matrix": "fall2026-v1",
+  "matrix_built_at": "2026-11-03T14:23:15+00:00",
+  "percentile": 60,
+  "pairs": 50004,
+  "median_abs_error_pct": 8.05,
+  "median_signed_error_pct": 3.05,
+  "unreachable_share": 0.0,
+  "pass": true,
+  "per_class": null,
+  "at": "2026-11-19T16:12:34+00:00"
+ }
+}
