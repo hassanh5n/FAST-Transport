@@ -149,6 +149,12 @@ class FakeOsrm:
             out.append([round(dist[b], 1) if b in dist else None for b in nodes])
         return clean_table(out)
 
+    def table_with_snaps(self, points: Sequence[tuple[float, float]], base: str = "http://localhost:5000",
+                         profile: str = "driving") -> tuple[list[list[float]], list[tuple[float, float]]]:
+        times = self.table(points, base, profile)
+        adj = self._adjacency(self._speeds(base))
+        return times, [self.coords[self._snap(adj, lat, lng)[0]] for lat, lng in points]
+
     def route(self, points: Sequence[tuple[float, float]], base: str = "http://localhost:5000",
               nodes: bool = False) -> dict:
         self.calls.append(("route", base, tuple(points)))

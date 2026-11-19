@@ -322,6 +322,16 @@ class MainTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             bs.main(self.argv("--skip-historical", "--resume", "--block-kmh", "1"), osrm=fake, graph=Graph(TABLES))
 
+    def test_resume_refuses_a_file_built_before_closed_points_were_judged_on_the_road(self):
+        fake = FakeOsrm(TABLES)
+        bs.main(self.argv("--skip-historical"), osrm=fake, graph=Graph(TABLES))
+        data = json.loads(self.out.read_text())
+        for c in data["closures"]:
+            del c["snapped"]
+        self.out.write_text(json.dumps(data))
+        with self.assertRaises(SystemExit):
+            bs.main(self.argv("--skip-historical", "--resume"), osrm=fake, graph=Graph(TABLES))
+
     def test_one_route(self):
         fake = FakeOsrm(TABLES)
         bs.main(self.argv("--route", "Jadoon:R-1", "--skip-historical"), osrm=fake, graph=Graph(TABLES))
@@ -345,3 +355,24 @@ class MainTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SnappedPointTests(unittest.TestCase):
+    """A point is closed when the place it meets the road is inside a full block (work plan Section 5),
+    not its raw coordinate: OSRM would otherwise move a point whose road is closed onto another road."""
+
+    def test_a_stop_whose_road_point_is_inside_the_circle_is_closed(self):
+        instance = copy.deepcopy(INSTANCE)
+        e_lat, e_lng = node_at(3, 2)
+        # 81 m west of its node: the coordinate is 207 m from the E-F closure's centre (outside the
+        # 200 m circle), but it meets the road at node (3, 2), 126 m from the centre (inside).
+        instance["stops"][E]["lng"] = round(e_lng - 0.0008, 6)
+        with tempfile.TemporaryDirectory() as tmp:
+            fake = FakeOsrm(TABLES)
+            car = make_osrm_folder(Path(tmp) / "car")
+            b = bs.ScenarioBuilder(fake, Graph(TABLES), instance, STUDENT_ROWS, WALK, car, Path(tmp) / "work")
+            out = b.build([r for r in bs.route_stops(instance, STUDENT_ROWS) if r.code == "R-2"], [])
+        c = by_id(out["closures"])["Nadeem-R-2-L2"]
+        self.assertEqual(c["closed_points"], [E, F])
+        self.assertEqual(c["snapped"][c["points"].index(E)], [e_lat, e_lng])
+        self.assertEqual(len(c["snapped"]), len(c["points"]) + 1)          # points, then campus

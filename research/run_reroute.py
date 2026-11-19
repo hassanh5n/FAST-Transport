@@ -493,15 +493,17 @@ class GraphSource:
 
     def problem(self, scenario: dict, closure: dict, walk: Mapping, limit_m: float):
         """The scenario's problem with rows from the graph under its closure, and the ``TravelTimes``."""
-        from reroute.closure import Closure, closed_points
+        from reroute.closure import Closure
         from reroute.graph import TravelTimes, problem_rows
         from reroute_cases import build_problem, case_points
         cl = Closure(closure["id"], tuple(tuple(float(x) for x in c) for c in closure["circles"]),
                      float(closure["factor"]))
         pts = case_points(scenario)
         self.snap(pts + [scenario["position"]])
-        closed = [bool(c) for c in closed_points([self.coords[p][0] for p in pts],
-                                                 [self.coords[p][1] for p in pts], [cl])]
+        # The scenario file says which points are closed (judged where each meets the road, when the
+        # scenarios were built), so the graph and OSRM's tables always agree on them.
+        listed = {int(p) for p in closure["closed_points"]}
+        closed = [int(p) in listed for p in pts]
         tt = TravelTimes(self.graph, self.corridor, [cl], reuse=self.reuse)
         nodes = [self.node[p] for p in pts]
         start = self.node[int(scenario["position"])]

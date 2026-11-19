@@ -935,3 +935,41 @@ OpenStreetMap's router and again on the untouched N1 car build (port 5000), with
 
 OSRM moved none of the four points (0 m). Both stretches close both directions (60 m circles every 100 m
 along the line, `build_scenarios.py`). The file is frozen from here, with the scenarios.
+
+## 2026-11-20: Closed points judged where each point meets the road (before the scenario rebuild)
+
+Written before the scenarios are built again; no quality or limits run has happened.
+
+**What the first build (19 Nov, not committed) showed.** 104 synthetic closures, 208 scenarios, 31 historical
+closures, 39 historical scenarios, 0 leaks. But 81 pairs were faster after a closure than before (87 of 16,988
+finite pairs, 0.5%, by a 0.1 s threshold; 23 of 135 closures). A diagnostic (`research/map/diag_faster.py`, not
+committed) on the two largest cases found:
+
+- The untouched build and a fresh copy customized with no speed file give identical durations, weights and routes,
+  so the "pre" tables are sound.
+- Saadi Town in Jadoon-R-25-L3 (453 m outside the circle): with the closure OSRM takes another route, 99 s faster
+  but with a higher weight (1626.2 against 1620.3). OSRM minimises weight (the car profile's penalties), not
+  duration, so a closure can push it onto a quicker route. This is OSRM's behaviour, and OSRM is the truth by
+  design: such pairs stay and are reported.
+- Race Course in Nadeem-35-L2: its coordinate is 109 m outside the 200 m circle, but OSRM meets the road 173 m from
+  it, 157 m from the circle's centre, inside. That road is blocked, so OSRM silently snapped the stop onto another
+  road (weight 1704.2 against 1767.4 before), while the stop was marked open and the road graph kept it on its
+  closed road. The two travel-time sources disagreed about the same stop.
+
+On the full blocks, 7 stops had their coordinate and their road point on different sides of a circle: 4 marked open
+whose road point is inside (Race Course, FTC, Bahadurabad, Rado Center) and 3 marked closed whose road point is
+outside (KESC, Nawabish, Fatmi Blood Bank).
+
+**Change.** The rule of work plan Section 5 is unchanged ("every point is snapped to the road once, before the
+closure; if its road segment is closed it cannot be visited, in both travel-time sources"); its implementation now
+follows it:
+
+- `build_scenarios.py` judges a point closed when the location where OSRM met the road for the "pre" table
+  (`osrm_tools.table_with_snaps`, from the answer's `sources`) is inside a full-block circle, and stores those
+  locations in each closure as `snapped`. `--resume` refuses a file built before this change.
+- `run_reroute.py` (the graph arm) takes the closed points from the scenario file's `closed_points` instead of
+  testing raw coordinates, so the graph and OSRM's tables agree by construction.
+- Four tests added (224 solver and graph tests, 269 script tests, all passing).
+
+The faster pairs left after the rebuild are expected to be the weight-against-duration kind only; they will be
+counted and reported in entry L6, not removed.

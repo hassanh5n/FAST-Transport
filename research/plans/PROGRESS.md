@@ -142,7 +142,7 @@ Names are not assigned yet.
 | Done | Track | Task | Plan and task | Due |
 | --- | --- | --- | --- | --- |
 | [x] (17 Nov) | C | Request and proposal formats | solver-core, Task 6 | Mon 23 |
-| [ ] code done; run blocked (needs Docker laptop and map file) | A | Scenario build, one route checked by eye | offline-builders, Task 6 steps 1 to 2 | Tue 24 |
+| [x] (19 Nov): Jadoon R-10 checked by eye | A | Scenario build, one route checked by eye | offline-builders, Task 6 steps 1 to 2 | Tue 24 |
 | [x] (17 Nov) | C | Scenario cases and scoring on true times | experiment-runner, Task 1 | Tue 24 |
 | [x] (17 Nov) | C | Summaries and verdict rules | experiment-runner, Task 2 | Wed 25 |
 | [ ] code done; run blocked (needs Docker laptop and map file) | A | Full scenario build; no leaks; file frozen and logged (L6) | offline-builders, Task 6 steps 3 to 5 | Thu 26 |
@@ -232,6 +232,7 @@ These differ from the wording of the work plan. Each is stated in the plan that 
 | The doubled contractor instances (Jadoon-doubled, Nadeem-doubled) stand in for All and All-doubled until the combined matrix exists | `run_scale.py`, OS1 (`c4c13f5`) | The combined matrix needs OSRM, which this machine cannot run |
 | `build_s` is not comparable between lookups; `ride_Ns` at N = budget includes the plan found right at the limit | `run_scale.py` | The callback lookup computes arc costs lazily, inside the search |
 | Points snap only to the main road network (the largest strongly connected part), at build time and in `Graph.nearest_node` (19 Nov) | `build_graph.py`, `reroute/graph.py` | Hyperstar and FTC had snapped onto a one-way parking aisle and a service-road piece with no way back, so two corridor legs had no path; OSRM avoids such pieces |
+| A point is closed when the place OSRM meets the road (pre-closure snap) is inside a full block, not its raw coordinate; the graph arm takes `closed_points` from the scenario file (20 Nov) | `build_scenarios.py`, `osrm_tools.py`, `run_reroute.py` | 7 stops lay with their coordinate and road point on different sides of a circle; Race Course was silently re-snapped by OSRM, giving times faster than before the closure |
 | Unreachable pairs (`None`) become 10**7 s arcs | `optimize.py` | The stop is dropped instead of crashing the solver |
 | Quick result folders are published like the other `-quick` folders; per-job `work/` and `logs/` folders are gitignored | `research/results/`, `research/.gitignore` | Pipeline tests stay visible; intermediates stay out of git |
 | The hub refuses to start a run when git cannot give the code version | `research/hub/serve.py` | No run is recorded with code version `unknown` |

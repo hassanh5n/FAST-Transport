@@ -265,6 +265,18 @@ class GraphWorkerTests(unittest.TestCase):
         self.assertEqual(problem.row(problem.start)[0], INF)
 
 
+    def test_the_graph_takes_closed_points_from_the_scenario_file(self):
+        # The circle touches no road and no point, but the file says stop 1 is closed (its road point
+        # was inside a block when the scenarios were built): the graph must agree with OSRM's tables.
+        source = run_reroute.GraphSource(self.graph, None, "city", self.coords, self.campus)
+        source.snap([0, 1, 2])
+        listed = dict(self.closure, closed_points=[1])
+        problem, _ = source.problem(TOY_SCENARIO, listed, WALK, 400)
+        self.assertEqual(problem.row(problem.start)[0], INF)
+        problem, _ = source.problem(TOY_SCENARIO, self.closure, WALK, 400)
+        self.assertLess(problem.row(problem.start)[0], INF)
+
+
 class ImportTests(unittest.TestCase):
     def test_imports_and_summarises_with_the_standard_library_only(self):
         code = ("import sys, json, tempfile, pathlib; sys.modules['numpy'] = None; sys.modules['scipy'] = None; "

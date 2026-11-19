@@ -230,8 +230,11 @@ class ScenarioBuilder:
         points = closure_point_ids(route.stop_ids, cands)
         ids = points + [CAMPUS_ID]
         where = [self.point(p) for p in ids]
-        pre = self.osrm.table(where, base=self.untouched)
-        closed = [bool(v) for v in closed_points([p[0] for p in where], [p[1] for p in where], [closure])]
+        # Closed is judged where each point meets the road before the closure (work plan Section 5), not
+        # at its raw coordinate: a stop whose road point is inside a block would otherwise be moved by
+        # OSRM onto another road (19 Nov: Race Course, 173 m from its road, in Nadeem-35-L2).
+        pre, snapped = self.osrm.table_with_snaps(where, base=self.untouched)
+        closed = [bool(v) for v in closed_points([p[0] for p in snapped], [p[1] for p in snapped], [closure])]
         post = apply_closed(self.osrm.table(where, base=self.closed), closed)
         closed_ids = [p for p, c in zip(ids, closed) if c]
         if CAMPUS_ID in closed_ids:
@@ -242,6 +245,7 @@ class ScenarioBuilder:
             self.log(f"  warning: {closure.id}: {faster} pairs faster after the closure than before")
         entry = {**head, "circles": _circle_json(closure.circles), "factor": float(closure.factor),
                  "points": points, "closed_points": closed_ids,
+                 "snapped": [[round(lat, 6), round(lng, 6)] for lat, lng in snapped],
                  "pre": to_json_table(pre), "post": to_json_table(post),
                  "segments": int(len(closed_segments(self.graph, closure))),
                  "leaks": self._leaks(route, closure, set(closed_ids)) if closure.blocks else None,
@@ -386,6 +390,9 @@ def _existing(path: Path, instance: Mapping, block_kmh: int) -> dict:
     for key, want in (("version", VERSION), ("instance", instance["version"]), ("block_kmh", block_kmh)):
         if data.get(key) != want:
             sys.exit(f"build_scenarios: cannot resume {path}: its {key} is {data.get(key)!r}, not {want!r}")
+    if any("snapped" not in c for c in data.get("closures", [])):
+        sys.exit(f"build_scenarios: cannot resume {path}: it was built before closed points were judged where "
+                 f"each point meets the road (20 Nov); build it again without --resume")
     return data
 
 

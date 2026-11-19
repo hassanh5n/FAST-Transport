@@ -158,6 +158,18 @@ def table(points: Sequence[Point], base: str = "http://localhost:5000", profile:
     return clean_table(body[annotations + "s"])
 
 
+def table_with_snaps(points: Sequence[Point], base: str = "http://localhost:5000",
+                     profile: str = "driving") -> tuple[list[list[float]], list[Point]]:
+    """One OSRM duration table over `points`, cleaned, and where OSRM met the road for each point.
+
+    The second list holds each point's snapped location as `(lat, lng)`, from the answer's `sources`.
+    The scenario build judges whether a point is closed there (work plan Section 5).
+    """
+    body = fetch_json(table_url(base, points, profile, "duration"))
+    snaps = [(float(s["location"][1]), float(s["location"][0])) for s in body["sources"]]
+    return clean_table(body["durations"]), snaps
+
+
 def route(points: Sequence[Point], base: str = "http://localhost:5000", nodes: bool = False) -> dict:
     """OSRM's first route through `points`, with the full GeoJSON line.
 

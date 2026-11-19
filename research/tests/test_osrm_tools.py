@@ -37,6 +37,15 @@ class OsrmToolsTests(unittest.TestCase):
 
 
 class PureHelperTests(unittest.TestCase):
+    def test_table_with_snaps_returns_where_each_point_was_snapped(self):
+        body = {"code": "Ok", "durations": [[0, 12.5], [None, 0]],
+                "sources": [{"location": [67.1, 24.9], "distance": 3.2}, {"location": [67.2, 24.8], "distance": 0.0}]}
+        with mock.patch.object(osrm_tools, "fetch_json", return_value=body):
+            times, snaps = osrm_tools.table_with_snaps([(24.9001, 67.1), (24.8, 67.2)])
+        self.assertEqual(times[0][1], 12.5)
+        self.assertEqual(times[1][0], math.inf)
+        self.assertEqual(snaps, [(24.9, 67.1), (24.8, 67.2)])
+
     def test_speed_csv_empty(self):
         self.assertEqual(speed_csv([]), "")
 
