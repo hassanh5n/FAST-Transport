@@ -881,3 +881,57 @@ walk to, so the walking option will matter in a minority of scenarios; at 800 m 
 how much R2 and R3 can gain over R0 by moving students, before any closure is placed.
 
 With the walking file, gate G1 is met on all five items (the file is committed with this entry).
+
+## 2026-11-19: Combined matrix (`data/matrix_fall2026_v1_all.json`)
+
+Same machine; untouched car build (`~/fleetcentric-osrm/car/`) on port 5000. `build_matrix.py --combined`:
+312 x 312 (campus and 311 stops), one table call, 0 unreachable pairs. One point moved more than 200 m to a
+road: Boat Basin, 224 m, as in run M1 and the road graph.
+
+Check against the saved per-contractor matrix `matrix_fall2026_v1.json`: Jadoon 29,584 pairs and Nadeem 20,736
+pairs, **0 differ by more than 0.1 s**. The car build is the one of run N1, so the saved matrices stay version 1.
+This unblocks All and All-doubled of run OS1 (optimizer-scaling, Task 3), run next into
+`results/optimizer-scale-wsl/`.
+
+## 2026-11-19: OS1 completed: All and All-doubled (`results/optimizer-scale-wsl/`)
+
+Machine: `DESKTOP-15B12RB`, WSL2, Intel Core i5-7300U, 4 CPUs, no limits (Linux peak RSS). Code `975760c`.
+4 of 4 runs ok, 300 s each, one at a time in fresh processes, nothing else running. These rows are not pooled
+with the 17 Nov rows from the Windows laptop (`results/optimizer-scale/`), as the rules entry of 17 Nov says.
+
+| Instance | Stops / buses | Lookup | Build (s) | First plan (s) | Peak (MB) | Ride 10 s | Ride 60 s | Ride 300 s | Scored 300 s (student-min) | Longest ride (min) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| All | 311 / 53 | callback | 0.016 | 0.19 | 74 | 65,824 | 63,123 | 62,936 | 60,995 | 58.9 |
+| All | 311 / 53 | matrix | 0.047 | 0.12 | 83 | 68,347 | 64,075 | 63,053 | 61,119 | 56.6 |
+| All-doubled | 622 / 106 | callback | 0.014 | 0.62 | 94 | 145,289 | 125,635 | 122,499 | 119,011 | 55.5 |
+| All-doubled | 622 / 106 | matrix | 0.2 | 2.38 | 130 | 161,538 | 147,729 | 133,565 | 129,159 | 89.1 |
+
+1,806 students (All) and 3,612 (All-doubled); no stop dropped in any run.
+
+- Memory stays small: 74 MB at 311 stops and 94 MB at 622 with the callback, far under 512 MB.
+- Convergence weakens with size. With the callback the 60 s plan is 0.30% above the 300 s plan at 311 stops
+  (as for the contractor instances on 17 Nov) but 2.6% above it at 622 stops, and the search was still improving
+  at 300 s (2,211 improvements). Under 0.1 CPU, 300 CPU-s is about 50 minutes of wall time, so a combined-fleet
+  plan of twice today's size would not fit the 300 s wall budget fixed after B1 on a free-tier server.
+- The matrix lookup is worse again, and much worse at 622 stops: 0.19% at 300 s for All, 9.0% for All-doubled,
+  where its plan also has a 89-minute longest ride against 56 with the callback. This confirms the 17 Nov decision:
+  the callback stays the default.
+- Whether planning both fleets together beats planning each contractor alone is not answered here: the
+  contractor rows were measured on another machine and are not compared with these.
+
+Run OS1 is complete: 12 of 12 runs over the two machines.
+
+## 2026-11-19: Historical closures pinned (`data/raw/historical_closures.json`)
+
+Candidate end points were taken from the map file itself (the map node where the named carriageway meets the
+named junction), then each was checked by Hassan on OpenStreetMap: on the carriageway, not on a flyover, slip
+road or service lane, and at the right junction. The route line between each pair was checked on
+OpenStreetMap's router and again on the untouched N1 car build (port 5000), with step names:
+
+| Stretch | From | To | Length | Roads on the route | Factor |
+| --- | --- | --- | --- | --- | --- |
+| Shahrah-e-Faisal, Karsaz to FTC | 24.874816, 67.096223 (Karsaz Road junction) | 24.859143, 67.052244 (FTC) | 4,863 m | Shahrah-e-Faisal only (the map spells it three ways) | 0.0, full block |
+| University Road, Hasan Square to NIPA | 24.900705, 67.072522 (Hasan Square, under the flyover) | 24.917938, 67.097152 (NIPA Chowrangi) | 3,142 m | University Road only (one way name, in Urdu) | 0.25, slowed |
+
+OSRM moved none of the four points (0 m). Both stretches close both directions (60 m circles every 100 m
+along the line, `build_scenarios.py`). The file is frozen from here, with the scenarios.

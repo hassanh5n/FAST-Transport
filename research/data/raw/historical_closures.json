@@ -1,6 +1,2 @@
-[{"id": "shahrah-e-faisal-2024-02-24", "name": "Shahrah-e-Faisal, Karsaz to FTC", "factor": 0.0,
-  "from": {"lat": null, "lng": null}, "to": {"lat": null, "lng": null}, "both_directions": true,
-  "source": "Aaj English TV, 24 Feb 2024; see the literature note, reference 76"},
- {"id": "university-road-ponding", "name": "University Road, Hasan Square to NIPA", "factor": 0.25,
-  "from": {"lat": null, "lng": null}, "to": {"lat": null, "lng": null}, "both_directions": true,
-  "source": "Hussain, Ahmed and Ali 2018; see the literature note, reference 75"}]
+[{"id": "shahrah-e-faisal-2024-02-24", "name": "Shahrah-e-Faisal, Karsaz to FTC", "factor": 0.0, "from": {"lat": 24.874816, "lng": 67.096223}, "to": {"lat": 24.859143, "lng": 67.052244}, "both_directions": true, "source": "Aaj English TV, 24 Feb 2024; see the literature note, reference 76", "length_m": 4863, "pinned": "19 Nov 2026: end points read off OpenStreetMap on the carriageway and checked by Hassan; route between them on the untouched N1 car build stays on the named road"},
+ {"id": "university-road-ponding", "name": "University Road, Hasan Square to NIPA", "factor": 0.25, "from": {"lat": 24.900705, "lng": 67.072522}, "to": {"lat": 24.917938, "lng": 67.097152}, "both_directions": true, "source": "Hussain, Ahmed and Ali 2018; see the literature note, reference 75", "length_m": 3142, "pinned": "19 Nov 2026: end points read off OpenStreetMap on the carriageway and checked by Hassan; route between them on the untouched N1 car build stays on the named road"}]

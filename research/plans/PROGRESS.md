@@ -19,7 +19,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | --- | --- |
 | Optimization: experiments | done (B1, Q1, T1, S1 all passed and are logged) |
 | Optimization: chapter | draft committed; references, figures and the Nadeem bus-count point still open |
-| Optimization: scaling run | in progress: run OS1 on Jadoon, Nadeem and their doubled instances done on the lead's laptop and logged (8 of 12 runs; code `7299036`, logged in `c1a9f8a`); All and All-doubled blocked (need the combined matrix, so OSRM) and run on the Docker laptop into `results/optimizer-scale-wsl/` |
+| Optimization: scaling run | done: run OS1 complete, 12 of 12 runs. Jadoon, Nadeem and their doubled instances on the Windows laptop (17 Nov, `results/optimizer-scale/`); All and All-doubled in WSL on 19 Nov (code `975760c`, `results/optimizer-scale-wsl/`); the two machines' rows are not pooled |
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
 | Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures, scenarios and the combined matrix next (Section 7) |
@@ -123,7 +123,7 @@ Names are not assigned yet.
 | [x] (17 Nov) | C | R3 and the lower bound | solver-core, Task 4 | Sat 21 |
 | [x] (19 Nov, L4): detour 1.38; 17.2% / 48.0% within 400 / 800 m | A | Walking distances built and logged (L4) | offline-builders, Task 3 | Sun 22 |
 | [x] (17 Nov) | A | Scenario placement rules | offline-builders, Task 4 | Sun 22 |
-| [ ] blocked (needs a person, the map and the unblocked OSRM server); file committed with null coordinates | A | Historical closure end points pinned on the map | offline-builders, Task 5 | Sun 22 |
+| [x] (19 Nov): checked by Hassan; 4,863 m and 3,142 m | A | Historical closure end points pinned on the map | offline-builders, Task 5 | Sun 22 |
 | [x] (19 Nov, L5): limited, 14 rows 1.21 s, 31 rows 2.30 s | B | Timings under limits, logged (L5) | road-graph, Task 7 | Sun 22 |
 | [x] (17 Nov) | C | Ladder with resumable solve | solver-core, Task 5 | Sun 22 |
 | [ ] drafted (`9132c3d`), R2 change added 17 Nov (not yet committed); not yet reviewed | C | Chapter sections 1, 2, 3, 7 | logbook-and-chapter | Sun 22 |
@@ -146,7 +146,7 @@ Names are not assigned yet.
 | [x] (17 Nov) | C | Scenario cases and scoring on true times | experiment-runner, Task 1 | Tue 24 |
 | [x] (17 Nov) | C | Summaries and verdict rules | experiment-runner, Task 2 | Wed 25 |
 | [ ] code done; run blocked (needs Docker laptop and map file) | A | Full scenario build; no leaks; file frozen and logged (L6) | offline-builders, Task 6 steps 3 to 5 | Thu 26 |
-| [ ] code done; run blocked (needs Docker laptop and map file) | A | Combined 311-stop matrix | offline-builders, Task 7 | Thu 26 |
+| [x] (19 Nov): 0 of 50,320 pairs differ from M1 | A | Combined 311-stop matrix | offline-builders, Task 7 | Thu 26 |
 | [x] (17 Nov, `c1a9f8a`): `quality --quick` 15 of 15 rows ok, toy verdicts pass | C | Quality pass and toy file | experiment-runner, Task 3 | Thu 26 |
 | [ ] code done; quick test passes without limits (17 Nov, `c1a9f8a`); `run_budget.py --check` and the limited quick test need WSL with systemd | C | Limits pass | experiment-runner, Task 4 | Fri 27 |
 | [ ] code done; quick tests pass on the lead's laptop (17 Nov); still to do from the hub on the run machine, and the limited quick test needs WSL with systemd | C | Hub entries; both quick tests pass from the hub on the run machine | experiment-runner, Task 6 | Fri 27 |
