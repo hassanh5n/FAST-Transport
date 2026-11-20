@@ -1,0 +1,778 @@
+{
+ "run_id": "Nadeem-limited-t10-r3",
+ "instance": "fall2026-v1",
+ "time_limit_s": 10,
+ "model": {
+  "deadline": "08:00",
+  "max_ride_min": 90,
+  "stop_time": "60 s + 5 s/student",
+  "objective": "total student ride time, driving time as tie-breaker"
+ },
+ "contractors": {
+  "Nadeem": {
+   "baseline": {
+    "buses_used": 25,
+    "total_student_ride_min": 37280,
+    "mean_ride_min": 41.4,
+    "longest_ride_min": 65.6,
+    "stops_over_90_min": 0,
+    "bus_driving_min": 1025
+   },
+   "solve_wall_s": 10.3,
+   "solve_cpu_s": 1.0,
+   "peak_rss_mb": 55,
+   "progress": [
+    [
+     1.7,
+     2663447
+    ],
+    [
+     1.9,
+     2615861
+    ],
+    [
+     2.0,
+     2615006
+    ],
+    [
+     2.1,
+     2606488
+    ],
+    [
+     2.2,
+     2606261
+    ],
+    [
+     2.3,
+     2605194
+    ],
+    [
+     2.31,
+     2592231
+    ],
+    [
+     2.4,
+     2585058
+    ],
+    [
+     2.5,
+     2583481
+    ],
+    [
+     2.61,
+     2580877
+    ],
+    [
+     2.8,
+     2576099
+    ],
+    [
+     2.9,
+     2570455
+    ],
+    [
+     2.91,
+     2566447
+    ],
+    [
+     3.01,
+     2566024
+    ],
+    [
+     3.1,
+     2565984
+    ],
+    [
+     3.2,
+     2562664
+    ],
+    [
+     3.3,
+     2560769
+    ],
+    [
+     3.31,
+     2559201
+    ],
+    [
+     3.6,
+     2558923
+    ],
+    [
+     3.7,
+     2557441
+    ],
+    [
+     3.71,
+     2557339
+    ],
+    [
+     3.8,
+     2557110
+    ],
+    [
+     3.91,
+     2556592
+    ],
+    [
+     4.0,
+     2555222
+    ],
+    [
+     4.11,
+     2554397
+    ],
+    [
+     4.31,
+     2544417
+    ],
+    [
+     4.5,
+     2542914
+    ],
+    [
+     4.51,
+     2542172
+    ],
+    [
+     4.61,
+     2538011
+    ],
+    [
+     4.8,
+     2534312
+    ],
+    [
+     4.8,
+     2533715
+    ],
+    [
+     4.81,
+     2530649
+    ],
+    [
+     4.91,
+     2516665
+    ],
+    [
+     5.0,
+     2515118
+    ],
+    [
+     5.01,
+     2495661
+    ],
+    [
+     5.01,
+     2494877
+    ],
+    [
+     5.11,
+     2493649
+    ],
+    [
+     5.21,
+     2493449
+    ],
+    [
+     5.3,
+     2473753
+    ],
+    [
+     5.31,
+     2469936
+    ],
+    [
+     5.4,
+     2464350
+    ],
+    [
+     5.4,
+     2461756
+    ],
+    [
+     5.5,
+     2459913
+    ],
+    [
+     5.61,
+     2451955
+    ],
+    [
+     5.7,
+     2445231
+    ],
+    [
+     5.8,
+     2444501
+    ],
+    [
+     6.0,
+     2428989
+    ],
+    [
+     6.1,
+     2422994
+    ],
+    [
+     6.1,
+     2420129
+    ],
+    [
+     6.11,
+     2418305
+    ],
+    [
+     6.2,
+     2417942
+    ],
+    [
+     6.3,
+     2417280
+    ],
+    [
+     6.5,
+     2416555
+    ],
+    [
+     6.6,
+     2415903
+    ],
+    [
+     6.71,
+     2415541
+    ],
+    [
+     6.8,
+     2415466
+    ],
+    [
+     7.01,
+     2412351
+    ],
+    [
+     7.01,
+     2411970
+    ],
+    [
+     7.1,
+     2411540
+    ],
+    [
+     7.2,
+     2410098
+    ],
+    [
+     7.5,
+     2399301
+    ],
+    [
+     7.6,
+     2397355
+    ],
+    [
+     7.61,
+     2396574
+    ],
+    [
+     7.8,
+     2396453
+    ],
+    [
+     7.81,
+     2396225
+    ],
+    [
+     8.1,
+     2392109
+    ],
+    [
+     8.11,
+     2391029
+    ],
+    [
+     8.2,
+     2389349
+    ],
+    [
+     8.2,
+     2388775
+    ],
+    [
+     8.3,
+     2387131
+    ],
+    [
+     8.4,
+     2386746
+    ],
+    [
+     8.41,
+     2386461
+    ],
+    [
+     8.6,
+     2384513
+    ],
+    [
+     8.61,
+     2382959
+    ],
+    [
+     8.81,
+     2313487
+    ],
+    [
+     8.91,
+     2313019
+    ],
+    [
+     9.41,
+     2311248
+    ],
+    [
+     9.5,
+     2309021
+    ],
+    [
+     9.5,
+     2305105
+    ],
+    [
+     9.7,
+     2302512
+    ],
+    [
+     9.8,
+     2301544
+    ],
+    [
+     9.81,
+     2301345
+    ],
+    [
+     9.9,
+     2297960
+    ],
+    [
+     9.91,
+     2291328
+    ],
+    [
+     10.01,
+     2286434
+    ],
+    [
+     10.1,
+     2281985
+    ]
+   ],
+   "optimized": {
+    "buses_used": 26,
+    "total_student_ride_min": 36698,
+    "mean_ride_min": 40.8,
+    "longest_ride_min": 90.0,
+    "stops_over_90_min": 0,
+    "bus_driving_min": 1359,
+    "dropped_stops": []
+   },
+   "routes": [
+    [
+     "Green Mosque Bahria Town",
+     "Star Gate",
+     "Askari IV",
+     "Hilltop",
+     "Perfume Chowk Johar",
+     "Colony Gate",
+     "Korangi No 5"
+    ],
+    [
+     "Rahat Park",
+     "Bahria Town Apartments Tower 15",
+     "Bahria International Hospital",
+     "Bahria Town Main Gate",
+     "Check Post 5"
+    ],
+    [
+     "Race Course",
+     "26 Street",
+     "KFC Badar",
+     "Badar Commercial",
+     "Florida Homes B-Street",
+     "Kamal Mart",
+     "Saba Avenue Imambargah",
+     "Essa Nagri",
+     "Drigh Road"
+    ],
+    [
+     "Liaquatabad Erum Bakery",
+     "Naz Petrol Pump",
+     "Cantt Station",
+     "Shell Petrol Pump",
+     "Khayaban-e-Bahria",
+     "Hyperstar",
+     "Nexus College",
+     "Khayaban-e-Shahbaz",
+     "DHA Phase IV"
+    ],
+    [
+     "Johar More",
+     "Korangi Crossing",
+     "Misri Shah",
+     "Khayaban-e-Muhafiz",
+     "Khayaban-e-Sehar",
+     "NHS-IV",
+     "Check Post 6"
+    ],
+    [
+     "Bahria Town Apartments Tower 20",
+     "Bahria Adventure Land",
+     "Tank Chowk Malir",
+     "Shahrah-e-Faisal Nursery",
+     "FTC",
+     "KPT Bridge Kababjees"
+    ],
+    [
+     "Sindh Secretariat",
+     "M. Ali Society",
+     "Soldier Bazar",
+     "Mobile Market"
+    ],
+    [
+     "Noorani Kabab",
+     "Gizri",
+     "Sona Chandi Lawn",
+     "Islamia College",
+     "NMC",
+     "KFC Phase II"
+    ],
+    [
+     "Inquiry Office",
+     "Tipu Sultan Road",
+     "Karsaz Pankha Stop",
+     "United Bakery",
+     "Altamash",
+     "Sunset Club",
+     "Nasir Jump",
+     "Landhi No 4"
+    ],
+    [
+     "Kala Board",
+     "Wireless Gate",
+     "Boat Basin",
+     "Tyre Company",
+     "Khayaban-e-Bukhari",
+     "Bukhari Commercial",
+     "Landhi 89"
+    ],
+    [
+     "Police Headquarter Garden",
+     "Ram Swami",
+     "Atrium Mall",
+     "Naz Plaza",
+     "Uncle Sariya",
+     "Lucky Star",
+     "Numaish",
+     "Khudadad Colony",
+     "Hafiz Sweets Malir 15"
+    ],
+    [
+     "Korangi No 2",
+     "Mumtaz Manzil",
+     "Hassan Square",
+     "Liaquatabad 10 No",
+     "Jamshed Road",
+     "PAF Chapter"
+    ],
+    [
+     "Malir Cantt Askari-V",
+     "Usman Memorial",
+     "Aziz Bhatti Park"
+    ],
+    [
+     "CMH Malir Cantt"
+    ],
+    [
+     "Tariq Road",
+     "Sir Syed Road",
+     "Kashmir Road",
+     "Khalid Bin Waleed Road"
+    ],
+    [
+     "Jang Press",
+     "Forum Shopping Mall",
+     "Bilawal Chowrangi",
+     "Askari II & III"
+    ],
+    [
+     "Tower",
+     "Iqra University"
+    ],
+    [
+     "NADRA Mega Center",
+     "Teen Talwar",
+     "Bacha Party",
+     "Punjab Chowrangi PSO Pump",
+     "Chandio Village"
+    ],
+    [
+     "Golimar Chowrangi",
+     "Garden Zoo",
+     "Ali Bhai",
+     "Garden Jamat Khana",
+     "Fatmi Blood Bank"
+    ],
+    [
+     "Manzoor Colony",
+     "Diamond"
+    ],
+    [
+     "Urdu Bazar Nazimabad",
+     "Jahangirabad",
+     "Stadium Road"
+    ],
+    [
+     "Urdu Science College",
+     "Bait-ul-Mukarram",
+     "Aladin Park",
+     "Lal Flat",
+     "Matka Stop"
+    ],
+    [
+     "Stadium",
+     "Dalmia",
+     "Millennium Mall"
+    ],
+    [
+     "Tariq Bin Zaid Society",
+     "Jinnah Garden",
+     "Check Post 2",
+     "Security Printing Press"
+    ],
+    [
+     "X-20 Malir Cantt",
+     "Malir Cantt Phase-I",
+     "Sector G Malir Cantt",
+     "Sector J Malir Cantt",
+     "Falcon Malir Cantt",
+     "Sector H Malir Cantt",
+     "Kazimabad",
+     "Cantt Bazar Malir"
+    ],
+    [
+     "Zubaida Hospital",
+     "Rangoon Wala Hall",
+     "Bahadurabad",
+     "Saylani Chowk",
+     "Sharfabad",
+     "Old Sabzi Mandi",
+     "New Town Chandni Chowk",
+     "Yadgar Fish",
+     "Guru Mandir",
+     "Khurasan",
+     "Allah Wali Chowrangi"
+    ]
+   ],
+   "baseline_routes": [
+    [
+     "Malir Cantt Askari-V",
+     "Check Post 5",
+     "Check Post 6",
+     "Tank Chowk Malir"
+    ],
+    [
+     "Sector J Malir Cantt",
+     "Sector G Malir Cantt",
+     "Malir Cantt Phase-I",
+     "Sector H Malir Cantt",
+     "Tariq Bin Zaid Society",
+     "Security Printing Press"
+    ],
+    [
+     "Soldier Bazar",
+     "Guru Mandir",
+     "Islamia College",
+     "Stadium Road"
+    ],
+    [
+     "Khudadad Colony",
+     "Kashmir Road",
+     "Sir Syed Road",
+     "Khalid Bin Waleed Road",
+     "Tariq Road",
+     "Tipu Sultan Road"
+    ],
+    [
+     "Usman Memorial",
+     "Essa Nagri",
+     "Stadium",
+     "Dalmia",
+     "Millennium Mall"
+    ],
+    [
+     "Old Sabzi Mandi",
+     "Sharfabad",
+     "Bahadurabad",
+     "Rangoon Wala Hall",
+     "Karsaz Pankha Stop",
+     "NHS-IV"
+    ],
+    [
+     "Forum Shopping Mall",
+     "Gizri",
+     "DHA Phase IV",
+     "Sunset Club",
+     "United Bakery",
+     "KFC Phase II"
+    ],
+    [
+     "Saba Avenue Imambargah",
+     "Khayaban-e-Bukhari",
+     "Bukhari Commercial",
+     "Misri Shah",
+     "Khayaban-e-Muhafiz",
+     "Rahat Park"
+    ],
+    [
+     "Bilawal Chowrangi",
+     "Hyperstar",
+     "Florida Homes B-Street",
+     "Kamal Mart",
+     "KFC Badar",
+     "Khayaban-e-Bahria",
+     "Shell Petrol Pump",
+     "NADRA Mega Center"
+    ],
+    [
+     "Hassan Square",
+     "Mumtaz Manzil",
+     "Bait-ul-Mukarram",
+     "Urdu Science College",
+     "Aziz Bhatti Park"
+    ],
+    [
+     "Tower",
+     "Jang Press",
+     "Sindh Secretariat",
+     "Atrium Mall",
+     "Lucky Star",
+     "FTC",
+     "Shahrah-e-Faisal Nursery"
+    ],
+    [
+     "Falcon Malir Cantt",
+     "CMH Malir Cantt",
+     "X-20 Malir Cantt",
+     "Cantt Bazar Malir",
+     "Check Post 2",
+     "Jinnah Garden",
+     "Kazimabad"
+    ],
+    [
+     "Jahangirabad",
+     "Golimar Chowrangi",
+     "Urdu Bazar Nazimabad",
+     "Inquiry Office",
+     "Naz Petrol Pump",
+     "Sona Chandi Lawn",
+     "Liaquatabad Erum Bakery"
+    ],
+    [
+     "KPT Bridge Kababjees",
+     "Iqra University",
+     "Diamond",
+     "Manzoor Colony",
+     "PAF Chapter"
+    ],
+    [
+     "Tyre Company",
+     "Boat Basin",
+     "26 Street",
+     "Badar Commercial",
+     "Khayaban-e-Sehar",
+     "Nexus College",
+     "Khayaban-e-Shahbaz"
+    ],
+    [
+     "Liaquatabad 10 No",
+     "Usman Memorial",
+     "Saylani Chowk",
+     "Zubaida Hospital",
+     "M. Ali Society"
+    ],
+    [
+     "Korangi Crossing",
+     "Nasir Jump",
+     "Korangi No 2",
+     "Korangi No 5",
+     "Landhi No 4",
+     "Landhi 89"
+    ],
+    [
+     "Teen Talwar",
+     "Race Course",
+     "Cantt Station",
+     "Askari II & III",
+     "NMC"
+    ],
+    [
+     "Police Headquarter Garden",
+     "Uncle Sariya",
+     "Mobile Market",
+     "Naz Plaza",
+     "Numaish",
+     "Islamia College",
+     "New Town Chandni Chowk"
+    ],
+    [
+     "Ram Swami",
+     "Garden Zoo",
+     "Ali Bhai",
+     "Garden Jamat Khana",
+     "Fatmi Blood Bank",
+     "Khurasan",
+     "Numaish",
+     "Khudadad Colony",
+     "Noorani Kabab",
+     "Allah Wali Chowrangi"
+    ],
+    [
+     "Bacha Party",
+     "Punjab Chowrangi PSO Pump",
+     "Chandio Village",
+     "Altamash"
+    ],
+    [
+     "Perfume Chowk Johar",
+     "Hilltop",
+     "Johar More",
+     "Drigh Road",
+     "Colony Gate",
+     "Star Gate",
+     "Wireless Gate",
+     "Kala Board",
+     "Hafiz Sweets Malir 15"
+    ],
+    [
+     "Matka Stop",
+     "Aladin Park",
+     "Lal Flat"
+    ],
+    [
+     "Green Mosque Bahria Town",
+     "Bahria Adventure Land",
+     "Bahria International Hospital",
+     "Bahria Town Apartments Tower 15",
+     "Bahria Town Apartments Tower 20",
+     "Bahria Town Main Gate"
+    ],
+    [
+     "Jamshed Road",
+     "Yadgar Fish",
+     "New Town Chandni Chowk",
+     "Askari IV"
+    ]
+   ]
+  }
+ }
+}
