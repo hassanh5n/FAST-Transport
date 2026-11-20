@@ -1,0 +1,46 @@
+{
+ "started_at": "2026-11-20T10:47:17+00:00",
+ "machine": {
+  "host": "DESKTOP-15B12RB",
+  "system": "Linux",
+  "kernel": "6.18.58.1-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "cpus": 4,
+  "cpu": "Intel(R) Core(TM) i5-7300U CPU @ 2.60GHz",
+  "ram_gb": 3.7,
+  "numpy": "2.5.4",
+  "scipy": "1.18.1"
+ },
+ "pass": "limits",
+ "quick": false,
+ "code_version": "d403950b38339e4c52722be2620729249daf4479",
+ "scenarios": {
+  "file": "scenarios_reroute_v1.json",
+  "sha256": "42cb29dcb3f06b7379580e3e282d13fa2e82a4d3311094637aa04a25c469a60c",
+  "version": "reroute-v1"
+ },
+ "limits": "systemd",
+ "limits_check": {
+  "ok": true,
+  "expected": {
+   "memory.max": "536870912",
+   "memory.swap.max": "0",
+   "cpu.max": "10000 100000"
+  },
+  "found": {
+   "memory.max": "536870912",
+   "memory.swap.max": "0",
+   "cpu.max": "10000 100000"
+  }
+ },
+ "arms": [
+  "graph_limited",
+  "graph_unlimited",
+  "truth_limited"
+ ],
+ "repeats": 3,
+ "cap_s": 30.0,
+ "slice_masks": 256,
+ "use_sudo": false,
+ "runs_total": 1729
+}
