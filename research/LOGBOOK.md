@@ -1068,3 +1068,49 @@ They are reported here and not added to the judged set after seeing the results.
 
 **Historical closures (main, 400 m, ok).** Shahrah-e-Faisal block (13): R0 and R3 median 114.7 s. University
 Road ponding (25): R0 73.0 s, R3 52.6 s. Reported separately, never pooled with the synthetic ones.
+
+## 2026-11-20: L9: rerouting limits pass (`results/reroute-limits/`)
+
+Machine: `DESKTOP-15B12RB`, WSL2 with systemd, started from the hub. Limits read back from the kernel before the
+run: `memory.max` 536870912, `memory.swap.max` 0, `cpu.max` 10000 100000. Code `d403950`, scenario file sha256
+`42cb29dc...` (L6). 1,729 of 1,729 rows: 1,464 ok, 245 infeasible, 20 `invalid_on_truth` (failures by the 17 Nov
+rules, so the summary marks the pass "not complete"). Arms: graph_limited (3 repeats), graph_unlimited (1),
+truth_limited (3), all at 400 m, each scenario's worst repeat judged.
+
+| Threshold (judged synthetic, graph_limited, worst repeat) | Result | Verdict |
+| --- | --- | --- |
+| 4. A plan valid on true times within 5 s in at least 95% of scenarios | 74 of 78 (94.9%); median first plan 0.50 s | **fail**, by one scenario |
+| 5. At 30 s, within 60 s of the oracle in at least 90% | 72 of 78 (92.3%); median gap 0 s, largest 151 s | **pass** |
+| 6. Peak memory under 400 MB, none killed | largest 209 MB, median 163 MB; none killed | **pass** |
+
+**The four scenarios that miss 5 s:**
+
+| Scenario | First plan, worst repeat | Cause |
+| --- | --- | --- |
+| Jadoon-R-5B-L5-early | 9.5 s (all three repeats 7.8 to 9.5 s) | Closure cuts the corridor; the search widens to the whole city graph (by design, road-graph Task 4) |
+| Nadeem-41-L4-early | 7.1 s (all three 6.9 to 7.1 s) | Same: widened to the city |
+| Nadeem-31-L4-early | no valid plan (all three) | Graph and truth disagree: the graph finds no path to stop 221 even on the whole city, OSRM reaches it in 616 s, so the graph's plan leaves a servable stop unserved (`invalid_on_truth`) |
+| Jadoon-R-26B-L3-early | 19.2 s in repeat 1; 3.0 and 2.6 s in repeats 2 and 3 | One slow repeat, not widened, same rows; not explained (the rule takes the worst repeat) |
+
+Under 0.1 CPU a city-wide search costs about 7 to 9 s of wall time (G1 measured 8.6 s for 14 city rows), so any
+closure that cuts a corridor misses 5 s on this hardware. 7.7% of graph_limited rows widened.
+
+**The 20 `invalid_on_truth` rows** are on two routes. Nadeem-31 (16 rows: L4 early and late, and the
+Shahrah-e-Faisal scenarios of that route): the graph cannot reach a stop OSRM reaches. Jadoon-R-24-L4-early (4
+rows): the opposite, the graph reaches stop 129 after the closure and OSRM does not, so the graph's plan uses a leg
+truth cannot drive. Both are differences between the two travel-time sources (the graph ignores turn restrictions
+and OSRM's turn penalties, and snaps a stop to its nearest graph node while OSRM snaps to a point on an edge), not
+crashes. They count against thresholds 4 and 5 as the rules say.
+
+**Graph against truth.** On the judged scenarios the graph's planned arrival is a median 109 s earlier than the
+true arrival of the same plan (p10 -248 s, p90 +146 s): after a closure the graph's detours are optimistic,
+although calibration on normal-day pairs had it 3% slow. Because every plan is scored on true times, this costs
+quality only where it changes the choice: unlimited graph plans end a median 0 s from the oracle and within 60 s
+in 93.5% of judged scenarios. truth_limited (plans on true times, inside the limits) gave its first plan within
+0.09 s everywhere, so the time to a first plan on the graph is search time, not solver time.
+
+**Reading.** On a free-tier server with the graph loaded, the rerouter has a valid plan in a median 0.5 s and,
+at 30 s, is within a minute of the oracle in 92% of judged closures, using under 210 MB. Threshold 4 fails by a
+single scenario (74 of 78 against the 75 needed), for reasons that are stated limits of the design: a corridor cut
+by the closure falls back to a city-wide search, and the road graph is not OSRM. No threshold is changed after
+seeing this.

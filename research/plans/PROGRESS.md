@@ -23,7 +23,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
 | Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures pinned, combined matrix built, scenarios frozen (L6, 20 Nov). Next: the quality pass |
-| Rerouting: experiments | quality pass done 20 Nov (L8): R2 matches R3 (pass), no violations (pass), walking gains a median 0 s net of the no-closure control (fail; a valid result, work plan Section 11). RS1 "stops" without limits done 17 Nov. Next: the limits pass (WSL with systemd) and the remaining RS1 parts into `results/reroute-scale-wsl/` |
+| Rerouting: experiments | quality pass done 20 Nov (L8): R2 matches R3 (pass), no violations (pass), walking gains a median 0 s net of the no-closure control (fail; a valid result, work plan Section 11). RS1 "stops" without limits done 17 Nov. Limits pass done 20 Nov (L9): valid plan within 5 s in 94.9% (fail by one scenario), within 60 s of the oracle at 30 s in 92.3% (pass), peak 209 MB (pass). Next: the remaining RS1 parts into `results/reroute-scale-wsl/` |
 | Rerouting: chapter | draft committed (`9132c3d`) from the plans and rules; updated 17 Nov (not yet committed) with the R2 change and the RS1 "stops" results; OS1 is in the optimization chapter (Section 7.6). Other results marked pending until each run is logged |
 | Website integration | design only (work plan Section 12); nothing to build before 6 December. `reroute.wire` is the request and proposal contract |
 
@@ -161,7 +161,7 @@ Names are not assigned yet.
 | --- | --- | --- | --- | --- |
 | [x] (17 Nov): `scale --quick` 4 of 4 ok; part "stops" run without limits | C | Scaling runs coded | experiment-runner, Task 5 | Mon 30 |
 | [ ] code done, entry L7 committed (`c4c13f5`, committed minutes before OS1 started) and quick test ok (17 Nov, 2 of 2); the plan asks for L7 pushed before the run, but it was only committed: push pending | B | Optimizer instances and scaling script; entry L7 pushed | optimizer-scaling, Tasks 2 to 3 | Mon 30 |
-| [ ] blocked (needs the frozen scenario file and WSL with systemd) | all | Limits pass run and logged the same day (L9) | experiment-runner, Task 7 | Tue 1 |
+| [x] (20 Nov, L9): thresholds 5 and 6 pass; threshold 4 fails by one scenario (74 of 78) | all | Limits pass run and logged the same day (L9) | experiment-runner, Task 7 | Tue 1 |
 | [ ] in progress: OS1 contractor part (8 of 12 runs) and RS1 "stops" without limits (run twice, the second with the improved R2) done and logged 17 Nov; left: OS1 All and All-doubled, RS1 limited "stops" rows and the graph, buses and slices parts, on the Docker laptop into the `-wsl` folders (Section 7) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
 | [ ] | all | **Run freeze**: no new runs after Wed 2 Dec | - | Wed 2 |
 | [ ] | all | Chapter sections 8, 9, 10; references checked | logbook-and-chapter | Fri 4 |
