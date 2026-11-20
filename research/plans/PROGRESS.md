@@ -23,7 +23,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
 | Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures pinned, combined matrix built, scenarios frozen (L6, 20 Nov). Next: the quality pass |
-| Rerouting: experiments | quick pipeline tests pass (logged 17 Nov, rerun on code `c1a9f8a`); RS1 "stops" without limits run twice and logged: first with the greedy-only R2 (`results/reroute-scale-r2-insertion/`, code `7299036`, logged in `c1a9f8a`), then with the improved R2 (`results/reroute-scale/`, code `c1a9f8a`, logged in `e59d26f`). Quality, limits, the limited "stops" rows and the graph, buses and slices parts blocked on the data and WSL; they run into `results/reroute-scale-wsl/` |
+| Rerouting: experiments | quality pass done 20 Nov (L8): R2 matches R3 (pass), no violations (pass), walking gains a median 0 s net of the no-closure control (fail; a valid result, work plan Section 11). RS1 "stops" without limits done 17 Nov. Next: the limits pass (WSL with systemd) and the remaining RS1 parts into `results/reroute-scale-wsl/` |
 | Rerouting: chapter | draft committed (`9132c3d`) from the plans and rules; updated 17 Nov (not yet committed) with the R2 change and the RS1 "stops" results; OS1 is in the optimization chapter (Section 7.6). Other results marked pending until each run is logged |
 | Website integration | design only (work plan Section 12); nothing to build before 6 December. `reroute.wire` is the request and proposal contract |
 
@@ -152,7 +152,7 @@ Names are not assigned yet.
 | [ ] code done; quick tests pass on the lead's laptop (17 Nov); still to do from the hub on the run machine, and the limited quick test needs WSL with systemd | C | Hub entries; both quick tests pass from the hub on the run machine | experiment-runner, Task 6 | Fri 27 |
 | [x] (17 Nov) | B | Reuse of pre-closure rows (first in the cut order) | road-graph, Task 8 | Fri 27 |
 | [x] (17 Nov) | B | Optimizer matrix lookup | optimizer-scaling, Task 1 | Fri 27 |
-| [ ] blocked (needs the frozen scenario file) | all | Quality pass run and logged the same day (L8) | experiment-runner, Task 7 | Sun 29 |
+| [x] (20 Nov, L8): thresholds 2 and 3 pass, threshold 1 fails (median net gain 0 s) | all | Quality pass run and logged the same day (L8) | experiment-runner, Task 7 | Sun 29 |
 | [ ] section 6 drafted (`9132c3d`; R2 and RS1 timings updated 17 Nov, not yet committed); sections 4 and 5 drafted with results pending entries L2 to L6 | all | Chapter sections 4, 5, 6 | logbook-and-chapter | Sun 29 |
 
 ### Week 3, 30 Nov to 6 Dec. Run freeze Wed 2; draft Fri 4; done Sun 6

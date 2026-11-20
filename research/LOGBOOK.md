@@ -1017,3 +1017,54 @@ file's header); the code is committed with this file.
 `runs_total` set in `hub/experiments.json`: 1,235 for the quality pass (5 rows per scenario) and 1,729 for the
 limits pass (247 scenarios x graph_limited 3 + graph_unlimited 1 + truth_limited 3). The file is frozen from here:
 any change means version 2 and a new entry.
+
+## 2026-11-20: L8: rerouting quality pass (`results/reroute-quality/`)
+
+Machine: `DESKTOP-15B12RB`, WSL2, started from the hub. Code `82748d4`, scenario file sha256 `42cb29dc...`
+(L6). 1,235 of 1,235 rows, 0 failures: 1,099 ok, 136 infeasible (counted results by the 17 Nov rules). About a
+minute with 2 workers.
+
+**Verdicts (thresholds of 16 Nov, judged synthetic scenarios at 400 m):**
+
+| Threshold | Result | Verdict |
+| --- | --- | --- |
+| 1. Walking gains at least 60 s net of the no-closure control (median) | median net gain **0 s**; 19% of scenarios gain at least 60 s net, 38% gain anything, p75 28 s, p90 134 s | **fail** |
+| 2. R2 within 60 s of R3 in at least 90% of scenarios and on every route's median | 98.7% within 60 s (93.6% equal); largest gap 134 s; worst route Jadoon-R-2, median 48.6 s | **pass** |
+| 3. No failed run, no avoidable unserved stop, R3 never later than R0 | none | **pass** |
+
+**Judged set.** 78 of 208 synthetic scenarios: at least two remaining stops and R0 at least 60 s late at 400 m.
+Of the other 130: 34 infeasible, 11 feasible with one remaining stop, 85 where R0 loses under a minute (the
+"nearly free detour" case of work plan Section 11).
+
+**Delays, judged synthetic, 400 m (seconds against the no-closure published route; median, p90):**
+
+| Arm | R0 | R2 | R3 | R3 differs from R0 |
+| --- | --- | --- | --- | --- |
+| main (closure) | 117.0, 365.3 | 81.3, 296.3 | 81.3, 279.0 | 68% |
+| control (no closure) | 0, 0 | -24.6, 0 | -24.6, 0 | 59% |
+| must-serve | 115.5, 365.3 | 85.1, 278.2 | 85.1, 278.2 | 63% |
+
+What it says:
+
+- The methods beat the patched route by a median 36 s on the judged closures (R3 gain; 49% of scenarios gain
+  at least 60 s), but on a normal day, with no closure, the same freedom to skip stops and let students walk
+  already saves a median 24.6 s. Netting that out, the median gain the closure itself creates is 0 s: in most
+  judged closures the patched detour is already about as good as rerouting. The gain is concentrated in about
+  one closure in five (net at least 60 s; one in ten over 134 s). Work plan Section 11 named this outcome in
+  advance ("walking may rarely help on real walking distances; a valid result, reported as such"), and the
+  walking file (L4) predicted it: at 400 m only 17% of stop visits have a same-route stop to walk to.
+- The greedy method is enough: R2 equals R3 in 94% of judged scenarios. On these problems the exact method adds
+  almost nothing over the greedy one, which runs in well under a second (RS1).
+- Must-serve stops cost little: the median per-scenario difference from the free R3 is 0 s (the medians of the
+  two arms differ by 3.8 s).
+- At 800 m (not judged) the methods move more students (median 5 to 6 walkers per scenario against 0 at 400 m)
+  and the gap to R0 widens (all synthetic: R3 median -42.6 s, R0 83.2 s).
+
+**Infeasible scenarios (main arm, 400 m: 35).** 21 have no remaining stop that can be served (every remaining
+stop closed with no boarding point in reach). 14 are infeasible because R0, the patched published route, never
+reaches campus on true times, though R3 may: these are the closures where keeping the published order fails
+outright, arguably where rerouting matters most, and the 17 Nov definition keeps them out of the judged set.
+They are reported here and not added to the judged set after seeing the results.
+
+**Historical closures (main, 400 m, ok).** Shahrah-e-Faisal block (13): R0 and R3 median 114.7 s. University
+Road ponding (25): R0 73.0 s, R3 52.6 s. Reported separately, never pooled with the synthetic ones.
