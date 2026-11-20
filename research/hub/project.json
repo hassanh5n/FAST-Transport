@@ -23,7 +23,8 @@
       "traffic-check",
       "seed-check",
       "optimizer-scale",
-      "optimizer-scale-wsl"
+      "optimizer-scale-wsl",
+      "optimizer-scale-onemachine"
      ]
     },
     {

@@ -178,6 +178,25 @@
   "design": "All (311 stops, 53 buses, both fleets) and All-doubled (622, 106) on the Docker laptop in WSL, 19 Nov, code 975760c: both lookups, 300 s each, no limits, each run a fresh process. Needs the combined matrix (data/matrix_fall2026_v1_all.json). Run OS1 is these 4 runs plus the 8 of 'Optimizer scaling (Windows laptop)'; the two machines' rows are not pooled."
  },
  {
+  "id": "optimizer-scale-onemachine",
+  "title": "Optimizer scaling (WSL, all six instances, one machine)",
+  "kind": "scale",
+  "main": true,
+  "dir": "results/optimizer-scale-onemachine",
+  "script": "research/run_scale.py",
+  "args": [
+   "--instances",
+   "Jadoon,Nadeem,Jadoon-doubled,Nadeem-doubled,All,All-doubled",
+   "--out-dir",
+   "research/results/optimizer-scale-onemachine",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 12,
+  "question": "How do the optimizer's build time, memory and plan quality grow as stops and buses grow, and does handing OR-Tools the travel times as a matrix instead of a Python callback change that?",
+  "design": "Run OS1 repeated on one machine (the Docker laptop, WSL), 20 Nov, so all six instances share one machine, one code version and one meta file: Jadoon (171 stops), Nadeem (143), Jadoon-doubled (342), Nadeem-doubled (286), All (311) and All-doubled (622); both lookups, 300 s each, no limits, each run a fresh process: 12 runs, about an hour. Optimizer code unchanged since 975760c. Supersedes the two-machine split for the chapter's curves; the earlier entries stay as recorded."
+ },
+ {
   "id": "reroute-quality",
   "title": "Rerouting quality pass",
   "kind": "reroute",
