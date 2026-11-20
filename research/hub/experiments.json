@@ -143,20 +143,39 @@
  },
  {
   "id": "optimizer-scale",
-  "title": "Optimizer scaling",
+  "title": "Optimizer scaling (Windows laptop)",
   "kind": "scale",
   "main": true,
   "dir": "results/optimizer-scale",
   "script": "research/run_scale.py",
   "args": [
    "--instances",
-   "Jadoon,Nadeem,All,All-doubled,Jadoon-doubled,Nadeem-doubled",
+   "Jadoon,Nadeem,Jadoon-doubled,Nadeem-doubled",
    "--code-version",
    "{code_version}"
   ],
-  "runs_total": 12,
+  "runs_total": 8,
   "question": "How do the optimizer's build time, memory and plan quality grow as stops and buses grow, and does handing OR-Tools the travel times as a matrix instead of a Python callback change that?",
-  "design": "Instances Jadoon (171 stops), Nadeem (143), All (311, both fleets), All-doubled (622), and Jadoon-doubled (342) and Nadeem-doubled (286); a doubled instance copies every stop 30 s from its original and every bus, so it tests model size, not geography. Lookups callback and matrix; 300 s each, no limits, each run a fresh process: 12 runs, about an hour. No pass/fail threshold: it reports curves. All and All-doubled need the combined matrix (OSRM) and are recorded as skipped without it; the doubled contractor instances stand in for size until then. Peak memory is the OS's figure for the machine that ran it (Linux ru_maxrss, Windows peak working set)."
+  "design": "Instances Jadoon (171 stops), Nadeem (143), All (311, both fleets), All-doubled (622), and Jadoon-doubled (342) and Nadeem-doubled (286); a doubled instance copies every stop 30 s from its original and every bus, so it tests model size, not geography. Lookups callback and matrix; 300 s each, no limits, each run a fresh process: 12 runs, about an hour. No pass/fail threshold: it reports curves. All and All-doubled need the combined matrix (OSRM) and are recorded as skipped without it; the doubled contractor instances stand in for size until then. Peak memory is the OS's figure for the machine that ran it (Linux ru_maxrss, Windows peak working set). All and All-doubled ran on the Docker laptop on 19 Nov, once the combined matrix existed, and are in their own entry (Optimizer scaling, WSL); the 'skipped' rows for them here are from 17 Nov. Rows from the two machines are never pooled, so this entry runs the four contractor instances only."
+ },
+ {
+  "id": "optimizer-scale-wsl",
+  "title": "Optimizer scaling (WSL, All and All-doubled)",
+  "kind": "scale",
+  "main": true,
+  "dir": "results/optimizer-scale-wsl",
+  "script": "research/run_scale.py",
+  "args": [
+   "--instances",
+   "All,All-doubled",
+   "--out-dir",
+   "research/results/optimizer-scale-wsl",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 4,
+  "question": "How do the optimizer's build time, memory and plan quality grow as stops and buses grow, and does handing OR-Tools the travel times as a matrix instead of a Python callback change that?",
+  "design": "All (311 stops, 53 buses, both fleets) and All-doubled (622, 106) on the Docker laptop in WSL, 19 Nov, code 975760c: both lookups, 300 s each, no limits, each run a fresh process. Needs the combined matrix (data/matrix_fall2026_v1_all.json). Run OS1 is these 4 runs plus the 8 of 'Optimizer scaling (Windows laptop)'; the two machines' rows are not pooled."
  },
  {
   "id": "reroute-quality",
