@@ -39,7 +39,7 @@ class RunnerChoice(unittest.TestCase):
     def test_needs_linux_marks_exactly_the_systemd_experiments(self):
         marked = {e["id"] for e in serve.build_site.load_experiments() if serve.needs_linux(e)}
         self.assertEqual(marked, {"time-budget", "time-budget-quick", "reroute-limits", "reroute-limits-quick",
-                                  "reroute-scale"})
+                                  "reroute-scale-wsl"})
 
     def test_native_python_is_the_venv_or_this_python(self):
         py = serve.native_python()

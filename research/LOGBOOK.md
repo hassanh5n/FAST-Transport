@@ -1114,3 +1114,54 @@ at 30 s, is within a minute of the oracle in 92% of judged closures, using under
 single scenario (74 of 78 against the 75 needed), for reasons that are stated limits of the design: a corridor cut
 by the closure falls back to a city-wide search, and the road graph is not OSRM. No threshold is changed after
 seeing this.
+
+## 2026-11-20: L10: rerouting scaling on WSL (`results/reroute-scale-wsl/`)
+
+Machine: `DESKTOP-15B12RB`, WSL2 with systemd; limits read back (`memory.max` 536870912, `memory.swap.max` 0,
+`cpu.max` 10000 100000). Command line, not the hub, so the rows stay in this machine's folder. 109 of 109 rows, 0
+failed. No verdicts: curves only. Not pooled with `results/reroute-scale/` (Windows laptop, 17 Nov).
+
+**Stops per bus** (synthetic problems, 1, 2 and 4 candidates per stop, 3 seeds; R3 capped at 30 s when limited):
+
+| Stops | R2 wall, max (s), no limits / limited | R3 wall, median (s), no limits / limited | R3 finished, limited | R3 peak (MB) |
+| --- | --- | --- | --- | --- |
+| 4 | 0.004 / 0.09 | 0.21 / 1.3 | 9 of 9 | 49 |
+| 8 | 0.19 / 0.69 | 0.29 / 1.8 | 9 of 9 | 49 |
+| 12 | 0.15 / 2.0 | 0.61 / 5.4 | 8 of 9 | 54 to 118 |
+| 16 | 0.34 / 4.3 | 8.9 / cap (30) | 0 of 9 | 134 to 135 |
+| 20 | 0.50 / 4.3 | not run (over 16 stops) | - | - |
+
+R2 always has a plan within 4.4 s on 0.1 CPU, up to 20 stops. R3 finishes within 30 s on the free tier up to 12
+stops (one 12-stop problem needs about 51 CPU-s) and never at 16, so on the free tier the exact method is a
+refinement for short remaining routes, and R2's plan is what a 16-stop bus gets. The 17 Nov run (no limits) gave
+the same shape.
+
+**Road area searched** (Jadoon-R-2, rows from 10, 30, 60 points):
+
+| Points | Corridor, wall (s), no limits / limited | City, wall (s), no limits / limited | Peak (MB), corridor / city |
+| --- | --- | --- | --- |
+| 10 | 0.08 / 0.40 | 1.28 / 6.70 | 100 / 130 |
+| 30 | 0.18 / 1.10 | 2.46 / 21.1 | 116 / 198 |
+| 60 | 0.35 / 2.30 | 3.31 / 34.1 | 140 / 265 |
+
+The corridor (14,189 nodes, 7% of the city) is 15 to 20 times faster under the limits. A closure that cuts the
+corridor and forces a city-wide search is what pushed two scenarios past 5 s in the limits pass (L9).
+
+**Buses hit by one closure at once** (one process, limited):
+
+| Buses | Distinct scenarios | All plans valid (s) | Peak (MB) | Row cache hits |
+| --- | --- | --- | --- | --- |
+| 1 | 1 | 10.7 | 197 | 33% |
+| 5 | 5 | 43.1 | 277 | 26% |
+| 10 | 10 | 80.5 | 359 | 33% |
+| 20 | 14 (repeated) | 128.5 | **426** | 51% |
+
+Time grows about linearly with buses (4 to 9 s each), so a closure hitting ten buses waits over a minute for the
+last plan on a free-tier server. Memory passes 400 MB (threshold 6's figure for one bus) at 20 buses and comes
+within 90 MB of the 512 MB limit: one free-tier process cannot serve a city-wide event of that size.
+
+**Solving in slices** (R3 paused and resumed): 3, 3 and 6 slices on three scenarios; saved state at most 325 bytes,
+except Jadoon-R-6B-L7-early at 274 KB during R3, so a resumable solve fits a database row or a small file. In all
+three R3 kept R2's plan (R2 was already optimal).
+
+Run RS1 is complete. Rerouting experiments are closed: quality (L8), limits (L9), scaling (L10).

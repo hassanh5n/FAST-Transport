@@ -495,7 +495,7 @@ Research*, vol. 202, no. 2, pp. 311-319, 2010.
 trends and research directions," *Omega*, vol. 95, art. 102056, 2020.
 
 [3] P. Toth and D. Vigo, Eds., *Vehicle Routing: Problems, Methods, and Applications*, 2nd ed.
-Philadelphia, PA, USA: SIAM, 2014.
+(MOS-SIAM Series on Optimization). Philadelphia, PA, USA: SIAM, 2014.
 
 [4] L. Perron and V. Furnon, "OR-Tools," Google. [Online]. Available:
 https://developers.google.com/optimization/
@@ -507,7 +507,7 @@ problem," *European Journal of Operational Research*, vol. 113, no. 2, pp. 469-4
 Int. Conf. Advances in Geographic Information Systems*, Chicago, IL, USA, 2011, pp. 513-516.
 
 [7] D. Delling, A. V. Goldberg, T. Pajor, and R. F. Werneck, "Customizable route planning," in *Proc.
-10th Int. Symp. Experimental Algorithms (SEA)*, LNCS 6630, 2011.
+10th Int. Symp. Experimental Algorithms (SEA)*, LNCS 6630, 2011, pp. 376-387.
 
 [8] F. Arnold, M. Gendreau, and K. Sörensen, "Efficiently solving very large-scale routing problems,"
 *Computers & Operations Research*, vol. 107, pp. 32-42, 2019.
@@ -542,10 +542,10 @@ are on the research hub, which exports them as PNG, CSV and LaTeX.
 
 ## Appendix B. Notes for the authors (remove before submission)
 
-- **References.** None was re-opened while writing this draft. [1] to [4], [6], [8] and [9] are copied
-  from the proposal's reference list; [2], [7] and [10] are marked verified in the literature note, and
-  [1] is marked unverified there. [5] and [11] are cited from memory. Check all of them, and the page
-  range of [7], before submission.
+- **References.** All eleven checked on 20 November 2026 against publisher, DBLP or RePEc records:
+  authors, titles, venues, volumes and pages match, including [5] and [11], which were first cited from
+  memory. Changes made: the page range of [7] (376-387) and the series name of [3]. [4] is software
+  and has no page range.
 - **Free-tier figures.** The chapter says "a free-tier web service with 512 MB and one tenth of a CPU
   core" without naming a provider. The logbook attributes these limits to Render's free tier. Add a
   dated citation of the provider's documentation if the provider is to be named.

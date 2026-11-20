@@ -952,7 +952,8 @@ path problem," *Transportation Science*, vol. 28, no. 4, pp. 317-327, 1994.
 [2] M. Gendreau, G. Laporte, and F. Semet, "The covering tour problem," *Operations Research*, vol. 45,
 no. 4, pp. 568-576, 1997.
 
-[3] J. R. Current, C. S. ReVelle, and J. L. Cohon, "The median shortest path problem," *Transportation
+[3] J. R. Current, C. S. ReVelle, and J. L. Cohon, "The median shortest path problem: A multiobjective
+approach to analyze cost vs. accessibility in the design of transportation networks," *Transportation
 Science*, vol. 21, no. 3, pp. 188-197, 1987.
 
 [4] N. Jozefowiez, F. Semet, and E.-G. Talbi, "The bi-objective covering tour problem," *Computers &
@@ -975,13 +976,16 @@ for solving the school bus routing problem with bus stop selection," *Mathematic
 2020.
 
 [9] P. Czioska, R. Kutadinata, A. Trifunović, S. Winter, M. Sester, and B. Friedrich, "Real-world
-meeting points for shared demand-responsive transportation systems," arXiv:1709.08488.
+meeting points for shared demand-responsive transportation systems," *Public Transport*, no. 2,
+pp. 341-377, 2019, doi: 10.1007/s12469-019-00207-y. Preprint: arXiv:1709.08488.
 
 [10] A. El-Geneidy, M. Grimsrud, R. Wasfi, P. Tétreault, and J. Surprenant-Legault, "New evidence on
-walking distances to transit stops," *Transportation*, vol. 41, no. 1, pp. 193-210, 2014.
+walking distances to transit stops: Identifying redundancies and gaps using variable service areas,"
+*Transportation*, vol. 41, no. 1, pp. 193-210, 2014.
 
 [11] F. Errico, T. G. Crainic, F. Malucelli, and M. Nonato, "A survey on planning semi-flexible transit
-systems," *Transportation Research Part C*, vol. 36, pp. 324-338, 2013.
+systems: Methodological issues and a unifying framework," *Transportation Research Part C*, vol. 36,
+pp. 324-338, 2013.
 
 [12] V. Pillac, M. Gendreau, C. Guéret, and A. L. Medaglia, "A review of dynamic vehicle routing
 problems," *European Journal of Operational Research*, vol. 225, no. 1, pp. 1-11, 2013.
@@ -990,7 +994,7 @@ problems," *European Journal of Operational Research*, vol. 225, no. 1, pp. 1-11
 counting," *Networks*, vol. 67, no. 1, pp. 3-31, 2016.
 
 [14] A. Sun and M. Hickman, "The real-time stop-skipping problem," *Journal of Intelligent
-Transportation Systems*, vol. 9, no. 2, pp. 91-109, 2005.
+Transportation Systems*, vol. 9, no. 2, pp. 91-109, 2005, doi: 10.1080/15472450590934642.
 
 [15] J.-Q. Li, P. B. Mirchandani, and D. Borenstein, "Real-time vehicle rerouting problems with time
 windows," *European Journal of Operational Research*, vol. 194, no. 3, pp. 711-727, 2009.
@@ -1002,10 +1006,11 @@ transport systems: A literature review," *Transportation Research Part B*, vol. 
 research agenda," *Transportation Research Part E*, vol. 145, art. 102176, 2021.
 
 [18] D. Delling, A. V. Goldberg, T. Pajor, and R. F. Werneck, "Customizable route planning," in *Proc.
-10th Int. Symp. Experimental Algorithms (SEA)*, LNCS 6630, 2011.
+10th Int. Symp. Experimental Algorithms (SEA)*, LNCS 6630, 2011, pp. 376-387.
 
 [19] H. Bast, D. Delling, A. Goldberg, M. Müller-Hannemann, T. Pajor, P. Sanders, D. Wagner, and
-R. F. Werneck, "Route planning in transportation networks," arXiv:1504.05140, 2015.
+R. F. Werneck, "Route planning in transportation networks," in *Algorithm Engineering*, LNCS 9220,
+2016, pp. 19-80. Preprint: arXiv:1504.05140.
 
 [20] Project OSRM, "OSRM documentation v26.5.0: command-line tools." [Online]. Available:
 https://project-osrm.org/docs/v26.5.0/tools
@@ -1017,20 +1022,21 @@ https://github.com/Project-OSRM/osrm-backend/wiki/Traffic
 p. 73, 1996.
 
 [23] M. Likhachev, G. Gordon, and S. Thrun, "ARA*: Anytime A* with provable bounds on sub-optimality,"
-in *Advances in Neural Information Processing Systems (NIPS)*, 2003.
+in *Advances in Neural Information Processing Systems 16 (NIPS 2003)*, 2003, pp. 767-774.
 
 [24] Y. He, J. Rentschler, P. Avner, J. Gao, X. Yue, and J. Radke, "Mobility and resilience: A global
 assessment of flood impacts on road transportation networks," World Bank Policy Research Working Paper
 10049, 2022.
 
-[25] Aaj English TV, report on the closure of Shahrah-e-Faisal, 24 February 2024. [Online]. Available:
-https://english.aaj.tv/news/30352283
+[25] Aaj English TV, "Take alternate routes amid protests, roadblock in Karachi," 24 February 2024.
+[Online]. Available: https://english.aaj.tv/news/30352283
 
-[26] E. Hussain, S. Ahmed, and M. S. Ali, "Modeling the effects of rainfall on vehicular traffic,"
-*Journal of Modern Transportation*, vol. 26, pp. 133-146, 2018.
+[26] E. Hussain, S. I. Ahmed, and M. S. Ali, "Modeling the effects of rainfall on vehicular traffic,"
+*Journal of Modern Transportation*, vol. 26, no. 2, pp. 133-146, 2018, doi: 10.1007/s40534-018-0155-0.
 
-[27] N. H. Anwar and A. Shakeel, "Disconnected mobility infrastructures: Female domestic workers and the
-perils of bus transport in Karachi," Mahbub ul Haq Research Centre, LUMS, 2023.
+[27] N. Anwar and E. Shakeel, "Disconnected mobility infrastructures: Female domestic workers & the
+perils of bus transport in Karachi," Mahbub ul Haq Research Centre, LUMS, 4 March 2023. [Online].
+Available: https://mhrc.lums.edu.pk/disconnected-mobility-infrastructures-female-domestic-workers-the-perils-of-bus-transport-in-karachi
 
 [28] E. Jenelius, T. Petersen, and L.-G. Mattsson, "Importance and exposure in road network
 vulnerability analysis," *Transportation Research Part A*, vol. 40, no. 7, pp. 537-560, 2006.
@@ -1069,10 +1075,12 @@ has a `--quick` variant on the toy file; its folder ends in `-quick` and holds n
   walking shares in the logbook, or replace them with entry L4's figures, before the chapter is final.
 - **The first RS1 run's gap.** The logbook's text says R2 was "a median 70 to 285 s later" than R3,
   while its table's smallest group median is 68 s. This draft uses the table (68 to 285 s).
-- **References.** Every reference is taken from the literature note and is marked [V] there. None was
-  re-opened while writing this draft and none is cited from memory. Check the DOI of [14] (unverified
-  in the note) and add a source for the Held-Karp name if it is used. The Valhalla statement in
-  Section 10 has no source in the note.
+- **References.** All 28 checked on 20 November 2026 against publisher, DBLP, RePEc or the source page.
+  Changes made: full titles of [3], [10] and [11]; the journal version of [9] (Public Transport, 2019)
+  and the book version of [19] (LNCS 9220); pages of [18] and [23]; the DOI of [14] (confirmed) and
+  of [26]; the article title of [25]; the second author of [27] (E. Shakeel, not A. Shakeel) with its
+  date and link. Still open: a source for the Held-Karp name if it is used, and for the Valhalla
+  statement in Section 10.
 - **Arithmetic, not measurement.** The 39 MB and 52 MB state sizes (Section 6.3, 6.5) and the walkers'
   ready times (Section 3) are computed from the code, not measured. The times "under 0.1 CPU" in
   Sections 6.3 and 8.4 (over a minute for a 16-stop R3, about 5 s for R2) are the logbook's estimates

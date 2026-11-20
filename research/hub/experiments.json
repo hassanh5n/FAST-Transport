@@ -214,20 +214,41 @@
  },
  {
   "id": "reroute-scale",
-  "title": "Rerouting scaling",
+  "title": "Rerouting scaling (Windows laptop, stops, no limits)",
   "kind": "reroute",
   "main": true,
   "dir": "results/reroute-scale",
   "script": "research/run_reroute.py",
-  "needs": "linux",
   "args": [
    "scale",
+   "--only",
+   "stops",
+   "--no-limits",
+   "--code-version",
+   "{code_version}"
+  ],
+  "runs_total": 45,
+  "question": "How do decision time and memory grow with stops on one bus, with the size of the road graph searched, and with the number of buses one closure hits at once, and what does solving in slices cost?",
+  "design": "Stops: synthetic problems with 4 to 20 remaining stops and 1, 2 or 4 extra boarding points per stop, 3 seeds, limited and unlimited (R3 not run above 16 stops; a lower bound instead). Graph: 10, 30 and 60 points on the longest route's corridor and on the whole city, limited and unlimited. Buses: the Shahrah-e-Faisal closure hitting 1, 5, 10 and 20 buses in one limited process sharing the row cache. Slices: the three largest judged scenarios solved 256 masks at a time, with plan quality and saved-state size after each slice. Each measurement runs in a fresh process. No pass/fail threshold: it reports curves. On 20 Nov every part (stops limited and unlimited, graph, buses, slices) ran in WSL with systemd into results/reroute-scale-wsl/ (its own entry). This entry keeps the 17 Nov Windows rows (stops, no limits) and runs only those; the two machines' rows are never pooled."
+ },
+ {
+  "id": "reroute-scale-wsl",
+  "title": "Rerouting scaling (WSL, all parts)",
+  "kind": "reroute",
+  "main": true,
+  "needs": "linux",
+  "dir": "results/reroute-scale-wsl",
+  "script": "research/run_reroute.py",
+  "args": [
+   "scale",
+   "--out-dir",
+   "research/results/reroute-scale-wsl",
    "--code-version",
    "{code_version}"
   ],
   "runs_total": 109,
   "question": "How do decision time and memory grow with stops on one bus, with the size of the road graph searched, and with the number of buses one closure hits at once, and what does solving in slices cost?",
-  "design": "Stops: synthetic problems with 4 to 20 remaining stops and 1, 2 or 4 extra boarding points per stop, 3 seeds, limited and unlimited (R3 not run above 16 stops; a lower bound instead). Graph: 10, 30 and 60 points on the longest route's corridor and on the whole city, limited and unlimited. Buses: the Shahrah-e-Faisal closure hitting 1, 5, 10 and 20 buses in one limited process sharing the row cache. Slices: the three largest judged scenarios solved 256 masks at a time, with plan quality and saved-state size after each slice. Each measurement runs in a fresh process. No pass/fail threshold: it reports curves."
+  "design": "All four parts on the Docker laptop in WSL with systemd limits (512 MB, no swap, 0.1 CPU), 20 Nov, code 595e144: stops (4 to 20 stops, 1, 2 or 4 candidates, 3 seeds, limited and unlimited), graph (corridor against city, 10, 30 and 60 points), buses (1, 5, 10 and 20 buses hit by one closure) and slices (R3 paused and resumed). 109 rows. Logbook entry L10."
  },
  {
   "id": "reroute-quality-quick",

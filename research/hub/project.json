@@ -6,7 +6,8 @@
   "Students are synthetic (bus loads 65 to 90 percent of capacity), not real registrations.",
   "Travel times are free-flow OSRM times with no traffic; real morning times are higher.",
   "Rerouting scope for FYP-1: morning runs to campus only, one bus rerouted at a time.",
-  "Traffic-aware planning with uneven, time-of-day travel times is deferred to FYP-2; the traffic check scaled every road equally."
+  "Traffic-aware planning with uneven, time-of-day travel times is deferred to FYP-2; the traffic check scaled every road equally.",
+  "Rerouting truth is OSRM, which picks routes by its internal weight, not by time: 0.30% of travel times get slightly faster after a closure. Every method is scored on the same table."
  ],
  "phases": [
   {
@@ -15,23 +16,25 @@
     {
      "title": "Optimization",
      "question": "Can all-stop routes be built from a travel-time matrix within free-tier CPU and memory limits, and how do they compare with the current hand-made routes?",
-     "status": "done",
+     "status": "complete",
      "experiments": [
       "time-budget",
       "query-budget",
       "traffic-check",
       "seed-check",
-      "optimizer-scale"
+      "optimizer-scale",
+      "optimizer-scale-wsl"
      ]
     },
     {
      "title": "Rerouting",
      "question": "When a road is blocked, which road and which stops (keep, skip, or let students walk to a nearby point) give the lowest student delay, within the same limits?",
-     "status": "in progress",
+     "status": "complete",
      "experiments": [
       "reroute-quality",
       "reroute-limits",
-      "reroute-scale"
+      "reroute-scale",
+      "reroute-scale-wsl"
      ]
     }
    ]
@@ -54,24 +57,11 @@
    ]
   }
  ],
- "planned_experiments": [
-  {
-   "title": "Road-block test",
-   "question": "Does OSRM really route around a road when its speed is set to 0, does a slowed road (not fully blocked) work too, and how long does re-customizing take?"
-  },
-  {
-   "title": "Road-graph timing (gate G1)",
-   "question": "On one route's corridor, inside the free-tier limits, does the rerouter's own road graph answer the 14 travel-time rows R0 needs within 5 s and 31 rows within 30 s on the worst repeat, and how close are its times to OSRM after calibration?"
-  }
- ],
+ "planned_experiments": [],
  "next_steps": [
-  "Docker laptop: find the map file of run N1, log its SHA-256, keep an untouched copy of the OSRM car build, and confirm Docker runs the OSRM image.",
-  "Docker laptop: build the road graph from the map file and log its counts; run the road-block test and log it; build the walking distances and log the three statistics.",
-  "Docker laptop: calibrate the graph against the saved matrix, build the route corridors, and time the graph inside the limits (gate G1).",
-  "Pin the end points of the two historical closures (Shahrah-e-Faisal, University Road) on the map by hand; then build the closure scenarios (one route first, then all) at the block speed the road-block test chose, and freeze the file.",
-  "Docker laptop: build the combined 311-stop matrix, then finish the optimizer scaling run with All and All-doubled, written with --out-dir to results/optimizer-scale-wsl/ (the Windows laptop's 8 runs in results/optimizer-scale/ are never pooled with them).",
-  "Run the rerouting quality pass and the limits pass on the frozen scenarios (limits in WSL with systemd), then the remaining scaling parts (graph, buses, slices, limited stops rows) with --out-dir to results/reroute-scale-wsl/. Log each result against the thresholds fixed on 16 Nov.",
-  "Write the rerouting chapter from the logged results.",
-  "Optimization chapter: finish the references, figures and the Nadeem bus-count point, and add the scaling curves from run OS1 (contractor part logged 17 Nov; All and All-doubled still to run)."
+  "Rerouting chapter: put the results of entries L6 to L10 into sections 4 to 6 (all marked pending), then write sections 8 to 10. Quality pass: R2 matches R3 (pass), walking gains a median 0 s net of the no-closure control (fail, a valid result). Limits pass: a valid plan within 5 s in 94.9% (fail by one scenario), within 60 s of the oracle at 30 s in 92.3% (pass), peak 209 MB (pass).",
+  "Optimization chapter: embed the three figures from the hub, settle the Nadeem bus-count point, and add the All and All-doubled scaling rows (19 Nov, results/optimizer-scale-wsl/).",
+  "Optional before the run freeze (Wed 2 Dec): rerun the four contractor instances of the optimizer scaling on the WSL laptop, so the size curve comes from one machine.",
+  "Internal review of both chapters by a second person (by Fri 4 Dec); then the hub plan, the progress tracker and the shared page brought up to date (by Sun 6 Dec)."
  ]
 }

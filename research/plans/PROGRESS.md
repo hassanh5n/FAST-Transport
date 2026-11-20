@@ -23,7 +23,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
 | Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures pinned, combined matrix built, scenarios frozen (L6, 20 Nov). Next: the quality pass |
-| Rerouting: experiments | quality pass done 20 Nov (L8): R2 matches R3 (pass), no violations (pass), walking gains a median 0 s net of the no-closure control (fail; a valid result, work plan Section 11). RS1 "stops" without limits done 17 Nov. Limits pass done 20 Nov (L9): valid plan within 5 s in 94.9% (fail by one scenario), within 60 s of the oracle at 30 s in 92.3% (pass), peak 209 MB (pass). Next: the remaining RS1 parts into `results/reroute-scale-wsl/` |
+| Rerouting: experiments | quality pass done 20 Nov (L8): R2 matches R3 (pass), no violations (pass), walking gains a median 0 s net of the no-closure control (fail; a valid result, work plan Section 11). RS1 "stops" without limits done 17 Nov. Limits pass done 20 Nov (L9): valid plan within 5 s in 94.9% (fail by one scenario), within 60 s of the oracle at 30 s in 92.3% (pass), peak 209 MB (pass). RS1 complete 20 Nov (L10, `results/reroute-scale-wsl/`): R2 within 4.4 s at 20 stops, R3 within 30 s up to 12 stops, 20 buses at once peak 426 MB. All rerouting experiments done |
 | Rerouting: chapter | draft committed (`9132c3d`) from the plans and rules; updated 17 Nov (not yet committed) with the R2 change and the RS1 "stops" results; OS1 is in the optimization chapter (Section 7.6). Other results marked pending until each run is logged |
 | Website integration | design only (work plan Section 12); nothing to build before 6 December. `reroute.wire` is the request and proposal contract |
 
@@ -162,7 +162,7 @@ Names are not assigned yet.
 | [x] (17 Nov): `scale --quick` 4 of 4 ok; part "stops" run without limits | C | Scaling runs coded | experiment-runner, Task 5 | Mon 30 |
 | [ ] code done, entry L7 committed (`c4c13f5`, committed minutes before OS1 started) and quick test ok (17 Nov, 2 of 2); the plan asks for L7 pushed before the run, but it was only committed: push pending | B | Optimizer instances and scaling script; entry L7 pushed | optimizer-scaling, Tasks 2 to 3 | Mon 30 |
 | [x] (20 Nov, L9): thresholds 5 and 6 pass; threshold 4 fails by one scenario (74 of 78) | all | Limits pass run and logged the same day (L9) | experiment-runner, Task 7 | Tue 1 |
-| [ ] in progress: OS1 contractor part (8 of 12 runs) and RS1 "stops" without limits (run twice, the second with the improved R2) done and logged 17 Nov; left: OS1 All and All-doubled, RS1 limited "stops" rows and the graph, buses and slices parts, on the Docker laptop into the `-wsl` folders (Section 7) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
+| [x] (20 Nov): OS1 complete (L7 of 19 Nov, All and All-doubled); RS1 complete (L10, all parts in WSL) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
 | [ ] | all | **Run freeze**: no new runs after Wed 2 Dec | - | Wed 2 |
 | [ ] | all | Chapter sections 8, 9, 10; references checked | logbook-and-chapter | Fri 4 |
 | [ ] | all | Internal review of the chapter by a second person | logbook-and-chapter | Fri 4 |
@@ -173,7 +173,7 @@ Names are not assigned yet.
 - [ ] References re-opened and checked (two were cited from memory: the guided local search and granular tabu search papers)
 - [ ] Three figures exported from the hub and embedded
 - [ ] Decide whether to run Nadeem held to 25 buses (the optimized plans use 26)
-- [ ] Decide whether the proposal needs a formal revision
+- [x] (20 Nov) Decide whether the proposal needs a formal revision: no, the team is not following the proposal closely
 
 ## 4. Decisions needed
 
@@ -181,7 +181,7 @@ Names are not assigned yet.
 | --- | --- | --- |
 | Who is on tracks A, B and C; which laptop has Docker | Mon 16 Nov | open |
 | Thresholds, walking speed and start lag in entry L1 | Tue 17 Nov | taken (17 Nov): the proposed values. Walkers start 60 s after the decision at 1.2 m/s; gain at least 60 s; R2 within 60 s of R3 in at least 90%; a valid plan within 5 s in at least 95%; within 60 s of the oracle at 30 s in at least 90%; memory under 400 MB |
-| Proposal revision: rerouting is listed there as out of scope | before the chapter is submitted | open |
+| Proposal revision: rerouting is listed there as out of scope | before the chapter is submitted | taken (20 Nov): no revision; the team is not following the proposal closely |
 | Limits on automatic reroutes on the website (work plan Section 12.2) | before any website build | open |
 | R3 is two-phase, not the plan's single search (Section 5) | before the quality pass | taken by the lead (17 Nov); team to confirm |
 | Meaning of "infeasible": R0 on true post-closure times never reaches campus or serves no stop, or the baseline is unreachable. `ok` and `infeasible` are counted results; every other status is a failure | before the quality pass | taken by the lead (17 Nov); team to confirm |
@@ -234,6 +234,7 @@ These differ from the wording of the work plan. Each is stated in the plan that 
 | Points snap only to the main road network (the largest strongly connected part), at build time and in `Graph.nearest_node` (19 Nov) | `build_graph.py`, `reroute/graph.py` | Hyperstar and FTC had snapped onto a one-way parking aisle and a service-road piece with no way back, so two corridor legs had no path; OSRM avoids such pieces |
 | A point is closed when the place OSRM meets the road (pre-closure snap) is inside a full block or on a segment the block closes (and on no open one), not by its raw coordinate; the graph arm takes `closed_points` from the scenario file (20 Nov) | `build_scenarios.py`, `osrm_tools.py`, `run_reroute.py` | 7 stops lay with their coordinate and road point on different sides of a circle; Race Course was silently re-snapped by OSRM, giving times faster than before the closure |
 | The hub's `optimizer-scale` entry runs the four contractor instances only (8 runs); a new entry `optimizer-scale-wsl` shows All and All-doubled (20 Nov) | `hub/experiments.json` | Pressing Run on the old entry would have written All and All-doubled into the Windows laptop's folder, pooling the two machines' rows |
+| The hub's `reroute-scale` entry runs the Windows laptop's part only (stops, no limits, 45 rows); a new entry `reroute-scale-wsl` shows the 109 WSL rows (20 Nov) | `hub/experiments.json` | As for the optimizer: pressing Run on the old entry would have written WSL rows into the Windows folder |
 | Unreachable pairs (`None`) become 10**7 s arcs | `optimize.py` | The stop is dropped instead of crashing the solver |
 | Quick result folders are published like the other `-quick` folders; per-job `work/` and `logs/` folders are gitignored | `research/results/`, `research/.gitignore` | Pipeline tests stay visible; intermediates stay out of git |
 | The hub refuses to start a run when git cannot give the code version | `research/hub/serve.py` | No run is recorded with code version `unknown` |
