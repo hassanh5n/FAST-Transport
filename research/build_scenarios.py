@@ -47,7 +47,7 @@ from typing import Any, Callable, Iterable, Mapping, Sequence
 
 import osrm_tools
 from osrm_tools import OsrmError, clean_table, speed_csv, to_json_table
-from reroute.closure import Closure, closed_points, closed_segments, osrm_speed_rows
+from reroute.closure import Closure, closed_points, closed_road_points, closed_segments, osrm_speed_rows
 from scenario_rules import (apply_closed, block_rows, candidates, circles_along, closure_legs,
                             closure_point_ids, first_crossing_leg, historical_triggers, line_in_circles,
                             load_historical, midpoint, route_students, scenario_id, scenario_tags,
@@ -57,6 +57,8 @@ RESEARCH = Path(__file__).resolve().parent
 DATA = RESEARCH / "data"
 OSRM_HOME = Path.home() / "fleetcentric-osrm"
 VERSION = "reroute-v1"
+# How closed points are judged: at the road point, inside a block or on a segment it closes (20 Nov).
+CLOSED_RULE = "road-point-and-segment-2026-11-20"
 CAMPUS_ID = -1
 SYNTHETIC_RADIUS_M = 200.0
 HISTORICAL_SPACING_M, HISTORICAL_RADIUS_M = 100.0, 60.0
@@ -234,7 +236,11 @@ class ScenarioBuilder:
         # at its raw coordinate: a stop whose road point is inside a block would otherwise be moved by
         # OSRM onto another road (19 Nov: Race Course, 173 m from its road, in Nadeem-35-L2).
         pre, snapped = self.osrm.table_with_snaps(where, base=self.untouched)
-        closed = [bool(v) for v in closed_points([p[0] for p in snapped], [p[1] for p in snapped], [closure])]
+        # Also closed: a point that meets the road on a segment the block closes and on no open one, even
+        # just outside the circle (20 Nov: KESC, Green House and eight others were moved by OSRM).
+        lat, lng = [p[0] for p in snapped], [p[1] for p in snapped]
+        closed = [bool(v) for v in (closed_points(lat, lng, [closure])
+                                    | closed_road_points(self.graph, lat, lng, [closure]))]
         post = apply_closed(self.osrm.table(where, base=self.closed), closed)
         closed_ids = [p for p, c in zip(ids, closed) if c]
         if CAMPUS_ID in closed_ids:
@@ -313,7 +319,7 @@ class ScenarioBuilder:
         out = {"version": VERSION, "instance": self.instance["version"],
                "graph": getattr(self.graph, "version", None), "walk": self.walk_version,
                "built_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-               "osrm_image": osrm_tools.IMAGE, "block_kmh": self.block_kmh,
+               "osrm_image": osrm_tools.IMAGE, "block_kmh": self.block_kmh, "closed_rule": CLOSED_RULE,
                "closures": list(existing["closures"]) if existing else [],
                "scenarios": list(existing["scenarios"]) if existing else []}
         done = {c["id"] for c in out["closures"]}
@@ -387,7 +393,8 @@ def _out_path(args: argparse.Namespace) -> Path:
 
 def _existing(path: Path, instance: Mapping, block_kmh: int) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
-    for key, want in (("version", VERSION), ("instance", instance["version"]), ("block_kmh", block_kmh)):
+    for key, want in (("version", VERSION), ("instance", instance["version"]), ("block_kmh", block_kmh),
+                      ("closed_rule", CLOSED_RULE)):
         if data.get(key) != want:
             sys.exit(f"build_scenarios: cannot resume {path}: its {key} is {data.get(key)!r}, not {want!r}")
     if any("snapped" not in c for c in data.get("closures", [])):

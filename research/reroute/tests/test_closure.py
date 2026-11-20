@@ -3,8 +3,8 @@ import unittest
 
 import numpy as np
 
-from reroute.closure import (Closure, closed_points, closed_segments, closure_key, edge_changes,
-                             osrm_speed_rows)
+from reroute.closure import (Closure, closed_points, closed_road_points, closed_segments, closure_key,
+                             edge_changes, osrm_speed_rows)
 from reroute.roadnet import Way, build_tables
 from reroute.tests.toymap import TOY
 
@@ -54,6 +54,17 @@ class ClosureTests(unittest.TestCase):
         lat, lng = np.array([24.900, 24.900]), np.array([67.001, 67.003])
         self.assertEqual(closed_points(lat, lng, [AT_NODE_2]).tolist(), [True, False])
         self.assertEqual(closed_points(lat, lng, [Closure("s", ((24.900, 67.001, 30.0),), 0.5)]).tolist(), [False, False])
+
+    # A point that meets the road outside a block but on a segment the block closes cannot be visited
+    # either: OSRM would move it onto another road (20 Nov). A point where an open road also meets stays open.
+    def test_closed_road_points(self):
+        # Midpoint of 1-2 (50 m from node 2, outside the 30 m circle; segment 1-2 is closed), node 3 (end of
+        # the closed segment 2-3 but also of the open 3-4 and 3-5), midpoint of the open 3-4, and node 2.
+        lat = np.array([24.900, 24.900, 24.900, 24.900])
+        lng = np.array([67.0005, 67.002, 67.0025, 67.001])
+        self.assertEqual(closed_road_points(T, lat, lng, [AT_NODE_2]).tolist(), [True, False, False, True])
+        slowed = Closure("s", ((24.900, 67.001, 30.0),), 0.5)
+        self.assertEqual(closed_road_points(T, lat, lng, [slowed]).tolist(), [False] * 4)
 
     def test_key_ignores_order(self):
         a, b = AT_NODE_2, Closure("c2", ((24.910, 67.005, 50.0),), 0.0)

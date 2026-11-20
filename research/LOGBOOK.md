@@ -973,3 +973,47 @@ follows it:
 
 The faster pairs left after the rebuild are expected to be the weight-against-duration kind only; they will be
 counted and reported in entry L6, not removed.
+
+### Addendum (20 Nov, before the second rebuild): a point on a closed segment is closed too
+
+The rebuild with road points (`snapped`) closed Race Course, FTC and Bahadurabad as intended, but left 73 pairs
+faster after a closure (79 of 16,978 finite pairs, 0.47%, by a 0.1 s threshold). Ten open points had their road
+point within 0.1 m of a segment the closure blocks, though outside the circle: the segment runs into it. OSRM
+moves such a point onto another road, as it did Race Course. Nine of the ten closures with faster pairs and such a
+point are explained by it.
+
+Work plan Section 5 says "if its road segment is closed", so a point is now also closed when its road point lies
+on a closed segment and on no open one, within 1 m (`reroute.closure.closed_road_points`). A point at a junction
+where an open road also meets stays open. Applied to the stored road points of the rebuilt file, this closes 9
+more points (Abbasi Hospital, KESC, Rado Center, Magsi Chowk, Water Pump More, Shahzad Store, Green House, Sunset
+Club, Lal Flat) and opens none; Moti Mahal stays open (it meets an open road too). Two tests added (225 solver and
+graph tests, 270 script tests, all passing); `--resume` now also refuses a file built under an earlier rule (`closed_rule` in the header). The scenarios are built again with this rule.
+
+## 2026-11-20: L6: scenarios built and frozen (`data/scenarios_reroute_v1.json`)
+
+Same machine; untouched car build on port 5000, customized copies on 5002; `--block-kmh 0` (entry L3). Built with
+the closed-point rule of the entry and addendum above (`closed_rule` "road-point-and-segment-2026-11-20" in the
+file's header); the code is committed with this file.
+
+| | Synthetic | Historical | Total |
+| --- | --- | --- | --- |
+| Closures | 104 (two per route, 52 routes) | 31 (Shahrah-e-Faisal 11 routes, University Road 20) | 135 |
+| Scenarios | 208 (early and late trigger per closure) | 39 | 247 |
+
+- Leaks: 0 on every full block (the slowed University Road stretch is not leak-checked).
+- Closed points: 67 over all closures; 73 scenarios have a closure that contains a remaining stop.
+- Remaining stops per scenario: 1 (20 scenarios), 2 (40), 3 (17), 4 (52), 5 (27), 6 (36), 7 (29), 8 to 10 or more
+  (26). Scenarios with one remaining stop fall outside the judged set by its definition (work plan Section 8.2).
+- About 135 customizations at 7 to 10 s each; the build took about 25 minutes.
+- Pairs faster after a closure than before: **51 of 16,829 finite pairs (0.30%), in 14 of 135 closures**, down
+  from 81 in the first build (the rest were the re-snapped points the rule now closes). Median 12.8 s faster
+  (2.8% of the trip), 22 under 10 s, 16 over 30 s, largest 99 s (Saadi Town in Jadoon-R-25-L3). The diagnostic
+  showed this kind for Saadi Town: OSRM minimises weight, not duration, so the closure moves it onto a route with
+  a higher weight and a shorter duration. The other cases (mostly Anara Garden in Jadoon-R-25B-L6 and CNG Pump in
+  Jadoon-R-5-L6 and R-6-L9) were not diagnosed one by one; none has its road point on a closed segment. They stay
+  in the file: OSRM is the truth by design. They can only make a closure look slightly milder for the published
+  route, not favour one method, since every method is scored on the same post-closure table.
+
+`runs_total` set in `hub/experiments.json`: 1,235 for the quality pass (5 rows per scenario) and 1,729 for the
+limits pass (247 scenarios x graph_limited 3 + graph_unlimited 1 + truth_limited 3). The file is frozen from here:
+any change means version 2 and a new entry.

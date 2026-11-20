@@ -332,6 +332,16 @@ class MainTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             bs.main(self.argv("--skip-historical", "--resume"), osrm=fake, graph=Graph(TABLES))
 
+    def test_resume_refuses_a_file_built_under_an_earlier_closed_point_rule(self):
+        fake = FakeOsrm(TABLES)
+        bs.main(self.argv("--skip-historical"), osrm=fake, graph=Graph(TABLES))
+        data = json.loads(self.out.read_text())
+        self.assertEqual(data["closed_rule"], bs.CLOSED_RULE)
+        del data["closed_rule"]
+        self.out.write_text(json.dumps(data))
+        with self.assertRaises(SystemExit):
+            bs.main(self.argv("--skip-historical", "--resume"), osrm=fake, graph=Graph(TABLES))
+
     def test_one_route(self):
         fake = FakeOsrm(TABLES)
         bs.main(self.argv("--route", "Jadoon:R-1", "--skip-historical"), osrm=fake, graph=Graph(TABLES))

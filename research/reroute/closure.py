@@ -214,3 +214,37 @@ def closed_points(point_lat, point_lng, closures: Sequence[Closure]) -> np.ndarr
         for clat, clng, radius in closure.circles:
             out |= haversine_np(lat, lng, clat, clng) <= radius
     return out
+
+
+def closed_road_points(tables: Any, point_lat, point_lng, closures: Sequence[Closure],
+                       tol_m: float = 1.0) -> np.ndarray:
+    """True where a point lies on a segment a full block closes and on no open segment (within ``tol_m``).
+
+    Use it on the place where a point meets the road: such a point cannot be visited, because OSRM
+    would move it onto another road (work plan Section 5: "if its road segment is closed"). A point
+    where an open road also meets, such as a junction at the end of a closed segment, stays open.
+    """
+    lat = np.atleast_1d(np.asarray(point_lat, dtype=np.float64))
+    lng = np.atleast_1d(np.asarray(point_lng, dtype=np.float64))
+    out = np.zeros(lat.shape, dtype=bool)
+    blocks = [c for c in closures if c.blocks]
+    if not blocks or not len(lat):
+        return out
+    index = _index(tables)
+    lat1, lng1 = np.asarray(_get(tables, "seg_lat1")), np.asarray(_get(tables, "seg_lng1"))
+    lat2, lng2 = np.asarray(_get(tables, "seg_lat2")), np.asarray(_get(tables, "seg_lng2"))
+    closed = np.unique(np.concatenate([closed_segments(tables, c) for c in blocks]))
+    for k in range(len(lat)):
+        cand = index.candidates(float(lat[k]), float(lng[k]), tol_m)
+        if not len(cand):
+            continue
+        kx = _M_PER_DEG_LAT * math.cos(math.radians(float(lat[k])))
+        ax, ay = (lng1[cand] - lng[k]) * kx, (lat1[cand] - lat[k]) * _M_PER_DEG_LAT
+        bx, by = (lng2[cand] - lng[k]) * kx, (lat2[cand] - lat[k]) * _M_PER_DEG_LAT
+        dx, dy = bx - ax, by - ay
+        length2 = dx * dx + dy * dy
+        t = np.clip(-(ax * dx + ay * dy) / np.where(length2 > 0, length2, 1.0), 0.0, 1.0)
+        near = np.hypot(ax + t * dx, ay + t * dy) <= tol_m
+        on_closed = np.isin(cand[near], closed)
+        out[k] = bool(on_closed.any()) and not bool((~on_closed).any())
+    return out

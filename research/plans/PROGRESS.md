@@ -1,6 +1,6 @@
 # Research progress tracker
 
-Last updated: **19 November 2026**. Deadline for the rerouting work: **Sunday 6 December 2026**.
+Last updated: **20 November 2026**. Deadline for the rerouting work: **Sunday 6 December 2026**.
 
 **How to use this file.** Tick a box when the task's "done when" in its plan is met and the work is
 committed. Add the date and initials after the tick. Update the "Last updated" line. Record every cut
@@ -22,7 +22,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | Optimization: scaling run | done: run OS1 complete, 12 of 12 runs. Jadoon, Nadeem and their doubled instances on the Windows laptop (17 Nov, `results/optimizer-scale/`); All and All-doubled in WSL on 19 Nov (code `975760c`, `results/optimizer-scale-wsl/`); the two machines' rows are not pooled |
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
-| Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures, scenarios and the combined matrix next (Section 7) |
+| Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures pinned, combined matrix built, scenarios frozen (L6, 20 Nov). Next: the quality pass |
 | Rerouting: experiments | quick pipeline tests pass (logged 17 Nov, rerun on code `c1a9f8a`); RS1 "stops" without limits run twice and logged: first with the greedy-only R2 (`results/reroute-scale-r2-insertion/`, code `7299036`, logged in `c1a9f8a`), then with the improved R2 (`results/reroute-scale/`, code `c1a9f8a`, logged in `e59d26f`). Quality, limits, the limited "stops" rows and the graph, buses and slices parts blocked on the data and WSL; they run into `results/reroute-scale-wsl/` |
 | Rerouting: chapter | draft committed (`9132c3d`) from the plans and rules; updated 17 Nov (not yet committed) with the R2 change and the RS1 "stops" results; OS1 is in the optimization chapter (Section 7.6). Other results marked pending until each run is logged |
 | Website integration | design only (work plan Section 12); nothing to build before 6 December. `reroute.wire` is the request and proposal contract |
@@ -145,7 +145,7 @@ Names are not assigned yet.
 | [x] (19 Nov): Jadoon R-10 checked by eye | A | Scenario build, one route checked by eye | offline-builders, Task 6 steps 1 to 2 | Tue 24 |
 | [x] (17 Nov) | C | Scenario cases and scoring on true times | experiment-runner, Task 1 | Tue 24 |
 | [x] (17 Nov) | C | Summaries and verdict rules | experiment-runner, Task 2 | Wed 25 |
-| [ ] code done; run blocked (needs Docker laptop and map file) | A | Full scenario build; no leaks; file frozen and logged (L6) | offline-builders, Task 6 steps 3 to 5 | Thu 26 |
+| [x] (20 Nov, L6): 135 closures, 247 scenarios, 0 leaks | A | Full scenario build; no leaks; file frozen and logged (L6) | offline-builders, Task 6 steps 3 to 5 | Thu 26 |
 | [x] (19 Nov): 0 of 50,320 pairs differ from M1 | A | Combined 311-stop matrix | offline-builders, Task 7 | Thu 26 |
 | [x] (17 Nov, `c1a9f8a`): `quality --quick` 15 of 15 rows ok, toy verdicts pass | C | Quality pass and toy file | experiment-runner, Task 3 | Thu 26 |
 | [ ] code done; quick test passes without limits (17 Nov, `c1a9f8a`); `run_budget.py --check` and the limited quick test need WSL with systemd | C | Limits pass | experiment-runner, Task 4 | Fri 27 |
@@ -232,7 +232,7 @@ These differ from the wording of the work plan. Each is stated in the plan that 
 | The doubled contractor instances (Jadoon-doubled, Nadeem-doubled) stand in for All and All-doubled until the combined matrix exists | `run_scale.py`, OS1 (`c4c13f5`) | The combined matrix needs OSRM, which this machine cannot run |
 | `build_s` is not comparable between lookups; `ride_Ns` at N = budget includes the plan found right at the limit | `run_scale.py` | The callback lookup computes arc costs lazily, inside the search |
 | Points snap only to the main road network (the largest strongly connected part), at build time and in `Graph.nearest_node` (19 Nov) | `build_graph.py`, `reroute/graph.py` | Hyperstar and FTC had snapped onto a one-way parking aisle and a service-road piece with no way back, so two corridor legs had no path; OSRM avoids such pieces |
-| A point is closed when the place OSRM meets the road (pre-closure snap) is inside a full block, not its raw coordinate; the graph arm takes `closed_points` from the scenario file (20 Nov) | `build_scenarios.py`, `osrm_tools.py`, `run_reroute.py` | 7 stops lay with their coordinate and road point on different sides of a circle; Race Course was silently re-snapped by OSRM, giving times faster than before the closure |
+| A point is closed when the place OSRM meets the road (pre-closure snap) is inside a full block or on a segment the block closes (and on no open one), not by its raw coordinate; the graph arm takes `closed_points` from the scenario file (20 Nov) | `build_scenarios.py`, `osrm_tools.py`, `run_reroute.py` | 7 stops lay with their coordinate and road point on different sides of a circle; Race Course was silently re-snapped by OSRM, giving times faster than before the closure |
 | Unreachable pairs (`None`) become 10**7 s arcs | `optimize.py` | The stop is dropped instead of crashing the solver |
 | Quick result folders are published like the other `-quick` folders; per-job `work/` and `logs/` folders are gitignored | `research/results/`, `research/.gitignore` | Pipeline tests stay visible; intermediates stay out of git |
 | The hub refuses to start a run when git cannot give the code version | `research/hub/serve.py` | No run is recorded with code version `unknown` |
@@ -263,7 +263,7 @@ When a cut is taken: write it here with the date, and write logbook entry L11.
 ## 7. Blocked on this machine
 
 The lead's laptop has no Docker, no OSRM, no Karachi `.osm.pbf` and cannot start WSL (virtualization is
-off). **Update 19 Nov:** the N1 laptop runs WSL with Docker and systemd; items 1, 2, 3, 4 and 5 are done there (LOGBOOK, 2026-11-19, three entries); gate G1 is met. Everything below needs the Docker laptop and the N1 map file; items 4, 11 and 12 also need WSL
+off). **Update 19 Nov:** the N1 laptop runs WSL with Docker and systemd; items 1, 2, 3, 4 and 5 are done there (LOGBOOK, 2026-11-19, three entries); gate G1 is met. Items 6 to 9 done 19 and 20 Nov (historical closures, scenarios, combined matrix, OS1 All). Everything below needs the Docker laptop and the N1 map file; items 4, 11 and 12 also need WSL
 with systemd. Results from that machine go to their own folders (`results/optimizer-scale-wsl/`,
 `results/reroute-scale-wsl/`) and are never pooled with the Windows laptop's rows. Run in this order, from the repository root unless stated. Log each
 result the same day.
