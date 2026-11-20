@@ -19,7 +19,7 @@ on OSRM yet. Section 7 lists those runs in order.
 | --- | --- |
 | Optimization: experiments | done (B1, Q1, T1, S1 all passed and are logged) |
 | Optimization: chapter | draft committed; references, figures and the Nadeem bus-count point still open |
-| Optimization: scaling run | done: run OS1 complete, 12 of 12 runs. Jadoon, Nadeem and their doubled instances on the Windows laptop (17 Nov, `results/optimizer-scale/`); All and All-doubled in WSL on 19 Nov (code `975760c`, `results/optimizer-scale-wsl/`); the two machines' rows are not pooled |
+| Optimization: scaling run | done: run OS1 complete, 12 of 12 runs. Jadoon, Nadeem and their doubled instances on the Windows laptop (17 Nov, `results/optimizer-scale/`); All and All-doubled in WSL on 19 Nov (code `975760c`, `results/optimizer-scale-wsl/`); the two machines' rows are not pooled . **20 Nov:** all six instances repeated on the Docker laptop (L11, `results/optimizer-scale-onemachine/`, 12 of 12): one-machine size curve, results agree with the split runs within 0.2% at 300 s; planning both fleets together gives no measurable gain (0.18%) |
 | Rerouting: planning | done (work plan version 2 approved; six implementation plans written) |
 | Rerouting: code | done: solver, road graph, offline builders, runner and optimizer scaling, with unit tests (221 in `reroute/tests`, 237 in `tests`, all passing); commits `54a55f2` and `7299036`; R2 improvement rounds added after RS1's first run (`723f4c8`) |
 | Rerouting: data (graph, walking distances, scenarios) | in progress: on 19 Nov, in WSL on the N1 laptop: map file and OSRM checked (A1), graph built (L2), road-block test (L3), calibration, corridors and G1 timings (L5), walking distances (L4); gate G1 met. Historical closures pinned, combined matrix built, scenarios frozen (L6, 20 Nov). Next: the quality pass |
@@ -162,7 +162,7 @@ Names are not assigned yet.
 | [x] (17 Nov): `scale --quick` 4 of 4 ok; part "stops" run without limits | C | Scaling runs coded | experiment-runner, Task 5 | Mon 30 |
 | [ ] code done, entry L7 committed (`c4c13f5`, committed minutes before OS1 started) and quick test ok (17 Nov, 2 of 2); the plan asks for L7 pushed before the run, but it was only committed: push pending | B | Optimizer instances and scaling script; entry L7 pushed | optimizer-scaling, Tasks 2 to 3 | Mon 30 |
 | [x] (20 Nov, L9): thresholds 5 and 6 pass; threshold 4 fails by one scenario (74 of 78) | all | Limits pass run and logged the same day (L9) | experiment-runner, Task 7 | Tue 1 |
-| [x] (20 Nov): OS1 complete (L7 of 19 Nov, All and All-doubled); RS1 complete (L10, all parts in WSL) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
+| [x] (20 Nov): OS1 complete (L7 of 19 Nov, All and All-doubled), and repeated on one machine (L11); RS1 complete (L10, all parts in WSL) | all | Rerouting and optimizer scaling runs, logged the same day (L10) | experiment-runner Task 7; optimizer-scaling Task 3 | Wed 2 |
 | [ ] | all | **Run freeze**: no new runs after Wed 2 Dec | - | Wed 2 |
 | [ ] | all | Chapter sections 8, 9, 10; references checked | logbook-and-chapter | Fri 4 |
 | [ ] | all | Internal review of the chapter by a second person | logbook-and-chapter | Fri 4 |
@@ -239,6 +239,7 @@ These differ from the wording of the work plan. Each is stated in the plan that 
 | Quick result folders are published like the other `-quick` folders; per-job `work/` and `logs/` folders are gitignored | `research/results/`, `research/.gitignore` | Pipeline tests stay visible; intermediates stay out of git |
 | The hub refuses to start a run when git cannot give the code version | `research/hub/serve.py` | No run is recorded with code version `unknown` |
 | OS1 and RS1 "stops" ran from the command line, not from the hub as optimizer-scaling Task 3 Step 5 and experiment-runner Task 7 Step 3 say; each run's `meta.json` still records the code version | `run_scale.py`, `run_reroute.py` | The hub's Run buttons start the scripts in WSL, which the lead's laptop cannot start |
+| `run_scale.py` turns a relative `--out-dir` into an absolute path before starting the worker | `run_scale.py`, L11 (20 Nov) | The worker runs inside `research/`, so a relative path pointed at `research/research/...` and the four contractor runs of the first one-machine attempt failed after solving |
 | Runs on the Docker laptop write to their own folders with `--out-dir`: `results/optimizer-scale-wsl/` and `results/reroute-scale-wsl/` | `run_scale.py`, `run_reroute.py`; logbook rules entry (`9132c3d`) | Rows from the Windows laptop (no limits, Windows peak working set) are never pooled with WSL rows |
 
 ### Changes made after the first results (17 Nov)

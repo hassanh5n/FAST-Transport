@@ -1165,3 +1165,58 @@ except Jadoon-R-6B-L7-early at 274 KB during R3, so a resumable solve fits a dat
 three R3 kept R2's plan (R2 was already optimal).
 
 Run RS1 is complete. Rerouting experiments are closed: quality (L8), limits (L9), scaling (L10).
+
+## 2026-11-20: L11: OS1 repeated on one machine (`results/optimizer-scale-onemachine/`)
+
+Machine: `DESKTOP-15B12RB`, WSL2, Intel Core i5-7300U, 4 CPUs, no limits (Linux peak RSS), the same machine as the
+19 Nov All rows. Code `a7f3fe2`, solver unchanged since `975760c`. All six instances, both lookups, 300 s each, one at
+a time in fresh processes: 12 of 12 ok. This entry gives the size curve from one machine; the 17 Nov (Windows) and
+19 Nov (WSL) entries stay as recorded and are not pooled with it.
+
+The first attempt lost the four contractor runs: `--out-dir` was given as a relative path, and the worker process,
+which runs inside `research/`, read it as `research/research/...` and could not write the per-run file the hub needs
+(only contractor instances write one, so the doubled and All runs were unaffected). `run_scale.py` now makes the
+folder absolute before starting the worker (test added). The four runs were repeated with that fix in the working
+tree but not yet committed, so their rows also say `a7f3fe2`; the fix changes only where the file is written.
+
+| Instance | Stops / buses | Lookup | Build (s) | First plan (s) | Peak (MB) | Ride 10 s | Ride 60 s | Ride 300 s | Scored 300 s (student-min) | Longest ride (min) |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Nadeem | 143 / 26 | callback | 0.014 | 0.11 | 58 | 31,176 | 30,837 | 30,708 | 29,760 | 53.0 |
+| Nadeem | 143 / 26 | matrix | 0.042 | 0.08 | 60 | 30,987 | 30,753 | 30,657 | 29,716 | 54.6 |
+| Jadoon | 171 / 27 | callback | 0.015 | 0.08 | 59 | 33,005 | 32,522 | 32,474 | 31,472 | 53.7 |
+| Jadoon | 171 / 27 | matrix | 0.03 | 0.07 | 62 | 33,125 | 32,522 | 32,474 | 31,472 | 53.7 |
+| Nadeem-doubled | 286 / 52 | callback | 0.01 | 0.29 | 66 | 63,489 | 59,463 | 59,355 | 57,704 | 54.1 |
+| Nadeem-doubled | 286 / 52 | matrix | 0.049 | 0.14 | 73 | 64,332 | 60,060 | 59,460 | 57,780 | 54.1 |
+| All | 311 / 53 | callback | 0.019 | 0.42 | 74 | 71,564 | 64,089 | 63,053 | 61,119 | 56.6 |
+| All | 311 / 53 | matrix | 0.054 | 0.25 | 83 | 69,908 | 64,359 | 63,063 | 61,123 | 56.6 |
+| Jadoon-doubled | 342 / 54 | callback | 0.009 | 0.24 | 69 | 67,119 | 63,755 | 63,542 | 61,696 | 51.6 |
+| Jadoon-doubled | 342 / 54 | matrix | 0.114 | 0.35 | 79 | 69,454 | 65,055 | 63,547 | 61,702 | 52.4 |
+| All-doubled | 622 / 106 | callback | 0.016 | 0.97 | 94 | 149,657 | 131,009 | 122,618 | 119,113 | 55.5 |
+| All-doubled | 622 / 106 | matrix | 0.2 | 2.58 | 130 | 161,254 | 148,480 | 135,524 | 130,971 | 89.7 |
+
+No stop dropped in any run. Ride columns are the solver's cost (approx. student-minutes); "Scored" is the plan
+rescored by `score()`.
+
+- **Size.** Build time stays under 0.2 s and the first plan arrives within 2.6 s at every size. Peak memory grows
+  from 58 MB (143 stops) to 94 MB (622 stops) with the callback, 130 MB with the matrix: far under 512 MB.
+- **Convergence weakens with size.** With the callback the 60 s plan is 0.2% to 0.4% above the 300 s plan up to
+  342 stops, 1.6% at All (311 stops, two fleets) and 6.8% at All-doubled, which was still improving at 300 s
+  (2,172 improvements). The 60 s checkpoint moves between repeats (All: 0.30% on 19 Nov, 1.6% here), because the
+  search is cut by wall time, not by a fixed amount of work; the 300 s results are stable (next point).
+- **Repeatability.** Against the 19 Nov rows on the same machine the 300 s cost differs by 0.19% (All, callback),
+  0.02% (All, matrix), 0.10% (All-doubled, callback) and 1.5% (All-doubled, matrix). Against the 17 Nov Windows rows
+  the four contractor instances differ by at most 0.2% at 300 s, so the machine split did not distort the earlier
+  conclusions; peak memory reads 5 to 6 MB higher here (Linux peak RSS against the Windows peak working set).
+- **Matrix against callback.** Within 0.2% at 300 s on every instance up to 342 stops (Nadeem: the matrix is 0.17%
+  better). At 622 stops the matrix is 10.5% worse, with fewer than half the improvements (760 against 2,172) and an
+  89.7-minute longest ride against 55.5; the 19 Nov run gave 9.0% and 89.1 minutes. Reproduced twice, so the
+  callback stays the default (decision of 17 Nov).
+- **Both fleets together against each alone.** Now measurable on one machine: Jadoon alone plus Nadeem alone score
+  31,472 + 29,760 = 61,232 student-min; All (both fleets in one model) scores 61,119, 0.18% less, with a longer
+  longest ride (56.6 against 53.7 and 53.0 minutes). The difference is the size of the repeat noise above (0.2%),
+  so planning the two contractors' fleets together gives no measurable gain on Fall 2026 data. The separate runs
+  also had 300 s each, twice the search time of the combined run; the conclusion does not depend on that, since the
+  combined plan is not worse.
+
+Run OS1 now has a one-machine version: 12 of 12 runs on the Docker laptop. The optimization chapter's size curve
+should use this entry.

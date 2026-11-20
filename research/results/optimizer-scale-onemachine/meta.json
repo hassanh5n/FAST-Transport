@@ -1,0 +1,29 @@
+{
+ "started_at": "2026-11-20T13:46:00+00:00",
+ "machine": {
+  "host": "DESKTOP-15B12RB",
+  "kernel": "6.18.58.1-microsoft-standard-WSL2",
+  "python": "3.12.3",
+  "cpus": 4,
+  "cpu": "Intel(R) Core(TM) i5-7300U CPU @ 2.60GHz",
+  "ortools": "9.15.6755"
+ },
+ "quick": false,
+ "setup": "unlimited",
+ "budget_s": 300,
+ "instances": [
+  "Jadoon",
+  "Nadeem",
+  "Jadoon-doubled",
+  "Nadeem-doubled",
+  "All",
+  "All-doubled"
+ ],
+ "lookups": [
+  "callback",
+  "matrix"
+ ],
+ "doubled_gap_s": 30.0,
+ "runs_total": 12,
+ "code_version": "a7f3fe2"
+}

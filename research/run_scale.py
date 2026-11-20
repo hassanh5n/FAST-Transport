@@ -164,6 +164,13 @@ def write_run_file(out_dir, job, I, result, progress, opt, row, inst):
     (out_dir / "runs" / f"{job['key']}.json").write_text(json.dumps(report, indent=1))
 
 
+def output_dir(given, quick=False):
+    """Absolute output folder. A relative --out-dir is read from the caller's working directory; it must be
+    absolute before it reaches the worker, which runs in research/ (a relative path there pointed at
+    research/research/... and lost the contractor runs' files, 20 Nov)."""
+    return (given or ROOT / "results" / ("optimizer-scale-quick" if quick else "optimizer-scale")).resolve()
+
+
 SCRIPT = Path(__file__).resolve()
 
 
@@ -256,7 +263,7 @@ def main():
     if args.worker:
         worker_main(json.loads(args.worker), args.out_dir, args.budget, args.result_file)
         return
-    out_dir = args.out_dir or ROOT / "results" / ("optimizer-scale-quick" if args.quick else "optimizer-scale")
+    out_dir = output_dir(args.out_dir, args.quick)
     if args.summarize:
         summarize(out_dir)
         return

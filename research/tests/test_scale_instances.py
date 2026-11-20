@@ -119,5 +119,25 @@ class RunScaleHelperTests(unittest.TestCase):
             build_instance("Nobody", inst, mat)
 
 
+class OutputDirTests(unittest.TestCase):
+    def test_relative_out_dir_is_made_absolute_from_the_callers_directory(self):
+        import os, tempfile
+        from run_scale import output_dir
+        here = os.getcwd()
+        with tempfile.TemporaryDirectory() as tmp:
+            os.chdir(tmp)
+            try:
+                got = output_dir(Path("research/results/x"))
+            finally:
+                os.chdir(here)
+            self.assertTrue(got.is_absolute())
+            self.assertEqual(got, (Path(tmp) / "research/results/x").resolve())
+
+    def test_default_out_dir(self):
+        from run_scale import ROOT, output_dir
+        self.assertEqual(output_dir(None), (ROOT / "results" / "optimizer-scale").resolve())
+        self.assertEqual(output_dir(None, quick=True).name, "optimizer-scale-quick")
+
+
 if __name__ == "__main__":
     unittest.main()

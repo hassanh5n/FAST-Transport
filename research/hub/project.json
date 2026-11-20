@@ -61,8 +61,7 @@
  "planned_experiments": [],
  "next_steps": [
   "Rerouting chapter: put the results of entries L6 to L10 into sections 4 to 6 (all marked pending), then write sections 8 to 10. Quality pass: R2 matches R3 (pass), walking gains a median 0 s net of the no-closure control (fail, a valid result). Limits pass: a valid plan within 5 s in 94.9% (fail by one scenario), within 60 s of the oracle at 30 s in 92.3% (pass), peak 209 MB (pass).",
-  "Optimization chapter: embed the three figures from the hub, settle the Nadeem bus-count point, and add the All and All-doubled scaling rows (19 Nov, results/optimizer-scale-wsl/).",
-  "Optional before the run freeze (Wed 2 Dec): rerun the four contractor instances of the optimizer scaling on the WSL laptop, so the size curve comes from one machine.",
+  "Optimization chapter: embed the three figures from the hub, settle the Nadeem bus-count point, and take the size curve from the one-machine run (L11, 20 Nov, results/optimizer-scale-onemachine/): memory 58 to 130 MB up to 622 stops, matrix lookup 10.5% worse at 622 stops, no measurable gain (0.18%) from planning both fleets together.",
   "Internal review of both chapters by a second person (by Fri 4 Dec); then the hub plan, the progress tracker and the shared page brought up to date (by Sun 6 Dec)."
  ]
 }

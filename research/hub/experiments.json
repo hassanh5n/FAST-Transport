@@ -194,7 +194,7 @@
   ],
   "runs_total": 12,
   "question": "How do the optimizer's build time, memory and plan quality grow as stops and buses grow, and does handing OR-Tools the travel times as a matrix instead of a Python callback change that?",
-  "design": "Run OS1 repeated on one machine (the Docker laptop, WSL), 20 Nov, so all six instances share one machine, one code version and one meta file: Jadoon (171 stops), Nadeem (143), Jadoon-doubled (342), Nadeem-doubled (286), All (311) and All-doubled (622); both lookups, 300 s each, no limits, each run a fresh process: 12 runs, about an hour. Optimizer code unchanged since 975760c. Supersedes the two-machine split for the chapter's curves; the earlier entries stay as recorded."
+  "design": "Run OS1 repeated on one machine (the Docker laptop, WSL), 20 Nov, so all six instances share one machine, one code version and one meta file: Jadoon (171 stops), Nadeem (143), Jadoon-doubled (342), Nadeem-doubled (286), All (311) and All-doubled (622); both lookups, 300 s each, no limits, each run a fresh process: 12 runs, about an hour. Optimizer code unchanged since 975760c; code a7f3fe2, 12 of 12 ok (L11). The four contractor runs were repeated after a fix to where run_scale.py writes the per-run file (relative --out-dir). Supersedes the two-machine split for the chapter's curves; the earlier entries stay as recorded."
  },
  {
   "id": "reroute-quality",
